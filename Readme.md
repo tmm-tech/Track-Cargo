@@ -1,7 +1,4 @@
-### Texmon Logistics Cargo Tracking System
-
-![Texmon Logistics Logo](https://www.texmonlogistics.co.ke/assets/images/texmon-logo.png)
-
+### Logistics Cargo Tracking System
 
 ## Overview
 
