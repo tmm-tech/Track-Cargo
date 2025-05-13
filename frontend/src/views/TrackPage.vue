@@ -58,7 +58,7 @@
       <div class="container mx-auto">
         <div class="flex flex-col md:flex-row justify-between">
           <div class="flex flex-col md:flex-row">
-            <button class="md:hidden p-4 text-white focus:outline-none">
+            <button class="md:hidden p-4 text-white focus:outline-none" @click="toggleMobileMenu">
               <svg
                 class="w-6 h-6"
                 fill="none"
@@ -69,7 +69,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <div class="hidden md:flex flex-col md:flex-row">
+            <div :class="['md:flex flex-col md:flex-row', { 'hidden': !mobileMenuOpen }]">
               <router-link to="/" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Home
               </router-link>
@@ -122,18 +122,48 @@
                       v-model="trackingNumber"
                       placeholder="Enter tracking or dispatch number"
                       class="pr-10 border-gray-300"
+                      @input="clearError"
                     />
                     <Search class="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
                   </div>
                   <p v-if="error" class="text-sm text-red-500">{{ error }}</p>
                 </div>
 
-                <Button type="submit" class="w-full bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold">
-                  Track
+                <Button 
+                  type="submit" 
+                  class="w-full bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold"
+                  :disabled="isSubmitting"
+                >
+                  <Loader v-if="isSubmitting" class="animate-spin mr-2 h-4 w-4" />
+                  {{ isSubmitting ? 'Tracking...' : 'Track' }}
                 </Button>
               </form>
+              
+              <div v-if="recentSearches.length > 0" class="mt-8">
+                <h3 class="text-sm font-medium text-gray-500 mb-2">Recent Searches</h3>
+                <div class="space-y-2">
+                  <div 
+                    v-for="search in recentSearches" 
+                    :key="search"
+                    class="flex justify-between items-center p-2 bg-gray-50 rounded hover:bg-gray-100 cursor-pointer"
+                    @click="useRecentSearch(search)"
+                  >
+                    <span>{{ search }}</span>
+                    <ArrowRight class="h-4 w-4 text-gray-400" />
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
+          
+          <div class="mt-8 text-center">
+            <p class="text-gray-600">Need help with tracking?</p>
+            <p class="mt-2">
+              <a href="tel:+254795616827" class="text-[#273272] font-medium hover:underline">
+                Call us at (+254) 795 616 827
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </main>
@@ -169,4 +199,202 @@
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     fill-rule="evenodd"
-                    d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.582.413 3.126 1.198 4.488L3 21.116l4.759-1.249a8.981 8.981 0 0 0 4.29 1.093h.004c4.947 0 8.975-4.027 8.977-8.977a8.926 8.926 0 0 0-2.627-6.35m-6.35 13.812h-.003a7.446 7.446 0 0 1-3.798-1.041l-.272-.162-2.824.741.753-2.753-.177-.282a7.448 7.448 0 0 1-1.141-3.971c.002-4.114 3.349-7.461 7.465-7.461a7.413 7.413 0 0 1 5.275 2.188 7.42 7.42 0 0 1
+                    d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.582.413 3.126 1.198 4.488L3 21.116l4.759-1.249a8.981 8.981 0 0 0 4.29 1.093h.004c4.947 0 8.975-4.027 8.977-8.977a8.926 8.926 0 0 0-2.627-6.35m-6.35 13.812h-.003a7.446 7.446 0 0 1-3.798-1.041l-.272-.162-2.824.741.753-2.753-.177-.282a7.448 7.448 0 0 1-1.141-3.971c.002-4.114 3.349-7.461 7.465-7.461a7.413 7.413 0 0 1 5.275 2.188 7.42 7.42 0 0 1 2.183 5.279c-.002 4.114-3.349 7.462-7.461 7.462m4.093-5.589c-.225-.113-1.327-.655-1.533-.73-.205-.075-.354-.112-.504.112s-.58.729-.711.879-.262.168-.486.056-.947-.349-1.804-1.113c-.667-.595-1.117-1.329-1.248-1.554s-.014-.346.099-.458c.101-.1.224-.262.336-.393.112-.131.149-.224.224-.374s.038-.281-.019-.393c-.056-.113-.505-1.217-.692-1.666-.181-.435-.366-.377-.504-.383a9.65 9.65 0 0 0-.429-.008.826.826 0 0 0-.599.28c-.206.225-.785.767-.785 1.871s.804 2.171.916 2.321c.112.15 1.582 2.415 3.832 3.387.536.231.954.369 1.279.473.537.171 1.026.146 1.413.089.431-.064 1.327-.542 1.514-1.066.187-.524.187-.973.131-1.067-.056-.094-.207-.151-.43-.263"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-[#ffb600]">
+                <span class="sr-only">LinkedIn</span>
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill-rule="evenodd"
+                    d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-bold mb-4">Working Hours</h3>
+            <ul class="text-gray-400">
+              <li class="flex justify-between mb-2">
+                <span>Monday - Friday:</span>
+                <span>08:00 - 17:00</span>
+              </li>
+              <li class="flex justify-between mb-2">
+                <span>Saturday:</span>
+                <span>Open</span>
+              </li>
+              <li class="flex justify-between mb-2">
+                <span>Sunday and holidays:</span>
+                <span>Open</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-bold mb-4">Services</h3>
+            <ul class="text-gray-400 space-y-2">
+              <li>
+                <a href="#" class="hover:text-[#ffb600]">
+                  Land Freight
+                </a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-[#ffb600]">
+                  Sea Freight
+                </a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-[#ffb600]">
+                  Air Freight
+                </a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-[#ffb600]">
+                  Customs Clearance
+                </a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-[#ffb600]">
+                  Cross Border Clearance
+                </a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-[#ffb600]">
+                  Project Cargo
+                </a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-[#ffb600]">
+                  Reverse Logistics
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-800 pt-4">
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-400">Copyright © {{ new Date().getFullYear() }} Texmon Logistics Limited</p>
+            <div class="flex space-x-4 mt-4 md:mt-0">
+              <a href="#" class="text-gray-400 hover:text-[#ffb600]">
+                About Us
+              </a>
+              <a href="#" class="text-gray-400 hover:text-[#ffb600]">
+                Services
+              </a>
+              <a href="#" class="text-gray-400 hover:text-[#ffb600]">
+                Contact Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { Search, ArrowRight, Loader } from 'lucide-vue-next';
+import Card from '../components/ui/Card.vue';
+import CardHeader from '../components/ui/CardHeader.vue';
+import CardTitle from '../components/ui/CardTitle.vue';
+import CardDescription from '../components/ui/CardDescription.vue';
+import CardContent from '../components/ui/CardContent.vue';
+import Button from '../components/ui/Button.vue';
+import Input from '../components/ui/Input.vue';
+import Label from '../components/ui/Label.vue';
+import { mockPackages } from '../data/mock-data';
+
+const router = useRouter();
+const trackingNumber = ref('');
+const error = ref('');
+const isSubmitting = ref(false);
+const mobileMenuOpen = ref(false);
+const recentSearches = ref<string[]>([]);
+
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+};
+
+const clearError = () => {
+  error.value = '';
+};
+
+const saveRecentSearch = (number: string) => {
+  // Add to recent searches if not already there
+  if (!recentSearches.value.includes(number)) {
+    // Keep only the 5 most recent searches
+    recentSearches.value = [number, ...recentSearches.value.slice(0, 4)];
+    localStorage.setItem('recentSearches', JSON.stringify(recentSearches.value));
+  }
+};
+
+const useRecentSearch = (number: string) => {
+  trackingNumber.value = number;
+  handleSubmit();
+};
+
+const handleSubmit = async () => {
+  if (!trackingNumber.value.trim()) {
+    error.value = 'Please enter a tracking or dispatch number';
+    return;
+  }
+
+  isSubmitting.value = true;
+
+  try {
+    // Simulate API call with a timeout
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Check if package exists in mock data
+    const foundPackage = mockPackages.find(
+      pkg => pkg.trackingNumber === trackingNumber.value || pkg.dispatchNumber === trackingNumber.value
+    );
+
+    if (foundPackage) {
+      // Save to recent searches
+      saveRecentSearch(trackingNumber.value);
+      
+      // Navigate to results page with tracking number
+      router.push(`/track/results?number=${trackingNumber.value}`);
+    } else {
+      error.value = 'No package found with the provided information';
+    }
+  } catch (err) {
+    error.value = 'An error occurred while tracking your package. Please try again.';
+    console.error('Tracking error:', err);
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+onMounted(() => {
+  // Load recent searches from localStorage
+  const savedSearches = localStorage.getItem('recentSearches');
+  if (savedSearches) {
+    recentSearches.value = JSON.parse(savedSearches);
+  }
+});
+</script>
+
+<style scoped>
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
