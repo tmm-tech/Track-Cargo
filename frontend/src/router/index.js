@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Track from '@/views/TrackPage.vue';
 
 const routes = [
-  { path: '/', name: 'Track', component: Home },
+  { path: '/', name: 'Track', component: Track },
 ];
 
 const router = createRouter({
