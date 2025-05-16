@@ -58,7 +58,8 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
     "zod": "^3.24.1",
-    "vue": "^3.5.13"
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
