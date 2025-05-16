@@ -1,8 +1,40 @@
+"use client"
+
+import { useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Truck, Ship, Plane } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { MapPin, TruckIcon, CheckCircle } from "lucide-react"
+import { mockPackages } from "@/lib/mock-data"
 
-export default function Home() {
+export default function ResultsPage() {
+  const searchParams = useSearchParams()
+  const trackingNumber = searchParams.get("number")
+
+  const [packageData, setPackageData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    // Simulate API call with a timeout
+    const timer = setTimeout(() => {
+      setLoading(false)
+
+      const foundPackage = mockPackages.find(
+        (pkg) => pkg.trackingNumber === trackingNumber || pkg.dispatchNumber === trackingNumber,
+      )
+
+      if (foundPackage) {
+        setPackageData(foundPackage)
+      } else {
+        setError("No package found with the provided information")
+      }
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [trackingNumber])
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="bg-[#273272] text-white">
@@ -107,77 +139,130 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="flex-1">
-        <section
-          className="py-12 md:py-20 bg-cover bg-center"
-          style={{ backgroundImage: "url('/placeholder.svg?height=600&width=1200')" }}
-        >
-          <div className="container mx-auto px-4">
-            <div className="max-w-xl bg-white/90 p-8 rounded-lg">
-              <h1 className="text-3xl md:text-4xl font-bold text-[#273272] mb-4">Track Your Cargo</h1>
-              <p className="text-gray-700 mb-6">
-                Know exactly where your package is at all times. Get updates on current location, next stop, and final
-                destination.
-              </p>
-              <Link href="/track">
-                <Button className="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-8 py-3 rounded">
-                  Track Now
-                </Button>
-              </Link>
+      <main className="flex-1 bg-gray-50 py-12">
+        <div className="container mx-auto px-4">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-16 h-16 border-4 border-[#ffb600] border-t-transparent rounded-full animate-spin"></div>
+              <p className="mt-4 text-gray-600">Loading tracking information...</p>
             </div>
-          </div>
-        </section>
+          ) : error ? (
+            <Card className="max-w-2xl mx-auto border-none shadow-lg">
+              <CardHeader className="bg-[#273272] text-white rounded-t-lg">
+                <CardTitle className="text-2xl">Package Not Found</CardTitle>
+                <CardDescription className="text-gray-200">
+                  We couldn't find any package with the provided information.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <p className="mb-6 text-gray-600">Please check your tracking or dispatch number and try again.</p>
+                <Link href="/track">
+                  <Button className="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold">Try Again</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            packageData && (
+              <div className="max-w-4xl mx-auto">
+                <h1 className="text-3xl font-bold text-[#273272] mb-6">Tracking Information</h1>
 
-        <section className="py-12 bg-gray-100">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-[#273272]">Our Logistics Services</h2>
-              <p className="text-gray-600 mt-2">Reliable, efficient and technology driven logistics solutions</p>
-            </div>
+                <Card className="mb-8 border-none shadow-lg">
+                  <CardHeader className="bg-[#273272] text-white rounded-t-lg">
+                    <CardTitle>Package Details</CardTitle>
+                    <CardDescription className="text-gray-200">Number: {trackingNumber}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <div>
+                        <h3 className="font-medium text-gray-500">Package Type</h3>
+                        <p className="text-lg">{packageData.type}</p>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-500">Weight</h3>
+                        <p className="text-lg">{packageData.weight} kg</p>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-500">Shipped Date</h3>
+                        <p className="text-lg">{packageData.shippedDate}</p>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-500">Estimated Delivery</h3>
+                        <p className="text-lg">{packageData.estimatedDelivery}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="w-16 h-16 bg-[#273272]/10 rounded-full flex items-center justify-center mb-4">
-                  <Truck className="w-8 h-8 text-[#273272]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#273272] mb-2">Land Freight</h3>
-                <p className="text-gray-600">Efficient transportation of goods via road networks across East Africa.</p>
+                <Card className="mb-8 border-none shadow-lg">
+                  <CardHeader className="bg-[#273272] text-white rounded-t-lg">
+                    <CardTitle>Current Status</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <div className="flex items-start gap-4 mb-8">
+                      <div className="bg-[#273272]/10 p-3 rounded-full">
+                        <MapPin className="h-6 w-6 text-[#273272]" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-500 text-lg">Current Location</h3>
+                        <p className="text-xl font-bold text-[#273272]">{packageData.currentLocation}</p>
+                        <p className="text-gray-500">Updated: {packageData.lastUpdated}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4 mb-8">
+                      <div className="bg-[#273272]/10 p-3 rounded-full">
+                        <TruckIcon className="h-6 w-6 text-[#273272]" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-500 text-lg">Next Stop</h3>
+                        <p className="text-xl font-bold text-[#273272]">{packageData.nextStop}</p>
+                        <p className="text-gray-500">Estimated arrival: {packageData.nextStopETA}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      <div className="bg-[#273272]/10 p-3 rounded-full">
+                        <CheckCircle className="h-6 w-6 text-[#273272]" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-500 text-lg">Final Destination</h3>
+                        <p className="text-xl font-bold text-[#273272]">{packageData.finalDestination}</p>
+                        <p className="text-gray-500">Estimated delivery: {packageData.estimatedDelivery}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-none shadow-lg">
+                  <CardHeader className="bg-[#273272] text-white rounded-t-lg">
+                    <CardTitle>Shipping Progress</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <div className="space-y-6">
+                      {packageData.trackingHistory.map((event: any, index: number) => (
+                        <div key={index} className="flex gap-4">
+                          <div className="relative flex flex-col items-center">
+                            <div
+                              className={`w-4 h-4 rounded-full ${index === 0 ? "bg-[#ffb600]" : "bg-gray-300"}`}
+                            ></div>
+                            {index < packageData.trackingHistory.length - 1 && (
+                              <div className="w-0.5 h-full bg-gray-200 absolute top-4"></div>
+                            )}
+                          </div>
+                          <div className="flex-1 pb-6">
+                            <p className="font-medium text-[#273272]">{event.status}</p>
+                            <p className="text-sm text-gray-500">{event.location}</p>
+                            <p className="text-sm text-gray-500">{event.timestamp}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="w-16 h-16 bg-[#273272]/10 rounded-full flex items-center justify-center mb-4">
-                  <Ship className="w-8 h-8 text-[#273272]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#273272] mb-2">Sea Freight</h3>
-                <p className="text-gray-600">Reliable shipping solutions for both FCL and LCL cargo worldwide.</p>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="w-16 h-16 bg-[#273272]/10 rounded-full flex items-center justify-center mb-4">
-                  <Plane className="w-8 h-8 text-[#273272]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#273272] mb-2">Air Freight</h3>
-                <p className="text-gray-600">Fast and secure air transportation for time-sensitive shipments.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-12 bg-[#273272] text-white">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold mb-2">Track Your Cargo Now</h2>
-                <p>Enter your tracking number to get real-time updates on your shipment</p>
-              </div>
-              <Link href="/track" className="mt-6 md:mt-0">
-                <Button className="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-8 py-3 rounded">
-                  Track Cargo
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
+            )
+          )}
+        </div>
       </main>
 
       <footer className="bg-[#1a1a1a] text-white pt-12 pb-4">

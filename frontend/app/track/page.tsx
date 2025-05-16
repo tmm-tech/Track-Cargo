@@ -1,8 +1,32 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Truck, Ship, Plane } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Search } from "lucide-react"
 
-export default function Home() {
+export default function TrackPage() {
+  const router = useRouter()
+  const [trackingNumber, setTrackingNumber] = useState("")
+  const [error, setError] = useState("")
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!trackingNumber.trim()) {
+      setError("Please enter a tracking or dispatch number")
+      return
+    }
+
+    router.push(`/track/results?number=${trackingNumber}`)
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="bg-[#273272] text-white">
@@ -107,77 +131,44 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="flex-1">
-        <section
-          className="py-12 md:py-20 bg-cover bg-center"
-          style={{ backgroundImage: "url('/placeholder.svg?height=600&width=1200')" }}
-        >
-          <div className="container mx-auto px-4">
-            <div className="max-w-xl bg-white/90 p-8 rounded-lg">
-              <h1 className="text-3xl md:text-4xl font-bold text-[#273272] mb-4">Track Your Cargo</h1>
-              <p className="text-gray-700 mb-6">
-                Know exactly where your package is at all times. Get updates on current location, next stop, and final
-                destination.
-              </p>
-              <Link href="/track">
-                <Button className="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-8 py-3 rounded">
-                  Track Now
-                </Button>
-              </Link>
-            </div>
+      <main className="flex-1 bg-gray-50 py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-md mx-auto">
+            <Card className="border-none shadow-lg">
+              <CardHeader className="bg-[#273272] text-white rounded-t-lg">
+                <CardTitle className="text-2xl">Track Your Cargo</CardTitle>
+                <CardDescription className="text-gray-200">
+                  Enter your tracking information to see the current status of your package
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="tracking-number">Tracking or Dispatch Number</Label>
+                    <div className="relative">
+                      <Input
+                        id="tracking-number"
+                        placeholder="Enter tracking or dispatch number"
+                        value={trackingNumber}
+                        onChange={(e) => {
+                          setTrackingNumber(e.target.value)
+                          setError("")
+                        }}
+                        className="pr-10 border-gray-300"
+                      />
+                      <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                    </div>
+                    {error && <p className="text-sm text-red-500">{error}</p>}
+                  </div>
+
+                  <Button type="submit" className="w-full bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold">
+                    Track
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
-        </section>
-
-        <section className="py-12 bg-gray-100">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-[#273272]">Our Logistics Services</h2>
-              <p className="text-gray-600 mt-2">Reliable, efficient and technology driven logistics solutions</p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="w-16 h-16 bg-[#273272]/10 rounded-full flex items-center justify-center mb-4">
-                  <Truck className="w-8 h-8 text-[#273272]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#273272] mb-2">Land Freight</h3>
-                <p className="text-gray-600">Efficient transportation of goods via road networks across East Africa.</p>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="w-16 h-16 bg-[#273272]/10 rounded-full flex items-center justify-center mb-4">
-                  <Ship className="w-8 h-8 text-[#273272]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#273272] mb-2">Sea Freight</h3>
-                <p className="text-gray-600">Reliable shipping solutions for both FCL and LCL cargo worldwide.</p>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="w-16 h-16 bg-[#273272]/10 rounded-full flex items-center justify-center mb-4">
-                  <Plane className="w-8 h-8 text-[#273272]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#273272] mb-2">Air Freight</h3>
-                <p className="text-gray-600">Fast and secure air transportation for time-sensitive shipments.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-12 bg-[#273272] text-white">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold mb-2">Track Your Cargo Now</h2>
-                <p>Enter your tracking number to get real-time updates on your shipment</p>
-              </div>
-              <Link href="/track" className="mt-6 md:mt-0">
-                <Button className="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-8 py-3 rounded">
-                  Track Cargo
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
+        </div>
       </main>
 
       <footer className="bg-[#1a1a1a] text-white pt-12 pb-4">
