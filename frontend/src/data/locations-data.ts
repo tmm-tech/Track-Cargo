@@ -1,7 +1,5 @@
-import type { LocationRoute } from "../types"
-
-// Define all possible locations and their next stops
-export const locationRoutes: LocationRoute[] = [
+// Define the location routes/paths
+export const locationRoutes = [
   {
     location: "Nairobi Warehouse",
     nextStop: "Nairobi Sorting Facility",
@@ -70,13 +68,13 @@ export const allLocations = Array.from(
 ).filter((location) => location !== "Delivery")
 
 // Function to get the next stop based on current location
-export const getNextStop = (currentLocation: string): string => {
+export const getNextStop = (currentLocation) => {
   const route = locationRoutes.find((r) => r.location === currentLocation)
   return route ? route.nextStop : "Delivery"
 }
 
 // Function to calculate the estimated arrival date based on current location
-export const calculateEstimatedArrival = (currentLocation: string): string => {
+export const calculateEstimatedArrival = (currentLocation) => {
   const route = locationRoutes.find((r) => r.location === currentLocation)
 
   if (!route) return ""

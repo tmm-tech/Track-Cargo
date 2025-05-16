@@ -1,6 +1,4 @@
-import type { Package } from "../types"
-
-export const mockPackages: Package[] = [
+export const mockPackages = [
   {
     id: "pkg1",
     trackingNumber: "TXM12345678",

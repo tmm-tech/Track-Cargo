@@ -298,99 +298,118 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Search, ArrowRight, Loader } from 'lucide-vue-next';
-import {Card, CardHeader, CardTitle, CardDescription, CardContent} from '../components/ui/card.tsx';
-import { Button } from '../components/ui/button.tsx';
-import {Input} from '../components/ui/input.tsx';
-import { Label } from '../components/ui/label.tsx';
+import Card from '../components/ui/Card.vue';
+import CardHeader from '../components/ui/CardHeader.vue';
+import CardTitle from '../components/ui/CardTitle.vue';
+import CardDescription from '../components/ui/CardDescription.vue';
+import CardContent from '../components/ui/CardContent.vue';
+import Button from '../components/ui/Button.vue';
+import Input from '../components/ui/Input.vue';
+import Label from '../components/ui/Label.vue';
 import { mockPackages } from '../data/mock-data';
 
-const router = useRouter();
-const trackingNumber = ref('');
-const error = ref('');
-const isSubmitting = ref(false);
-const mobileMenuOpen = ref(false);
-const recentSearches = ref<string[]>([]);
+export default {
+  name: 'TrackPage',
+  components: {
+    Search,
+    ArrowRight,
+    Loader,
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    Button,
+    Input,
+    Label
+  },
+  setup() {
+    const router = useRouter();
+    const trackingNumber = ref('');
+    const error = ref('');
+    const isSubmitting = ref(false);
+    const mobileMenuOpen = ref(false);
+    const recentSearches = ref([]);
 
-const toggleMobileMenu = () => {
-  mobileMenuOpen.value = !mobileMenuOpen.value;
-};
+    const toggleMobileMenu = () => {
+      mobileMenuOpen.value = !mobileMenuOpen.value;
+    };
 
-const clearError = () => {
-  error.value = '';
-};
+    const clearError = () => {
+      error.value = '';
+    };
 
-const saveRecentSearch = (number: string) => {
-  // Add to recent searches if not already there
-  if (!recentSearches.value.includes(number)) {
-    // Keep only the 5 most recent searches
-    recentSearches.value = [number, ...recentSearches.value.slice(0, 4)];
-    localStorage.setItem('recentSearches', JSON.stringify(recentSearches.value));
+    const saveRecentSearch = (number) => {
+      // Add to recent searches if not already there
+      if (!recentSearches.value.includes(number)) {
+        // Keep only the 5 most recent searches
+        recentSearches.value = [number, ...recentSearches.value.slice(0, 4)];
+        localStorage.setItem('recentSearches', JSON.stringify(recentSearches.value));
+      }
+    };
+
+    const useRecentSearch = (number) => {
+      trackingNumber.value = number;
+      handleSubmit();
+    };
+
+    const handleSubmit = async () => {
+      if (!trackingNumber.value.trim()) {
+        error.value = 'Please enter a tracking or dispatch number';
+        return;
+      }
+
+      isSubmitting.value = true;
+
+      try {
+        // Simulate API call with a timeout
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Check if package exists in mock data
+        const foundPackage = mockPackages.find(
+          pkg => pkg.trackingNumber === trackingNumber.value || pkg.dispatchNumber === trackingNumber.value
+        );
+
+        if (foundPackage) {
+          // Save to recent searches
+          saveRecentSearch(trackingNumber.value);
+          
+          // Navigate to results page with tracking number
+          router.push(`/track/results?number=${trackingNumber.value}`);
+        } else {
+          error.value = 'No package found with the provided information';
+        }
+      } catch (err) {
+        error.value = 'An error occurred while tracking your package. Please try again.';
+        console.error('Tracking error:', err);
+      } finally {
+        isSubmitting.value = false;
+      }
+    };
+
+    onMounted(() => {
+      // Load recent searches from localStorage
+      const savedSearches = localStorage.getItem('recentSearches');
+      if (savedSearches) {
+        recentSearches.value = JSON.parse(savedSearches);
+      }
+    });
+
+    return {
+      trackingNumber,
+      error,
+      isSubmitting,
+      mobileMenuOpen,
+      recentSearches,
+      toggleMobileMenu,
+      clearError,
+      useRecentSearch,
+      handleSubmit
+    };
   }
-};
-
-const useRecentSearch = (number: string) => {
-  trackingNumber.value = number;
-  handleSubmit();
-};
-
-const handleSubmit = async () => {
-  if (!trackingNumber.value.trim()) {
-    error.value = 'Please enter a tracking or dispatch number';
-    return;
-  }
-
-  isSubmitting.value = true;
-
-  try {
-    // Simulate API call with a timeout
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Check if package exists in mock data
-    const foundPackage = mockPackages.find(
-      pkg => pkg.trackingNumber === trackingNumber.value || pkg.dispatchNumber === trackingNumber.value
-    );
-
-    if (foundPackage) {
-      // Save to recent searches
-      saveRecentSearch(trackingNumber.value);
-      
-      // Navigate to results page with tracking number
-      router.push(`/track/results?number=${trackingNumber.value}`);
-    } else {
-      error.value = 'No package found with the provided information';
-    }
-  } catch (err) {
-    error.value = 'An error occurred while tracking your package. Please try again.';
-    console.error('Tracking error:', err);
-  } finally {
-    isSubmitting.value = false;
-  }
-};
-
-onMounted(() => {
-  // Load recent searches from localStorage
-  const savedSearches = localStorage.getItem('recentSearches');
-  if (savedSearches) {
-    recentSearches.value = JSON.parse(savedSearches);
-  }
-});
+}
 </script>
-
-<style scoped>
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>

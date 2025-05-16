@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col min-h-screen">
+    <!-- Header -->
     <header class="bg-[#273272] text-white">
       <div class="container mx-auto">
         <div class="flex justify-between items-center py-2 px-4">
@@ -26,6 +27,7 @@
       </div>
     </header>
 
+    <!-- Logo section -->
     <div class="bg-white border-b">
       <div class="container mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-center py-4 px-4">
@@ -54,11 +56,12 @@
       </div>
     </div>
 
+    <!-- Navigation -->
     <nav class="bg-[#273272] text-white">
       <div class="container mx-auto">
         <div class="flex flex-col md:flex-row justify-between">
           <div class="flex flex-col md:flex-row">
-            <button class="md:hidden p-4 text-white focus:outline-none">
+            <button @click="toggleMobileMenu" class="md:hidden p-4 text-white focus:outline-none">
               <svg
                 class="w-6 h-6"
                 fill="none"
@@ -69,7 +72,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <div class="hidden md:flex flex-col md:flex-row">
+            <div :class="['md:flex flex-col md:flex-row', mobileMenuOpen ? 'flex' : 'hidden']">
               <router-link to="/" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Home
               </router-link>
@@ -102,7 +105,9 @@
       </div>
     </nav>
 
+    <!-- Main content -->
     <main class="flex-1">
+      <!-- Hero section -->
       <section
         class="py-12 md:py-20 bg-cover bg-center"
         style="background-image: url('/placeholder.svg?height=600&width=1200')"
@@ -115,14 +120,15 @@
               destination.
             </p>
             <router-link to="/track">
-              <Button class="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-8 py-3 rounded">
+              <button class="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-8 py-3 rounded inline-flex items-center justify-center">
                 Track Now
-              </Button>
+              </button>
             </router-link>
           </div>
         </div>
       </section>
 
+      <!-- Services section -->
       <section class="py-12 bg-gray-100">
         <div class="container mx-auto px-4">
           <div class="text-center mb-12">
@@ -133,7 +139,7 @@
           <div class="grid md:grid-cols-3 gap-8">
             <div class="bg-white p-6 rounded-lg shadow-md">
               <div class="w-16 h-16 bg-[#273272]/10 rounded-full flex items-center justify-center mb-4">
-                <Truck class="w-8 h-8 text-[#273272]" />
+                <TruckIcon class="w-8 h-8 text-[#273272]" />
               </div>
               <h3 class="text-xl font-bold text-[#273272] mb-2">Land Freight</h3>
               <p class="text-gray-600">Efficient transportation of goods via road networks across East Africa.</p>
@@ -141,7 +147,12 @@
 
             <div class="bg-white p-6 rounded-lg shadow-md">
               <div class="w-16 h-16 bg-[#273272]/10 rounded-full flex items-center justify-center mb-4">
-                <Ship class="w-8 h-8 text-[#273272]" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[#273272]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 12h-9.5l-2.5-6h-6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2Z"/>
+                  <path d="M8 12V6"/>
+                  <path d="M6 10V6"/>
+                  <path d="M4 18h6"/>
+                </svg>
               </div>
               <h3 class="text-xl font-bold text-[#273272] mb-2">Sea Freight</h3>
               <p class="text-gray-600">Reliable shipping solutions for both FCL and LCL cargo worldwide.</p>
@@ -149,7 +160,7 @@
 
             <div class="bg-white p-6 rounded-lg shadow-md">
               <div class="w-16 h-16 bg-[#273272]/10 rounded-full flex items-center justify-center mb-4">
-                <Plane class="w-8 h-8 text-[#273272]" />
+                <PaperAirplaneIcon  class="w-8 h-8 text-[#273272]" />
               </div>
               <h3 class="text-xl font-bold text-[#273272] mb-2">Air Freight</h3>
               <p class="text-gray-600">Fast and secure air transportation for time-sensitive shipments.</p>
@@ -158,6 +169,7 @@
         </div>
       </section>
 
+      <!-- CTA section -->
       <section class="py-12 bg-[#273272] text-white">
         <div class="container mx-auto px-4">
           <div class="flex flex-col md:flex-row items-center justify-between">
@@ -166,15 +178,16 @@
               <p>Enter your tracking number to get real-time updates on your shipment</p>
             </div>
             <router-link to="/track" class="mt-6 md:mt-0">
-              <Button class="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-8 py-3 rounded">
+              <button class="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-8 py-3 rounded inline-flex items-center justify-center">
                 Track Cargo
-              </Button>
+              </button>
             </router-link>
           </div>
         </div>
       </section>
     </main>
 
+    <!-- Footer -->
     <footer class="bg-[#1a1a1a] text-white pt-12 pb-4">
       <div class="container mx-auto px-4">
         <div class="grid md:grid-cols-3 gap-8 mb-8">
@@ -286,7 +299,7 @@
 
         <div class="border-t border-gray-800 pt-4">
           <div class="flex flex-col md:flex-row justify-between items-center">
-            <p class="text-gray-400">Copyright © {{ new Date().getFullYear() }} Texmon Logistics Limited</p>
+            <p class="text-gray-400">Copyright © {{ currentYear }} Texmon Logistics Limited</p>
             <div class="flex space-x-4 mt-4 md:mt-0">
               <a href="#" class="text-gray-400 hover:text-[#ffb600]">
                 About Us
@@ -305,7 +318,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { Truck, Ship, Plane } from 'lucide-vue-next';
-import button from '../../components/ui/button.tsx';
+<script setup>
+import { ref, computed } from 'vue';
+import { TruckIcon, PaperAirplaneIcon  } from '@heroicons/vue/24/outline';
+
+const mobileMenuOpen = ref(false)
+
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
+
+const currentYear = computed(() => new Date().getFullYear())
 </script>

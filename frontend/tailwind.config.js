@@ -1,18 +1,16 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
+    "./index.html",
+    "./src/**/*.{vue,js,jsx}",
   ],
   theme: {
-    extend: {},
-    fontFamily:{
-      signature:["Montserrat"]
-    },
-    animation: {
-      "accordion-down": "accordion-down 0.2s ease-out",
-      "accordion-up": "accordion-up 0.2s ease-out"
+    extend: {
+      colors: {
+        primary: "#273272",
+        accent: "#ffb600",
+      },
     },
   },
-
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 }
