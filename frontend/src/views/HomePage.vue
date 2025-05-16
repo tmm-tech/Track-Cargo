@@ -307,5 +307,5 @@
 
 <script setup lang="ts">
 import { Truck, Ship, Plane } from 'lucide-vue-next';
-import Button from '../components/ui/Button.vue';
+import button from '../../components/ui/button.tsx';
 </script>

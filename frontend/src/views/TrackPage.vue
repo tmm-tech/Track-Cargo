@@ -302,14 +302,10 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Search, ArrowRight, Loader } from 'lucide-vue-next';
-import Card from '../components/ui/Card.vue';
-import CardHeader from '../components/ui/CardHeader.vue';
-import CardTitle from '../components/ui/CardTitle.vue';
-import CardDescription from '../components/ui/CardDescription.vue';
-import CardContent from '../components/ui/CardContent.vue';
-import Button from '../components/ui/Button.vue';
-import Input from '../components/ui/Input.vue';
-import Label from '../components/ui/Label.vue';
+import {Card, CardHeader, CardTitle, CardDescription, CardContent} from '../components/ui/card.tsx';
+import { Button } from '../components/ui/button.tsx';
+import {Input} from '../components/ui/input.tsx';
+import { Label } from '../components/ui/label.tsx';
 import { mockPackages } from '../data/mock-data';
 
 const router = useRouter();
