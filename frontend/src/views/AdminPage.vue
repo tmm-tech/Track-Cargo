@@ -150,6 +150,12 @@
                           <PencilIcon class="h-4 w-4 mr-1" />
                           Edit
                         </button>
+                        <button 
+                          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                          @click="printPackageDetails(pkg)"
+                        >
+                          <PrinterIcon class="h-4 w-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -307,6 +313,42 @@
             </div>
           </div>
 
+          <!-- Comments Section in Edit Modal -->
+          <div class="mt-6 pt-6 border-t">
+            <h3 class="text-lg font-medium mb-4">Comments</h3>
+            <div v-if="editingPackage.comments && editingPackage.comments.length > 0" class="space-y-4 mb-6">
+              <div v-for="(comment, index) in editingPackage.comments" :key="index" class="bg-gray-50 p-4 rounded-md">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="font-medium">{{ comment.author }}</p>
+                    <p class="text-sm text-gray-500">{{ comment.timestamp }}</p>
+                  </div>
+                </div>
+                <p class="mt-2">{{ comment.text }}</p>
+              </div>
+            </div>
+            <div v-else class="text-gray-500 mb-6">No comments yet</div>
+            
+            <form @submit.prevent="addComment(editingPackage.id)" class="space-y-4">
+              <div class="space-y-2">
+                <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
+                <textarea 
+                  id="editCommentText" 
+                  v-model="newComment.text" 
+                  rows="3"
+                  placeholder="Enter your comment here..."
+                  class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                ></textarea>
+              </div>
+              <button 
+                type="submit"
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+              >
+                Add Comment
+              </button>
+            </form>
+          </div>
+
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
             <button 
               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
@@ -396,6 +438,47 @@
             />
           </div>
 
+          <!-- Comments Section -->
+          <div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
+            <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
+              <ChatBubbleLeftRightIcon class="h-5 w-5 mr-2" />
+              <h3 class="text-xl font-semibold">Comments</h3>
+            </div>
+            <div class="p-6">
+              <div v-if="viewingPackage.comments && viewingPackage.comments.length > 0" class="space-y-4 mb-6">
+                <div v-for="(comment, index) in viewingPackage.comments" :key="index" class="bg-gray-50 p-4 rounded-md">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <p class="font-medium">{{ comment.author }}</p>
+                      <p class="text-sm text-gray-500">{{ comment.timestamp }}</p>
+                    </div>
+                  </div>
+                  <p class="mt-2">{{ comment.text }}</p>
+                </div>
+              </div>
+              <div v-else class="text-gray-500 mb-6">No comments yet</div>
+              
+              <form @submit.prevent="addComment(viewingPackage.id)" class="space-y-4">
+                <div class="space-y-2">
+                  <label for="commentText" class="text-sm font-medium">Add Comment</label>
+                  <textarea 
+                    id="commentText" 
+                    v-model="newComment.text" 
+                    rows="3"
+                    placeholder="Enter your comment here..."
+                    class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  ></textarea>
+                </div>
+                <button 
+                  type="submit"
+                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                >
+                  Add Comment
+                </button>
+              </form>
+            </div>
+          </div>
+
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
             <button 
               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
@@ -409,6 +492,13 @@
             >
               <PencilIcon class="h-4 w-4 mr-2" />
               Edit Package
+            </button>
+            <button 
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 py-2"
+              @click="printPackageDetails(viewingPackage)"
+            >
+              <PrinterIcon class="h-4 w-4 mr-2" />
+              Print Details
             </button>
           </div>
         </div>
@@ -698,7 +788,9 @@ import {
   TruckIcon, 
   CheckCircleIcon,
   CalendarIcon,
-  TrashIcon
+  TrashIcon,
+  PrinterIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/vue/24/outline'
 import { mockPackages } from '../data/mock-data'
 import { allLocations, getNextStop, calculateEstimatedArrival } from '../data/locations-data'
@@ -782,6 +874,270 @@ const newStop = ref({
 })
 const stopErrors = ref({})
 
+// Comments state
+const newComment = ref({
+  text: '',
+  author: 'Admin',
+  timestamp: ''
+})
+
+// Add comment function
+const addComment = (packageId) => {
+  if (!newComment.value.text.trim()) return
+  
+  // Set the current timestamp
+  newComment.value.timestamp = new Date().toLocaleString()
+  
+  // Find the package and add the comment
+  packages.value = packages.value.map(pkg => {
+    if (pkg.id === packageId) {
+      const comments = pkg.comments || []
+      return {
+        ...pkg,
+        comments: [...comments, { ...newComment.value }]
+      }
+    }
+    return pkg
+  })
+  
+  // Reset the comment form
+  newComment.value.text = ''
+}
+
+// Print package details function
+const printPackageDetails = async (pkg) => {
+  if (!pkg) return
+  
+  // Create a new window for printing
+  const printWindow = window.open('', '_blank')
+  
+  // Generate HTML content for the PDF
+  const content = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Package Details - ${pkg.trackingNumber}</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background-color: #273272;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          margin-bottom: 20px;
+          border-radius: 5px;
+        }
+        .logo {
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        .section {
+          margin-bottom: 30px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          overflow: hidden;
+        }
+        .section-header {
+          background-color: #273272;
+          color: white;
+          padding: 10px 15px;
+          font-size: 18px;
+          font-weight: bold;
+        }
+        .section-content {
+          padding: 15px;
+        }
+        .grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 15px;
+        }
+        .field {
+          margin-bottom: 10px;
+        }
+        .field-label {
+          font-weight: bold;
+          color: #666;
+          font-size: 14px;
+        }
+        .field-value {
+          font-size: 16px;
+        }
+        .tracking-item {
+          padding: 15px;
+          border-bottom: 1px solid #eee;
+        }
+        .tracking-item:last-child {
+          border-bottom: none;
+        }
+        .tracking-status {
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+        .tracking-location, .tracking-time {
+          color: #666;
+          font-size: 14px;
+        }
+        .tracking-notes {
+          font-style: italic;
+          color: #888;
+          margin-top: 5px;
+        }
+        .comment {
+          background-color: #f9f9f9;
+          padding: 10px;
+          border-radius: 5px;
+          margin-bottom: 10px;
+        }
+        .comment-author {
+          font-weight: bold;
+        }
+        .comment-time {
+          color: #666;
+          font-size: 12px;
+        }
+        .comment-text {
+          margin-top: 5px;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 30px;
+          font-size: 12px;
+          color: #666;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="logo">Texmon Logistics</div>
+        <div>Package Tracking Details</div>
+      </div>
+      
+      <div class="section">
+        <div class="section-header">Package Information</div>
+        <div class="section-content grid">
+          <div class="field">
+            <div class="field-label">Tracking Number</div>
+            <div class="field-value">${pkg.trackingNumber}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Dispatch Number</div>
+            <div class="field-value">${pkg.dispatchNumber}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Package Type</div>
+            <div class="field-value">${pkg.type}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Weight</div>
+            <div class="field-value">${pkg.weight} kg</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Shipped Date</div>
+            <div class="field-value">${pkg.shippedDate}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Estimated Delivery</div>
+            <div class="field-value">${pkg.estimatedDelivery}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-header">Current Status</div>
+        <div class="section-content">
+          <div class="field">
+            <div class="field-label">Current Location</div>
+            <div class="field-value">${pkg.currentLocation}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Next Stop</div>
+            <div class="field-value">${pkg.nextStop}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Next Stop ETA</div>
+            <div class="field-value">${pkg.nextStopETA}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Final Destination</div>
+            <div class="field-value">${pkg.finalDestination}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Last Updated</div>
+            <div class="field-value">${pkg.lastUpdated}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-header">Shipping Address</div>
+        <div class="section-content">
+          ${pkg.shippingAddress ? `
+            <div class="field-value">${pkg.shippingAddress.recipientName}</div>
+            <div class="field-value">${pkg.shippingAddress.streetAddress}</div>
+            <div class="field-value">${pkg.shippingAddress.city}, ${pkg.shippingAddress.state} ${pkg.shippingAddress.postalCode}</div>
+            <div class="field-value">${pkg.shippingAddress.country}</div>
+          ` : 'No shipping address information available'}
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-header">Tracking History</div>
+        <div class="section-content">
+          ${pkg.trackingHistory.map(event => `
+            <div class="tracking-item">
+              <div class="tracking-status">${event.status}</div>
+              <div class="tracking-location">${event.location}</div>
+              <div class="tracking-time">${event.timestamp}</div>
+              ${event.notes ? `<div class="tracking-notes">${event.notes}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      ${pkg.comments && pkg.comments.length > 0 ? `
+        <div class="section">
+          <div class="section-header">Comments</div>
+          <div class="section-content">
+            ${pkg.comments.map(comment => `
+              <div class="comment">
+                <div class="comment-author">${comment.author}</div>
+                <div class="comment-time">${comment.timestamp}</div>
+                <div class="comment-text">${comment.text}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+      
+      <div class="footer">
+        <p>Generated on ${new Date().toLocaleString()}</p>
+        <p>Texmon Logistics Limited, Kenya</p>
+      </div>
+    </body>
+    </html>
+  `
+  
+  // Write the content to the new window
+  printWindow.document.open()
+  printWindow.document.write(content)
+  printWindow.document.close()
+  
+  // Wait for the content to load
+  printWindow.onload = () => {
+    // Print the window
+    printWindow.print()
+  }
+}
+
 // Check if user is authenticated on component mount
 onMounted(() => {
   // In a real app, you would check for a valid session or token
@@ -789,6 +1145,17 @@ onMounted(() => {
   if (checkAuth === 'authenticated') {
     isAuthenticated.value = true
   }
+  
+  // Add comments array to each package if it doesn't exist
+  packages.value = packages.value.map(pkg => {
+    if (!pkg.comments) {
+      return {
+        ...pkg,
+        comments: []
+      }
+    }
+    return pkg
+  })
 })
 
 // Authentication methods
