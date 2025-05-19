@@ -51,8 +51,8 @@
               <label for="username" class="text-sm font-medium">Username</label>
               <input
                 id="username"
-                v-model="username"
                 placeholder="Enter your username"
+                v-model="username"
                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 required
               />
@@ -70,7 +70,7 @@
             </div>
             <button 
               type="submit" 
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold h-10 px-4 py-2 w-full"
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] h-10 px-4 py-2 w-full"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
@@ -437,6 +437,7 @@
               :nextStopETA="viewingPackage.nextStopETA"
               :finalDestination="viewingPackage.finalDestination"
               :estimatedDelivery="viewingPackage.estimatedDelivery"
+              showComments
             />
           </div>
 
@@ -707,6 +708,16 @@
                       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
                     />
                   </div>
+                  <div class="space-y-2">
+                    <label for="stopComment" class="text-sm font-medium">Comment</label>
+                    <textarea 
+                      id="stopComment" 
+                      placeholder="Enter comment for this stop" 
+                      v-model="newStop.comment" 
+                      rows="2"
+                      class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    ></textarea>
+                  </div>
                 </div>
 
                 <button 
@@ -733,6 +744,10 @@
                           <p class="text-sm text-gray-500">{{ stop.location }}</p>
                           <p class="text-sm text-gray-500">{{ formatDate(stop.timestamp) }}</p>
                           <p v-if="stop.notes" class="text-sm text-gray-400 mt-1">{{ stop.notes }}</p>
+                          <div v-if="stop.comment" class="mt-2 p-2 bg-gray-50 rounded-md">
+                            <p class="text-sm font-medium text-gray-700">Comment:</p>
+                            <p class="text-sm text-gray-600">{{ stop.comment }}</p>
+                          </div>
                         </div>
                         <button
                           @click="removeTrackingStop(index)"
@@ -872,7 +887,8 @@ const newStop = ref({
   status: '',
   location: '',
   timestamp: '',
-  notes: ''
+  notes: '',
+  comment: []
 })
 const stopErrors = ref({})
 
@@ -915,120 +931,246 @@ const printPackageDetails = async (pkg) => {
   
   // Generate HTML content for the PDF
   const content = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Package Details - ${pkg.trackingNumber}</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          line-height: 1.6;
-          color: #333;
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 20px;
-        }
-        .header {
-          background-color: #273272;
-          color: white;
-          padding: 20px;
-          text-align: center;
-          margin-bottom: 20px;
-          border-radius: 5px;
-        }
-        .logo {
-          font-size: 24px;
-          font-weight: bold;
-          margin-bottom: 10px;
-        }
-        .section {
-          margin-bottom: 30px;
-          border: 1px solid #ddd;
-          border-radius: 5px;
-          overflow: hidden;
-        }
-        .section-header {
-          background-color: #273272;
-          color: white;
-          padding: 10px 15px;
-          font-size: 18px;
-          font-weight: bold;
-        }
-        .section-content {
-          padding: 15px;
-        }
-        .grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 15px;
-        }
-        .field {
-          margin-bottom: 10px;
-        }
-        .field-label {
-          font-weight: bold;
-          color: #666;
-          font-size: 14px;
-        }
-        .field-value {
-          font-size: 16px;
-        }
-        .tracking-item {
-          padding: 15px;
-          border-bottom: 1px solid #eee;
-        }
-        .tracking-item:last-child {
-          border-bottom: none;
-        }
-        .tracking-status {
-          font-weight: bold;
-          margin-bottom: 5px;
-        }
-        .tracking-location, .tracking-time {
-          color: #666;
-          font-size: 14px;
-        }
-        .tracking-notes {
-          font-style: italic;
-          color: #888;
-          margin-top: 5px;
-        }
-        .comment {
-          background-color: #f9f9f9;
-          padding: 10px;
-          border-radius: 5px;
-          margin-bottom: 10px;
-        }
-        .comment-author {
-          font-weight: bold;
-        }
-        .comment-time {
-          color: #666;
-          font-size: 12px;
-        }
-        .comment-text {
-          margin-top: 5px;
-        }
-        .footer {
-          text-align: center;
-          margin-top: 30px;
-          font-size: 12px;
-          color: #666;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <div class="logo">Texmon Logistics</div>
-        <div>Package Tracking Details</div>
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Package Details - ${pkg.trackingNumber}</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background: linear-gradient(135deg, #273272 0%, #1a2050 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      <div class="logo-container">
+        <img src="https://www.texmonlogistics.co.ke/assets/images/texmon-logo.png" alt="Texmon Logistics Logo" class="logo-image" />
+        <div class="company-name">Texmon Logistics</div>
       </div>
-      
-      <div class="section">
-        <div class="section-header">Package Information</div>
-        <div class="section-content grid">
+      .section {
+        margin-bottom: 30px;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      .section-header {
+        background: linear-gradient(to right, #273272, #3a4999);
+        color: white;
+        padding: 12px 15px;
+        font-size: 18px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+      }
+      .section-header-icon {
+        margin-right: 10px;
+        font-size: 20px;
+      }
+      .section-content {
+        padding: 20px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .field {
+        margin-bottom: 15px;
+      }
+      .field-label {
+        font-weight: bold;
+        color: #273272;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .field-value {
+        font-size: 16px;
+        padding: 5px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .tracking-timeline {
+        position: relative;
+        padding-left: 30px;
+      }
+      .tracking-timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: #ddd;
+      }
+      .tracking-item {
+        position: relative;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid #273272;
+      }
+      .tracking-item::before {
+        content: '';
+        position: absolute;
+        left: -32px;
+        top: 20px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #273272;
+        border: 3px solid white;
+        box-shadow: 0 0 0 1px #ddd;
+      }
+      .tracking-item.completed::before {
+        background-color: #4CAF50;
+      }
+      .tracking-item.current::before {
+        background-color: #ffb600;
+      }
+      .tracking-item.future::before {
+        background-color: #ddd;
+      }
+      .tracking-status {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #273272;
+      }
+      .tracking-location {
+        color: #555;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+      }
+      .tracking-location::before {
+        content: '📍';
+        margin-right: 5px;
+      }
+      .tracking-time {
+        color: #777;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        margin-top: 3px;
+      }
+      .tracking-time::before {
+        content: '🕒';
+        margin-right: 5px;
+      }
+      .tracking-notes {
+        font-style: italic;
+        color: #666;
+        margin-top: 8px;
+        padding: 5px 10px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+      .tracking-comment {
+        margin-top: 8px;
+        padding: 8px 10px;
+        background-color: #fff3cd;
+        border-left: 3px solid #ffb600;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+      .comment {
+        background-color: #f0f7ff;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border-left: 3px solid #273272;
+      }
+      .comment-author {
+        font-weight: bold;
+        color: #273272;
+      }
+      .comment-time {
+        color: #666;
+        font-size: 12px;
+      }
+      .comment-text {
+        margin-top: 8px;
+        line-height: 1.5;
+      }
+      .shipping-address {
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #eee;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        font-size: 12px;
+        color: #666;
+      }
+      .badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        background-color: #273272;
+        margin-left: 8px;
+      }
+      .qr-code {
+        text-align: center;
+        margin: 20px 0;
+      }
+      .qr-code img {
+        width: 100px;
+        height: 100px;
+        border: 1px solid #eee;
+        padding: 5px;
+        background: white;
+      }
+      .logo-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-right: 15px;
+        object-fit: contain;
+        background-color: white;
+        padding: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo-container">
+        <img src="https://i.imgur.com/jWxX8ZS.png" alt="Texmon Logistics Logo" class="logo-image" />
+        <div class="company-name">Texmon Logistics</div>
+      </div>
+      <div>Package Tracking Details</div>
+    </div>
+    
+    <div class="section">
+      <div class="section-header">
+        <span class="section-header-icon">📦</span>
+        Package Information
+      </div>
+      <div class="section-content">
+        <div class="grid">
           <div class="field">
             <div class="field-label">Tracking Number</div>
-            <div class="field-value">${pkg.trackingNumber}</div>
+            <div class="field-value">${pkg.trackingNumber} <span class="badge">Active</span></div>
           </div>
           <div class="field">
             <div class="field-label">Dispatch Number</div>
@@ -1051,11 +1193,23 @@ const printPackageDetails = async (pkg) => {
             <div class="field-value">${pkg.estimatedDelivery}</div>
           </div>
         </div>
+        
+        <div class="qr-code">
+          <div style="font-weight: bold; margin-bottom: 5px;">Scan to track</div>
+          <div style="width: 100px; height: 100px; background-color: #fff; border: 1px solid #ddd; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+            QR
+          </div>
+        </div>
       </div>
-      
-      <div class="section">
-        <div class="section-header">Current Status</div>
-        <div class="section-content">
+    </div>
+    
+    <div class="section">
+      <div class="section-header">
+        <span class="section-header-icon">🚚</span>
+        Current Status
+      </div>
+      <div class="section-content">
+        <div class="grid">
           <div class="field">
             <div class="field-label">Current Location</div>
             <div class="field-value">${pkg.currentLocation}</div>
@@ -1072,129 +1226,171 @@ const printPackageDetails = async (pkg) => {
             <div class="field-label">Final Destination</div>
             <div class="field-value">${pkg.finalDestination}</div>
           </div>
-          <div class="field">
-            <div class="field-label">Last Updated</div>
-            <div class="field-value">${pkg.lastUpdated}</div>
+        </div>
+        
+        <div style="margin-top: 20px; background-color: #f0f7ff; padding: 15px; border-radius: 8px; text-align: center;">
+          <div style="font-weight: bold; color: #273272; margin-bottom: 10px;">Delivery Progress</div>
+          <div style="display: flex; justify-content: space-between; position: relative; padding: 0 20px;">
+            <div style="position: absolute; top: 10px; left: 0; right: 0; height: 4px; background-color: #ddd; z-index: 1;"></div>
+            <div style="position: absolute; top: 10px; left: 0; width: ${calculateProgress(pkg)}%; height: 4px; background-color: #273272; z-index: 2;"></div>
+            
+            <div style="position: relative; z-index: 3; text-align: center;">
+              <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${isCompleted(pkg, 'Shipped') ? '#273272' : '#ddd'}; margin: 0 auto;"></div>
+              <div style="font-size: 12px; margin-top: 5px;">Shipped</div>
+            </div>
+            
+            <div style="position: relative; z-index: 3; text-align: center;">
+              <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${isCompleted(pkg, 'In Transit') ? '#273272' : '#ddd'}; margin: 0 auto;"></div>
+              <div style="font-size: 12px; margin-top: 5px;">In Transit</div>
+            </div>
+            
+            <div style="position: relative; z-index: 3; text-align: center;">
+              <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${isCompleted(pkg, 'Out for Delivery') ? '#273272' : '#ddd'}; margin: 0 auto;"></div>
+              <div style="font-size: 12px; margin-top: 5px;">Out for Delivery</div>
+            </div>
+            
+            <div style="position: relative; z-index: 3; text-align: center;">
+              <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${isCompleted(pkg, 'Delivered') ? '#273272' : '#ddd'}; margin: 0 auto;"></div>
+              <div style="font-size: 12px; margin-top: 5px;">Delivered</div>
+            </div>
           </div>
         </div>
       </div>
-      
-      <div class="section">
-        <div class="section-header">Shipping Address</div>
-        <div class="section-content">
-          ${pkg.shippingAddress ? `
-            <div class="field-value">${pkg.shippingAddress.recipientName}</div>
-            <div class="field-value">${pkg.shippingAddress.streetAddress}</div>
-            <div class="field-value">${pkg.shippingAddress.city}, ${pkg.shippingAddress.state} ${pkg.shippingAddress.postalCode}</div>
-            <div class="field-value">${pkg.shippingAddress.country}</div>
-          ` : 'No shipping address information available'}
-        </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-header">
+        <span class="section-header-icon">📍</span>
+        Shipping Address
       </div>
-      
-      <div class="section">
-        <div class="section-header">Tracking History</div>
-        <div class="section-content">
-          ${pkg.trackingHistory.map(event => `
-            <div class="tracking-item">
+      <div class="section-content">
+        ${pkg.shippingAddress ? `
+          <div class="shipping-address">
+            <div style="font-weight: bold;">${pkg.shippingAddress.recipientName}</div>
+            <div>${pkg.shippingAddress.streetAddress}</div>
+            <div>${pkg.shippingAddress.city}, ${pkg.shippingAddress.state} ${pkg.shippingAddress.postalCode}</div>
+            <div>${pkg.shippingAddress.country}</div>
+          </div>
+        ` : '<div>No shipping address information available</div>'}
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-header">
+        <span class="section-header-icon">🔄</span>
+        Tracking History
+      </div>
+      <div class="section-content">
+        <div class="tracking-timeline">
+          ${pkg.trackingHistory.map((event, index) => `
+            <div class="tracking-item ${getTrackingItemClass(event, pkg, index)}">
               <div class="tracking-status">${event.status}</div>
               <div class="tracking-location">${event.location}</div>
               <div class="tracking-time">${event.timestamp}</div>
               ${event.notes ? `<div class="tracking-notes">${event.notes}</div>` : ''}
+              ${event.comment ? `<div class="tracking-comment"><strong>Comment:</strong> ${event.comment}</div>` : ''}
             </div>
           `).join('')}
         </div>
       </div>
-      
-      ${pkg.comments && pkg.comments.length > 0 ? `
-        <div class="section">
-          <div class="section-header">Comments</div>
-          <div class="section-content">
-            ${pkg.comments.map(comment => `
-              <div class="comment">
-                <div class="comment-author">${comment.author}</div>
-                <div class="comment-time">${comment.timestamp}</div>
-                <div class="comment-text">${comment.text}</div>
-              </div>
-            `).join('')}
-          </div>
+    </div>
+    
+    ${pkg.comments && pkg.comments.length > 0 ? `
+      <div class="section">
+        <div class="section-header">
+          <span class="section-header-icon">💬</span>
+          Comments
         </div>
-      ` : ''}
-      
-      <div class="footer">
-        <p>Generated on ${new Date().toLocaleString()}</p>
-        <p>Texmon Logistics Limited, Kenya</p>
+        <div class="section-content">
+          ${pkg.comments.map(comment => `
+            <div class="comment">
+              <div class="comment-author">${comment.author}</div>
+              <div class="comment-time">${comment.timestamp}</div>
+              <div class="comment-text">${comment.text}</div>
+            </div>
+          `).join('')}
+        </div>
       </div>
-    </body>
-    </html>
-  `
+    ` : ''}
+    
+    <div class="footer">
+      <p>Generated on ${new Date().toLocaleString()}</p>
+      <p>Texmon Logistics Limited, Kenya</p>
+      <p>Contact: +254 700 000000 | info@texmonlogistics.com</p>
+    </div>
+  </body>
+  </html>
+`
+
+// Helper function to calculate progress percentage for the progress bar
+function calculateProgress(pkg) {
+  const stages = ['Shipped', 'In Transit', 'Out for Delivery', 'Delivered'];
+  let currentStageIndex = 0;
   
-  // Write the content to the new window
-  printWindow.document.open()
-  printWindow.document.write(content)
-  printWindow.document.close()
+  // Find the current stage based on tracking history
+  for (let i = stages.length - 1; i >= 0; i--) {
+    if (pkg.trackingHistory.some(event => event.status.includes(stages[i]))) {
+      currentStageIndex = i;
+      break;
+    }
+  }
   
-  // Wait for the content to load
-  printWindow.onload = () => {
-    // Print the window
-    printWindow.print()
+  // Calculate percentage (each stage is 25% of the total)
+  return Math.min(100, (currentStageIndex + 1) * 25);
+}
+
+// Helper function to check if a stage is completed
+function isCompleted(pkg, stage) {
+  return pkg.trackingHistory.some(event => event.status.includes(stage));
+}
+
+// Helper function to determine the class for tracking items
+function getTrackingItemClass(event, pkg, index) {
+  if (index === 0) {
+    return 'current';
+  } else if (event.status.includes('Delivered')) {
+    return 'completed';
+  } else {
+    return '';
   }
 }
 
-// Check if user is authenticated on component mount
-onMounted(() => {
-  // In a real app, you would check for a valid session or token
-  const checkAuth = localStorage.getItem('texmonAdminAuth')
-  if (checkAuth === 'authenticated') {
-    isAuthenticated.value = true
-  }
+  printWindow.document.write(content)
+  printWindow.document.close()
   
-  // Add comments array to each package if it doesn't exist
-  packages.value = packages.value.map(pkg => {
-    if (!pkg.comments) {
-      return {
-        ...pkg,
-        comments: []
-      }
-    }
-    return pkg
-  })
-})
+  // Wait for the content to load and then print
+  printWindow.onload = () => {
+    printWindow.print()
+    printWindow.close()
+  }
+}
 
-// Authentication methods
+// Handle login function
 const handleLogin = () => {
-  // In a real app, you would validate against a secure backend
-  // This is just a simple demo with hardcoded credentials
-  if (username.value === 'admin' && password.value === 'texmon2024') {
+  if (username.value === 'admin' && password.value === 'password') {
     isAuthenticated.value = true
-    localStorage.setItem('texmonAdminAuth', 'authenticated')
     loginError.value = ''
   } else {
     loginError.value = 'Invalid username or password'
   }
 }
 
+// Handle logout function
 const logout = () => {
   isAuthenticated.value = false
-  localStorage.removeItem('texmonAdminAuth')
+  username.value = ''
+  password.value = ''
 }
 
-// Edit package methods
-const editPackage = (pkg) => {
-  editingPackage.value = pkg
+// Edit package functions
+const openEditPackageModal = (pkg) => {
+  editingPackage.value = { ...pkg }
   editData.value = {
     currentLocation: pkg.currentLocation,
     nextStop: pkg.nextStop,
     nextStopETA: pkg.nextStopETA,
-    shippingAddress: {
-      recipientName: pkg.shippingAddress?.recipientName || '',
-      streetAddress: pkg.shippingAddress?.streetAddress || '',
-      city: pkg.shippingAddress?.city || '',
-      state: pkg.shippingAddress?.state || '',
-      postalCode: pkg.shippingAddress?.postalCode || '',
-      country: pkg.shippingAddress?.country || '',
-    }
+    shippingAddress: { ...pkg.shippingAddress }
   }
-  activeEditTab.value = 'location'
   showEditModal.value = true
 }
 
@@ -1203,78 +1399,34 @@ const closeEditModal = () => {
   editingPackage.value = null
 }
 
-const handleLocationChange = (event) => {
-  const location = event.target.value
-  const nextStop = getNextStop(location)
-  const nextStopETA = calculateEstimatedArrival(location)
-
-  editData.value = {
-    ...editData.value,
-    currentLocation: location,
-    nextStop: nextStop,
-    nextStopETA: nextStopETA
-  }
+const editPackage = (pkg) => {
+  openEditPackageModal(pkg)
 }
 
 const savePackageChanges = () => {
   if (!editingPackage.value) return
 
-  // Get the current date and time
-  const currentDateTime = new Date().toLocaleString()
-
-  // Create a new tracking history entry for the location change
-  const newHistoryEntry = {
-    status: editData.value.currentLocation === editingPackage.value.currentLocation
-      ? `Updated at ${editData.value.currentLocation}`
-      : `Arrived at ${editData.value.currentLocation}`,
-    location: editData.value.currentLocation,
-    timestamp: currentDateTime
-  }
-
-  // Check if shipping address was changed
-  const isAddressChanged =
-    editData.value.shippingAddress.recipientName !== editingPackage.value.shippingAddress?.recipientName ||
-    editData.value.shippingAddress.streetAddress !== editingPackage.value.shippingAddress?.streetAddress ||
-    editData.value.shippingAddress.city !== editingPackage.value.shippingAddress?.city ||
-    editData.value.shippingAddress.state !== editingPackage.value.shippingAddress?.state ||
-    editData.value.shippingAddress.postalCode !== editingPackage.value.shippingAddress?.postalCode ||
-    editData.value.shippingAddress.country !== editingPackage.value.shippingAddress?.country
-
-  // Create a shipping address update entry if address was changed
-  let addressHistoryEntry = null
-  if (isAddressChanged) {
-    addressHistoryEntry = {
-      status: 'Shipping address updated',
-      location: editData.value.currentLocation,
-      timestamp: currentDateTime,
-      notes: `Address changed to: ${editData.value.shippingAddress.streetAddress}, ${editData.value.shippingAddress.city}, ${editData.value.shippingAddress.state}, ${editData.value.shippingAddress.country}`
+  // Update the package in the packages array
+  packages.value = packages.value.map(pkg => {
+    if (pkg.id === editingPackage.value.id) {
+      return {
+        ...pkg,
+        currentLocation: editData.value.currentLocation,
+        nextStop: editData.value.nextStop,
+        nextStopETA: editData.value.nextStopETA,
+        shippingAddress: { ...editData.value.shippingAddress },
+        lastUpdated: new Date().toLocaleDateString()
+      }
     }
-  }
-
-  // Update the package with new location data and add to tracking history
-  packages.value = packages.value.map(pkg =>
-    pkg.id === editingPackage.value.id
-      ? {
-          ...pkg,
-          currentLocation: editData.value.currentLocation,
-          nextStop: editData.value.nextStop,
-          nextStopETA: editData.value.nextStopETA,
-          shippingAddress: editData.value.shippingAddress,
-          lastUpdated: currentDateTime,
-          // Add the new entries at the beginning of the tracking history
-          trackingHistory: addressHistoryEntry
-            ? [addressHistoryEntry, newHistoryEntry, ...pkg.trackingHistory]
-            : [newHistoryEntry, ...pkg.trackingHistory]
-        }
-      : pkg
-  )
+    return pkg
+  })
 
   closeEditModal()
 }
 
-// View package methods
-const viewPackageDetails = (pkg) => {
-  viewingPackage.value = pkg
+// View package functions
+const openViewPackageModal = (pkg) => {
+  viewingPackage.value = { ...pkg }
   showViewModal.value = true
 }
 
@@ -1283,24 +1435,109 @@ const closeViewModal = () => {
   viewingPackage.value = null
 }
 
-const editFromViewModal = () => {
-  closeViewModal()
-  editPackage(viewingPackage.value)
+const viewPackageDetails = (pkg) => {
+  openViewPackageModal(pkg)
 }
 
-// Add package methods
+const editFromViewModal = () => {
+  if (viewingPackage.value) {
+    closeViewModal()
+    editPackage(viewingPackage.value)
+  }
+}
+
+// Add package functions
 const openAddPackageModal = () => {
   showAddModal.value = true
   addPackageTab.value = 'details'
-  resetAddPackageForm()
+  resetNewPackageForm()
+  resetTrackingStops()
 }
 
 const closeAddModal = () => {
   showAddModal.value = false
-  resetAddPackageForm()
 }
 
-const resetAddPackageForm = () => {
+const addNewPackage = () => {
+  if (validateForm()) {
+    const newPackageToAdd = {
+      id: Date.now(),
+      trackingNumber: newPackage.value.trackingNumber,
+      dispatchNumber: newPackage.value.dispatchNumber,
+      type: newPackage.value.type,
+      weight: newPackage.value.weight,
+      shippedDate: newPackage.value.shippedDate,
+      estimatedDelivery: newPackage.value.estimatedDelivery,
+      currentLocation: newPackage.value.currentLocation,
+      nextStop: newPackage.value.nextStop,
+      nextStopETA: newPackage.value.nextStopETA,
+      finalDestination: newPackage.value.finalDestination,
+      shippingAddress: { ...newPackage.value.shippingAddress },
+      lastUpdated: new Date().toLocaleDateString(),
+      trackingHistory: [...trackingStops.value],
+      comments: []
+    }
+
+    packages.value.push(newPackageToAdd)
+    closeAddModal()
+  }
+}
+
+const validateForm = () => {
+  formErrors.value = {}
+  let isValid = true
+
+  if (!newPackage.value.trackingNumber) {
+    formErrors.value.trackingNumber = 'Tracking number is required'
+    isValid = false
+  }
+
+  if (!newPackage.value.dispatchNumber) {
+    formErrors.value.dispatchNumber = 'Dispatch number is required'
+    isValid = false
+  }
+
+  if (!newPackage.value.type) {
+    formErrors.value.type = 'Package type is required'
+    isValid = false
+  }
+
+  if (!newPackage.value.weight) {
+    formErrors.value.weight = 'Weight is required'
+    isValid = false
+  }
+
+  if (!newPackage.value.shippedDate) {
+    formErrors.value.shippedDate = 'Shipped date is required'
+    isValid = false
+  }
+
+  if (!newPackage.value.estimatedDelivery) {
+    formErrors.value.estimatedDelivery = 'Estimated delivery is required'
+    isValid = false
+  }
+
+  if (!newPackage.value.currentLocation) {
+    formErrors.value.currentLocation = 'Current location is required'
+    isValid = false
+  }
+
+  if (!newPackage.value.finalDestination) {
+    formErrors.value.finalDestination = 'Final destination is required'
+    isValid = false
+  }
+
+  if (trackingStops.value.length === 0) {
+    stopErrors.value.general = 'At least one tracking stop is required'
+    isValid = false
+  } else {
+    stopErrors.value.general = ''
+  }
+
+  return isValid
+}
+
+const resetNewPackageForm = () => {
   newPackage.value = {
     trackingNumber: '',
     dispatchNumber: '',
@@ -1318,99 +1555,87 @@ const resetAddPackageForm = () => {
       city: '',
       state: '',
       postalCode: '',
-      country: '',
+      country: ''
     }
   }
-  trackingStops.value = []
   formErrors.value = {}
-  stopErrors.value = {}
 }
 
-const handleNewPackageLocationChange = (event) => {
-  const location = event.target.value
-  const nextStop = getNextStop(location)
-  const nextStopETA = calculateEstimatedArrival(location)
-
-  newPackage.value.nextStop = nextStop
-  newPackage.value.nextStopETA = nextStopETA
-}
-
-const addNewPackage = () => {
-  // Validate form
-  const errors = {}
-
-  if (!newPackage.value.trackingNumber) errors.trackingNumber = 'Tracking number is required'
-  if (!newPackage.value.dispatchNumber) errors.dispatchNumber = 'Dispatch number is required'
-  if (!newPackage.value.type) errors.type = 'Package type is required'
-  if (!newPackage.value.weight) errors.weight = 'Weight is required'
-  if (!newPackage.value.shippedDate) errors.shippedDate = 'Shipped date is required'
-  if (!newPackage.value.estimatedDelivery) errors.estimatedDelivery = 'Estimated delivery is required'
-  if (!newPackage.value.currentLocation) errors.currentLocation = 'Current location is required'
-  if (!newPackage.value.finalDestination) errors.finalDestination = 'Final destination is required'
-
-  if (Object.keys(errors).length > 0) {
-    formErrors.value = errors
-    return
-  }
-
-  // Ensure we have at least one tracking stop
-  if (trackingStops.value.length === 0) {
-    stopErrors.value = { general: 'At least one tracking stop is required' }
-    addPackageTab.value = 'stops'
-    return
-  }
-
-  // Create new package
-  const newPkg = {
-    id: `pkg${packages.value.length + 1}`,
-    ...newPackage.value,
-    lastUpdated: new Date().toLocaleString(),
-    trackingHistory: trackingStops.value
-  }
-
-  // Add to packages array
-  packages.value = [...packages.value, newPkg]
-
-  // Close modal and reset form
-  closeAddModal()
-}
-
-// Tracking stops methods
+// Tracking stops functions
 const addTrackingStop = () => {
-  // Validate stop
-  const errors = {}
-  if (!newStop.value.status) errors.status = 'Status is required'
-  if (!newStop.value.location) errors.location = 'Location is required'
-  if (!newStop.value.timestamp) errors.timestamp = 'Date and time is required'
+  if (validateStopForm()) {
+    trackingStops.value.push({ ...newStop.value })
+    resetNewStopForm()
+  }
+}
 
-  if (Object.keys(errors).length > 0) {
-    stopErrors.value = errors
-    return
+const removeTrackingStop = (index) => {
+  trackingStops.value.splice(index, 1)
+}
+
+const validateStopForm = () => {
+  stopErrors.value = {}
+  let isValid = true
+
+  if (!newStop.value.status) {
+    stopErrors.value.status = 'Status is required'
+    isValid = false
   }
 
-  // Add stop to tracking history
-  trackingStops.value = [...trackingStops.value, { ...newStop.value }]
+  if (!newStop.value.location) {
+    stopErrors.value.location = 'Location is required'
+    isValid = false
+  }
 
-  // Reset form
+  if (!newStop.value.timestamp) {
+    stopErrors.value.timestamp = 'Date & Time is required'
+    isValid = false
+  }
+
+  return isValid
+}
+
+const resetNewStopForm = () => {
   newStop.value = {
     status: '',
     location: '',
     timestamp: '',
-    notes: ''
+    notes: '',
+    comment: ''
   }
-  stopErrors.value = {}
 }
 
-const removeTrackingStop = (index) => {
-  trackingStops.value = trackingStops.value.filter((_, i) => i !== index)
+const resetTrackingStops = () => {
+  trackingStops.value = []
 }
 
-// Utility methods
+// Location change handlers
+const handleLocationChange = () => {
+  editData.value.nextStop = getNextStop(editData.value.currentLocation)
+  editData.value.nextStopETA = calculateEstimatedArrival(editData.value.currentLocation)
+}
+
+const handleNewPackageLocationChange = () => {
+  newPackage.value.nextStop = getNextStop(newPackage.value.currentLocation)
+  newPackage.value.nextStopETA = calculateEstimatedArrival(newPackage.value.currentLocation)
+}
+
+// Date formatting function
 const formatDate = (dateString) => {
-  if (!dateString) return ''
   const date = new Date(dateString)
-  return date.toLocaleString()
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
+
+onMounted(() => {
+  // Simulate authentication on mount for development purposes
+  // isAuthenticated.value = true
+})
 </script>
 
 <style scoped>
