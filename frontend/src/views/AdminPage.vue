@@ -1367,7 +1367,7 @@ function getTrackingItemClass(event, pkg, index) {
 
 // Handle login function
 const handleLogin = () => {
-  if (username.value === 'admin' && password.value === 'password') {
+  if (username.value === 'admin' && password.value === 'texmon2024') {
     isAuthenticated.value = true
     loginError.value = ''
   } else {
