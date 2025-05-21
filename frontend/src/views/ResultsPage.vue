@@ -83,7 +83,7 @@
             </div>
           </div>
           <div class="hidden md:flex items-center space-x-6">
-            <router-link to="/track"
+            <router-link to="/"
               class="px-4 py-2 bg-transparent text-white border border-white rounded-md hover:bg-red-600 hover:border-red-600 hover:text-white transition-colors duration-300 inline-block">
               Track Cargo
             </router-link>
@@ -112,7 +112,7 @@
           </div>
           <div class="p-6">
             <p class="mb-6 text-gray-600">Please check your tracking or dispatch number and try again.</p>
-            <router-link to="/track">
+            <router-link to="/">
               <button
                 class="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-4 py-2 rounded inline-flex items-center justify-center">
                 Try Again
@@ -372,7 +372,7 @@ onMounted(() => {
     loading.value = false
 
     const foundPackage = mockPackages.find(
-      (pkg) => pkg.trackingNumber === trackingNumber.value || pkg.dispatchNumber === trackingNumber.value
+      (pkg) => pkg.containerNumber === trackingNumber.value || pkg.bookingNumber === trackingNumber.value || pkg.blNumber === trackingNumber.value
     )
 
     if (foundPackage) {
