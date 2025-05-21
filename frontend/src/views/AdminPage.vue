@@ -131,8 +131,9 @@
                     <td colspan="7" class="text-center py-4 text-gray-500">No packages found</td>
                   </tr>
                   <tr v-for="pkg in filteredPackages" :key="pkg.id">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.trackingNumber }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.dispatchNumber }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.containerNumber }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.bookingNumber }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.blNumber }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.currentLocation }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.nextStop }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.nextStopETA }}</td>
@@ -181,12 +182,16 @@
           <div v-if="editingPackage" class="space-y-4 py-4">
             <div class="flex justify-between items-center">
               <div>
-                <p class="text-sm font-medium text-gray-500">Tracking Number</p>
-                <p>{{ editingPackage.trackingNumber }}</p>
+                <p class="text-sm font-medium text-gray-500">Container Number</p>
+                <p>{{ editingPackage.containerNumber }}</p>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-500">Dispatch Number</p>
-                <p>{{ editingPackage.dispatchNumber }}</p>
+                <p class="text-sm font-medium text-gray-500">Booking Number</p>
+                <p>{{ editingPackage.bookingNumber }}</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500">BL Number</p>
+                <p>{{ editingPackage.blNumber }}</p>
               </div>
             </div>
 
@@ -377,7 +382,7 @@
           <div class="flex flex-col space-y-1.5 pb-4">
             <h2 class="text-lg font-semibold leading-none tracking-tight">Package Details</h2>
             <p class="text-sm text-muted-foreground" v-if="viewingPackage">
-              Tracking Number: {{ viewingPackage.trackingNumber }} | Dispatch Number: {{ viewingPackage.dispatchNumber }}
+              Container Number: {{ viewingPackage.containerNumber }} | Booking Number: {{ viewingPackage.bookingNumber }} | BL Number: {{ viewingPackage.blNumber }}
             </p>
           </div>
 
@@ -546,22 +551,31 @@
             <div v-if="addPackageTab === 'details'" class="space-y-4 mt-4">
               <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
-                  <label for="trackingNumber" class="text-sm font-medium">Tracking Number</label>
+                  <label for="containerNumber" class="text-sm font-medium">Container Number</label>
                   <input 
-                    id="trackingNumber" 
-                    v-model="newPackage.trackingNumber" 
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.trackingNumber ? 'border-red-500' : '']" 
+                    id="containerNumber" 
+                    v-model="newPackage.containerNumber" 
+                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.containerNumber ? 'border-red-500' : '']" 
                   />
-                  <p v-if="formErrors.trackingNumber" class="text-red-500 text-sm">{{ formErrors.trackingNumber }}</p>
+                  <p v-if="formErrors.containerNumber" class="text-red-500 text-sm">{{ formErrors.containerNumber }}</p>
                 </div>
                 <div class="space-y-2">
-                  <label for="dispatchNumber" class="text-sm font-medium">Dispatch Number</label>
+                  <label for="bookingNumber" class="text-sm font-medium">Booking Number</label>
                   <input 
-                    id="dispatchNumber" 
-                    v-model="newPackage.dispatchNumber" 
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.dispatchNumber ? 'border-red-500' : '']" 
+                    id="bookingNumber" 
+                    v-model="newPackage.bookingNumber" 
+                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.bookingNumber ? 'border-red-500' : '']" 
                   />
-                  <p v-if="formErrors.dispatchNumber" class="text-red-500 text-sm">{{ formErrors.dispatchNumber }}</p>
+                  <p v-if="formErrors.bookingNumber" class="text-red-500 text-sm">{{ formErrors.bookingNumber }}</p>
+                </div>
+                <div class="space-y-2">
+                  <label for="blNumber" class="text-sm font-medium">BL Number</label>
+                  <input 
+                    id="blNumber" 
+                    v-model="newPackage.blNumber" 
+                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.blNumber ? 'border-red-500' : '']" 
+                  />
+                  <p v-if="formErrors.blNumber" class="text-red-500 text-sm">{{ formErrors.blNumber }}</p>
                 </div>
               </div>
 
@@ -820,8 +834,9 @@ const filteredPackages = computed(() => {
   if (!searchTerm.value) return packages.value
   
   return packages.value.filter(pkg => 
-    pkg.trackingNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    pkg.dispatchNumber.toLowerCase().includes(searchTerm.value.toLowerCase())
+    pkg.containerNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    pkg.bookingNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    pkg.blNumber.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
 })
 
@@ -851,8 +866,9 @@ const viewingPackage = ref(null)
 const showAddModal = ref(false)
 const addPackageTab = ref('details')
 const newPackage = ref({
-  trackingNumber: '',
-  dispatchNumber: '',
+  containerNumber: '',
+  bookingNumber: '',
+  blNumber: '',
   type: '',
   weight: '',
   shippedDate: '',
@@ -1159,12 +1175,16 @@ const printPackageDetails = async (pkg) => {
       <div class="section-content">
         <div class="grid">
           <div class="field">
-            <div class="field-label">Tracking Number</div>
-            <div class="field-value">${pkg.trackingNumber} <span class="badge">Active</span></div>
+            <div class="field-label">Container Number</div>
+            <div class="field-value">${pkg.containerNumber} <span class="badge">Active</span></div>
           </div>
           <div class="field">
-            <div class="field-label">Dispatch Number</div>
-            <div class="field-value">${pkg.dispatchNumber}</div>
+            <div class="field-label">Booking Number</div>
+            <div class="field-value">${pkg.bookingNumber}</div>
+          </div>
+           <div class="field">
+            <div class="field-label">BL Number</div>
+            <div class="field-value">${pkg.blNumber}</div>
           </div>
           <div class="field">
             <div class="field-label">Package Type</div>
@@ -1451,8 +1471,9 @@ const addNewPackage = () => {
   if (validateForm()) {
     const newPackageToAdd = {
       id: Date.now(),
-      trackingNumber: newPackage.value.trackingNumber,
-      dispatchNumber: newPackage.value.dispatchNumber,
+      containerNumber: newPackage.value.containerNumber,
+      bookingNumber: newPackage.value.bookingNumber,
+      blNumber: newPackage.value.blNumber,
       type: newPackage.value.type,
       weight: newPackage.value.weight,
       shippedDate: newPackage.value.shippedDate,
@@ -1476,13 +1497,18 @@ const validateForm = () => {
   formErrors.value = {}
   let isValid = true
 
-  if (!newPackage.value.trackingNumber) {
-    formErrors.value.trackingNumber = 'Tracking number is required'
+  if (!newPackage.value.containerNumber) {
+    formErrors.value.containerNumber = 'Container number is required'
     isValid = false
   }
 
-  if (!newPackage.value.dispatchNumber) {
-    formErrors.value.dispatchNumber = 'Dispatch number is required'
+  if (!newPackage.value.bookingNumber) {
+    formErrors.value.bookingNumber = 'Booking number is required'
+    isValid = false
+  }
+
+  if (!newPackage.value.blNumber) {
+    formErrors.value.blNumber = 'BL number is required'
     isValid = false
   }
 
@@ -1528,8 +1554,9 @@ const validateForm = () => {
 
 const resetNewPackageForm = () => {
   newPackage.value = {
-    trackingNumber: '',
-    dispatchNumber: '',
+    containerNumber: '',
+    bookingNumber: '',
+    blNumber: '',
     type: '',
     weight: '',
     shippedDate: '',
