@@ -448,8 +448,8 @@
               <h3 class="text-xl font-semibold">Comments</h3>
             </div>
             <div class="p-6">
-              <div v-if="viewingPackage.comments && viewingPackage.comments.length > 0" class="space-y-4 mb-6">
-                <div v-for="(comment, index) in viewingPackage.comments" :key="index" class="bg-gray-50 p-4 rounded-md">
+              <div v-if="viewingPackage.comment && viewingPackage.comment.length > 0" class="space-y-4 mb-6">
+                <div v-for="(comment, index) in viewingPackage.comment" :key="index" class="bg-gray-50 p-4 rounded-md">
                   <div class="flex justify-between items-start">
                     <div>
                       <p class="font-medium">{{ comment.author }}</p>
@@ -699,15 +699,7 @@
                     </div>
                     <p v-if="stopErrors.timestamp" class="text-red-500 text-sm">{{ stopErrors.timestamp }}</p>
                   </div>
-                  <div class="space-y-2">
-                    <label for="notes" class="text-sm font-medium">Notes (Optional)</label>
-                    <input 
-                      id="notes" 
-                      placeholder="Additional information" 
-                      v-model="newStop.notes" 
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                    />
-                  </div>
+                
                   <div class="space-y-2">
                     <label for="stopComment" class="text-sm font-medium">Comment</label>
                     <textarea 
@@ -743,7 +735,6 @@
                           <p class="font-medium">{{ stop.status }}</p>
                           <p class="text-sm text-gray-500">{{ stop.location }}</p>
                           <p class="text-sm text-gray-500">{{ formatDate(stop.timestamp) }}</p>
-                          <p v-if="stop.notes" class="text-sm text-gray-400 mt-1">{{ stop.notes }}</p>
                           <div v-if="stop.comment" class="mt-2 p-2 bg-gray-50 rounded-md">
                             <p class="text-sm font-medium text-gray-700">Comment:</p>
                             <p class="text-sm text-gray-600">{{ stop.comment }}</p>
@@ -887,7 +878,6 @@ const newStop = ref({
   status: '',
   location: '',
   timestamp: '',
-  notes: '',
   comment: []
 })
 const stopErrors = ref({})
@@ -909,7 +899,7 @@ const addComment = (packageId) => {
   // Find the package and add the comment
   packages.value = packages.value.map(pkg => {
     if (pkg.id === packageId) {
-      const comments = pkg.comments || []
+      const comments = pkg.comment || []
       return {
         ...pkg,
         comments: [...comments, { ...newComment.value }]
@@ -1287,7 +1277,6 @@ const printPackageDetails = async (pkg) => {
               <div class="tracking-status">${event.status}</div>
               <div class="tracking-location">${event.location}</div>
               <div class="tracking-time">${event.timestamp}</div>
-              ${event.notes ? `<div class="tracking-notes">${event.notes}</div>` : ''}
               ${event.comment ? `<div class="tracking-comment"><strong>Comment:</strong> ${event.comment}</div>` : ''}
             </div>
           `).join('')}
@@ -1295,14 +1284,14 @@ const printPackageDetails = async (pkg) => {
       </div>
     </div>
     
-    ${pkg.comments && pkg.comments.length > 0 ? `
+    ${pkg.comment && pkg.comment.length > 0 ? `
       <div class="section">
         <div class="section-header">
           <span class="section-header-icon">💬</span>
           Comments
         </div>
         <div class="section-content">
-          ${pkg.comments.map(comment => `
+          ${pkg.comment.map(comment => `
             <div class="comment">
               <div class="comment-author">${comment.author}</div>
               <div class="comment-time">${comment.timestamp}</div>
@@ -1367,7 +1356,7 @@ function getTrackingItemClass(event, pkg, index) {
 
 // Handle login function
 const handleLogin = () => {
-  if (username.value === 'admin' && password.value === 'password') {
+  if (username.value === 'admin' && password.value === 'texmon2024') {
     isAuthenticated.value = true
     loginError.value = ''
   } else {

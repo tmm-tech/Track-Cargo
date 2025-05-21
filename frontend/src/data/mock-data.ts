@@ -1,8 +1,9 @@
 export const mockPackages = [
   {
     id: "pkg1",
-    trackingNumber: "TXM12345678",
-    dispatchNumber: "DSP87654321",
+    containerNumber: "MSCU7654321", // Container No
+    bookingNumber: "BKG98765432", // Booking No
+    blNumber: "MBLNO123456789", // B/L
     type: "Standard Package",
     weight: "5.2",
     shippedDate: "2025-04-22",
@@ -135,8 +136,9 @@ export const mockPackages = [
   },
   {
     id: "pkg2",
-    trackingNumber: "TXM98765432",
-    dispatchNumber: "DSP12345678",
+    containerNumber: "CMAU2345678", // Container No
+    bookingNumber: "BOK87654321", // Booking No
+    blNumber: "HBLNO987654321", // B/L
     type: "Express Package",
     weight: "2.8",
     shippedDate: "2025-05-01",
@@ -220,8 +222,9 @@ export const mockPackages = [
   },
   {
     id: "pkg3",
-    trackingNumber: "TXM45678901",
-    dispatchNumber: "DSP10987654",
+    containerNumber: "MAEU3456789", // Container No
+    bookingNumber: "RES76543210", // Booking No
+    blNumber: "BLNO876543210", // B/L
     type: "Heavy Freight",
     weight: "120.5",
     shippedDate: "2025-04-19",
@@ -341,8 +344,9 @@ export const mockPackages = [
   },
   {
     id: "pkg4",
-    trackingNumber: "TXM11223344",
-    dispatchNumber: "DSP44332211",
+    containerNumber: "ZIMU8901234", // Container No
+    bookingNumber: "BKG12340987", // Booking No
+    blNumber: "MBLNO765432109", // B/L
     type: "Fragile Package",
     weight: "1.3",
     shippedDate: "2025-05-10",
@@ -420,8 +424,9 @@ export const mockPackages = [
   },
   {
     id: "pkg5",
-    trackingNumber: "TXM55667788",
-    dispatchNumber: "DSP88776655",
+    containerNumber: "NYKU5678901", // Container No
+    bookingNumber: "TXM89012345", // Booking No
+    blNumber: "TXM789012345", // B/L
     type: "Refrigerated Goods",
     weight: "15.7",
     shippedDate: "2025-04-25",
@@ -529,8 +534,9 @@ export const mockPackages = [
   },
   {
     id: "pkg6",
-    trackingNumber: "TXM22446688",
-    dispatchNumber: "DSP11335577",
+    containerNumber: "EMSU6789012", // Container No
+    bookingNumber: "BOK65432109", // Booking No
+    blNumber: "HBLNO654321098", // B/L
     type: "Medical Supplies",
     weight: "8.4",
     shippedDate: "2025-05-05",
@@ -626,8 +632,9 @@ export const mockPackages = [
   },
   {
     id: "pkg7",
-    trackingNumber: "TXM13579246",
-    dispatchNumber: "DSP97531086",
+    containerNumber: "OOLU9012345", // Container No
+    bookingNumber: "RES54321098", // Booking No
+    blNumber: "BLNO543210987", // B/L
     type: "Electronics",
     weight: "4.6",
     shippedDate: "2025-04-28",
