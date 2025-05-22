@@ -1405,19 +1405,9 @@ const generatePrintContent = (pkg) => {
         <p>This document was generated on ${new Date().toLocaleString()}</p>
         <p>Thank you for choosing Texmon Logistics</p>
       </div>
-      
-      <script>
-        // Auto-print when loaded
-        window.onload = function() {
-          // Small delay to ensure everything is rendered
-          setTimeout(function() {
-            window.print();
-          }, 500);
-        };
-      </script>
-    </body>
-    </html>
-  `
+      </body>
+    </html>  
+`
 }
 
 // Format date for display
