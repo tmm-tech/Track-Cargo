@@ -2,7 +2,7 @@ export const mockPackages = [
   {
     id: "pkg1",
     containerNumber: "MSCU7654321", // Container No
-    bookingNumber: "BKG98765432", // Booking No
+    truckNumber: "BKG98765432", // Truck No
     blNumber: "MBLNO123456789", // B/L
     type: "Standard Package",
     weight: "5.2",
@@ -137,7 +137,7 @@ export const mockPackages = [
   {
     id: "pkg2",
     containerNumber: "CMAU2345678", // Container No
-    bookingNumber: "BOK87654321", // Booking No
+    truckNumber: "BOK87654321", // Truck No
     blNumber: "HBLNO987654321", // B/L
     type: "Express Package",
     weight: "2.8",
@@ -223,7 +223,7 @@ export const mockPackages = [
   {
     id: "pkg3",
     containerNumber: "MAEU3456789", // Container No
-    bookingNumber: "RES76543210", // Booking No
+    truckNumber: "RES76543210", // Truck No
     blNumber: "BLNO876543210", // B/L
     type: "Heavy Freight",
     weight: "120.5",
@@ -345,7 +345,7 @@ export const mockPackages = [
   {
     id: "pkg4",
     containerNumber: "ZIMU8901234", // Container No
-    bookingNumber: "BKG12340987", // Booking No
+    truckNumber: "BKG12340987", // Truck No
     blNumber: "MBLNO765432109", // B/L
     type: "Fragile Package",
     weight: "1.3",
@@ -425,7 +425,7 @@ export const mockPackages = [
   {
     id: "pkg5",
     containerNumber: "NYKU5678901", // Container No
-    bookingNumber: "TXM89012345", // Booking No
+    truckNumber: "TXM89012345", // Truck No
     blNumber: "TXM789012345", // B/L
     type: "Refrigerated Goods",
     weight: "15.7",
@@ -535,7 +535,7 @@ export const mockPackages = [
   {
     id: "pkg6",
     containerNumber: "EMSU6789012", // Container No
-    bookingNumber: "BOK65432109", // Booking No
+    truckNumber: "BOK65432109", // Truck No
     blNumber: "HBLNO654321098", // B/L
     type: "Medical Supplies",
     weight: "8.4",
@@ -633,7 +633,7 @@ export const mockPackages = [
   {
     id: "pkg7",
     containerNumber: "OOLU9012345", // Container No
-    bookingNumber: "RES54321098", // Booking No
+    truckNumber: "RES54321098", // Truck No
     blNumber: "BLNO543210987", // B/L
     type: "Electronics",
     weight: "4.6",

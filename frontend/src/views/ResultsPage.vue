@@ -372,7 +372,7 @@ onMounted(() => {
     loading.value = false
 
     const foundPackage = mockPackages.find(
-      (pkg) => pkg.containerNumber === trackingNumber.value || pkg.bookingNumber === trackingNumber.value || pkg.blNumber === trackingNumber.value
+      (pkg) => pkg.containerNumber === trackingNumber.value || pkg.truckNumber === trackingNumber.value || pkg.blNumber === trackingNumber.value
     )
 
     if (foundPackage) {

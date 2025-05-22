@@ -103,9 +103,9 @@
             <CardContent class="pt-6">
               <form @submit.prevent="handleSubmit" class="space-y-6">
                 <div class="space-y-2">
-                  <Label for="tracking-number">Container, Booking, or B/L Number</Label>
+                  <Label for="tracking-number">Container, Truck, or B/L Number</Label>
                   <div class="relative">
-                    <Input id="tracking-number" v-model="trackingNumber" placeholder="Container No | Booking No | B/L"
+                    <Input id="tracking-number" v-model="trackingNumber" placeholder="Container No | Truck No | B/L"
                       class="pr-10 border-gray-300" />
                     <Search class="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
                   </div>
@@ -310,7 +310,7 @@ export default {
 
     const handleSubmit = async () => {
       if (!trackingNumber.value.trim()) {
-        error.value = 'Please enter a Container No, Booking No, or B/L';
+        error.value = 'Please enter a Container No, Truck No, or B/L';
         return;
       }
 
@@ -322,7 +322,7 @@ export default {
 
         // Check if package exists in mock data
         const foundPackage = mockPackages.find(
-          pkg => pkg.containerNumber === trackingNumber.value || pkg.bookingNumber === trackingNumber.value || pkg.blNumber === trackingNumber.value
+          pkg => pkg.containerNumber === trackingNumber.value || pkg.truckNumber === trackingNumber.value || pkg.blNumber === trackingNumber.value
         );
 
         if (foundPackage) {

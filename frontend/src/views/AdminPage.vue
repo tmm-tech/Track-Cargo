@@ -106,7 +106,7 @@
               <div class="relative">
                 <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                 <input
-                  placeholder="Search by tracking or dispatch number"
+                  placeholder="Search by tracking or truck number"
                   v-model="searchTerm"
                   class="flex h-10 w-full rounded-md border border-input bg-background pl-10 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 />
@@ -117,8 +117,9 @@
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tracking #</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dispatch #</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Container #</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">truck #</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BL #</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Location</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Stop</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Stop ETA</th>
@@ -132,7 +133,7 @@
                   </tr>
                   <tr v-for="pkg in filteredPackages" :key="pkg.id">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.containerNumber }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.bookingNumber }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.truckNumber }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.blNumber }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.currentLocation }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.nextStop }}</td>
@@ -186,8 +187,8 @@
                 <p>{{ editingPackage.containerNumber }}</p>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-500">Booking Number</p>
-                <p>{{ editingPackage.bookingNumber }}</p>
+                <p class="text-sm font-medium text-gray-500">Truck Number</p>
+                <p>{{ editingPackage.truckNumber }}</p>
               </div>
               <div>
                 <p class="text-sm font-medium text-gray-500">BL Number</p>
@@ -382,7 +383,7 @@
           <div class="flex flex-col space-y-1.5 pb-4">
             <h2 class="text-lg font-semibold leading-none tracking-tight">Package Details</h2>
             <p class="text-sm text-muted-foreground" v-if="viewingPackage">
-              Container Number: {{ viewingPackage.containerNumber }} | Booking Number: {{ viewingPackage.bookingNumber }} | BL Number: {{ viewingPackage.blNumber }}
+              Container Number: {{ viewingPackage.containerNumber }} | Truck Number: {{ viewingPackage.truckNumber }} | BL Number: {{ viewingPackage.blNumber }}
             </p>
           </div>
 
@@ -560,13 +561,13 @@
                   <p v-if="formErrors.containerNumber" class="text-red-500 text-sm">{{ formErrors.containerNumber }}</p>
                 </div>
                 <div class="space-y-2">
-                  <label for="bookingNumber" class="text-sm font-medium">Booking Number</label>
+                  <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
                   <input 
-                    id="bookingNumber" 
-                    v-model="newPackage.bookingNumber" 
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.bookingNumber ? 'border-red-500' : '']" 
+                    id="truckNumber" 
+                    v-model="newPackage.truckNumber" 
+                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truckNumber ? 'border-red-500' : '']" 
                   />
-                  <p v-if="formErrors.bookingNumber" class="text-red-500 text-sm">{{ formErrors.bookingNumber }}</p>
+                  <p v-if="formErrors.truckNumber" class="text-red-500 text-sm">{{ formErrors.truckNumber }}</p>
                 </div>
                 <div class="space-y-2">
                   <label for="blNumber" class="text-sm font-medium">BL Number</label>
@@ -807,7 +808,7 @@ import {
   PlusIcon, 
   DocumentCheckIcon, 
   MapPinIcon, 
-  TruckIcon, 
+  truckIcon, 
   CheckCircleIcon,
   CalendarIcon,
   TrashIcon,
@@ -835,7 +836,7 @@ const filteredPackages = computed(() => {
   
   return packages.value.filter(pkg => 
     pkg.containerNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    pkg.bookingNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    pkg.truckNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
     pkg.blNumber.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
 })
@@ -867,7 +868,7 @@ const showAddModal = ref(false)
 const addPackageTab = ref('details')
 const newPackage = ref({
   containerNumber: '',
-  bookingNumber: '',
+  truckNumber: '',
   blNumber: '',
   type: '',
   weight: '',
@@ -1161,7 +1162,7 @@ const printPackageDetails = async (pkg) => {
   <body>
     <div class="header">
       <div class="logo-container">
-        <img src="https://i.imgur.com/jWxX8ZS.png" alt="Texmon Logistics Logo" class="logo-image" />
+        <img src="https://www.texmonlogistics.co.ke/assets/images/texmon-logo.png" alt="Texmon Logistics Logo" class="logo-image" />
         <div class="company-name">Texmon Logistics</div>
       </div>
       <div>Package Tracking Details</div>
@@ -1179,8 +1180,8 @@ const printPackageDetails = async (pkg) => {
             <div class="field-value">${pkg.containerNumber} <span class="badge">Active</span></div>
           </div>
           <div class="field">
-            <div class="field-label">Booking Number</div>
-            <div class="field-value">${pkg.bookingNumber}</div>
+            <div class="field-label">Truck Number</div>
+            <div class="field-value">${pkg.truckNumber}</div>
           </div>
            <div class="field">
             <div class="field-label">BL Number</div>
@@ -1472,7 +1473,7 @@ const addNewPackage = () => {
     const newPackageToAdd = {
       id: Date.now(),
       containerNumber: newPackage.value.containerNumber,
-      bookingNumber: newPackage.value.bookingNumber,
+      truckNumber: newPackage.value.truckNumber,
       blNumber: newPackage.value.blNumber,
       type: newPackage.value.type,
       weight: newPackage.value.weight,
@@ -1502,8 +1503,8 @@ const validateForm = () => {
     isValid = false
   }
 
-  if (!newPackage.value.bookingNumber) {
-    formErrors.value.bookingNumber = 'Booking number is required'
+  if (!newPackage.value.truckNumber) {
+    formErrors.value.truckNumber = 'Truck number is required'
     isValid = false
   }
 
@@ -1555,7 +1556,7 @@ const validateForm = () => {
 const resetNewPackageForm = () => {
   newPackage.value = {
     containerNumber: '',
-    bookingNumber: '',
+    truckNumber: '',
     blNumber: '',
     type: '',
     weight: '',
