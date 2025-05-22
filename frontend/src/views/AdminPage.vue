@@ -451,7 +451,34 @@
         </div>
       </div>
     </div>
+<!-- Print Package Modal -->
+    <Dialog :open="isPrintModalOpen" @update:open="isPrintModalOpen = $event">
+      <DialogPanel class="max-w-md w-full transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+        <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
+          Print Package Details
+        </DialogTitle>
+        <div class="mt-2">
+          <p class="text-sm text-gray-500">
+            Are you sure you want to print the details for package #{{ printingPackage.trackingNumber }}?
+          </p>
+        </div>
+        <div class="mt-4">
+          <button type="button" class="inline-flex justify-center rounded-md border border-transparent bg-blue-500 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" @click="printPackage">
+            Print
+          </button>
+          <button type="button" class="ml-2 inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" @click="closePrintModal">
+            Cancel
+          </button>
+        </div>
+      </DialogPanel>
+    </Dialog>
 
+    <!-- Hidden iframe for printing -->
+    <iframe 
+      ref="printFrame" 
+      style="display: none;"
+      title="Print Frame"
+    ></iframe>
     <!-- Add Package Modal -->
     <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       @click="closeAddModal">
@@ -703,7 +730,7 @@ const loginError = ref('')
 const packages = ref([...mockPackages])
 const searchTerm = ref('')
 const currentYear = computed(() => new Date().getFullYear())
-
+const isPrintModalOpen = ref(false)
 // Filtered packages based on search term
 const filteredPackages = computed(() => {
   if (!searchTerm.value) return packages.value
