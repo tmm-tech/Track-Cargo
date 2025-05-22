@@ -1280,7 +1280,7 @@ const generatePrintContent = (pkg) => {
   </body>
   </html>
 `
-}
+
   // Helper function to calculate progress percentage for the progress bar
   function calculateProgress(pkg) {
     const stages = ['Shipped', 'In Transit', 'Out for Delivery', 'Delivered'];
@@ -1314,14 +1314,6 @@ const generatePrintContent = (pkg) => {
     }
   }
 
-  printWindow.document.write(content)
-  printWindow.document.close()
-
-  // Wait for the content to load and then print
-  printWindow.onload = () => {
-    printWindow.print()
-    printWindow.close()
-  }
 }
 
 // Handle login function
