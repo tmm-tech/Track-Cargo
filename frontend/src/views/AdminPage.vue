@@ -152,7 +152,7 @@
                         </button>
                         <button
                           class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
-                          @click="printPackageDetails(pkg)">
+                         @click="printPackageDetails(pkg)">
                           <PrinterIcon class="h-4 w-4" />
                         </button>
                       </div>
@@ -810,7 +810,7 @@ const printPackageDetails = (pkg) => {
 };
 
 // Replace the printPackage function with this mobile-friendly version
-const printPackage = () => {
+const printingPackage = () => {
   // Create a hidden div to hold the print content
   const printContainer = document.createElement('div');
   printContainer.style.position = 'absolute';
