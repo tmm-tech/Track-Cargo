@@ -167,6 +167,7 @@
                   <h3 class="font-medium text-gray-500 text-lg">Current Location</h3>
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.currentLocation }}</p>
                   <p class="text-gray-500">Updated: {{ packageData.lastUpdated }}</p>
+                  
                 </div>
               </div>
 
@@ -178,6 +179,7 @@
                   <h3 class="font-medium text-gray-500 text-lg">Next Stop</h3>
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.nextStop }}</p>
                   <p class="text-gray-500">Estimated arrival: {{ packageData.nextStopETA }}</p>
+                  <Badge class="ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300">Pending</Badge>
                 </div>
               </div>
 
@@ -189,6 +191,7 @@
                   <h3 class="font-medium text-gray-500 text-lg">Final Destination</h3>
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.finalDestination }}</p>
                   <p class="text-gray-500">Estimated delivery: {{ packageData.estimatedDelivery }}</p>
+                  <Badge class="ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300">Pending</Badge>
                 </div>
               </div>
             </div>
