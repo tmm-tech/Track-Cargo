@@ -827,25 +827,14 @@ const printPackageDetails = async (pkg) => {
         background-color: #f9f9f9;
       }
       .header {
-        background: linear-gradient(135deg, #273272 0%, #1a2050 100%);
-        color: white;
+        background-color: #0c2d57; /* dark blue */
+        color: #ffffff; /* white text */
         padding: 20px;
         text-align: center;
         margin-bottom: 20px;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       }
-
-      .logo-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #273272;
-  padding: 10px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-bottom: 10px;
-}
 
       .section {
         margin-bottom: 30px;

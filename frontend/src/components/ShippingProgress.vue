@@ -53,7 +53,7 @@
                 <div v-if="index < trackingHistory.length - 1" class="w-0.5 h-full bg-gray-200 absolute top-4"></div>
               </div>
               <div class="flex-1 pb-6">
-                <p class="font-medium text-[#273272]">{{ event.status }}</p>
+                <p :class="['font-medium', statusColorClass(event.status)]">{{ event.status }}</p>
                 <p class="text-sm text-gray-500">{{ event.location }}</p>
                 <p class="text-sm text-gray-500">{{ event.timestamp }}</p>
                 <p v-if="event.notes" class="text-sm text-gray-400 mt-1">{{ event.notes }}</p>
@@ -101,4 +101,22 @@ defineProps({
     required: true
   }
 });
+
+function statusColorClass(status: string) {
+  switch (status.toLowerCase()) {
+    case 'Delivered':
+      return 'text-green-600';
+    case 'In transit':
+      return 'text-yellow-600';
+    case 'Pending':
+      return 'text-gray-500';
+    case 'Cancelled':
+      return 'text-red-600';
+    case 'Delayed':
+      return 'text-orange-500';
+    default:
+      return 'text-[#273272]';
+  }
+}
+
 </script>
