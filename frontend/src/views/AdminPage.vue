@@ -104,7 +104,7 @@
                       class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Container #
                     </th>
                     <th scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">truck #
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Truck #
                     </th>
                     <th scope="col"
                       class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BL #</th>
