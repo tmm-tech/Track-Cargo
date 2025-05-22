@@ -1,457 +1,291 @@
 <template>
-  <div class="flex flex-col min-h-screen">
-    <!-- Header -->
-    <header class="bg-[#273272] text-white">
-      <div class="container mx-auto">
-        <div class="flex justify-between items-center py-2 px-4">
-          <div class="flex items-center">
-            <span class="text-sm">
-              <i class="mr-2">📍</i> Texmon Logistics Limited, Kenya
-            </span>
-          </div>
-          <div class="flex space-x-4" v-if="isAuthenticated">
-            <button @click="logout" class="text-sm hover:text-[#ffb600]">
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
+  <div class="container mx-auto p-4">
+    <h1 class="text-2xl font-semibold mb-4">Admin Dashboard</h1>
 
-    <!-- Logo section -->
-    <div class="bg-white border-b">
-      <div class="container mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center py-4 px-4">
-          <div class="mb-4 md:mb-0">
-            <router-link to="/" class="flex items-center">
-              <span class="text-2xl font-bold text-[#273272]">Texmon Logistics</span>
-            </router-link>
-          </div>
-          <div v-if="isAuthenticated">
-            <h2 class="text-xl font-bold text-[#273272]">Admin Dashboard</h2>
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+      <div class="flex gap-2">
+        <button @click="openCreateModal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Create Package
+        </button>
+        <button @click="showUserManagement = true" class="bg-purple-600 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded">
+          <UserIcon class="h-4 w-4 inline mr-1" />
+          Users
+        </button>
+        <button @click="refreshPackages" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          Refresh
+        </button>
+      </div>
+      <div class="w-full md:w-1/2">
+        <div class="relative">
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="Search by Container No, Truck No, or B/L..." 
+            class="shadow appearance-none border rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          >
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+            <SearchIcon class="w-5 h-5" />
           </div>
         </div>
+        <p class="text-xs text-gray-500 mt-1">
+          Search by Container No, Truck No, or B/L
+        </p>
       </div>
     </div>
 
-    <!-- Login Form -->
-    <main v-if="!isAuthenticated" class="flex-1 bg-gray-50 flex items-center justify-center p-4">
-      <div class="rounded-lg border bg-white shadow-lg overflow-hidden w-full max-w-md">
-        <div class="bg-[#273272] text-white p-6 rounded-t-lg">
-          <h2 class="text-2xl font-semibold">Admin Login</h2>
-          <p class="text-gray-200">Please login to access the admin dashboard</p>
-        </div>
-        <div class="p-6">
-          <form @submit.prevent="handleLogin" class="space-y-4">
-            <div v-if="loginError" class="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">{{ loginError }}</div>
-            <div class="space-y-2">
-              <label for="username" class="text-sm font-medium">Username</label>
-              <input id="username" placeholder="Enter your username" v-model="username"
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                required />
+    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Container No
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Truck No
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              B/L
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Recipient
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Destination
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Weight
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr v-for="pkg in filteredPackages" :key="pkg.id">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ pkg.trackingNumber }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ pkg.containerNumber }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ pkg.truckNumber }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ pkg.blNumber }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span 
+                :class="[
+                  'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                  getStatusBadgeStyle(pkg).bg,
+                  getStatusBadgeStyle(pkg).text
+                ]"
+              >
+                {{ pkg.trackingHistory[0]?.status || 'Unknown' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ pkg.recipientName }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ pkg.destinationAddress }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ pkg.weight }} kg</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex justify-end gap-2">
+                <button 
+                  :class="[
+                    'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-9 px-3',
+                    getStatusBadgeStyle(pkg).bg,
+                    getStatusBadgeStyle(pkg).text
+                  ]"
+                  @click="viewPackageDetails(pkg)"
+                >
+                  View
+                </button>
+                <button 
+                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                  @click="editPackage(pkg)"
+                >
+                  <PencilIcon class="h-4 w-4 mr-1" />
+                  Edit
+                </button>
+                <button 
+                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                  @click="printPackageDetails(pkg)"
+                >
+                  <PrinterIcon class="h-4 w-4" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Create Package Modal -->
+    <Dialog :open="isCreateModalOpen" @update:open="isCreateModalOpen = $event">
+      <DialogPanel class="max-w-md w-full transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+        <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
+          Create New Package
+        </DialogTitle>
+        <div class="mt-2">
+          <form @submit.prevent="createPackage">
+            <div class="grid grid-cols-1 gap-4">
+              <div>
+                <label for="recipientName" class="block text-sm font-medium text-gray-700">Recipient Name</label>
+                <input type="text" id="recipientName" v-model="newPackage.recipientName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+              <div>
+                <label for="destinationAddress" class="block text-sm font-medium text-gray-700">Destination Address</label>
+                <input type="text" id="destinationAddress" v-model="newPackage.destinationAddress" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+              <div>
+                <label for="containerNumber" class="block text-sm font-medium text-gray-700">Container No</label>
+                <input type="text" id="containerNumber" v-model="newPackage.containerNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+              <div>
+                <label for="truckNumber" class="block text-sm font-medium text-gray-700">Truck No</label>
+                <input type="text" id="truckNumber" v-model="newPackage.truckNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+              <div>
+                <label for="blNumber" class="block text-sm font-medium text-gray-700">B/L</label>
+                <input type="text" id="blNumber" v-model="newPackage.blNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+              <div>
+                <label for="weight" class="block text-sm font-medium text-gray-700">Weight (kg)</label>
+                <input type="number" id="weight" v-model="newPackage.weight" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
             </div>
-            <div class="space-y-2">
-              <label for="password" class="text-sm font-medium">Password</label>
-              <input id="password" type="password" placeholder="Enter your password" v-model="password"
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                required />
+            <div class="mt-4">
+              <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-blue-500 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Create
+              </button>
+              <button type="button" class="ml-2 inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" @click="closeCreateModal">
+                Cancel
+              </button>
             </div>
-            <button type="submit"
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] h-10 px-4 py-2 w-full">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                  clip-rule="evenodd" />
-              </svg>
-              Login
-            </button>
           </form>
         </div>
-      </div>
-    </main>
-
-    <!-- Admin Dashboard -->
-    <main v-else class="flex-1 bg-gray-50 py-8">
-      <div class="container mx-auto px-4">
-        <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
-          <div class="flex flex-row items-center justify-between bg-[#273272] text-white p-6 rounded-t-lg">
-            <div>
-              <h2 class="text-xl font-semibold">Package Management</h2>
-              <p class="text-gray-200">
-                Update the current location and next stop information for packages
-              </p>
-            </div>
-            <button @click="openAddPackageModal"
-              class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-4 py-2 rounded inline-flex items-center">
-              <PlusIcon class="h-4 w-4 mr-2" />
-              Add Package
-            </button>
-          </div>
-          <div class="p-6">
-            <div class="mb-6">
-              <div class="relative">
-                <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                <input placeholder="Search by tracking or truck number" v-model="searchTerm"
-                  class="flex h-10 w-full rounded-md border border-input bg-background pl-10 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" />
-              </div>
-            </div>
-
-            <div class="rounded-md border border-gray-200 overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Container #
-                    </th>
-                    <th scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Truck #
-                    </th>
-                    <th scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BL #</th>
-                    <th scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current
-                      Location</th>
-                    <th scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Stop
-                    </th>
-                    <th scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Stop
-                      ETA</th>
-                    <th scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last
-                      Updated</th>
-                    <th scope="col"
-                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-if="filteredPackages.length === 0">
-                    <td colspan="7" class="text-center py-4 text-gray-500">No packages found</td>
-                  </tr>
-                  <tr v-for="pkg in filteredPackages" :key="pkg.id">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.containerNumber }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.truckNumber }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.blNumber }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.currentLocation }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.nextStop }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.nextStopETA }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ pkg.lastUpdated }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="flex justify-end gap-2">
-                        <button
-                          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
-                          @click="viewPackageDetails(pkg)">
-                          View
-                        </button>
-                        <button
-                          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
-                          @click="editPackage(pkg)">
-                          <PencilIcon class="h-4 w-4 mr-1" />
-                          Edit
-                        </button>
-                        <button
-                          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
-                         @click="printPackageDetails(pkg)">
-                          <PrinterIcon class="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+      </DialogPanel>
+    </Dialog>
 
     <!-- Edit Package Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      @click="closeEditModal">
-      <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
-        <div class="p-6">
-          <div class="flex flex-col space-y-1.5 pb-4">
-            <h2 class="text-lg font-semibold leading-none tracking-tight">Update Package Information</h2>
-            <p class="text-sm text-muted-foreground">Update the package location and shipping address information.</p>
-          </div>
-
-          <div v-if="editingPackage" class="space-y-4 py-4">
-            <div class="flex justify-between items-center">
+    <Dialog :open="isEditModalOpen" @update:open="isEditModalOpen = $event">
+      <DialogPanel class="max-w-md w-full transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+        <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
+          Edit Package
+        </DialogTitle>
+        <div class="mt-2">
+          <form @submit.prevent="updatePackage">
+            <div class="grid grid-cols-1 gap-4">
               <div>
-                <p class="text-sm font-medium text-gray-500">Container Number</p>
-                <p>{{ editingPackage.containerNumber }}</p>
+                <label for="recipientName" class="block text-sm font-medium text-gray-700">Recipient Name</label>
+                <input type="text" id="recipientName" v-model="editingPackage.recipientName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-500">Truck Number</p>
-                <p>{{ editingPackage.truckNumber }}</p>
+                <label for="destinationAddress" class="block text-sm font-medium text-gray-700">Destination Address</label>
+                <input type="text" id="destinationAddress" v-model="editingPackage.destinationAddress" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-500">BL Number</p>
-                <p>{{ editingPackage.blNumber }}</p>
+                <label for="containerNumber" class="block text-sm font-medium text-gray-700">Container No</label>
+                <input type="text" id="containerNumber" v-model="editingPackage.containerNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+              <div>
+                <label for="truckNumber" class="block text-sm font-medium text-gray-700">Truck No</label>
+                <input type="text" id="truckNumber" v-model="editingPackage.truckNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+              <div>
+                <label for="blNumber" class="block text-sm font-medium text-gray-700">B/L</label>
+                <input type="text" id="blNumber" v-model="editingPackage.blNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+              <div>
+                <label for="weight" class="block text-sm font-medium text-gray-700">Weight (kg)</label>
+                <input type="number" id="weight" v-model="editingPackage.weight" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
               </div>
             </div>
-
-            <div>
-              <div class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
-                <button :class="[
-                  'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                  'disabled:pointer-events-none disabled:opacity-50',
-                  activeEditTab === 'location' ? 'bg-background text-foreground shadow-sm' : 'hover:bg-muted/50'
-                ]" @click="activeEditTab = 'location'">
-                  Location
-                </button>
-                <button :class="[
-                  'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                  'disabled:pointer-events-none disabled:opacity-50',
-                  activeEditTab === 'address' ? 'bg-background text-foreground shadow-sm' : 'hover:bg-muted/50'
-                ]" @click="activeEditTab = 'address'">
-                  Shipping Address
-                </button>
-              </div>
-
-              <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
-                <div class="space-y-2">
-                  <label for="currentLocation" class="text-sm font-medium">Current Location</label>
-                  <select id="currentLocation" v-model="editData.currentLocation" @change="handleLocationChange"
-                    class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                    <option value="" disabled>Select location</option>
-                    <option v-for="location in allLocations" :key="location" :value="location">{{ location }}</option>
-                  </select>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="space-y-2">
-                    <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                    <input id="nextStop" v-model="editData.nextStop" readonly
-                      class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                    <p class="text-xs text-gray-500">Automatically determined based on current location</p>
-                  </div>
-                  <div class="space-y-2">
-                    <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                    <input id="nextStopETA" type="date" v-model="editData.nextStopETA" readonly
-                      class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                    <p class="text-xs text-gray-500">Estimated based on standard transit times</p>
-                  </div>
-                </div>
-              </div>
-
-              <div v-if="activeEditTab === 'address'" class="space-y-4 mt-4">
-                <div class="space-y-2">
-                  <label for="recipientName" class="text-sm font-medium">Recipient Name</label>
-                  <input id="recipientName" v-model="editData.shippingAddress.recipientName"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                </div>
-
-                <div class="space-y-2">
-                  <label for="streetAddress" class="text-sm font-medium">Street Address</label>
-                  <input id="streetAddress" v-model="editData.shippingAddress.streetAddress"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="space-y-2">
-                    <label for="city" class="text-sm font-medium">City</label>
-                    <input id="city" v-model="editData.shippingAddress.city"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                  </div>
-                  <div class="space-y-2">
-                    <label for="state" class="text-sm font-medium">State/Province</label>
-                    <input id="state" v-model="editData.shippingAddress.state"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="space-y-2">
-                    <label for="postalCode" class="text-sm font-medium">Postal Code</label>
-                    <input id="postalCode" v-model="editData.shippingAddress.postalCode"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                  </div>
-                  <div class="space-y-2">
-                    <label for="country" class="text-sm font-medium">Country</label>
-                    <input id="country" v-model="editData.shippingAddress.country"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Comments Section in Edit Modal -->
-          <div class="mt-6 pt-6 border-t">
-            <h3 class="text-lg font-medium mb-4">Comments</h3>
-            <div v-if="editingPackage.comments && editingPackage.comments.length > 0" class="space-y-4 mb-6">
-              <div v-for="(comment, index) in editingPackage.comments" :key="index" class="bg-gray-50 p-4 rounded-md">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <p class="font-medium">{{ comment.author }}</p>
-                    <p class="text-sm text-gray-500">{{ comment.timestamp }}</p>
-                  </div>
-                </div>
-                <p class="mt-2">{{ comment.text }}</p>
-              </div>
-            </div>
-            <div v-else class="text-gray-500 mb-6">No comments yet</div>
-
-            <form @submit.prevent="addComment(editingPackage.id)" class="space-y-4">
-              <div class="space-y-2">
-                <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
-                <textarea id="editCommentText" v-model="newComment.text" rows="3"
-                  placeholder="Enter your comment here..."
-                  class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-              </div>
-              <button type="submit"
-                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                Add Comment
+            <div class="mt-4">
+              <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-blue-500 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Update
               </button>
-            </form>
-          </div>
-
-          <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-            <button
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-              @click="closeEditModal">
-              Cancel
-            </button>
-            <button
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-              @click="savePackageChanges">
-              <DocumentCheckIcon class="h-4 w-4 mr-2" />
-              Update Package
-            </button>
-          </div>
+              <button type="button" class="ml-2 inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" @click="closeEditModal">
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
-    </div>
+      </DialogPanel>
+    </Dialog>
 
     <!-- View Package Modal -->
-    <div v-if="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      @click="closeViewModal">
-      <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
-        <div class="p-6">
-          <div class="flex flex-col space-y-1.5 pb-4">
-            <h2 class="text-lg font-semibold leading-none tracking-tight">Package Details</h2>
-            <p class="text-sm text-muted-foreground" v-if="viewingPackage">
-              Container Number: {{ viewingPackage.containerNumber }} | Truck Number: {{ viewingPackage.truckNumber }} |
-              BL Number: {{ viewingPackage.blNumber }}
-            </p>
-          </div>
-
-          <div v-if="viewingPackage" class="space-y-6">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <p class="text-sm font-medium text-gray-500">Package Type</p>
-                <p class="text-lg">{{ viewingPackage.type }}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Weight</p>
-                <p class="text-lg">{{ viewingPackage.weight }} kg</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Shipped Date</p>
-                <p class="text-lg">{{ viewingPackage.shippedDate }}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
-                <p class="text-lg">{{ viewingPackage.estimatedDelivery }}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Final Destination</p>
-                <p class="text-lg">{{ viewingPackage.finalDestination }}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Last Updated</p>
-                <p class="text-lg">{{ viewingPackage.lastUpdated }}</p>
-              </div>
+    <Dialog :open="isViewModalOpen" @update:open="isViewModalOpen = $event">
+      <DialogPanel class="max-w-md w-full transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+        <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
+          Package Details
+        </DialogTitle>
+        <div class="mt-2">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm font-medium text-gray-500">Recipient Name</p>
+              <p class="text-sm text-gray-900">{{ viewingPackage.recipientName }}</p>
             </div>
-
-            <!-- Shipping Address Card -->
-            <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
-              <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
-                <MapPinIcon class="h-5 w-5 mr-2" />
-                <h3 class="text-xl font-semibold">Shipping Address</h3>
-              </div>
-              <div class="p-6">
-                <div v-if="viewingPackage.shippingAddress" class="space-y-1">
-                  <p class="font-medium">{{ viewingPackage.shippingAddress.recipientName }}</p>
-                  <p>{{ viewingPackage.shippingAddress.streetAddress }}</p>
-                  <p>
-                    {{ viewingPackage.shippingAddress.city }}, {{ viewingPackage.shippingAddress.state }}
-                    {{ viewingPackage.shippingAddress.postalCode }}
-                  </p>
-                  <p>{{ viewingPackage.shippingAddress.country }}</p>
-                </div>
-                <p v-else class="text-gray-500">No shipping address information available</p>
-              </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500">Container No</p>
+              <p class="text-sm text-gray-900">{{ viewingPackage.containerNumber }}</p>
             </div>
-
-            <!-- Shipping Progress -->
-            <ShippingProgress :trackingHistory="viewingPackage.trackingHistory"
-              :currentLocation="viewingPackage.currentLocation" :nextStop="viewingPackage.nextStop"
-              :nextStopETA="viewingPackage.nextStopETA" :finalDestination="viewingPackage.finalDestination"
-              :estimatedDelivery="viewingPackage.estimatedDelivery" showComments />
-          </div>
-
-          <!-- Comments Section -->
-          <div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
-            <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
-              <ChatBubbleLeftRightIcon class="h-5 w-5 mr-2" />
-              <h3 class="text-xl font-semibold">Comments</h3>
+            <div>
+              <p class="text-sm font-medium text-gray-500">Truck No</p>
+              <p class="text-sm text-gray-900">{{ viewingPackage.truckNumber }}</p>
             </div>
-            <div class="p-6">
-              <div v-if="viewingPackage.comment && viewingPackage.comment.length > 0" class="space-y-4 mb-6">
-                <div v-for="(comment, index) in viewingPackage.comment" :key="index" class="bg-gray-50 p-4 rounded-md">
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <p class="font-medium">{{ comment.author }}</p>
-                      <p class="text-sm text-gray-500">{{ comment.timestamp }}</p>
-                    </div>
-                  </div>
-                  <p class="mt-2">{{ comment.text }}</p>
-                </div>
-              </div>
-              <div v-else class="text-gray-500 mb-6">No comments yet</div>
-
-              <form @submit.prevent="addComment(viewingPackage.id)" class="space-y-4">
-                <div class="space-y-2">
-                  <label for="commentText" class="text-sm font-medium">Add Comment</label>
-                  <textarea id="commentText" v-model="newComment.text" rows="3" placeholder="Enter your comment here..."
-                    class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                </div>
-                <button type="submit"
-                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                  Add Comment
-                </button>
-              </form>
+            <div>
+              <p class="text-sm font-medium text-gray-500">B/L</p>
+              <p class="text-sm text-gray-900">{{ viewingPackage.blNumber }}</p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500">Destination Address</p>
+              <p class="text-sm text-gray-900">{{ viewingPackage.destinationAddress }}</p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500">Weight</p>
+              <p class="text-sm text-gray-900">{{ viewingPackage.weight }} kg</p>
             </div>
           </div>
-
-          <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-            <button
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-              @click="closeViewModal">
-              Close
-            </button>
-            <button
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-              @click="editFromViewModal">
-              <PencilIcon class="h-4 w-4 mr-2" />
-              Edit Package
-            </button>
-            <button
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 py-2"
-              @click="printPackageDetails(viewingPackage)">
-              <PrinterIcon class="h-4 w-4 mr-2" />
-              Print Details
-            </button>
+          <div class="mt-4 mb-4">
+            <p class="text-sm font-medium text-gray-500 mb-2">Current Status</p>
+            <span 
+              :class="[
+                'px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full',
+                getStatusBadgeStyle(viewingPackage).bg,
+                getStatusBadgeStyle(viewingPackage).text
+              ]"
+            >
+              {{ viewingPackage.trackingHistory[0]?.status || 'Unknown' }}
+            </span>
+          </div>
+          <div class="mt-4">
+            <p class="text-sm font-medium text-gray-500">Tracking History</p>
+            <ul class="list-disc pl-5">
+              <li v-for="(history, index) in viewingPackage.trackingHistory" :key="index" class="text-sm text-gray-900">
+                {{ history.status }} - {{ formatDate(history.timestamp) }}
+              </li>
+            </ul>
           </div>
         </div>
-      </div>
-    </div>
-<!-- Print Package Modal -->
+        <div class="mt-4">
+          <button type="button" class="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" @click="closeViewModal">
+            Close
+          </button>
+        </div>
+      </DialogPanel>
+    </Dialog>
+
+    <!-- Print Package Modal -->
     <Dialog :open="isPrintModalOpen" @update:open="isPrintModalOpen = $event">
       <DialogPanel class="max-w-md w-full transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
         <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
@@ -459,7 +293,7 @@
         </DialogTitle>
         <div class="mt-2">
           <p class="text-sm text-gray-500">
-            Are you sure you want to print the details for package #{{ printingPackage.trackingNumber }}?
+            Are you sure you want to print the details for package #{{ printingPackage.containerNumber }}?
           </p>
         </div>
         <div class="mt-4">
@@ -479,365 +313,809 @@
       style="display: none;"
       title="Print Frame"
     ></iframe>
-    <!-- Add Package Modal -->
-    <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      @click="closeAddModal">
-      <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
+
+    <!-- User Management Modal -->
+    <div v-if="showUserManagement" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click="closeUserManagement">
+      <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-auto" @click.stop>
         <div class="p-6">
           <div class="flex flex-col space-y-1.5 pb-4">
-            <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Package</h2>
-            <p class="text-sm text-muted-foreground">Enter the details for the new package and its tracking history.</p>
+            <h2 class="text-lg font-semibold leading-none tracking-tight">User Management</h2>
+            <p class="text-sm text-muted-foreground">Manage users who can access the admin dashboard.</p>
           </div>
 
-          <div>
-            <div class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
-              <button :class="[
-                'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                'disabled:pointer-events-none disabled:opacity-50',
-                addPackageTab === 'details' ? 'bg-background text-foreground shadow-sm' : 'hover:bg-muted/50'
-              ]" @click="addPackageTab = 'details'">
-                Package Details
-              </button>
-              <button :class="[
-                'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                'disabled:pointer-events-none disabled:opacity-50',
-                addPackageTab === 'stops' ? 'bg-background text-foreground shadow-sm' : 'hover:bg-muted/50'
-              ]" @click="addPackageTab = 'stops'">
-                Tracking Stops
-              </button>
-            </div>
-
-            <div v-if="addPackageTab === 'details'" class="space-y-4 mt-4">
-              <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-2">
-                  <label for="containerNumber" class="text-sm font-medium">Container Number</label>
-                  <input id="containerNumber" v-model="newPackage.containerNumber"
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.containerNumber ? 'border-red-500' : '']" />
-                  <p v-if="formErrors.containerNumber" class="text-red-500 text-sm">{{ formErrors.containerNumber }}</p>
-                </div>
-                <div class="space-y-2">
-                  <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
-                  <input id="truckNumber" v-model="newPackage.truckNumber"
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truckNumber ? 'border-red-500' : '']" />
-                  <p v-if="formErrors.truckNumber" class="text-red-500 text-sm">{{ formErrors.truckNumber }}</p>
-                </div>
-                <div class="space-y-2">
-                  <label for="blNumber" class="text-sm font-medium">BL Number</label>
-                  <input id="blNumber" v-model="newPackage.blNumber"
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.blNumber ? 'border-red-500' : '']" />
-                  <p v-if="formErrors.blNumber" class="text-red-500 text-sm">{{ formErrors.blNumber }}</p>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-2">
-                  <label for="type" class="text-sm font-medium">Package Type</label>
-                  <input id="type" v-model="newPackage.type"
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.type ? 'border-red-500' : '']" />
-                  <p v-if="formErrors.type" class="text-red-500 text-sm">{{ formErrors.type }}</p>
-                </div>
-                <div class="space-y-2">
-                  <label for="weight" class="text-sm font-medium">Weight (kg)</label>
-                  <input id="weight" v-model="newPackage.weight"
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.weight ? 'border-red-500' : '']" />
-                  <p v-if="formErrors.weight" class="text-red-500 text-sm">{{ formErrors.weight }}</p>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-2">
-                  <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
-                  <input id="shippedDate" type="date" v-model="newPackage.shippedDate"
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shippedDate ? 'border-red-500' : '']" />
-                  <p v-if="formErrors.shippedDate" class="text-red-500 text-sm">{{ formErrors.shippedDate }}</p>
-                </div>
-                <div class="space-y-2">
-                  <label for="estimatedDelivery" class="text-sm font-medium">Estimated Delivery</label>
-                  <input id="estimatedDelivery" type="date" v-model="newPackage.estimatedDelivery"
-                    :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.estimatedDelivery ? 'border-red-500' : '']" />
-                  <p v-if="formErrors.estimatedDelivery" class="text-red-500 text-sm">{{ formErrors.estimatedDelivery }}
-                  </p>
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <label for="currentLocation" class="text-sm font-medium">Current Location</label>
-                <select id="currentLocation" v-model="newPackage.currentLocation"
-                  @change="handleNewPackageLocationChange"
-                  :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.currentLocation ? 'border-red-500' : '']">
-                  <option value="" disabled selected>Select location</option>
-                  <option v-for="location in allLocations" :key="location" :value="location">{{ location }}</option>
-                </select>
-                <p v-if="formErrors.currentLocation" class="text-red-500 text-sm">{{ formErrors.currentLocation }}</p>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-2">
-                  <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                  <input id="nextStop" v-model="newPackage.nextStop" readonly
-                    class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                  <p class="text-xs text-gray-500">Automatically determined based on current location</p>
-                </div>
-                <div class="space-y-2">
-                  <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                  <input id="nextStopETA" type="date" v-model="newPackage.nextStopETA" readonly
-                    class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
-                <input id="finalDestination" v-model="newPackage.finalDestination"
-                  :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.finalDestination ? 'border-red-500' : '']" />
-                <p v-if="formErrors.finalDestination" class="text-red-500 text-sm">{{ formErrors.finalDestination }}</p>
+          <div class="flex justify-between items-center mb-6">
+            <div class="relative w-64">
+              <input 
+                v-model="userSearchQuery" 
+                type="text" 
+                placeholder="Search users..." 
+                class="shadow appearance-none border rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              >
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                <SearchIcon class="w-4 h-4" />
               </div>
             </div>
+            <button 
+              @click="openAddUserModal" 
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+            >
+              <UserPlusIcon class="h-4 w-4 mr-1" />
+              Add User
+            </button>
+          </div>
 
-            <div v-if="addPackageTab === 'stops'" class="space-y-4 mt-4">
-              <div v-if="stopErrors.general" class="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">{{
-                stopErrors.general }}</div>
-
-              <div class="bg-gray-50 p-4 rounded-md border">
-                <h3 class="font-medium text-lg mb-3">Add Tracking Stop</h3>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                  <div class="space-y-2">
-                    <label for="status" class="text-sm font-medium">Status</label>
-                    <input id="status" placeholder="e.g., Package received, In transit" v-model="newStop.status"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.status ? 'border-red-500' : '']" />
-                    <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
-                  </div>
-                  <div class="space-y-2">
-                    <label for="location" class="text-sm font-medium">Location</label>
-                    <input id="location" placeholder="e.g., Nairobi Warehouse" v-model="newStop.location"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.location ? 'border-red-500' : '']" />
-                    <p v-if="stopErrors.location" class="text-red-500 text-sm">{{ stopErrors.location }}</p>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                  <div class="space-y-2">
-                    <label for="timestamp" class="text-sm font-medium">Date & Time</label>
-                    <div class="relative">
-                      <input id="timestamp" type="datetime-local" v-model="newStop.timestamp"
-                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.timestamp ? 'border-red-500' : '']" />
-                      <CalendarIcon class="absolute right-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" />
-                    </div>
-                    <p v-if="stopErrors.timestamp" class="text-red-500 text-sm">{{ stopErrors.timestamp }}</p>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="stopComment" class="text-sm font-medium">Comment</label>
-                    <textarea id="stopComment" placeholder="Enter comment for this stop" v-model="newStop.comment"
-                      rows="2"
-                      class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                  </div>
-                </div>
-
-                <button @click="addTrackingStop"
-                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] hover:bg-[#1e2759] text-white h-10 px-4 py-2">
-                  <PlusIcon class="h-4 w-4 mr-2" />
-                  Add Stop
-                </button>
-              </div>
-
-              <div class="mt-6">
-                <h3 class="font-medium text-lg mb-3">Tracking History</h3>
-                <div v-if="trackingStops.length === 0" class="text-center py-8 bg-gray-50 rounded-md border">
-                  <p class="text-gray-500">No tracking stops added yet</p>
-                  <p class="text-sm text-gray-400 mt-1">Add stops to create the package's tracking history</p>
-                </div>
-                <div v-else class="space-y-4">
-                  <div v-for="(stop, index) in trackingStops" :key="index"
-                    class="flex items-start gap-4 bg-white p-4 rounded-md border">
-                    <div class="flex-1">
-                      <div class="flex justify-between">
-                        <div>
-                          <p class="font-medium">{{ stop.status }}</p>
-                          <p class="text-sm text-gray-500">{{ stop.location }}</p>
-                          <p class="text-sm text-gray-500">{{ formatDate(stop.timestamp) }}</p>
-                          <div v-if="stop.comment" class="mt-2 p-2 bg-gray-50 rounded-md">
-                            <p class="text-sm font-medium text-gray-700">Comment:</p>
-                            <p class="text-sm text-gray-600">{{ stop.comment }}</p>
-                          </div>
-                        </div>
-                        <button @click="removeTrackingStop(index)"
-                          class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded">
-                          <TrashIcon class="h-4 w-4" />
-                        </button>
+          <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Username
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Last Login
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="user in filteredUsers" :key="user.id">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3">
+                        {{ user.name.charAt(0) }}
                       </div>
+                      <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ user.username }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ user.email }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      :class="[
+                        'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        user.role === 'Admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                      ]"
+                    >
+                      {{ user.role }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ user.lastLogin || 'Never' }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex justify-end gap-2">
+                      <button 
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                        @click="editUser(user)"
+                      >
+                        <PencilIcon class="h-4 w-4 mr-1" />
+                        Edit
+                      </button>
+                      <button 
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                        @click="resetUserPassword(user)"
+                      >
+                        <KeyIcon class="h-4 w-4 mr-1" />
+                        Reset
+                      </button>
+                      <button 
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-red-300 text-red-700 hover:bg-red-50 h-9 px-3"
+                        @click="confirmDeleteUser(user)"
+                        :disabled="user.username === 'admin'"
+                      >
+                        <TrashIcon class="h-4 w-4 mr-1" />
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="filteredUsers.length === 0">
+                  <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                    No users found
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
             <button
               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-              @click="closeAddModal">
-              Cancel
-            </button>
-            <button
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-              @click="addNewPackage">
-              Add Package
+              @click="closeUserManagement"
+            >
+              Close
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-[#1a1a1a] text-white py-4">
-      <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-          <p class="text-gray-400">
-            Copyright © {{ currentYear }} Texmon Logistics Limited - Admin Portal
-          </p>
+    <!-- Add/Edit User Modal -->
+    <div v-if="showUserFormModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click="closeUserFormModal">
+      <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+        <div class="p-6">
+          <div class="flex flex-col space-y-1.5 pb-4">
+            <h2 class="text-lg font-semibold leading-none tracking-tight">{{ editingUser.id ? 'Edit User' : 'Add New User' }}</h2>
+            <p class="text-sm text-muted-foreground">{{ editingUser.id ? 'Update user information and permissions.' : 'Create a new user account.' }}</p>
+          </div>
+
+          <form @submit.prevent="saveUser">
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <label for="name" class="text-sm font-medium">Full Name</label>
+                <input 
+                  id="name" 
+                  v-model="editingUser.name" 
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  :class="{ 'border-red-500': userFormErrors.name }"
+                  placeholder="John Doe"
+                />
+                <p v-if="userFormErrors.name" class="text-red-500 text-xs mt-1">{{ userFormErrors.name }}</p>
+              </div>
+              
+              <div class="space-y-2">
+                <label for="username" class="text-sm font-medium">Username</label>
+                <input 
+                  id="username" 
+                  v-model="editingUser.username" 
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  :class="{ 'border-red-500': userFormErrors.username }"
+                  placeholder="johndoe"
+                  :disabled="editingUser.id && editingUser.username === 'admin'"
+                />
+                <p v-if="userFormErrors.username" class="text-red-500 text-xs mt-1">{{ userFormErrors.username }}</p>
+              </div>
+              
+              <div class="space-y-2">
+                <label for="email" class="text-sm font-medium">Email</label>
+                <input 
+                  id="email" 
+                  v-model="editingUser.email" 
+                  type="email"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  :class="{ 'border-red-500': userFormErrors.email }"
+                  placeholder="john.doe@example.com"
+                />
+                <p v-if="userFormErrors.email" class="text-red-500 text-xs mt-1">{{ userFormErrors.email }}</p>
+              </div>
+              
+              <div class="space-y-2">
+                <label for="role" class="text-sm font-medium">Role</label>
+                <select 
+                  id="role" 
+                  v-model="editingUser.role"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  :disabled="editingUser.id && editingUser.username === 'admin'"
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="User">User</option>
+                  <option value="Viewer">Viewer</option>
+                </select>
+              </div>
+              
+              <div v-if="!editingUser.id" class="space-y-2">
+                <label for="password" class="text-sm font-medium">Password</label>
+                <input 
+                  id="password" 
+                  v-model="editingUser.password" 
+                  type="password"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  :class="{ 'border-red-500': userFormErrors.password }"
+                  placeholder="••••••••"
+                />
+                <p v-if="userFormErrors.password" class="text-red-500 text-xs mt-1">{{ userFormErrors.password }}</p>
+              </div>
+              
+              <div v-if="!editingUser.id" class="space-y-2">
+                <label for="confirmPassword" class="text-sm font-medium">Confirm Password</label>
+                <input 
+                  id="confirmPassword" 
+                  v-model="editingUser.confirmPassword" 
+                  type="password"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  :class="{ 'border-red-500': userFormErrors.confirmPassword }"
+                  placeholder="••••••••"
+                />
+                <p v-if="userFormErrors.confirmPassword" class="text-red-500 text-xs mt-1">{{ userFormErrors.confirmPassword }}</p>
+              </div>
+            </div>
+            
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-6">
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                @click="closeUserFormModal"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+              >
+                {{ editingUser.id ? 'Update User' : 'Create User' }}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-    </footer>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div v-if="showResetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click="closeResetPasswordModal">
+      <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+        <div class="p-6">
+          <div class="flex flex-col space-y-1.5 pb-4">
+            <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
+            <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username }}</strong></p>
+          </div>
+
+          <form @submit.prevent="saveNewPassword">
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <label for="newPassword" class="text-sm font-medium">New Password</label>
+                <input 
+                  id="newPassword" 
+                  v-model="resetPasswordUser.newPassword" 
+                  type="password"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  :class="{ 'border-red-500': resetPasswordErrors.newPassword }"
+                  placeholder="••••••••"
+                />
+                <p v-if="resetPasswordErrors.newPassword" class="text-red-500 text-xs mt-1">{{ resetPasswordErrors.newPassword }}</p>
+              </div>
+              
+              <div class="space-y-2">
+                <label for="confirmNewPassword" class="text-sm font-medium">Confirm New Password</label>
+                <input 
+                  id="confirmNewPassword" 
+                  v-model="resetPasswordUser.confirmNewPassword" 
+                  type="password"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  :class="{ 'border-red-500': resetPasswordErrors.confirmNewPassword }"
+                  placeholder="••••••••"
+                />
+                <p v-if="resetPasswordErrors.confirmNewPassword" class="text-red-500 text-xs mt-1">{{ resetPasswordErrors.confirmNewPassword }}</p>
+              </div>
+            </div>
+            
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-6">
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                @click="closeResetPasswordModal"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+              >
+                Reset Password
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete User Confirmation Modal -->
+    <div v-if="showDeleteUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click="closeDeleteUserModal">
+      <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+        <div class="p-6">
+          <div class="flex flex-col space-y-1.5 pb-4">
+            <h2 class="text-lg font-semibold leading-none tracking-tight text-red-600">Delete User</h2>
+            <p class="text-sm text-muted-foreground">Are you sure you want to delete the user <strong>{{ userToDelete.username }}</strong>? This action cannot be undone.</p>
+          </div>
+          
+          <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-6">
+            <button
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+              @click="closeDeleteUserModal"
+            >
+              Cancel
+            </button>
+            <button
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
+              @click="deleteUser"
+            >
+              Delete User
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import {
-  MagnifyingGlassIcon,
-  PencilIcon,
-  PlusIcon,
-  DocumentCheckIcon,
-  MapPinIcon,
-  CalendarIcon,
-  TrashIcon,
-  PrinterIcon,
-  ChatBubbleLeftRightIcon
-} from '@heroicons/vue/24/outline'
-import { mockPackages } from '../data/mock-data'
-import { allLocations, getNextStop, calculateEstimatedArrival } from '../data/locations-data'
-import ShippingProgress from '../components/ShippingProgress.vue'
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'
+import { PencilIcon, PrinterIcon, SearchIcon, UserIcon, UserPlusIcon, TrashIcon, KeyIcon } from '@heroicons/vue/24/outline'
 
-// Authentication state
-const isAuthenticated = ref(false)
-const username = ref('')
-const password = ref('')
-const loginError = ref('')
-
-// Package management state
-const packages = ref([...mockPackages])
-const searchTerm = ref('')
-const currentYear = computed(() => new Date().getFullYear())
+const packages = ref([])
+const searchQuery = ref('')
+const isCreateModalOpen = ref(false)
+const isEditModalOpen = ref(false)
+const isViewModalOpen = ref(false)
 const isPrintModalOpen = ref(false)
-// Filtered packages based on search term
-const filteredPackages = computed(() => {
-  if (!searchTerm.value) return packages.value
+const printFrame = ref(null)
 
-  return packages.value.filter(pkg =>
-    pkg.containerNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    pkg.truckNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    pkg.blNumber.toLowerCase().includes(searchTerm.value.toLowerCase())
-  )
-})
-
-// Edit package state
-const showEditModal = ref(false)
-const editingPackage = ref(null)
-const activeEditTab = ref('location')
-const editData = ref({
-  currentLocation: '',
-  nextStop: '',
-  nextStopETA: '',
-  shippingAddress: {
-    recipientName: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: '',
-  }
-})
-
-// View package state
-const showViewModal = ref(false)
-const viewingPackage = ref(null)
-
-// Add package state
-const showAddModal = ref(false)
-const addPackageTab = ref('details')
 const newPackage = ref({
+  recipientName: '',
+  destinationAddress: '',
   containerNumber: '',
   truckNumber: '',
   blNumber: '',
-  type: '',
-  weight: '',
-  shippedDate: '',
-  estimatedDelivery: '',
-  currentLocation: '',
-  nextStop: '',
-  nextStopETA: '',
-  finalDestination: '',
-  shippingAddress: {
-    recipientName: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: '',
+  weight: 0,
+})
+const editingPackage = ref({
+  id: null,
+  recipientName: '',
+  destinationAddress: '',
+  containerNumber: '',
+  truckNumber: '',
+  blNumber: '',
+  weight: 0,
+})
+const viewingPackage = ref({
+  recipientName: '',
+  destinationAddress: '',
+  containerNumber: '',
+  truckNumber: '',
+  blNumber: '',
+  weight: 0,
+  trackingHistory: []
+})
+const printingPackage = ref({
+  recipientName: '',
+  destinationAddress: '',
+  containerNumber: '',
+  truckNumber: '',
+  blNumber: '',
+  weight: 0,
+  trackingHistory: []
+})
+
+// User management state
+const showUserManagement = ref(false)
+const userSearchQuery = ref('')
+const users = ref([
+  {
+    id: 1,
+    name: 'Admin User',
+    username: 'admin',
+    email: 'admin@texmonlogistics.com',
+    role: 'Admin',
+    lastLogin: new Date().toLocaleDateString()
+  },
+  {
+    id: 2,
+    name: 'John Doe',
+    username: 'johndoe',
+    email: 'john.doe@texmonlogistics.com',
+    role: 'User',
+    lastLogin: '2023-05-15'
+  },
+  {
+    id: 3,
+    name: 'Jane Smith',
+    username: 'janesmith',
+    email: 'jane.smith@texmonlogistics.com',
+    role: 'Viewer',
+    lastLogin: '2023-06-20'
   }
+])
+
+// User form state
+const showUserFormModal = ref(false)
+const editingUser = ref({
+  id: null,
+  name: '',
+  username: '',
+  email: '',
+  role: 'User',
+  password: '',
+  confirmPassword: ''
 })
-const formErrors = ref({})
+const userFormErrors = ref({})
 
-// Tracking stops state
-const trackingStops = ref([])
-const newStop = ref({
-  status: '',
-  location: '',
-  timestamp: '',
-  comment: []
+// Reset password state
+const showResetPasswordModal = ref(false)
+const resetPasswordUser = ref({
+  id: null,
+  username: '',
+  newPassword: '',
+  confirmNewPassword: ''
 })
-const stopErrors = ref({})
+const resetPasswordErrors = ref({})
 
-// Comments state
-const newComment = ref({
-  text: '',
-  author: 'Admin',
-  timestamp: ''
+// Delete user state
+const showDeleteUserModal = ref(false)
+const userToDelete = ref({
+  id: null,
+  username: ''
 })
 
-// Add comment function
-const addComment = (packageId) => {
-  if (!newComment.value.text.trim()) return
+// Filtered users based on search query
+const filteredUsers = computed(() => {
+  if (!userSearchQuery.value) return users.value
 
-  // Set the current timestamp
-  newComment.value.timestamp = new Date().toLocaleString()
+  const query = userSearchQuery.value.toLowerCase()
+  return users.value.filter(user => 
+    user.name.toLowerCase().includes(query) ||
+    user.username.toLowerCase().includes(query) ||
+    user.email.toLowerCase().includes(query) ||
+    user.role.toLowerCase().includes(query)
+  )
+})
 
-  // Find the package and add the comment
-  packages.value = packages.value.map(pkg => {
-    if (pkg.id === packageId) {
-      const comments = pkg.comment || []
-      return {
-        ...pkg,
-        comments: [...comments, { ...newComment.value }]
-      }
-    }
-    return pkg
-  })
-
-  // Reset the comment form
-  newComment.value.text = ''
+// User management functions
+const closeUserManagement = () => {
+  showUserManagement.value = false
 }
 
-// Print package details function
+const openAddUserModal = () => {
+  editingUser.value = {
+    id: null,
+    name: '',
+    username: '',
+    email: '',
+    role: 'User',
+    password: '',
+    confirmPassword: ''
+  }
+  userFormErrors.value = {}
+  showUserFormModal.value = true
+}
+
+const editUser = (user) => {
+  editingUser.value = { ...user }
+  userFormErrors.value = {}
+  showUserFormModal.value = true
+}
+
+const closeUserFormModal = () => {
+  showUserFormModal.value = false
+}
+
+const validateUserForm = () => {
+  userFormErrors.value = {}
+  let isValid = true
+
+  if (!editingUser.value.name) {
+    userFormErrors.value.name = 'Name is required'
+    isValid = false
+  }
+
+  if (!editingUser.value.username) {
+    userFormErrors.value.username = 'Username is required'
+    isValid = false
+  } else if (
+    !editingUser.value.id && 
+    users.value.some(u => u.username.toLowerCase() === editingUser.value.username.toLowerCase())
+  ) {
+    userFormErrors.value.username = 'Username already exists'
+    isValid = false
+  }
+
+  if (!editingUser.value.email) {
+    userFormErrors.value.email = 'Email is required'
+    isValid = false
+  } else if (!/\S+@\S+\.\S+/.test(editingUser.value.email)) {
+    userFormErrors.value.email = 'Email is invalid'
+    isValid = false
+  }
+
+  if (!editingUser.value.id) {
+    if (!editingUser.value.password) {
+      userFormErrors.value.password = 'Password is required'
+      isValid = false
+    } else if (editingUser.value.password.length < 6) {
+      userFormErrors.value.password = 'Password must be at least 6 characters'
+      isValid = false
+    }
+
+    if (!editingUser.value.confirmPassword) {
+      userFormErrors.value.confirmPassword = 'Please confirm your password'
+      isValid = false
+    } else if (editingUser.value.password !== editingUser.value.confirmPassword) {
+      userFormErrors.value.confirmPassword = 'Passwords do not match'
+      isValid = false
+    }
+  }
+
+  return isValid
+}
+
+const saveUser = () => {
+  if (!validateUserForm()) return
+
+  if (editingUser.value.id) {
+    // Update existing user
+    users.value = users.value.map(user => 
+      user.id === editingUser.value.id ? { ...editingUser.value } : user
+    )
+  } else {
+    // Create new user
+    const newUser = {
+      id: users.value.length + 1,
+      name: editingUser.value.name,
+      username: editingUser.value.username,
+      email: editingUser.value.email,
+      role: editingUser.value.role,
+      lastLogin: 'Never'
+    }
+    users.value.push(newUser)
+  }
+
+  closeUserFormModal()
+}
+
+const resetUserPassword = (user) => {
+  resetPasswordUser.value = {
+    id: user.id,
+    username: user.username,
+    newPassword: '',
+    confirmNewPassword: ''
+  }
+  resetPasswordErrors.value = {}
+  showResetPasswordModal.value = true
+}
+
+const closeResetPasswordModal = () => {
+  showResetPasswordModal.value = false
+}
+
+const validateResetPasswordForm = () => {
+  resetPasswordErrors.value = {}
+  let isValid = true
+
+  if (!resetPasswordUser.value.newPassword) {
+    resetPasswordErrors.value.newPassword = 'New password is required'
+    isValid = false
+  } else if (resetPasswordUser.value.newPassword.length < 6) {
+    resetPasswordErrors.value.newPassword = 'Password must be at least 6 characters'
+    isValid = false
+  }
+
+  if (!resetPasswordUser.value.confirmNewPassword) {
+    resetPasswordErrors.value.confirmNewPassword = 'Please confirm your password'
+    isValid = false
+  } else if (resetPasswordUser.value.newPassword !== resetPasswordUser.value.confirmNewPassword) {
+    resetPasswordErrors.value.confirmNewPassword = 'Passwords do not match'
+    isValid = false
+  }
+
+  return isValid
+}
+
+const saveNewPassword = () => {
+  if (!validateResetPasswordForm()) return
+
+  // In a real application, you would send this to your API
+  console.log(`Password reset for user ${resetPasswordUser.value.username}`)
+  
+  // Show success message
+  alert(`Password has been reset for ${resetPasswordUser.value.username}`)
+  
+  closeResetPasswordModal()
+}
+
+const confirmDeleteUser = (user) => {
+  userToDelete.value = { ...user }
+  showDeleteUserModal.value = true
+}
+
+const closeDeleteUserModal = () => {
+  showDeleteUserModal.value = false
+}
+
+const deleteUser = () => {
+  // Remove the user from the list
+  users.value = users.value.filter(user => user.id !== userToDelete.value.id)
+  
+  closeDeleteUserModal()
+}
+
+onMounted(() => {
+  fetchPackages()
+})
+
+const fetchPackages = async () => {
+  try {
+    // For demo purposes, we'll create some mock data instead of fetching from an API
+    packages.value = generateMockPackages()
+  } catch (error) {
+    console.error('Error fetching packages:', error)
+  }
+}
+
+// Generate mock package data
+const generateMockPackages = () => {
+  const statuses = [
+    'Pending', 
+    'Package Received', 
+    'In Transit', 
+    'Out for Delivery', 
+    'Delivered'
+  ]
+  
+  // Container prefixes for different shipping lines
+  const containerPrefixes = ['MSCU', 'CMAU', 'MAEU', 'ZIMU', 'NYKU', 'EMSU', 'OOLU']
+  
+  // B/L prefixes
+  const blPrefixes = ['MBLNO', 'HBLNO', 'BLNO', 'TXM']
+  
+  // Truck prefixes
+  const truckPrefixes = ['BKG', 'BOK', 'TXM', 'RES']
+  
+  return Array.from({ length: 10 }, (_, i) => {
+    const statusIndex = Math.floor(Math.random() * statuses.length)
+    const trackingHistory = []
+    
+    // Generate tracking history based on current status
+    for (let j = 0; j <= statusIndex; j++) {
+      const date = new Date()
+      date.setDate(date.getDate() - (statusIndex - j))
+      
+      trackingHistory.unshift({
+        status: statuses[j],
+        timestamp: date.toISOString(),
+        location: ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret'][Math.floor(Math.random() * 5)]
+      })
+    }
+    
+    // Generate random shipping identifiers
+    const containerPrefix = containerPrefixes[Math.floor(Math.random() * containerPrefixes.length)]
+    const blPrefix = blPrefixes[Math.floor(Math.random() * blPrefixes.length)]
+    const truckPrefix = truckPrefixes[Math.floor(Math.random() * truckPrefixes.length)]
+    
+    return {
+      id: i + 1,
+      containerNumber: `${containerPrefix}${Math.floor(1000000 + Math.random() * 9000000)}`,
+      truckingNumber: `${truckPrefix}${Math.floor(10000000 + Math.random() * 90000000)}`,
+      blNumber: `${blPrefix}${Math.floor(100000000 + Math.random() * 900000000)}`,
+      recipientName: ['John Doe', 'Jane Smith', 'Robert Johnson', 'Emily Davis', 'Michael Brown'][Math.floor(Math.random() * 5)],
+      destinationAddress: ['123 Main St, Nairobi', '456 Park Ave, Mombasa', '789 Ocean Blvd, Kisumu'][Math.floor(Math.random() * 3)],
+      weight: Math.floor(1 + Math.random() * 20),
+      trackingHistory
+    }
+  })
+}
+
+const refreshPackages = () => {
+  fetchPackages()
+}
+
+const filteredPackages = computed(() => {
+  const query = searchQuery.value.toLowerCase()
+  return packages.value.filter(pkg => {
+    return pkg.trackingNumber.toLowerCase().includes(query) ||
+      pkg.recipientName.toLowerCase().includes(query) ||
+      pkg.destinationAddress.toLowerCase().includes(query) ||
+      pkg.containerNumber.toLowerCase().includes(query) ||
+      pkg.truckNumber.toLowerCase().includes(query) ||
+      pkg.blNumber.toLowerCase().includes(query)
+  })
+})
+
+const openCreateModal = () => {
+  isCreateModalOpen.value = true
+}
+
+const closeCreateModal = () => {
+  isCreateModalOpen.value = false
+  newPackage.value = {
+    recipientName: '',
+    destinationAddress: '',
+    containerNumber: '',
+    truckNumber: '',
+    blNumber: '',
+    weight: 0,
+  }
+}
+
+const createPackage = async () => {
+  // Generate random identifiers
+  const containerPrefix = ['MSCU', 'CMAU', 'MAEU', 'ZIMU'][Math.floor(Math.random() * 4)]
+  const containerNumber = newPackage.value.containerNumber || `${containerPrefix}${Math.floor(1000000 + Math.random() * 9000000)}`
+  const truckNumber = newPackage.value.truckNumber || `BKG${Math.floor(10000000 + Math.random() * 90000000)}`
+  const blNumber = newPackage.value.blNumber || `MBLNO${Math.floor(100000000 + Math.random() * 900000000)}`
+
+  // Create a new package object with the generated tracking number and a default "Pending" status
+  const newPackageWithTracking = {
+    id: packages.value.length + 1,
+    containerNumber: containerNumber,
+    truckNumber: truckNumber,
+    blNumber: blNumber,
+    recipientName: newPackage.value.recipientName,
+    destinationAddress: newPackage.value.destinationAddress,
+    weight: newPackage.value.weight,
+    trackingHistory: [{
+      timestamp: new Date().toISOString(),
+      status: 'Pending',
+      location: 'Nairobi Warehouse'
+    }]
+  }
+
+  // Update the local state
+  packages.value.push(newPackageWithTracking)
+
+  // Close the modal
+  closeCreateModal()
+}
+
+const editPackage = (pkg) => {
+  editingPackage.value = { ...pkg }
+  isEditModalOpen.value = true
+}
+
+const closeEditModal = () => {
+  isEditModalOpen.value = false
+  editingPackage.value = {
+    id: null,
+    recipientName: '',
+    destinationAddress: '',
+    containerNumber: '',
+    truckNumber: '',
+    blNumber: '',
+    weight: 0,
+  }
+}
+
+const updatePackage = async () => {
+  // Update the local state
+  const index = packages.value.findIndex(p => p.id === editingPackage.value.id)
+  if (index !== -1) {
+    packages.value[index] = { ...packages.value[index], ...editingPackage.value }
+  }
+
+  // Close the modal
+  closeEditModal()
+}
+
+const viewPackageDetails = (pkg) => {
+  viewingPackage.value = { ...pkg }
+  isViewModalOpen.value = true
+}
+
+const closeViewModal = () => {
+  isViewModalOpen.value = false
+  viewingPackage.value = {
+    trackingNumber: '',
+    recipientName: '',
+    destinationAddress: '',
+    containerNumber: '',
+    truckNumber: '',
+    blNumber: '',
+    weight: 0,
+    trackingHistory: []
+  }
+}
+
+// Replace the printPackageDetails function with this mobile-friendly version
 const printPackageDetails = (pkg) => {
   printingPackage.value = { ...pkg };
   isPrintModalOpen.value = true;
 };
 
 // Replace the printPackage function with this mobile-friendly version
-const printingPackage = () => {
+const printPackage = () => {
   // Create a hidden div to hold the print content
   const printContainer = document.createElement('div');
   printContainer.style.position = 'absolute';
@@ -917,698 +1195,237 @@ const generatePrintContent = (pkg) => {
   const statusText = pkg.trackingHistory[0]?.status || 'Unknown'
   
   return `
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <title>Package Details - ${pkg.containerNumber}</title>
-    <style>
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #f9f9f9;
-      }
-      .header {
-        background-color: #0c2d57; /* dark blue */
-        color: #ffffff; /* white text */
-        padding: 20px;
-        text-align: center;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      }
-
-      .section {
-        margin-bottom: 30px;
-        border-radius: 8px;
-        overflow: hidden;
-        background-color: white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      }
-      .section-header {
-        background: linear-gradient(to right, #273272, #3a4999);
-        color: white;
-        padding: 12px 15px;
-        font-size: 18px;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-      }
-      .section-header-icon {
-        margin-right: 10px;
-        font-size: 20px;
-      }
-      .section-content {
-        padding: 20px;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-      }
-      .field {
-        margin-bottom: 15px;
-      }
-      .field-label {
-        font-weight: bold;
-        color: #273272;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      .field-value {
-        font-size: 16px;
-        padding: 5px 0;
-        border-bottom: 1px solid #eee;
-      }
-      .tracking-timeline {
-        position: relative;
-        padding-left: 30px;
-      }
-      .tracking-timeline::before {
-        content: '';
-        position: absolute;
-        left: 10px;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background-color: #ddd;
-      }
-      .tracking-item {
-        position: relative;
-        padding: 15px;
-        margin-bottom: 15px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        border-left: 3px solid #273272;
-      }
-      .tracking-item::before {
-        content: '';
-        position: absolute;
-        left: -32px;
-        top: 20px;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background-color: #273272;
-        border: 3px solid white;
-        box-shadow: 0 0 0 1px #ddd;
-      }
-      .tracking-item.completed::before {
-        background-color: #4CAF50;
-      }
-      .tracking-item.current::before {
-        background-color: #ffb600;
-      }
-      .tracking-item.future::before {
-        background-color: #ddd;
-      }
-      .tracking-status {
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: #273272;
-      }
-      .tracking-location {
-        color: #555;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-      }
-      .tracking-location::before {
-        content: '📍';
-        margin-right: 5px;
-      }
-      .tracking-time {
-        color: #777;
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        margin-top: 3px;
-      }
-      .tracking-time::before {
-        content: '🕒';
-        margin-right: 5px;
-      }
-      .tracking-notes {
-        font-style: italic;
-        color: #666;
-        margin-top: 8px;
-        padding: 5px 10px;
-        background-color: #f0f0f0;
-        border-radius: 4px;
-        font-size: 13px;
-      }
-      .tracking-comment {
-        margin-top: 8px;
-        padding: 8px 10px;
-        background-color: #fff3cd;
-        border-left: 3px solid #ffb600;
-        border-radius: 4px;
-        font-size: 13px;
-      }
-      .comment {
-        background-color: #f0f7ff;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        border-left: 3px solid #273272;
-      }
-      .comment-author {
-        font-weight: bold;
-        color: #273272;
-      }
-      .comment-time {
-        color: #666;
-        font-size: 12px;
-      }
-      .comment-text {
-        margin-top: 8px;
-        line-height: 1.5;
-      }
-      .shipping-address {
-        padding: 10px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        border: 1px solid #eee;
-      }
-      .footer {
-        text-align: center;
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-        font-size: 12px;
-        color: #666;
-      }
-      .badge {
-        display: inline-block;
-        padding: 3px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: bold;
-        color: white;
-        background-color: #273272;
-        margin-left: 8px;
-      }
-      .qr-code {
-        text-align: center;
-        margin: 20px 0;
-      }
-      .qr-code img {
-        width: 100px;
-        height: 100px;
-        border: 1px solid #eee;
-        padding: 5px;
-        background: white;
-      }
-      .logo-image {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        margin-right: 15px;
-        object-fit: contain;
-        background-color: white;
-        padding: 5px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="header">
-      <div class="logo-container">
-        <img src="https://www.texmonlogistics.co.ke/assets/images/texmon-logo.png" alt="Texmon Logistics Logo" class="logo-image" />
-        <div class="company-name">Texmon Logistics</div>
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Package Details - ${pkg.trackingNumber}</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 30px;
+          padding-bottom: 20px;
+          border-bottom: 2px solid #eaeaea;
+        }
+        .logo {
+          font-size: 24px;
+          font-weight: bold;
+          color: #273272;
+        }
+        .company-info {
+          font-size: 14px;
+          color: #666;
+          margin-top: 5px;
+        }
+        .section {
+          margin-bottom: 30px;
+        }
+        .section-title {
+          font-size: 18px;
+          font-weight: bold;
+          margin-bottom: 15px;
+          color: #273272;
+          border-bottom: 1px solid #eaeaea;
+          padding-bottom: 5px;
+        }
+        .info-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 15px;
+        }
+        .info-item {
+          margin-bottom: 10px;
+        }
+        .info-label {
+          font-weight: bold;
+          color: #666;
+          font-size: 14px;
+        }
+        .info-value {
+          font-size: 16px;
+        }
+        .status-badge {
+          display: inline-block;
+          padding: 5px 10px;
+          border-radius: 15px;
+          font-weight: bold;
+          font-size: 14px;
+        }
+        .bg-green-500 { background-color: #10b981; }
+        .bg-blue-500 { background-color: #3b82f6; }
+        .bg-amber-500 { background-color: #f59e0b; }
+        .bg-purple-500 { background-color: #8b5cf6; }
+        .bg-gray-500 { background-color: #6b7280; }
+        .bg-orange-400 { background-color: #fb923c; }
+        .bg-gray-200 { background-color: #e5e7eb; }
+        .text-white { color: white; }
+        .text-black { color: black; }
+        .text-gray-800 { color: #1f2937; }
+        .tracking-history {
+          margin-top: 20px;
+        }
+        .history-item {
+          padding: 10px 0;
+          border-bottom: 1px solid #eaeaea;
+        }
+        .history-status {
+          font-weight: bold;
+        }
+        .history-timestamp {
+          font-size: 14px;
+          color: #666;
+        }
+        .history-location {
+          font-size: 14px;
+          color: #666;
+        }
+        .footer {
+          margin-top: 50px;
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+          border-top: 1px solid #eaeaea;
+          padding-top: 20px;
+        }
+        .qr-placeholder {
+          width: 100px;
+          height: 100px;
+          border: 1px solid #ccc;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 20px auto;
+          background: #f9f9f9;
+        }
+        @media print {
+          body {
+            padding: 0;
+            margin: 0;
+          }
+          .no-print {
+            display: none;
+          }
+        }
+        .shipping-details {
+          background-color: #f0f7ff;
+          padding: 15px;
+          border-radius: 8px;
+          margin-top: 15px;
+          border-left: 4px solid #3a4999;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="logo">Texmon Logistics</div>
+        <div class="company-info">P.O. Box 12345, Nairobi, Kenya | +254 700 123456 | info@texmonlogistics.com</div>
       </div>
-      <div>Package Tracking Details</div>
-    </div>
-    
-    <div class="section">
-      <div class="section-header">
-        <span class="section-header-icon">📦</span>
-        Package Information
-      </div>
-      <div class="section-content">
-        <div class="grid">
-          <div class="field">
-            <div class="field-label">Container Number</div>
-            <div class="field-value">${pkg.containerNumber} <span class="badge">Active</span></div>
-          </div>
-          <div class="field">
-            <div class="field-label">Truck Number</div>
-            <div class="field-value">${pkg.truckNumber}</div>
-          </div>
-           <div class="field">
-            <div class="field-label">BL Number</div>
-            <div class="field-value">${pkg.blNumber}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Package Type</div>
-            <div class="field-value">${pkg.type}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Weight</div>
-            <div class="field-value">${pkg.weight} kg</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Shipped Date</div>
-            <div class="field-value">${pkg.shippedDate}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Estimated Delivery</div>
-            <div class="field-value">${pkg.estimatedDelivery}</div>
-          </div>
-        </div>
-        
-        <div class="qr-code">
-          <div style="font-weight: bold; margin-bottom: 5px;">Scan to track</div>
-          <div style="width: 100px; height: 100px; background-color: #fff; border: 1px solid #ddd; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-            QR
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="section">
-      <div class="section-header">
-        <span class="section-header-icon">🚚</span>
-        Current Status
-      </div>
-      <div class="section-content">
-        <div class="grid">
-          <div class="field">
-            <div class="field-label">Current Location</div>
-            <div class="field-value">${pkg.currentLocation}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Next Stop</div>
-            <div class="field-value">${pkg.nextStop}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Next Stop ETA</div>
-            <div class="field-value">${pkg.nextStopETA}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Final Destination</div>
-            <div class="field-value">${pkg.finalDestination}</div>
-          </div>
-        </div>
-        
-        <div style="margin-top: 20px; background-color: #f0f7ff; padding: 15px; border-radius: 8px; text-align: center;">
-          <div style="font-weight: bold; color: #273272; margin-bottom: 10px;">Delivery Progress</div>
-          <div style="display: flex; justify-content: space-between; position: relative; padding: 0 20px;">
-            <div style="position: absolute; top: 10px; left: 0; right: 0; height: 4px; background-color: #ddd; z-index: 1;"></div>
-            <div style="position: absolute; top: 10px; left: 0; width: ${calculateProgress(pkg)}%; height: 4px; background-color: #273272; z-index: 2;"></div>
-            
-            <div style="position: relative; z-index: 3; text-align: center;">
-              <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${isCompleted(pkg, 'Shipped') ? '#273272' : '#ddd'}; margin: 0 auto;"></div>
-              <div style="font-size: 12px; margin-top: 5px;">Shipped</div>
-            </div>
-            
-            <div style="position: relative; z-index: 3; text-align: center;">
-              <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${isCompleted(pkg, 'In Transit') ? '#273272' : '#ddd'}; margin: 0 auto;"></div>
-              <div style="font-size: 12px; margin-top: 5px;">In Transit</div>
-            </div>
-            
-            <div style="position: relative; z-index: 3; text-align: center;">
-              <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${isCompleted(pkg, 'Out for Delivery') ? '#273272' : '#ddd'}; margin: 0 auto;"></div>
-              <div style="font-size: 12px; margin-top: 5px;">Out for Delivery</div>
-            </div>
-            
-            <div style="position: relative; z-index: 3; text-align: center;">
-              <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${isCompleted(pkg, 'Delivered') ? '#273272' : '#ddd'}; margin: 0 auto;"></div>
-              <div style="font-size: 12px; margin-top: 5px;">Delivered</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="section">
-      <div class="section-header">
-        <span class="section-header-icon">📍</span>
-        Shipping Address
-      </div>
-      <div class="section-content">
-        ${pkg.shippingAddress ? `
-          <div class="shipping-address">
-            <div style="font-weight: bold;">${pkg.shippingAddress.recipientName}</div>
-            <div>${pkg.shippingAddress.streetAddress}</div>
-            <div>${pkg.shippingAddress.city}, ${pkg.shippingAddress.state} ${pkg.shippingAddress.postalCode}</div>
-            <div>${pkg.shippingAddress.country}</div>
-          </div>
-        ` : '<div>No shipping address information available</div>'}
-      </div>
-    </div>
-    
-    <div class="section">
-      <div class="section-header">
-        <span class="section-header-icon">🔄</span>
-        Tracking History
-      </div>
-      <div class="section-content">
-        <div class="tracking-timeline">
-          ${pkg.trackingHistory.map((event, index) => `
-            <div class="tracking-item ${getTrackingItemClass(event, pkg, index)}">
-              <div class="tracking-status">${event.status}</div>
-              <div class="tracking-location">${event.location}</div>
-              <div class="tracking-time">${event.timestamp}</div>
-              ${event.comment ? `<div class="tracking-comment"><strong>Comment:</strong> ${event.comment}</div>` : ''}
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    </div>
-    
-    ${pkg.comment && pkg.comment.length > 0 ? `
+      
       <div class="section">
-        <div class="section-header">
-          <span class="section-header-icon">💬</span>
-          Comments
+        <div class="section-title">Package Information</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Tracking Number</div>
+            <div class="info-value">${pkg.trackingNumber}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Status</div>
+            <div class="info-value">
+              <span class="status-badge ${statusClass}">${statusText}</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Weight</div>
+            <div class="info-value">${pkg.weight} kg</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Created Date</div>
+            <div class="info-value">${formatDate(pkg.trackingHistory[pkg.trackingHistory.length - 1]?.timestamp)}</div>
+          </div>
         </div>
-        <div class="section-content">
-          ${pkg.comment.map(comment => `
-            <div class="comment">
-              <div class="comment-author">${comment.author}</div>
-              <div class="comment-time">${comment.timestamp}</div>
-              <div class="comment-text">${comment.text}</div>
+        
+        <div class="shipping-details">
+          <div class="section-title">Shipping Details</div>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Container No</div>
+              <div class="info-value">${pkg.containerNumber}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Truck No</div>
+              <div class="info-value">${pkg.truckNumber}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">B/L</div>
+              <div class="info-value">${pkg.blNumber}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="qr-placeholder">QR Code</div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">Recipient Information</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Name</div>
+            <div class="info-value">${pkg.recipientName}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Delivery Address</div>
+            <div class="info-value">${pkg.destinationAddress}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">Tracking History</div>
+        <div class="tracking-history">
+          ${pkg.trackingHistory.map(history => `
+            <div class="history-item">
+              <div class="history-status">${history.status}</div>
+              <div class="history-timestamp">${formatDate(history.timestamp)}</div>
+              ${history.location ? `<div class="history-location">Location: ${history.location}</div>` : ''}
             </div>
           `).join('')}
         </div>
       </div>
-    ` : ''}
-    
-    <div class="footer">
-      <p>Generated on ${new Date().toLocaleString()}</p>
-      <p>Texmon Logistics Limited, Kenya</p>
-      <p>Contact: +254 700 000000 | info@texmonlogistics.com</p>
-    </div>
-  </body>
-  </html>
-`
-
-  // Helper function to calculate progress percentage for the progress bar
-  function calculateProgress(pkg) {
-    const stages = ['Shipped', 'In Transit', 'Out for Delivery', 'Delivered'];
-    let currentStageIndex = 0;
-
-    // Find the current stage based on tracking history
-    for (let i = stages.length - 1; i >= 0; i--) {
-      if (pkg.trackingHistory.some(event => event.status.includes(stages[i]))) {
-        currentStageIndex = i;
-        break;
-      }
-    }
-
-    // Calculate percentage (each stage is 25% of the total)
-    return Math.min(100, (currentStageIndex + 1) * 25);
-  }
-
-  // Helper function to check if a stage is completed
-  function isCompleted(pkg, stage) {
-    return pkg.trackingHistory.some(event => event.status.includes(stage));
-  }
-
-  // Helper function to determine the class for tracking items
-  function getTrackingItemClass(event, pkg, index) {
-    if (index === 0) {
-      return 'current';
-    } else if (event.status.includes('Delivered')) {
-      return 'completed';
-    } else {
-      return '';
-    }
-  }
-
+      
+      <div class="footer">
+        <p>This document was generated on ${new Date().toLocaleString()}</p>
+        <p>Thank you for choosing Texmon Logistics</p>
+      </div>
+      
+      <script>
+        // Auto-print when loaded
+        window.onload = function() {
+          // Small delay to ensure everything is rendered
+          setTimeout(function() {
+            window.print();
+          }, 500);
+        };
+      </script>
+    </body>
+    </html>
+  `
 }
 
-// Handle login function
-const handleLogin = () => {
-  if (username.value === 'admin' && password.value === 'texmon2024') {
-    isAuthenticated.value = true
-    loginError.value = ''
-  } else {
-    loginError.value = 'Invalid username or password'
-  }
-}
-
-// Handle logout function
-const logout = () => {
-  isAuthenticated.value = false
-  username.value = ''
-  password.value = ''
-}
-
-// Edit package functions
-const openEditPackageModal = (pkg) => {
-  editingPackage.value = { ...pkg }
-  editData.value = {
-    currentLocation: pkg.currentLocation,
-    nextStop: pkg.nextStop,
-    nextStopETA: pkg.nextStopETA,
-    shippingAddress: { ...pkg.shippingAddress }
-  }
-  showEditModal.value = true
-}
-
-const closeEditModal = () => {
-  showEditModal.value = false
-  editingPackage.value = null
-}
-
-const editPackage = (pkg) => {
-  openEditPackageModal(pkg)
-}
-
-const savePackageChanges = () => {
-  if (!editingPackage.value) return
-
-  // Update the package in the packages array
-  packages.value = packages.value.map(pkg => {
-    if (pkg.id === editingPackage.value.id) {
-      return {
-        ...pkg,
-        currentLocation: editData.value.currentLocation,
-        nextStop: editData.value.nextStop,
-        nextStopETA: editData.value.nextStopETA,
-        shippingAddress: { ...editData.value.shippingAddress },
-        lastUpdated: new Date().toLocaleDateString()
-      }
-    }
-    return pkg
-  })
-
-  closeEditModal()
-}
-
-// View package functions
-const openViewPackageModal = (pkg) => {
-  viewingPackage.value = { ...pkg }
-  showViewModal.value = true
-}
-
-const closeViewModal = () => {
-  showViewModal.value = false
-  viewingPackage.value = null
-}
-
-const viewPackageDetails = (pkg) => {
-  openViewPackageModal(pkg)
-}
-
-const editFromViewModal = () => {
-  if (viewingPackage.value) {
-    closeViewModal()
-    editPackage(viewingPackage.value)
-  }
-}
-
-// Add package functions
-const openAddPackageModal = () => {
-  showAddModal.value = true
-  addPackageTab.value = 'details'
-  resetNewPackageForm()
-  resetTrackingStops()
-}
-
-const closeAddModal = () => {
-  showAddModal.value = false
-}
-
-const addNewPackage = () => {
-  if (validateForm()) {
-    const newPackageToAdd = {
-      id: Date.now(),
-      containerNumber: newPackage.value.containerNumber,
-      truckNumber: newPackage.value.truckNumber,
-      blNumber: newPackage.value.blNumber,
-      type: newPackage.value.type,
-      weight: newPackage.value.weight,
-      shippedDate: newPackage.value.shippedDate,
-      estimatedDelivery: newPackage.value.estimatedDelivery,
-      currentLocation: newPackage.value.currentLocation,
-      nextStop: newPackage.value.nextStop,
-      nextStopETA: newPackage.value.nextStopETA,
-      finalDestination: newPackage.value.finalDestination,
-      shippingAddress: { ...newPackage.value.shippingAddress },
-      lastUpdated: new Date().toLocaleDateString(),
-      trackingHistory: [...trackingStops.value],
-      comments: []
-    }
-
-    packages.value.push(newPackageToAdd)
-    closeAddModal()
-  }
-}
-
-const validateForm = () => {
-  formErrors.value = {}
-  let isValid = true
-
-  if (!newPackage.value.containerNumber) {
-    formErrors.value.containerNumber = 'Container number is required'
-    isValid = false
-  }
-
-  if (!newPackage.value.truckNumber) {
-    formErrors.value.truckNumber = 'Truck number is required'
-    isValid = false
-  }
-
-  if (!newPackage.value.blNumber) {
-    formErrors.value.blNumber = 'BL number is required'
-    isValid = false
-  }
-
-  if (!newPackage.value.type) {
-    formErrors.value.type = 'Package type is required'
-    isValid = false
-  }
-
-  if (!newPackage.value.weight) {
-    formErrors.value.weight = 'Weight is required'
-    isValid = false
-  }
-
-  if (!newPackage.value.shippedDate) {
-    formErrors.value.shippedDate = 'Shipped date is required'
-    isValid = false
-  }
-
-  if (!newPackage.value.estimatedDelivery) {
-    formErrors.value.estimatedDelivery = 'Estimated delivery is required'
-    isValid = false
-  }
-
-  if (!newPackage.value.currentLocation) {
-    formErrors.value.currentLocation = 'Current location is required'
-    isValid = false
-  }
-
-  if (!newPackage.value.finalDestination) {
-    formErrors.value.finalDestination = 'Final destination is required'
-    isValid = false
-  }
-
-  if (trackingStops.value.length === 0) {
-    stopErrors.value.general = 'At least one tracking stop is required'
-    isValid = false
-  } else {
-    stopErrors.value.general = ''
-  }
-
-  return isValid
-}
-
-const resetNewPackageForm = () => {
-  newPackage.value = {
-    containerNumber: '',
-    truckNumber: '',
-    blNumber: '',
-    type: '',
-    weight: '',
-    shippedDate: '',
-    estimatedDelivery: '',
-    currentLocation: '',
-    nextStop: '',
-    nextStopETA: '',
-    finalDestination: '',
-    shippingAddress: {
-      recipientName: '',
-      streetAddress: '',
-      city: '',
-      state: '',
-      postalCode: '',
-      country: ''
-    }
-  }
-  formErrors.value = {}
-}
-
-// Tracking stops functions
-const addTrackingStop = () => {
-  if (validateStopForm()) {
-    trackingStops.value.push({ ...newStop.value })
-    resetNewStopForm()
-  }
-}
-
-const removeTrackingStop = (index) => {
-  trackingStops.value.splice(index, 1)
-}
-
-const validateStopForm = () => {
-  stopErrors.value = {}
-  let isValid = true
-
-  if (!newStop.value.status) {
-    stopErrors.value.status = 'Status is required'
-    isValid = false
-  }
-
-  if (!newStop.value.location) {
-    stopErrors.value.location = 'Location is required'
-    isValid = false
-  }
-
-  if (!newStop.value.timestamp) {
-    stopErrors.value.timestamp = 'Date & Time is required'
-    isValid = false
-  }
-
-  return isValid
-}
-
-const resetNewStopForm = () => {
-  newStop.value = {
-    status: '',
-    location: '',
-    timestamp: '',
-    notes: '',
-    comment: ''
-  }
-}
-
-const resetTrackingStops = () => {
-  trackingStops.value = []
-}
-
-// Location change handlers
-const handleLocationChange = () => {
-  editData.value.nextStop = getNextStop(editData.value.currentLocation)
-  editData.value.nextStopETA = calculateEstimatedArrival(editData.value.currentLocation)
-}
-
-const handleNewPackageLocationChange = () => {
-  newPackage.value.nextStop = getNextStop(newPackage.value.currentLocation)
-  newPackage.value.nextStopETA = calculateEstimatedArrival(newPackage.value.currentLocation)
-}
-
-// Date formatting function
+// Format date for display
 const formatDate = (dateString) => {
+  if (!dateString) return 'N/A'
+  
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -1617,24 +1434,25 @@ const formatDate = (dateString) => {
   })
 }
 
-onMounted(() => {
-  // Simulate authentication on mount for development purposes
-  // isAuthenticated.value = true
-})
+// Function to determine status badge color based on tracking history
+const getStatusBadgeStyle = (pkg) => {
+  // Get the most recent status from tracking history
+  const latestStatus = pkg.trackingHistory && pkg.trackingHistory[0]?.status.toLowerCase() || ''
+  
+  if (latestStatus.includes('delivered')) {
+    return { bg: 'bg-green-500', text: 'text-white' }
+  } else if (latestStatus.includes('out for delivery')) {
+    return { bg: 'bg-blue-500', text: 'text-white' }
+  } else if (latestStatus.includes('in transit')) {
+    return { bg: 'bg-amber-500', text: 'text-white' }
+  } else if (latestStatus.includes('package received') || latestStatus.includes('arrived')) {
+    return { bg: 'bg-purple-500', text: 'text-white' }
+  } else if (latestStatus.includes('shipping label') || latestStatus.includes('created')) {
+    return { bg: 'bg-gray-500', text: 'text-white' }
+  } else if (latestStatus.includes('pending')) {
+    return { bg: 'bg-orange-400', text: 'text-black' }
+  } else {
+    return { bg: 'bg-gray-200', text: 'text-gray-800' }
+  }
+}
 </script>
-
-<style scoped>
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>
