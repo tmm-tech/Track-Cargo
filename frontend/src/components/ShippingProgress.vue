@@ -14,7 +14,7 @@
             <p class="text-sm text-gray-500">Current Location</p>
             <p class="font-medium">{{ currentLocation }}</p>
           </div>
-          <Badge class="ml-auto bg-[#273272]">Current</Badge>
+          <Badge class="ml-auto bg-[#273272] text-white">Current</Badge>
         </div>
 
         <!-- Next Stop -->
@@ -27,7 +27,7 @@
             <p class="font-medium">{{ nextStop }}</p>
             <p class="text-xs text-gray-500">ETA: {{ nextStopETA }}</p>
           </div>
-          <Badge class="ml-auto bg-gray-500">Pending</Badge>
+          <Badge class="ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300">Pending</Badge>
         </div>
 
         <!-- Final Destination -->
@@ -40,7 +40,7 @@
             <p class="font-medium">{{ finalDestination }}</p>
             <p class="text-xs text-gray-500">ETA: {{ estimatedDelivery }}</p>
           </div>
-          <Badge class="ml-auto bg-gray-500">Pending</Badge>
+         <Badge class="ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300">Pending</Badge>
         </div>
 
         <!-- Tracking History Timeline -->
@@ -53,7 +53,7 @@
                 <div v-if="index < trackingHistory.length - 1" class="w-0.5 h-full bg-gray-200 absolute top-4"></div>
               </div>
               <div class="flex-1 pb-6">
-                <p :class="['font-medium', statusColorClass(event.status)]">{{ event.status }}</p>
+                <p class="font-medium text-[#273272]">{{ event.status }}</p>
                 <p class="text-sm text-gray-500">{{ event.location }}</p>
                 <p class="text-sm text-gray-500">{{ event.timestamp }}</p>
                 <p v-if="event.notes" class="text-sm text-gray-400 mt-1">{{ event.notes }}</p>
@@ -101,22 +101,4 @@ defineProps({
     required: true
   }
 });
-
-function statusColorClass(status: string) {
-  switch (status.toLowerCase()) {
-    case 'Delivered':
-      return 'text-green-600';
-    case 'In transit':
-      return 'text-yellow-600';
-    case 'Pending':
-      return 'text-gray-500';
-    case 'Cancelled':
-      return 'text-red-600';
-    case 'Delayed':
-      return 'text-orange-500';
-    default:
-      return 'text-[#273272]';
-  }
-}
-
 </script>
