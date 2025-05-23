@@ -193,23 +193,21 @@
             </div>
 
             <div>
-             <div class="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 w-full max-w-md">
+             <div class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
               <button
                 :class="[
-                  'inline-flex items-center justify-center whitespace-nowrap rounded px-4 py-2 text-sm font-medium transition-all flex-1',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                  'disabled:pointer-events-none disabled:opacity-50',
-                  activeEditTab === 'location' ? 'bg-white text-gray-900 shadow' : 'hover:bg-gray-200 text-gray-700'
+                 'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                  activeEditTab === 'location' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
                 ]"
                 @click="activeEditTab = 'location'">
                 Location
               </button>
               <button
                 :class="[
-                  'inline-flex items-center justify-center whitespace-nowrap rounded px-4 py-2 text-sm font-medium transition-all flex-1',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                  'disabled:pointer-events-none disabled:opacity-50',
-                  activeEditTab === 'address' ? 'bg-white text-gray-900 shadow' : 'hover:bg-gray-200 text-gray-700'
+                  'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                  activeEditTab === 'address' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
                 ]"
                 @click="activeEditTab = 'address'">
                 Shipping Address
