@@ -193,24 +193,28 @@
             </div>
 
             <div>
-             <div class="inline-flex h-10 items-center justify-center rounded-md bg-gray-800 p-1 text-gray-300 w-full max-w-md">
-  <button :class="[
-    'inline-flex items-center justify-center whitespace-nowrap rounded px-4 py-2 text-sm font-medium ring-offset-background transition-all flex-1',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-    'disabled:pointer-events-none disabled:opacity-50',
-    activeEditTab === 'location' ? 'bg-white text-gray-900 shadow-sm' : 'hover:bg-gray-700 text-gray-300'
-  ]" @click="activeEditTab = 'location'">
-    Location
-  </button>
-  <button :class="[
-    'inline-flex items-center justify-center whitespace-nowrap rounded px-4 py-2 text-sm font-medium ring-offset-background transition-all flex-1',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-    'disabled:pointer-events-none disabled:opacity-50',
-    activeEditTab === 'address' ? 'bg-white text-gray-900 shadow-sm' : 'hover:bg-gray-700 text-gray-300'
-  ]" @click="activeEditTab = 'address'">
-    Shipping Address
-  </button>
-</div>
+             <div class="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 w-full max-w-md">
+              <button
+                :class="[
+                  'inline-flex items-center justify-center whitespace-nowrap rounded px-4 py-2 text-sm font-medium transition-all flex-1',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                  'disabled:pointer-events-none disabled:opacity-50',
+                  activeEditTab === 'location' ? 'bg-white text-gray-900 shadow' : 'hover:bg-gray-200 text-gray-700'
+                ]"
+                @click="activeEditTab = 'location'">
+                Location
+              </button>
+              <button
+                :class="[
+                  'inline-flex items-center justify-center whitespace-nowrap rounded px-4 py-2 text-sm font-medium transition-all flex-1',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                  'disabled:pointer-events-none disabled:opacity-50',
+                  activeEditTab === 'address' ? 'bg-white text-gray-900 shadow' : 'hover:bg-gray-200 text-gray-700'
+                ]"
+                @click="activeEditTab = 'address'">
+                Shipping Address
+              </button>
+            </div>
               <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
                 <div class="space-y-2">
                   <label for="currentLocation" class="text-sm font-medium">Current Location</label>
@@ -462,24 +466,29 @@
           </div>
 
           <div>
-            <div class="inline-flex h-10 items-center justify-center rounded-md bg-gray-800 p-1 text-gray-300 w-full max-w-md">
-  <button :class="[
-    'inline-flex items-center justify-center whitespace-nowrap rounded px-4 py-2 text-sm font-medium ring-offset-background transition-all flex-1',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-    'disabled:pointer-events-none disabled:opacity-50',
-    addPackageTab === 'details' ? 'bg-white text-gray-900 shadow-sm' : 'hover:bg-gray-700 text-gray-300'
-  ]" @click="addPackageTab = 'details'">
-    Package Details
-  </button>
-  <button :class="[
-    'inline-flex items-center justify-center whitespace-nowrap rounded px-4 py-2 text-sm font-medium ring-offset-background transition-all flex-1',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-    'disabled:pointer-events-none disabled:opacity-50',
-    addPackageTab === 'stops' ? 'bg-white text-gray-900 shadow-sm' : 'hover:bg-gray-700 text-gray-300'
-  ]" @click="addPackageTab = 'stops'">
-    Tracking Stops
-  </button>
-</div>
+           <div class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
+            <button
+              :class="[
+                'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                addPackageTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+              ]"
+              @click="addPackageTab = 'details'"
+            >
+              Package Details
+            </button>
+            <button
+              :class="[
+                'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                addPackageTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+              ]"
+              @click="addPackageTab = 'stops'"
+            >
+              Tracking Stops
+            </button>
+        </div>
+
 
             <div v-if="addPackageTab === 'details'" class="space-y-4 mt-4">
               <div class="grid grid-cols-2 gap-4">
