@@ -485,6 +485,16 @@
             <div v-if="addPackageTab === 'details'" class="space-y-4 mt-4">
               <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
+                  <label for="containerload" class="text-sm font-medium">Shipping Details</label>
+                  <select id="containerload" v-model="newPackage.currentLocation"
+                  :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.currentLocation ? 'border-red-500' : '']">
+                  <option value="" disabled selected>Select Container Load</option>
+                  <option value="Full Container Load">Full Container Load (FCL)</option>
+                  <option value="Less than Container Load">Less than Container Load (LCL)</option>
+                </select>
+                <p v-if="formErrors.containerload" class="text-red-500 text-sm">{{ formErrors.containerload }}</p>
+                </div>
+                <div class="space-y-2">
                   <label for="containerNumber" class="text-sm font-medium">Container Number</label>
                   <input id="containerNumber" v-model="newPackage.containerNumber"
                     :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.containerNumber ? 'border-red-500' : '']" />
@@ -741,6 +751,7 @@ const viewingPackage = ref(null)
 const showAddModal = ref(false)
 const addPackageTab = ref('details')
 const newPackage = ref({
+  containerload: '',
   containerNumber: '',
   truckNumber: '',
   blNumber: '',
@@ -790,7 +801,7 @@ const addComment = (packageId) => {
   // Find the package and add the comment
   packages.value = packages.value.map(pkg => {
     if (pkg.id === packageId) {
-      const comments = pkg.comment || []
+      const comments = pkg.comments || []
       return {
         ...pkg,
         comments: [...comments, { ...newComment.value }]
@@ -805,91 +816,21 @@ const addComment = (packageId) => {
 
 // Print package details function
 const printPackageDetails = (pkg) => {
-  printingPackage.value = { ...pkg };
-  isPrintModalOpen.value = true;
-};
+ try {
+    const printContent = generatePrintContent(pkg);
+    if (!printContent) {
+      console.error('Failed to generate print content');
+      return;
+    }
 
-// Replace the printPackage function with this mobile-friendly version
-const printPackage = () => {
-  // Create a hidden div to hold the print content
-  const printContainer = document.createElement('div');
-  printContainer.style.position = 'absolute';
-  printContainer.style.left = '-9999px';
-  printContainer.style.top = '-9999px';
-  document.body.appendChild(printContainer);
-  
-  // Generate the HTML content for printing
-  const printContent = generatePrintContent(printingPackage.value);
-  
-  // Insert the content into the hidden div
-  printContainer.innerHTML = printContent;
-  
-  // Get all images in the print content and wait for them to load
-  const images = printContainer.querySelectorAll('img');
-  let imagesLoaded = 0;
-  const totalImages = images.length;
-  
-  // If there are no images, print immediately
-  if (totalImages === 0) {
-    performPrint();
-    return;
-  }
-  
-  // Wait for all images to load before printing
-  images.forEach(img => {
-    img.onload = () => {
-      imagesLoaded++;
-      if (imagesLoaded === totalImages) {
-        performPrint();
-      }
-    };
-    img.onerror = () => {
-      imagesLoaded++;
-      if (imagesLoaded === totalImages) {
-        performPrint();
-      }
-    };
-  });
-  
-  function performPrint() {
-    // Save the current document body and replace it with our print content
-    const originalBody = document.body.innerHTML;
-    const originalBodyStyle = document.body.style.cssText;
-    
-    // Apply print-only styles to the body
-    document.body.style.cssText = 'background-color: white; height: auto; padding: 0; margin: 0;';
-    document.body.innerHTML = printContent;
-    
-    // Use a small timeout to ensure the content is rendered
-    setTimeout(() => {
-      window.print();
-      
-      // Restore the original document content
-      document.body.innerHTML = originalBody;
-      document.body.style.cssText = originalBodyStyle;
-      
-      // Clean up the print container
-      if (document.body.contains(printContainer)) {
-        document.body.removeChild(printContainer);
-      }
-      
-      // Close the print modal
-      closePrintModal();
-    }, 300);
-  }
-};
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      console.error('Pop-up blocked');
+      return;
+    }
 
-const closePrintModal = () => {
-  isPrintModalOpen.value = false
-}
+    printWindow.document.write( `
 
-const generatePrintContent = (pkg) => {
-  // Get the status style for the package
-  const statusStyle = getStatusBadgeStyle(pkg)
-  const statusClass = `${statusStyle.bg} ${statusStyle.text}`
-  const statusText = pkg.trackingHistory[0]?.status || 'Unknown'
-  
-  return `
   <!DOCTYPE html>
   <html>
   <head>
@@ -1279,24 +1220,19 @@ const generatePrintContent = (pkg) => {
     </div>
   </body>
   </html>
-`
+`);
+    printWindow.document.close();
 
-  // Helper function to calculate progress percentage for the progress bar
-  function calculateProgress(pkg) {
-    const stages = ['Shipped', 'In Transit', 'Out for Delivery', 'Delivered'];
-    let currentStageIndex = 0;
+    requestAnimationFrame(() => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    });
 
-    // Find the current stage based on tracking history
-    for (let i = stages.length - 1; i >= 0; i--) {
-      if (pkg.trackingHistory.some(event => event.status.includes(stages[i]))) {
-        currentStageIndex = i;
-        break;
-      }
-    }
-
-    // Calculate percentage (each stage is 25% of the total)
-    return Math.min(100, (currentStageIndex + 1) * 25);
+  } catch (err) {
+    console.error('Print error:', err);
   }
+};
 
   // Helper function to check if a stage is completed
   function isCompleted(pkg, stage) {
@@ -1311,7 +1247,6 @@ const generatePrintContent = (pkg) => {
       return 'completed';
     } else {
       return '';
-    }
   }
 
 }
@@ -1438,7 +1373,10 @@ const addNewPackage = () => {
 const validateForm = () => {
   formErrors.value = {}
   let isValid = true
-
+if (!newPackage.value.containerload) {
+    formErrors.value.containerload = 'Container Load is required'
+    isValid = false
+  }
   if (!newPackage.value.containerNumber) {
     formErrors.value.containerNumber = 'Container number is required'
     isValid = false
@@ -1496,6 +1434,7 @@ const validateForm = () => {
 
 const resetNewPackageForm = () => {
   newPackage.value = {
+    containerload: '',
     containerNumber: '',
     truckNumber: '',
     blNumber: '',
@@ -1577,6 +1516,7 @@ const handleNewPackageLocationChange = () => {
   newPackage.value.nextStop = getNextStop(newPackage.value.currentLocation)
   newPackage.value.nextStopETA = calculateEstimatedArrival(newPackage.value.currentLocation)
 }
+
 
 // Date formatting function
 const formatDate = (dateString) => {
