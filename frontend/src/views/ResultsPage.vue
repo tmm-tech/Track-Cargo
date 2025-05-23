@@ -129,7 +129,7 @@
           <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
               <h2 class="text-xl font-semibold">Package Details</h2>
-              <p class="text-gray-200">Number: {{ trackingNumber }}</p>
+              <p class="text-gray-200">Package Number: {{ trackingNumber }}</p>
             </div>
             <div class="p-6">
               <div class="grid gap-6 md:grid-cols-2">
@@ -160,43 +160,166 @@
             </div>
             <div class="p-6">
               <div class="flex items-start gap-4 mb-8">
-                <div class="bg-[#273272]/10 p-3 rounded-full">
-                  <MapPinIcon class="h-6 w-6 text-[#273272]" />
+                <div :class="[
+                  'p-3 rounded-full transition-all duration-300',
+                  isCurrentLocation ? 'bg-[#ffb600]/20 ring-2 ring-[#ffb600]' : 'bg-[#273272]/10'
+                ]">
+                  <MapPinIcon :class="[
+                    'h-6 w-6 transition-colors duration-300',
+                    isCurrentLocation ? 'text-[#ffb600]' : 'text-[#273272]'
+                  ]" />
                 </div>
-                <div>
+                <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Current Location</h3>
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.currentLocation }}</p>
                   <p class="text-gray-500">Updated: {{ packageData.lastUpdated }}</p>
-                  
+                  <div class="flex items-center mt-2">
+                    <span :class="[
+                      'px-2 py-1 text-xs font-medium rounded-full capitalize',
+                      getStatusClass(getCurrentLocationStatus())
+                    ]">
+                      {{ getCurrentLocationStatus() }}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <div class="flex items-start gap-4 mb-8">
-                <div class="bg-[#273272]/10 p-3 rounded-full">
-                  <TruckIcon class="h-6 w-6 text-[#273272]" />
+                <div :class="[
+                  'p-3 rounded-full transition-all duration-300',
+                  isNextStop ? 'bg-[#ffb600]/20 ring-2 ring-[#ffb600]' : 'bg-[#273272]/10'
+                ]">
+                  <TruckIcon :class="[
+                    'h-6 w-6 transition-colors duration-300',
+                    isNextStop ? 'text-[#ffb600]' : 'text-[#273272]'
+                  ]" />
                 </div>
-                <div>
+                <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Next Stop</h3>
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.nextStop }}</p>
                   <p class="text-gray-500">Estimated arrival: {{ packageData.nextStopETA }}</p>
-                  <Badge class="ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300">Pending</Badge>
+                  <div class="flex items-center mt-2">
+                    <span
+                      class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
+                      Pending
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <div class="flex items-start gap-4">
-                <div class="bg-[#273272]/10 p-3 rounded-full">
-                  <CheckCircleIcon class="h-6 w-6 text-[#273272]" />
+                <div :class="[
+                  'p-3 rounded-full transition-all duration-300',
+                  isFinalDestination ? 'bg-[#ffb600]/20 ring-2 ring-[#ffb600]' : 'bg-[#273272]/10'
+                ]">
+                  <CheckCircleIcon :class="[
+                    'h-6 w-6 transition-colors duration-300',
+                    isFinalDestination ? 'text-[#ffb600]' : 'text-[#273272]'
+                  ]" />
                 </div>
-                <div>
+                <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Final Destination</h3>
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.finalDestination }}</p>
                   <p class="text-gray-500">Estimated delivery: {{ packageData.estimatedDelivery }}</p>
-                  <Badge class="ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300">Pending</Badge>
+                  <div class="flex items-center mt-2">
+                    <span
+                      class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
+                      {{ isDelivered ? 'Delivered' : 'Pending' }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          <!-- Shipping Status Icons with Animation -->
+          <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
+            <div class="bg-[#273272] text-white p-6 rounded-t-lg">
+              <h2 class="text-xl font-semibold">Shipping Status</h2>
+            </div>
+            <div class="p-6">
+              <div class="relative">
+                <!-- Progress Line -->
+                <div class="absolute top-6 left-4 w-full h-1 bg-gray-200"></div>
+                <div class="absolute top-6 left-4 h-1 bg-[#ffb600] transition-all duration-1000 ease-out"
+                  :style="{ width: `${progressPercentage}%` }"></div>
 
+                <!-- Status Icons -->
+                <div class="flex justify-between relative">
+                  <!-- Shipped -->
+                  <div class="flex flex-col items-center z-10">
+                    <div :class="[
+                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
+                      currentStep >= 1 ? 'bg-[#ffb600]' : 'bg-gray-200'
+                    ]">
+                      <transition name="icon-fade">
+                        <ArchiveBoxIcon v-if="currentStep >= 1" class="h-6 w-6 text-white" />
+                      </transition>
+                    </div>
+                    <p class="mt-2 text-sm font-medium">Shipped</p>
+                    <transition name="fade">
+                      <div v-if="currentStep >= 1" class="mt-1 text-xs text-gray-500">
+                        {{ formatDate(packageData.shippedDate) }}
+                      </div>
+                    </transition>
+                  </div>
+
+                  <!-- In Transit -->
+                  <div class="flex flex-col items-center z-10">
+                    <div :class="[
+                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
+                      currentStep >= 2 ? 'bg-[#ffb600]' : 'bg-gray-200'
+                    ]">
+                      <transition name="icon-fade">
+                        <TruckIcon v-if="currentStep >= 2" class="h-6 w-6 text-white" />
+                      </transition>
+                    </div>
+                    <p class="mt-2 text-sm font-medium">In Transit</p>
+                    <transition name="fade">
+                      <div v-if="currentStep >= 2" class="mt-1 text-xs text-gray-500">
+                        {{ getInTransitDate() }}
+                      </div>
+                    </transition>
+                  </div>
+
+                  <!-- Out for Delivery -->
+                  <div class="flex flex-col items-center z-10">
+                    <div :class="[
+                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
+                      currentStep >= 3 ? 'bg-[#ffb600]' : 'bg-gray-200'
+                    ]">
+                      <transition name="icon-fade">
+                        <MapPinIcon v-if="currentStep >= 3" class="h-6 w-6 text-white" />
+                      </transition>
+                    </div>
+                    <p class="mt-2 text-sm font-medium">Out for Delivery</p>
+                    <transition name="fade">
+                      <div v-if="currentStep >= 3" class="mt-1 text-xs text-gray-500">
+                        {{ getOutForDeliveryDate() }}
+                      </div>
+                    </transition>
+                  </div>
+
+                  <!-- Delivered -->
+                  <div class="flex flex-col items-center z-10">
+                    <div :class="[
+                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
+                      currentStep >= 4 ? 'bg-[#ffb600]' : 'bg-gray-200'
+                    ]">
+                      <transition name="icon-fade">
+                        <CheckCircleIcon v-if="currentStep >= 4" class="h-6 w-6 text-white" />
+                      </transition>
+                    </div>
+                    <p class="mt-2 text-sm font-medium">Delivered</p>
+                    <transition name="fade">
+                      <div v-if="currentStep >= 4" class="mt-1 text-xs text-gray-500">
+                        {{ getDeliveredDate() || 'Pending' }}
+                      </div>
+                    </transition>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <!-- Shipping Progress Card -->
           <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
@@ -351,9 +474,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { MapPinIcon, TruckIcon, CheckCircleIcon } from '@heroicons/vue/24/outline'
+import { MapPinIcon, TruckIcon, CheckCircleIcon, ArchiveBoxIcon } from '@heroicons/vue/24/outline'
 import { mockPackages } from '../data/mock-data'
 
 const route = useRoute()
@@ -365,16 +488,115 @@ const error = ref('')
 const mobileMenuOpen = ref(false)
 const currentYear = computed(() => new Date().getFullYear())
 
+
+
+
+// Shipping status tracking
+const currentStep = ref(0)
+const progressPercentage = ref(0)
+
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
 
+// Format date to more readable format
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/A'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  })
+}
+
+// Get dates for each shipping stage from tracking history
+const getInTransitDate = () => {
+  if (!packageData.value?.trackingHistory) return 'N/A'
+  const inTransitEvent = packageData.value.trackingHistory.find(
+    event => event.status.toLowerCase().includes('in transit')
+  )
+  return inTransitEvent ? inTransitEvent.timestamp.split(' ')[0] : 'N/A'
+}
+
+const getOutForDeliveryDate = () => {
+  if (!packageData.value?.trackingHistory) return 'N/A'
+  const outForDeliveryEvent = packageData.value.trackingHistory.find(
+    event => event.status.toLowerCase().includes('out for delivery')
+  )
+  return outForDeliveryEvent ? outForDeliveryEvent.timestamp.split(' ')[0] : 'N/A'
+}
+
+const getDeliveredDate = () => {
+  if (!packageData.value?.trackingHistory) return null
+  const deliveredEvent = packageData.value.trackingHistory.find(
+    event => event.status.toLowerCase().includes('delivered')
+  )
+  return deliveredEvent ? deliveredEvent.timestamp.split(' ')[0] : null
+}
+
+// Determine current shipping step based on tracking history
+const determineShippingStep = () => {
+  if (!packageData.value) return 0
+
+  const history = packageData.value.trackingHistory
+
+  // Always at least at step 1 (Shipped) if we have package data
+  let step = 1
+
+  // Check for "In Transit" status
+  if (history.some(event => event.status.toLowerCase().includes('in transit'))) {
+    step = 2
+  }
+
+  // Check for "Out for Delivery" status
+  if (history.some(event => event.status.toLowerCase().includes('out for delivery'))) {
+    step = 3
+  }
+
+  // Check for "Delivered" status
+  if (history.some(event => event.status.toLowerCase().includes('delivered'))) {
+    step = 4
+  }
+
+  return step
+}
+
+// Animate the progress when package data changes
+watch(() => packageData.value, () => {
+  if (packageData.value) {
+    // Reset animation
+    currentStep.value = 0
+    progressPercentage.value = 0
+
+    // Determine the final step based on tracking history
+    const finalStep = determineShippingStep()
+
+    // Animate step by step with delays
+    const animateSteps = () => {
+      const stepInterval = setInterval(() => {
+        if (currentStep.value < finalStep) {
+          currentStep.value++
+          progressPercentage.value = (currentStep.value / 4) * 100
+        } else {
+          clearInterval(stepInterval)
+        }
+      }, 500)
+    }
+
+    // Start animation after a short delay
+    setTimeout(animateSteps, 500)
+  }
+}, { immediate: false })
+
 onMounted(() => {
+  let foundPackage = null; // Initialize foundPackage
+
   // Simulate API call with a timeout
   setTimeout(() => {
     loading.value = false
 
-    const foundPackage = mockPackages.find(
+    foundPackage = mockPackages.find(
       (pkg) => pkg.containerNumber === trackingNumber.value || pkg.truckNumber === trackingNumber.value || pkg.blNumber === trackingNumber.value
     )
 
@@ -385,6 +607,63 @@ onMounted(() => {
     }
   }, 1000)
 })
+
+// Add these after the other computed properties in the script section
+const isCurrentLocation = computed(() => {
+  if (!packageData.value) return false
+  // Check if we're in the "in transit" or earlier phase
+  return currentStep.value <= 2
+})
+
+const isNextStop = computed(() => {
+  if (!packageData.value) return false
+  // Check if we're in the "out for delivery" phase
+  return currentStep.value === 3
+})
+
+const isFinalDestination = computed(() => {
+  if (!packageData.value) return false
+  // Check if we're in the "delivered" phase
+  return currentStep.value === 4
+})
+
+const isDelivered = computed(() => {
+  if (!packageData.value) return false
+  return packageData.value.trackingHistory.some(
+    event => event.status.toLowerCase().includes('delivered')
+  )
+})
+
+// Get the current status based on tracking history
+const getCurrentLocationStatus = () => {
+  if (!packageData.value?.trackingHistory || packageData.value.trackingHistory.length === 0) {
+    return 'Processing'
+  }
+
+  // Get the most recent status from tracking history
+  const latestEvent = packageData.value.trackingHistory[0]
+  return latestEvent.status
+}
+
+// Get appropriate styling for different statuses
+const getStatusClass = (status) => {
+  const statusLower = status.toLowerCase()
+
+  if (statusLower.includes('delivered')) {
+    return 'bg-green-100 text-green-700 border border-green-300'
+  } else if (statusLower.includes('transit') || statusLower.includes('shipped')) {
+    return 'bg-blue-100 text-blue-700 border border-blue-300'
+  } else if (statusLower.includes('delay') || statusLower.includes('hold')) {
+    return 'bg-red-100 text-red-700 border border-red-300'
+  } else if (statusLower.includes('out for delivery')) {
+    return 'bg-purple-100 text-purple-700 border border-purple-300'
+  } else if (statusLower.includes('processing') || statusLower.includes('scheduled')) {
+    return 'bg-orange-100 text-orange-700 border border-orange-300'
+  } else {
+    return 'bg-gray-100 text-gray-700 border border-gray-300'
+  }
+}
+
 </script>
 
 <style scoped>
