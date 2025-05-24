@@ -1472,18 +1472,9 @@
             <div class="flex items-center gap-2 sm:gap-3 ml-4">
               <!-- Action Buttons -->
               <button @click="handlePrint"
-                class="px-2 sm:px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20 transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                class="px-2 sm:px-4 py-2 bg-[#ffb600] text-[#273272] rounded-md hover:bg-[#e6a500] transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
                 <PrinterIcon class="w-4 h-4" />
                 <span class="hidden sm:inline">{{ isMobileDevice ? 'Download PDF' : 'Print' }}</span>
-              </button>
-              <button @click="handleDownloadPDF"
-                class="px-2 sm:px-4 py-2 bg-[#ffb600] text-[#273272] rounded-md hover:bg-[#e6a500] transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                  </path>
-                </svg>
-                <span class="hidden sm:inline">Download PDF</span>
               </button>
               <button @click="closeTrackingDialog" class="text-white/70 hover:text-white transition-colors p-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
