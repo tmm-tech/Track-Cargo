@@ -2150,10 +2150,6 @@ const closeTrackingDialog = () => {
 
 // Enhanced Print Function
 const handlePrint = async () => {
-  if (isMobileDevice.value) {
-    await handleDownloadPDF()
-    return
-  }
 
   try {
     // Wait for any images to load
