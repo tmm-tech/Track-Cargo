@@ -1,77 +1,100 @@
 <template>
   <div class="flex h-screen">
+    <!-- Mobile Menu Overlay -->
+    <div v-if="showMobileMenu && isAuthenticated" class="fixed inset-0 z-50 bg-black/50 md:hidden"
+      @click="closeMobileMenu"></div>
     <!-- Sidebar Navigation -->
     <div v-if="isAuthenticated"
-      class="sidebar bg-[#1e2338] text-white h-screen flex flex-col transition-all duration-300 shadow-lg relative z-40 overflow-hidden"
-      :class="{ 'w-16': sidebarCollapsed, 'w-64': !sidebarCollapsed }">
+      class="sidebar bg-[#1e2338] text-white h-screen flex flex-col transition-all duration-300 shadow-lg relative z-50 overflow-hidden"
+      :class="{
+        'w-16': sidebarCollapsed && !isMobileDevice,
+        'w-41': !sidebarCollapsed && !isMobileDevice,
+        'fixed left-0 top-0 w-64 transform': isMobileDevice,
+        'translate-x-0': isMobileDevice && showMobileMenu,
+        '-translate-x-full': isMobileDevice && !showMobileMenu
+      }">
 
       <!-- Logo and Brand -->
       <div class="py-4 px-3 flex items-center justify-center border-b border-gray-700/50"
-        :class="{ 'px-2': sidebarCollapsed }">
-        <div class="flex items-center gap-3" :class="{ 'justify-center w-full': sidebarCollapsed }">
+        :class="{ 'px-2': sidebarCollapsed && !isMobileDevice }">
+        <div class="flex items-center gap-3" :class="{ 'justify-center w-full': sidebarCollapsed && !isMobileDevice }">
           <img src="https://www.texmonlogistics.co.ke/assets/images/texmon-logo.png" alt="Texmon Logistics Logo"
             class="w-10 h-10 rounded object-contain" />
-          <span v-if="!sidebarCollapsed" class="text-lg font-semibold tracking-wide text-gray-100">Texmon
-            Logistics</span>
+          <span v-if="!sidebarCollapsed || isMobileDevice"
+            class="text-lg font-semibold tracking-wide text-gray-100 ">Texmon<br>Logistics</span>
         </div>
       </div>
 
       <!-- Navigation Menu -->
       <div class="flex-1 overflow-y-auto py-3 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
         <div class="px-2 mb-3">
-          <p v-if="!sidebarCollapsed" class="text-xs uppercase text-gray-500 font-medium px-3 py-2">Main Navigation</p>
+          <p v-if="!sidebarCollapsed || isMobileDevice" class="text-xs uppercase text-gray-500 font-medium px-3 py-2">
+            Main Navigation</p>
           <nav class="space-y-1">
-            <button @click="currentView = 'dashboard'" :title="sidebarCollapsed ? 'Dashboard' : ''"
+            <button @click="navigateToView('dashboard')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Dashboard' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
-                'justify-center px-2 py-3': sidebarCollapsed,
-                'px-3 py-2.5': !sidebarCollapsed
+                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
+                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'bg-[#273272] text-white': currentView === 'dashboard'
               }" active-class="bg-[#273272] text-white">
-              <HomeIcon :class="{ 'h-6 w-6': sidebarCollapsed, 'h-5 w-5': !sidebarCollapsed }" class="flex-shrink-0" />
-              <span v-if="!sidebarCollapsed" class="ml-3 font-medium">Dashboard</span>
-            </button>
-
-            <button @click="currentView = 'packages'" :title="sidebarCollapsed ? 'Packages' : ''"
-              class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
-              :class="{
-                'justify-center px-2 py-3': sidebarCollapsed,
-                'px-3 py-2.5': !sidebarCollapsed
-              }" active-class="bg-[#273272] text-white">
-              <ArchiveBoxIcon :class="{ 'h-6 w-6': sidebarCollapsed, 'h-5 w-5': !sidebarCollapsed }"
+              <HomeIcon
+                :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
                 class="flex-shrink-0" />
-              <span v-if="!sidebarCollapsed" class="ml-3 font-medium">Packages</span>
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Dashboard</span>
             </button>
 
-            <button @click="currentView = 'users'" :title="sidebarCollapsed ? 'Users' : ''"
+            <button @click="navigateToView('packages')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Packages' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
-                'justify-center px-2 py-3': sidebarCollapsed,
-                'px-3 py-2.5': !sidebarCollapsed
+                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
+                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'bg-[#273272] text-white': currentView === 'packages'
               }" active-class="bg-[#273272] text-white">
-              <UsersIcon :class="{ 'h-6 w-6': sidebarCollapsed, 'h-5 w-5': !sidebarCollapsed }" class="flex-shrink-0" />
-              <span v-if="!sidebarCollapsed" class="ml-3 font-medium">Users</span>
+              <ArchiveBoxIcon
+                :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
+                class="flex-shrink-0" />
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Packages</span>
+            </button>
+
+            <button @click="navigateToView('users')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Users' : ''"
+              class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
+              :class="{
+                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
+                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'bg-[#273272] text-white': currentView === 'users'
+              }" active-class="bg-[#273272] text-white">
+              <UsersIcon
+                :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
+                class="flex-shrink-0" />
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Users</span>
             </button>
           </nav>
         </div>
 
         <div class="px-2 mb-3">
-          <p v-if="!sidebarCollapsed" class="text-xs uppercase text-gray-500 font-medium px-3 py-2">System</p>
+          <p v-if="!sidebarCollapsed || isMobileDevice" class="text-xs uppercase text-gray-500 font-medium px-3 py-2">
+            System</p>
           <nav class="space-y-1">
-            <button @click="currentView = 'activity'" :title="sidebarCollapsed ? 'Activity Log' : ''"
+            <button @click="navigateToView('activity')"
+              :title="(sidebarCollapsed && !isMobileDevice) ? 'Activity Log' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
-                'justify-center px-2 py-3': sidebarCollapsed,
-                'px-3 py-2.5': !sidebarCollapsed
+                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
+                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'bg-[#273272] text-white': currentView === 'activity'
               }" active-class="bg-[#273272] text-white">
-              <ClockIcon :class="{ 'h-6 w-6': sidebarCollapsed, 'h-5 w-5': !sidebarCollapsed }" class="flex-shrink-0" />
-              <span v-if="!sidebarCollapsed" class="ml-3 font-medium">Activity Log</span>
+              <ClockIcon
+                :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
+                class="flex-shrink-0" />
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Activity Log</span>
             </button>
           </nav>
         </div>
       </div>
 
-      <!-- Sidebar Toggle (inside sidebar) -->
-      <div :class="[
+       <!-- Sidebar Toggle (Desktop only) -->
+      <div v-if="!isMobileDevice" :class="[
         'p-2 transition-all duration-300',
         sidebarCollapsed ? 'flex justify-center' : 'flex justify-end'
       ]">
@@ -84,8 +107,8 @@
 
 
       <!-- User Profile & Logout -->
-      <div class="border-t border-gray-700/50 pt-3 pb-3 px-3" :class="{ 'px-2': sidebarCollapsed }">
-        <div v-if="!sidebarCollapsed" class="flex items-center p-3 mb-3 rounded-md bg-gray-800/30">
+      <div class="border-t border-gray-700/50 pt-3 pb-3 px-3" :class="{ 'px-2': sidebarCollapsed && !isMobileDevice }">
+        <div v-if="!sidebarCollapsed || isMobileDevice" class="flex items-center p-3 mb-3 rounded-md bg-gray-800/30">
           <div
             class="h-9 w-9 rounded-full bg-[#273272] flex items-center justify-center text-white text-sm font-medium">
             {{ currentUser.initials }}
@@ -102,26 +125,35 @@
           </div>
         </div>
 
-        <button @click="logout" :title="sidebarCollapsed ? 'Log Out' : ''"
+        <button @click="logout" :title="(sidebarCollapsed && !isMobileDevice) ? 'Log Out' : ''"
           class="w-full flex items-center text-gray-300 hover:bg-red-600 hover:text-white rounded-md transition-colors group relative"
           :class="{
-            'justify-center px-2 py-3': sidebarCollapsed,
-            'px-3 py-2.5': !sidebarCollapsed
+            'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
+            'px-3 py-2.5': !sidebarCollapsed || isMobileDevice
           }">
-          <LogOut :class="{ 'h-6 w-6': sidebarCollapsed, 'h-5 w-5': !sidebarCollapsed }" class="flex-shrink-0" />
-          <span v-if="!sidebarCollapsed" class="ml-3 text-sm">Logout</span>
+          <LogOut
+            :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
+            class="flex-shrink-0" />
+          <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 text-sm">Logout</span>
         </button>
       </div>
     </div>
 
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1 flex flex-col" :class="{ 'md:ml-0': isMobileDevice }">
       <!-- Header -->
       <header class="bg-[#273272] text-white">
         <div class="container mx-auto">
           <div class="flex justify-between items-center py-2 px-4">
             <div class="flex items-center">
+              <!-- Mobile Menu Button -->
+              <button v-if="isMobileDevice && isAuthenticated" @click="toggleMobileMenu"
+                class="mr-3 p-1 rounded-md hover:bg-white/10 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
               <span class="text-sm">
                 📍 Texmon Logistics Limited, Kenya
               </span>
@@ -197,55 +229,54 @@
 
       <!-- Admin Dashboard -->
       <main v-else class="flex-1 bg-gray-50 py-8 overflow-auto">
-        <div class="container mx-auto px-4">
-          <!-- Router View for different sections -->
+        <div class="container mx-auto px-2 sm:px-4">
           <!-- Dashboard View (default) -->
-          <div v-if="currentView === 'dashboard'" class="space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div class="bg-white rounded-lg shadow p-6 border-l-4 border-[#273272]">
+          <div v-if="currentView === 'dashboard'" class="space-y-6 sm:space-y-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+              <div class="bg-white rounded-lg shadow p-3 sm:p-6 border-l-4 border-[#273272]">
                 <div class="flex items-center">
-                  <div class="p-3 rounded-full bg-[#273272]/10 mr-4">
-                    <ArchiveBoxIcon class="h-6 w-6 text-[#273272]" />
+                  <div class="p-2 sm:p-3 rounded-full bg-[#273272]/10 mr-2 sm:mr-4">
+                    <ArchiveBoxIcon class="h-4 w-4 sm:h-6 sm:w-6 text-[#273272]" />
                   </div>
                   <div>
-                    <p class="text-sm text-gray-500">Total Packages</p>
-                    <p class="text-2xl font-bold">{{ packages.length }}</p>
+                    <p class="text-xs sm:text-sm text-gray-500">Total Packages</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ packages.length }}</p>
                   </div>
                 </div>
               </div>
 
-              <div class="bg-white rounded-lg shadow p-6 border-l-4 border-[#ffb600]">
+              <div class="bg-white rounded-lg shadow  p-3 sm:p-6 border-l-4 border-[#ffb600]">
                 <div class="flex items-center">
-                  <div class="p-3 rounded-full bg-[#ffb600]/10 mr-4">
-                    <TruckIcon class="h-6 w-6 text-[#ffb600]" />
+                  <div class="p-2 sm:p-3 rounded-full bg-[#ffb600]/10 mr-2 sm:mr-4">
+                    <TruckIcon class="h-4 w-4 sm:h-6 sm:w-6 text-[#ffb600]" />
                   </div>
                   <div>
-                    <p class="text-sm text-gray-500">In Transit</p>
-                    <p class="text-2xl font-bold">{{ getPackagesByStatus('transit') }}</p>
+                    <p class="text-xs sm:text-sm text-gray-500">In Transit</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getPackagesByStatus('transit') }}</p>
                   </div>
                 </div>
               </div>
 
               <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
                 <div class="flex items-center">
-                  <div class="p-3 rounded-full bg-green-500/10 mr-4">
+                  <div class="p-2 sm:p-3 rounded-full bg-green-500/10 mr-2 sm:mr-4">
                     <CheckCircleIcon class="h-6 w-6 text-green-500" />
                   </div>
                   <div>
-                    <p class="text-sm text-gray-500">Delivered</p>
-                    <p class="text-2xl font-bold">{{ getPackagesByStatus('delivered') }}</p>
+                    <p class="text-xs sm:text-sm text-gray-500">Delivered</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getPackagesByStatus('delivered') }}</p>
                   </div>
                 </div>
               </div>
 
-              <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+              <div class="bg-white rounded-lg shadow p-3 sm:p-6 border-l-4 border-red-500">
                 <div class="flex items-center">
-                  <div class="p-3 rounded-full bg-red-500/10 mr-4">
-                    <ClockIcon class="h-6 w-6 text-red-500" />
+                  <div class="p-2 sm:p-3 rounded-full bg-red-500/10 mr-2 sm:mr-4">
+                    <ClockIcon class="h-4 w-4 sm:h-6 sm:w-6 text-red-500" />
                   </div>
                   <div>
-                    <p class="text-sm text-gray-500">Delayed</p>
-                    <p class="text-2xl font-bold">{{ getPackagesByStatus('delayed') }}</p>
+                    <p class="text-xs sm:text-sm text-gray-500">Delayed</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getPackagesByStatus('delayed') }}</p>
                   </div>
                 </div>
               </div>
@@ -253,19 +284,21 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div class="lg:col-span-2 bg-white rounded-lg shadow">
-                <div class="p-6 border-b">
-                  <h3 class="text-lg font-semibold">Recent Activity</h3>
+                <div class="p-4 sm:p-6 border-b">
+                  <h3 class="text-base sm:text-lg font-semibold">Recent Activity</h3>
                 </div>
-                <div class="p-6">
-                  <div class="space-y-6">
+                <div class="p-4 sm:p-6">
+                  <div class="space-y-4 sm:space-y-6">
                     <div v-for="(activity, index) in recentActivity" :key="index" class="flex">
-                      <div class="mr-4">
-                        <div class="h-9 w-9 rounded-full bg-[#273272]/10 flex items-center justify-center">
-                          <component :is="getActivityIcon(activity.type)" class="h-5 w-5 text-[#273272]" />
+                      <div class="mr-3 sm:mr-4">
+                        <div
+                          class="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-[#273272]/10 flex items-center justify-center">
+                          <component :is="getActivityIcon(activity.type)"
+                            class="h-4 w-4 sm:h-5 sm:w-5 text-[#273272]" />
                         </div>
                       </div>
                       <div>
-                        <p class="text-sm font-medium">{{ activity.message }}</p>
+                        <p class="text-xs sm:text-sm font-medium">{{ activity.message }}</p>
                         <div class="flex items-center mt-1">
                           <p class="text-xs text-gray-500">{{ activity.user }}</p>
                           <span class="mx-1 text-gray-500">•</span>
@@ -278,32 +311,32 @@
               </div>
 
               <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b">
-                  <h3 class="text-lg font-semibold">User Statistics</h3>
+                <div class="p-4 sm:p-6 border-b">
+                  <h3 class="text-base sm:text-lg font-semibold">User Statistics</h3>
                 </div>
-                <div class="p-6">
+                <div class="p-4 sm:p-6">
                   <div class="space-y-4">
                     <div class="flex justify-between items-center">
-                      <span class="text-sm font-medium">Total Users</span>
-                      <span class="text-sm font-bold">{{ users.length }}</span>
+                      <span class="text-xs sm:text-sm font-medium">Total Users</span>
+                      <span class="text-xs sm:text-sm font-bold">{{ users.length }}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                      <span class="text-sm font-medium">Admins</span>
-                      <span class="text-sm font-bold">{{ getUsersByRole('admin') }}</span>
+                      <span class="text-xs sm:text-sm font-medium">Admins</span>
+                      <span class="text-xs sm:text-sm font-bold">{{ getUsersByRole('admin') }}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                      <span class="text-sm font-medium">Operators</span>
-                      <span class="text-sm font-bold">{{ getUsersByRole('operator') }}</span>
+                      <span class="text-xs sm:text-sm font-medium">Operators</span>
+                      <span class="text-xs sm:text-sm font-bold">{{ getUsersByRole('operator') }}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                      <span class="text-sm font-medium">Viewers</span>
-                      <span class="text-sm font-bold">{{ getUsersByRole('viewer') }}</span>
+                      <span class="text-xs sm:text-sm font-medium">Viewers</span>
+                      <span class="text-xs sm:text-sm font-bold">{{ getUsersByRole('viewer') }}</span>
                     </div>
                   </div>
 
                   <div class="mt-6">
                     <button @click="currentView = 'users'"
-                      class="w-full inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                      class="w-full inline-flex items-center justify-center rounded-md text-xs sm:text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-8 sm:h-10 px-3 sm:px-4 py-2">
                       Manage Users
                     </button>
                   </div>
@@ -426,59 +459,61 @@
           </div>
 
           <!-- Package Management View -->
-          <div v-if="currentView === 'packages'" class="space-y-8">
-            <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
-              <div class="flex flex-row items-center justify-between bg-[#273272] text-white p-6 rounded-t-lg">
+          <div v-if="currentView === 'packages'" class="space-y-6 sm:space-y-8">
+            <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-6 sm:mb-8">
+              <div
+                class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#273272] text-white p-4 sm:p-6 rounded-t-lg gap-4 sm:gap-0">
                 <div>
-                  <h2 class="text-xl font-semibold">Package Management</h2>
-                  <p class="text-gray-200">
+                  <h2 class="text-lg sm:text-xl font-semibold">Package Management</h2>
+                  <p class="text-gray-200 text-sm">
                     Update the current location and next stop information for packages
                   </p>
                 </div>
                 <button @click="openAddPackageModal"
-                  class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-4 py-2 rounded inline-flex items-center">
+                  class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-3 sm:px-4 py-2 rounded inline-flex items-center text-sm">
                   <PlusIcon class="h-4 w-4 mr-2" />
-                  Add Package
+                  <span class="hidden sm:inline">Add Package</span>
+                  <span class="sm:hidden">Add</span>
                 </button>
               </div>
-              <div class="p-6">
-                <div class="mb-6">
+              <div class="p-4 sm:p-6">
+                <div class="mb-4 sm:mb-6">
                   <div class="relative">
                     <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                    <input placeholder="Search by tracking or truck number" v-model="searchTerm"
+                    <input placeholder="Search by container, B/L or truck number" v-model="searchTerm"
                       class="flex h-10 w-full rounded-md border border-gray-300 bg-white pl-10 px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#273272] focus:ring-offset-2" />
                   </div>
                 </div>
 
-                <!-- Responsive table wrapper with proper overflow handling -->
-                <div class="w-full overflow-hidden rounded-md border border-gray-200">
+                <!-- Desktop Table View -->
+                <div class="hidden md:block w-full overflow-hidden rounded-md border border-gray-200">
                   <div class="overflow-x-auto max-w-full">
                     <table class="min-w-full divide-y divide-gray-200">
                       <thead class="bg-gray-50">
                         <tr>
                           <th scope="col"
-                            class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Container #</th>
                           <th scope="col"
-                            class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Truck #</th>
                           <th scope="col"
-                            class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             BL #</th>
                           <th scope="col"
-                            class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Current Location</th>
                           <th scope="col"
-                            class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Next Stop</th>
                           <th scope="col"
-                            class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Next Stop ETA</th>
                           <th scope="col"
-                            class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Last Updated</th>
                           <th scope="col"
-                            class="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Actions</th>
                         </tr>
                       </thead>
@@ -487,28 +522,28 @@
                           <td colspan="8" class="text-center py-4 text-gray-500">No packages found</td>
                         </tr>
                         <tr v-for="pkg in filteredPackages" :key="pkg.id" class="hover:bg-gray-50">
-                          <td class="px-4 py-4 text-sm text-gray-900 font-medium whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
                             {{ pkg.containerNumber }}
                           </td>
-                          <td class="px-4 py-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.truckNumber }}
                           </td>
-                          <td class="px-4 py-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.blNumber }}
                           </td>
-                          <td class="px-4 py-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.currentLocation">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.currentLocation">
                             {{ pkg.currentLocation }}
                           </td>
-                          <td class="px-4 py-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nextStop">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nextStop">
                             {{ pkg.nextStop }}
                           </td>
-                          <td class="px-4 py-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.nextStopETA }}
                           </td>
-                          <td class="px-4 py-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.lastUpdated }}
                           </td>
-                          <td class="px-4 py-4 text-right text-sm font-medium whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
                             <div class="flex justify-end gap-1">
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
@@ -534,17 +569,19 @@
                 </div>
 
                 <!-- Mobile-friendly card view for smaller screens -->
-                <div class="block md:hidden mt-6">
+                <div class="block md:hidden">
                   <div class="space-y-4">
                     <div v-for="pkg in filteredPackages" :key="pkg.id"
                       class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                       <div class="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 class="font-medium text-gray-900">{{ pkg.containerNumber }}</h3>
-                          <p class="text-sm text-gray-500">{{ pkg.truckNumber }} • {{ pkg.blNumber }}</p>
+                        <div class="flex-1">
+                          <h3 class="font-bold text-gray-900 text-sm">{{ pkg.containerNumber }}</h3>
+                          <p class="text-xs text-gray-500 mt-1">{{ pkg.truckNumber }} • {{ pkg.blNumber }}</p>
                         </div>
-                        <div class="flex gap-1">
-                          <button @click="viewPackageDetails(pkg)" class="p-1 text-gray-400 hover:text-gray-600">
+                        <div class="flex gap-1 ml-2">
+                          <button @click="viewPackageDetails(pkg)"
+                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                            title="View Details">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -553,30 +590,34 @@
                               </path>
                             </svg>
                           </button>
-                          <button @click="editPackage(pkg)" class="p-1 text-gray-400 hover:text-gray-600">
+                          <button @click="editPackage(pkg)"
+                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                            title="Print Details">
                             <PencilIcon class="h-4 w-4" />
                           </button>
-                          <button @click="printPackageDetails(pkg)" class="p-1 text-gray-400 hover:text-gray-600">
+                          <button @click="printPackageDetails(pkg)"
+                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                            title="Print Details">
                             <PrinterIcon class="h-4 w-4" />
                           </button>
                         </div>
                       </div>
-                      <div class="grid grid-cols-2 gap-2 text-sm">
-                        <div>
+                      <div class="grid grid-cols-1 gap-2 text-xs">
+                        <div class="flex justify-between">
                           <span class="text-gray-500">Current:</span>
-                          <span class="ml-1 text-gray-900">{{ pkg.currentLocation }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.currentLocation }}</span>
                         </div>
-                        <div>
+                        <div class="flex justify-between">
                           <span class="text-gray-500">Next:</span>
-                          <span class="ml-1 text-gray-900">{{ pkg.nextStop }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.nextStop }}</span>
                         </div>
-                        <div>
+                        <div class="flex justify-between">
                           <span class="text-gray-500">ETA:</span>
-                          <span class="ml-1 text-gray-900">{{ pkg.nextStopETA }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.nextStopETA }}</span>
                         </div>
-                        <div>
+                        <div class="flex justify-between">
                           <span class="text-gray-500">Updated:</span>
-                          <span class="ml-1 text-gray-900">{{ pkg.lastUpdated }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.lastUpdated }}</span>
                         </div>
                       </div>
                     </div>
@@ -938,20 +979,20 @@
                   </div>
                 </div>
 
-                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
                   <button
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 space-y-2 sm:space-y-0"
                     @click="closeViewModal">
                     Close
                   </button>
                   <button
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 space-y-2 sm:space-y-0"
                     @click="editFromViewModal">
                     <PencilIcon class="h-4 w-4 mr-2" />
                     Edit Package
                   </button>
                   <button
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 py-2"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 space-y-2 sm:space-y-0"
                     @click="openTrackingDialog(pkg)">
                     <PrinterIcon class="h-4 w-4 mr-2" />
                     Print Details
@@ -1418,24 +1459,34 @@
       </main>
 
       <!-- Package Tracking Dialog -->
-      <div v-if="showTrackingDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      <div v-if="showTrackingDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
         @click="closeTrackingDialog">
-        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-hidden" @click.stop>
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden" @click.stop>
           <!-- Dialog Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-[#273272] text-white">
-            <div>
-              <h2 class="text-xl font-semibold">Package Tracking Details</h2>
-              <p class="text-gray-200 text-sm mt-1">Container: {{ selectedPackage?.containerNumber }}</p>
+          <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-[#273272] text-white">
+            <div class="flex-1 min-w-0">
+              <h2 class="text-lg sm:text-xl font-semibold truncate">Package Tracking Details</h2>
+              <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedPackage?.containerNumber
+                }}</p>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 ml-4">
               <!-- Action Buttons -->
               <button @click="handlePrint"
-                class="px-4 py-2 bg-white/10 text-white rounded-md hover:bg-[#e6a500] transition-colors flex items-center gap-2 text-sm">
+                class="px-2 sm:px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20 transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
                 <PrinterIcon class="w-4 h-4" />
-                {{ isMobile ? 'Download PDF' : 'Print' }}
+                <span class="hidden sm:inline">{{ isMobileDevice ? 'Download PDF' : 'Print' }}</span>
               </button>
-              <button @click="closeTrackingDialog" class="text-white/70 hover:text-white transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button @click="handleDownloadPDF"
+                class="px-2 sm:px-4 py-2 bg-[#ffb600] text-[#273272] rounded-md hover:bg-[#e6a500] transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                  </path>
+                </svg>
+                <span class="hidden sm:inline">Download PDF</span>
+              </button>
+              <button @click="closeTrackingDialog" class="text-white/70 hover:text-white transition-colors p-1">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>
@@ -1452,7 +1503,7 @@
       <!-- Footer -->
       <footer class="bg-[#1a1a1a] text-white py-4">
         <div class="container mx-auto px-4 flex justify-center items-center">
-          <p class="text-gray-400 text-center">
+          <p class="text-gray-400 text-center text-xs sm:text-sm">
             Copyright © {{ currentYear }} Texmon Logistics Limited - Admin Portal
           </p>
         </div>
@@ -1462,7 +1513,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted} from 'vue'
 import {
   MagnifyingGlassIcon,
   PencilIcon,
@@ -1499,10 +1550,43 @@ const loginError = ref('')
 
 // Sidebar state
 const sidebarCollapsed = ref(false)
-const toggleSidebar = () => {
-  sidebarCollapsed.value = !sidebarCollapsed.value
+
+
+
+
+// Mobile state
+const isMobileDevice = ref(false)
+const showMobileMenu = ref(false)
+
+// Mobile detection and handling
+const checkMobileDevice = () => {
+  isMobileDevice.value = window.innerWidth < 768
+  if (isMobileDevice.value) {
+    showMobileMenu.value = false
+    sidebarCollapsed.value = false // Reset sidebar state on mobile
+  }
 }
 
+const toggleMobileMenu = () => {
+  showMobileMenu.value = !showMobileMenu.value
+}
+
+const closeMobileMenu = () => {
+  showMobileMenu.value = false
+}
+
+const navigateToView = (view) => {
+  currentView.value = view
+  if (isMobileDevice.value) {
+    closeMobileMenu()
+  }
+}
+
+const toggleSidebar = () => {
+  if (!isMobileDevice.value) {
+    sidebarCollapsed.value = !sidebarCollapsed.value
+  }
+}
 
 // Package Tracking Dialog state
 const showTrackingDialog = ref(false)
@@ -2075,7 +2159,7 @@ const closeTrackingDialog = () => {
 
 // Enhanced Print Function
 const handlePrint = async () => {
-  if (isMobile) {
+  if (isMobileDevice.value) {
     await handleDownloadPDF()
     return
   }
@@ -2083,7 +2167,7 @@ const handlePrint = async () => {
   try {
     // Wait for any images to load
     await waitForImages()
-    
+
     // Get the content to print
     const printContent = document.getElementById('tracking-content')
     if (!printContent) {
@@ -2093,7 +2177,7 @@ const handlePrint = async () => {
 
     // Create a new window for printing
     const printWindow = window.open('', '_blank', 'width=800,height=600')
-    
+
     // Write the complete HTML structure
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -2171,9 +2255,9 @@ const handlePrint = async () => {
       </body>
       </html>
     `);
-    
+
     printWindow.document.close()
-    
+
   } catch (error) {
     console.error('Error printing document:', error)
     alert('Failed to print document')
@@ -2187,19 +2271,19 @@ const handleDownloadPDF = async () => {
     if (!window.html2pdf) {
       await loadHtml2PdfLibrary()
     }
-    
+
     // Wait for any images to load
     await waitForImages()
-    
+
     const element = document.getElementById('tracking-content')
     if (!element) {
       console.error('Tracking content not found')
       return
     }
-    
+
     // Clone the element to avoid modifying the original
     const clonedElement = element.cloneNode(true)
-    
+
     // Ensure all images have proper dimensions
     const images = clonedElement.querySelectorAll('img')
     images.forEach(img => {
@@ -2214,7 +2298,7 @@ const handleDownloadPDF = async () => {
         img.crossOrigin = 'anonymous'
       }
     })
-    
+
     // Create a temporary container
     const tempContainer = document.createElement('div')
     tempContainer.style.position = 'absolute'
@@ -2225,16 +2309,16 @@ const handleDownloadPDF = async () => {
     tempContainer.style.padding = '20px'
     tempContainer.appendChild(clonedElement)
     document.body.appendChild(tempContainer)
-    
+
     const opt = {
       margin: [0.5, 0.5, 0.5, 0.5],
       filename: `Texmon_Package_${selectedPackage.value.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`,
-      image: { 
-        type: 'jpeg', 
+      image: {
+        type: 'jpeg',
         quality: 0.98,
         crossOrigin: 'anonymous'
       },
-      html2canvas: { 
+      html2canvas: {
         scale: 2,
         useCORS: true,
         allowTaint: true,
@@ -2247,20 +2331,20 @@ const handleDownloadPDF = async () => {
         windowWidth: 800,
         windowHeight: tempContainer.scrollHeight
       },
-      jsPDF: { 
-        unit: 'in', 
-        format: 'a4', 
+      jsPDF: {
+        unit: 'in',
+        format: 'a4',
         orientation: 'portrait',
         compress: true
       }
     }
-    
+
     // Generate PDF
     await window.html2pdf().from(tempContainer).set(opt).save()
-    
+
     // Clean up
     document.body.removeChild(tempContainer)
-    
+
   } catch (error) {
     console.error('Error generating PDF:', error)
     alert('Failed to generate PDF: ' + error.message)
@@ -2273,19 +2357,19 @@ const waitForImages = () => {
     const images = document.querySelectorAll('#tracking-content img')
     let loadedCount = 0
     const totalImages = images.length
-    
+
     if (totalImages === 0) {
       resolve()
       return
     }
-    
+
     const checkComplete = () => {
       loadedCount++
       if (loadedCount === totalImages) {
         resolve()
       }
     }
-    
+
     images.forEach(img => {
       if (img.complete) {
         checkComplete()
@@ -2294,7 +2378,7 @@ const waitForImages = () => {
         img.onerror = checkComplete
       }
     })
-    
+
     // Fallback timeout
     setTimeout(resolve, 3000)
   })
@@ -2306,7 +2390,7 @@ const loadHtml2PdfLibrary = () => {
       resolve()
       return
     }
-    
+
     const script = document.createElement('script')
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
     script.onload = resolve
@@ -2596,10 +2680,19 @@ const formatDate = (dateString) => {
   })
 }
 
+
+// Event listeners
 onMounted(() => {
-  // Simulate authentication on mount for development purposes
-  // isAuthenticated.value = true
+  checkMobileDevice()
+  window.addEventListener('resize', checkMobileDevice)
+  // Auto-login for demo
+  isAuthenticated.value = true
 })
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobileDevice)
+})
+
 </script>
 
 <style scoped>
@@ -2618,6 +2711,45 @@ onMounted(() => {
 }
 
 .sidebar {
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, transform 0.3s ease;
+}
+
+@media print {
+  .print-content {
+    margin: 0;
+    padding: 20px;
+  }
+
+  /* Hide everything except the print content when printing */
+  body * {
+    visibility: hidden;
+  }
+
+  .print-content, .print-content * {
+    visibility: visible;
+  }
+
+  .print-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-gray-700 {
+  scrollbar-color: #374151 transparent;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed !important;
+    z-index: 50;
+  }
 }
 </style>
