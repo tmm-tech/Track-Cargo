@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import TrackPage from '../views/TrackPage.vue';
 import ResultsPage from '../views/ResultsPage.vue';
-import AdminPage from '../views/AdminPage1.vue';
+import AdminPage from '../views/AdminPage.vue';
 const router = createRouter({
   history: createWebHistory(),
   routes: [
