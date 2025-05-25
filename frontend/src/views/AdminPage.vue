@@ -2259,95 +2259,35 @@ const handlePrint = async () => {
 
 const handleDownloadPDF = async () => {
   try {
-    await nextTick();
-    await waitForImages();
-
-    if (!window.jspdf) await loadJsPDFLibrary();
-
-    if (!window.html2canvas) {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-        script.onload = resolve;
-        script.onerror = () => reject(new Error('Failed to load html2canvas'));
-        document.body.appendChild(script);
-      });
+    if (!window.jspdf) {
+      await loadJsPDFLibrary();
     }
-
-    const content = document.getElementById('tracking-content');
-    if (!content) {
-      alert('Content not found');
-      return;
-    }
-
-    // Use html2canvas to capture the full content as a tall canvas
-    const canvas = await window.html2canvas(content, {
-      scale: 2,
-      useCORS: true,
-      scrollY: -window.scrollY // ensure full content captured, even if scrolled
-    });
-
-    const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const margin = 10;
+    let y = margin;
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const pkg = selectedPackage.value || {};
 
-    // Convert pixel dimensions to mm for PDF
-    const pxToMm = px => px * 0.264583;
+    doc.setFontSize(18);
+    doc.text("Package Tracking Details", margin, y);
+    y += 10;
 
-    const imgProps = pdf.getImageProperties(imgData);
-    const imgWidthPx = imgProps.width;
-    const imgHeightPx = imgProps.height;
+    doc.setFontSize(12);
+    doc.text(`Container Number: ${pkg.containerNumber || "N/A"}`, margin, y);
+    y += 7;
+    doc.text(`Tracking Number: ${pkg.trackingNumber || "N/A"}`, margin, y);
+    y += 7;
+    doc.text(`Status: ${pkg.status || "Unknown"}`, margin, y);
 
-    const imgWidthMm = pxToMm(imgWidthPx);
-    const imgHeightMm = pxToMm(imgHeightPx);
-
-    const ratio = pdfWidth / imgWidthMm;
-    const imgHeightScaled = imgHeightMm * ratio;
-
-    // If the image height fits on one page, add directly
-    if (imgHeightScaled <= pdfHeight) {
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeightScaled);
-    } else {
-      // Image is taller than one page, split into pages
-
-      let heightLeft = imgHeightScaled;
-      let position = 0;
-      let pageHeightPx = pdf.internal.pageSize.getHeight() / ratio * (1 / pxToMm(1)); // Convert PDF height mm back to px at scale
-
-      while (heightLeft > 0) {
-        // Create a canvas to crop a part of the big image
-        const pageCanvas = document.createElement('canvas');
-        pageCanvas.width = imgWidthPx;
-        pageCanvas.height = Math.min(pageHeightPx, imgHeightPx - position);
-
-        const ctx = pageCanvas.getContext('2d');
-        ctx.drawImage(canvas, 0, position, imgWidthPx, pageCanvas.height, 0, 0, imgWidthPx, pageCanvas.height);
-
-        const pageDataUrl = pageCanvas.toDataURL('image/png');
-
-        const pageHeightMm = pxToMm(pageCanvas.height) * ratio;
-
-        if (position > 0) pdf.addPage();
-
-        pdf.addImage(pageDataUrl, 'PNG', 0, 0, pdfWidth, pageHeightMm);
-
-        heightLeft -= pageHeightMm;
-        position += pageCanvas.height;
-      }
-    }
-
-    const pdfBlob = pdf.output('blob');
-    const blobUrl = URL.createObjectURL(pdfBlob);
-    window.open(blobUrl, '_blank');
-
-  } catch (err) {
-    console.error('Error generating PDF:', err);
-    alert('Failed to generate PDF.');
+    doc.save(`Package_Tracking_${pkg.containerNumber || "Unknown"}.pdf`);
+    alert("PDF generated successfully!");
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    alert("Failed to generate PDF. Please try again.");
   }
 };
+
 
 async function loadJsPDFLibrary() {
   if (window.jspdf) return; // already loaded
