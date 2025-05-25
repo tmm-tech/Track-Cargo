@@ -1,7 +1,5 @@
 const express = require('express');
 require('dotenv').config();
-const path = require('path');
-const fs = require('fs');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const UserRoutes = require('./routes/UserRoutes');
