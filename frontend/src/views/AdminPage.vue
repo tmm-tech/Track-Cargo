@@ -2274,6 +2274,21 @@ const handleDownloadPDF = async () => {
 };
 
 
+async function loadJsPDFLibrary() {
+  if (window.jspdf) return; // already loaded
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.onload = () => {
+      // jsPDF loads as window.jspdf
+      resolve();
+    };
+    script.onerror = () => reject(new Error('Failed to load jsPDF library'));
+    document.head.appendChild(script);
+  });
+}
+
 
 // Helper function to wait for images to load
 const waitForImages = () => {
