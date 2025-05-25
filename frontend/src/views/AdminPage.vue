@@ -1535,30 +1535,6 @@ import { mockPackages } from '../data/mock-data'
 import PackageTracking from './PackageTracking.vue'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-
-async function generatePdfFromHtml() {
-  const element = document.getElementById('packageDetails'); // your HTML container
-
-  const canvas = await html2canvas(element, { scale: 2 });
-  const imgData = canvas.toDataURL('image/png');
-
-  const pdf = new jsPDF({
-    unit: 'pt',
-    format: 'a4'
-  });
-
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = pdf.internal.pageSize.getHeight();
-
-  // Scale image to fit width, adjust height proportionally
-  const imgProps = pdf.getImageProperties(imgData);
-  const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-  pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
-
-  pdf.save('package-details.pdf');
-}
-
 import ShippingProgress from '../components/ShippingProgress.vue'
 
 
@@ -2288,54 +2264,48 @@ async function handleDownloadPDF() {
      if (!window.jspdf) {
       await loadJsPDFLibrary();
     }
-    // Adjust selector to your container element id/class with the package HTML
     const element = document.getElementById("tracking-content");
-    if (!element) {
-      throw new Error("Tracking content element not found");
-    }
+    if (!element) throw new Error("Tracking content not found");
 
-    // Capture element to canvas
-    const canvas = await html2canvas(element, {
-      scale: 2,       // improve resolution
-      useCORS: true,  // if images come from other origins
-      scrollY: -window.scrollY, // fix for scrolling
-    });
+    // Save original styles
+    const originalMaxHeight = element.style.maxHeight;
+    const originalOverflowY = element.style.overflowY;
+    const pkg = selectedPackage.value
+    // Temporarily remove scroll & height limits to show all content
+    element.style.maxHeight = "none";
+    element.style.overflowY = "visible";
 
+    // Wait for reflow so styles take effect
+    await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
+
+    // Now capture the full content
+    const canvas = await html2canvas(element, { scale: 2, useCORS: true, scrollY: -window.scrollY });
     const imgData = canvas.toDataURL("image/png");
 
-    // Create jsPDF instance (A4 paper size)
-    const pdf = new jsPDF({
-      unit: "pt",
-      format: "a4",
-    });
+    // Restore original styles
+    element.style.maxHeight = originalMaxHeight;
+    element.style.overflowY = originalOverflowY;
 
+    // Generate PDF
+    const pdf = new jsPDF({ unit: "pt", format: "a4" });
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    // Image properties for aspect ratio
     const imgProps = pdf.getImageProperties(imgData);
     const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
     let position = 0;
+    let heightLeft = imgHeight;
 
-    if (imgHeight < pdfHeight) {
-      // Fits on one page
+    while (heightLeft > 0) {
       pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
-    } else {
-      // If content too tall, split across pages (simple approach)
-      let heightLeft = imgHeight;
-
-      while (heightLeft > 0) {
-        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
-        heightLeft -= pdfHeight;
-        position -= pdfHeight;
-        if (heightLeft > 0) {
-          pdf.addPage();
-        }
-      }
+      heightLeft -= pdfHeight;
+      position -= pdfHeight;
+      if (heightLeft > 0) pdf.addPage();
     }
 
-    pdf.save("package-details.pdf");
+ pdf.save(`Texmon_Package_${pkg.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
+
   } catch (error) {
     console.error("Error generating PDF:", error);
     alert("Failed to generate PDF: " + error.message);
