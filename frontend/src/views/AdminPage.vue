@@ -2259,93 +2259,100 @@ const handlePrint = async () => {
 
 const handleDownloadPDF = async () => {
   try {
-    await nextTick();
-    await waitForImages();
+    // Wait for any images to load
+    await waitForImages()
 
-    if (!window.jspdf) await loadJsPDFLibrary();
-
-    if (!window.html2canvas) {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-        script.onload = resolve;
-        script.onerror = () => reject(new Error('Failed to load html2canvas'));
-        document.body.appendChild(script);
-      });
+    // Get the content to print
+    const printContent = document.getElementById('tracking-content')
+    if (!printContent) {
+      console.error('Print content not found')
+      return
     }
 
-    const content = document.getElementById('tracking-content');
-    if (!content) {
-      alert('Content not found');
-      return;
-    }
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank', 'width=800,height=600')
 
-    // Use html2canvas to capture the full content as a tall canvas
-    const canvas = await window.html2canvas(content, {
-      scale: 2,
-      useCORS: true,
-      scrollY: -window.scrollY // ensure full content captured, even if scrolled
-    });
+    // Write the complete HTML structure
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Package Tracking - ${selectedPackage.value?.containerNumber}</title>
+        <meta charset="utf-8">
+        <style>
 
-    const imgData = canvas.toDataURL('image/png');
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
+          
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+          }
+          
+          .print-content {
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          
+          img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+          }
+          
+          .qr-code img {
+            width: 100px !important;
+            height: 100px !important;
+          }
+          
+          @media print {
+            body {
+              margin: 0;
+              padding: 10px;
+            }
+            
+            .print-content {
+              max-width: none;
+              margin: 0;
+            }
+            
+            * {
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+            }
+          }
+          
+          @page {
+            margin: 0.5in;
+            size: A4;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="print-content">
+          ${printContent.innerHTML}
+        </div>
+        <script>
+          window.onload = function() {
+            // Wait a bit for images to load, then print
+            setTimeout(function() {
+              window.print();
+              window.close();
+            }, 1000);
+          };
+        <\/script>
+      </body>
+      </html>
+    `);
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+    printWindow.document.close()
 
-    // Convert pixel dimensions to mm for PDF
-    const pxToMm = px => px * 0.264583;
-
-    const imgProps = pdf.getImageProperties(imgData);
-    const imgWidthPx = imgProps.width;
-    const imgHeightPx = imgProps.height;
-
-    const imgWidthMm = pxToMm(imgWidthPx);
-    const imgHeightMm = pxToMm(imgHeightPx);
-
-    const ratio = pdfWidth / imgWidthMm;
-    const imgHeightScaled = imgHeightMm * ratio;
-
-    // If the image height fits on one page, add directly
-    if (imgHeightScaled <= pdfHeight) {
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeightScaled);
-    } else {
-      // Image is taller than one page, split into pages
-
-      let heightLeft = imgHeightScaled;
-      let position = 0;
-      let pageHeightPx = pdf.internal.pageSize.getHeight() / ratio * (1 / pxToMm(1)); // Convert PDF height mm back to px at scale
-
-      while (heightLeft > 0) {
-        // Create a canvas to crop a part of the big image
-        const pageCanvas = document.createElement('canvas');
-        pageCanvas.width = imgWidthPx;
-        pageCanvas.height = Math.min(pageHeightPx, imgHeightPx - position);
-
-        const ctx = pageCanvas.getContext('2d');
-        ctx.drawImage(canvas, 0, position, imgWidthPx, pageCanvas.height, 0, 0, imgWidthPx, pageCanvas.height);
-
-        const pageDataUrl = pageCanvas.toDataURL('image/png');
-
-        const pageHeightMm = pxToMm(pageCanvas.height) * ratio;
-
-        if (position > 0) pdf.addPage();
-
-        pdf.addImage(pageDataUrl, 'PNG', 0, 0, pdfWidth, pageHeightMm);
-
-        heightLeft -= pageHeightMm;
-        position += pageCanvas.height;
-      }
-    }
-
-    const pdfBlob = pdf.output('blob');
-    const blobUrl = URL.createObjectURL(pdfBlob);
-    window.open(blobUrl, '_blank');
-
-  } catch (err) {
-    console.error('Error generating PDF:', err);
-    alert('Failed to generate PDF.');
+  } catch (error) {
+    console.error('Error printing document:', error)
+    alert('Failed to print document')
   }
 };
 
@@ -2699,20 +2706,22 @@ onUnmounted(() => {
 
 @media print {
   .print-content {
-  max-width: 800px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
-  background: white;
-  padding: 20px;
-}
-.print-content img {
-  max-width: 100%;
-  height: auto;
-}
-.qr-code img {
-  width: 100px;
-  height: 100px;
-}
+    max-width: 800px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background: white;
+    padding: 20px;
+  }
+
+  .print-content img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .qr-code img {
+    width: 100px;
+    height: 100px;
+  }
 }
 
 .scrollbar-thin {
