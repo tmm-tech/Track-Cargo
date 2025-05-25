@@ -2259,102 +2259,59 @@ const handlePrint = async () => {
 
 const handleDownloadPDF = async () => {
   try {
-    // Wait for any images to load
-    await waitForImages()
+    await nextTick(); // wait for DOM updates
+    await waitForImages(); // wait for images to load (QR code etc)
 
-    // Get the content to print
-    const printContent = document.getElementById('tracking-content')
-    if (!printContent) {
-      console.error('Print content not found')
-      return
+    if (!window.jspdf) {
+      await loadJsPDFLibrary();
     }
 
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank', 'width=800,height=600')
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const margin = 10;
+    let y = margin;
 
-    // Write the complete HTML structure
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Package Tracking - ${selectedPackage.value?.containerNumber}</title>
-        <meta charset="utf-8">
-        <style>
+    const pkg = selectedPackage.value;
 
-          
-          body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-          }
-          
-          .print-content {
-            max-width: 800px;
-            margin: 0 auto;
-          }
-          
-          img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-          }
-          
-          .qr-code img {
-            width: 100px !important;
-            height: 100px !important;
-          }
-          
-          @media print {
-            body {
-              margin: 0;
-              padding: 10px;
-            }
-            
-            .print-content {
-              max-width: none;
-              margin: 0;
-            }
-            
-            * {
-              -webkit-print-color-adjust: exact !important;
-              color-adjust: exact !important;
-            }
-          }
-          
-          @page {
-            margin: 0.5in;
-            size: A4;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="print-content">
-          ${printContent.innerHTML}
-        </div>
-        <script>
-          window.onload = function() {
-            // Wait a bit for images to load, then print
-            setTimeout(function() {
-              window.print();
-              window.close();
-            }, 1000);
-          };
-        <\/script>
-      </body>
-      </html>
-    `);
+    // Title
+    doc.setFontSize(18);
+    doc.setTextColor('#273272');
+    doc.text('Package Tracking Details', margin, y);
+    y += 10;
 
-    printWindow.document.close()
+    // Basic Details
+    doc.setFontSize(12);
+    doc.setTextColor('#000000');
+    doc.text(`Container Number: ${pkg?.containerNumber || 'N/A'}`, margin, y);
+    y += 7;
+    doc.text(`Tracking Number: ${pkg?.trackingNumber || 'N/A'}`, margin, y);
+    y += 7;
+    doc.text(`Status: ${pkg?.status || 'Unknown'}`, margin, y);
+    y += 10;
+
+    // Add QR code image - make sure you get correct data URL from <img>
+    const qrImg = document.querySelector('#tracking-content .qr-code img');
+    if (qrImg && qrImg.src.startsWith('data:image')) {
+      doc.addImage(qrImg.src, 'PNG', margin, y, 40, 40);
+      y += 50;
+    }
+
+    doc.setFontSize(10);
+    doc.text('Generated from the tracking system', margin, y);
+
+    const fileName = `Package_Tracking_${pkg?.containerNumber || 'Unknown'}.pdf`;
+
+    // On mobile, just download the PDF file directly
+    doc.save(fileName);
+
+    alert('PDF downloaded. Please open it from your downloads to print or share.');
 
   } catch (error) {
-    console.error('Error printing document:', error)
-    alert('Failed to print document')
+    console.error('Error generating PDF:', error);
+    alert('Failed to generate PDF. Please try again.');
   }
 };
+
 
 
 // Helper function to wait for images to load
