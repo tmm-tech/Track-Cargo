@@ -2283,223 +2283,64 @@ const handlePrint = async () => {
   }
 }
 
-const handleDownloadPDF = async () => {
+async function handleDownloadPDF() {
   try {
-    if (!window.jspdf) {
+     if (!window.jspdf) {
       await loadJsPDFLibrary();
     }
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 15;
-    let y = margin;
-
-    const pkg = selectedPackage.value || {};
-
-    // Colors
-    const darkBlue = '#273272';
-    const lightBlue = '#3a4999';
-    const greyText = '#333';
-    const lightGreyBg = '#f9f9f9';
-    const white = '#ffffff';
-
-    // Set background color for entire page
-    doc.setFillColor(249, 249, 249); // #f9f9f9
-    doc.rect(0, 0, pageWidth, doc.internal.pageSize.getHeight(), 'F');
-
-    // HEADER - dark blue background with white text
-    const headerHeight = 25;
-    doc.setFillColor(39, 50, 114); // #273272 dark blue
-    doc.rect(0, 0, pageWidth, headerHeight, 'F');
-    doc.setTextColor(white);
-    doc.setFontSize(18);
-    doc.setFont(undefined, 'bold');
-    doc.text('Texmon Logistics', margin, 17);
-    doc.setFontSize(14);
-    doc.setFont(undefined, 'normal');
-    doc.text('Package Tracking Details', pageWidth / 2, 17, { align: 'center' });
-
-    y = headerHeight + 10;
-
-    // Section: Package Information box with gradient header (approximate with solid color)
-    const sectionX = margin;
-    const sectionWidth = pageWidth - margin * 2;
-
-    // Draw section box background white with shadow (light grey)
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(sectionX, y, sectionWidth, 60, 3, 3, 'F');
-    doc.setDrawColor(200);
-    doc.roundedRect(sectionX, y, sectionWidth, 60, 3, 3);
-
-    // Section header background
-    const sectionHeaderHeight = 10;
-    doc.setFillColor(39, 50, 114); // dark blue
-    doc.rect(sectionX, y, sectionWidth, sectionHeaderHeight, 'F');
-
-    // Section header text + icon
-    doc.setTextColor(white);
-    doc.setFontSize(14);
-    doc.setFont(undefined, 'bold');
-    doc.text('📦 Package Information', sectionX + 5, y + 7);
-
-    // Reset text color and font
-    doc.setTextColor(greyText);
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'normal');
-
-    // Prepare two-column layout for package info
-    const colWidth = (sectionWidth - 20) / 2;
-    const labelColor = '#273272';
-
-    // Function to draw label-value pairs
-    const drawField = (label, value, xPos, yPos) => {
-      doc.setTextColor(labelColor);
-      doc.setFont(undefined, 'bold');
-      doc.text(label.toUpperCase(), xPos, yPos);
-      doc.setTextColor(greyText);
-      doc.setFont(undefined, 'normal');
-      doc.text(String(value || 'N/A'), xPos, yPos + 6);
-    };
-
-    const startY = y + sectionHeaderHeight + 10;
-    let fieldY = startY;
-
-    drawField('Container Number', pkg.containerNumber || 'N/A', sectionX + 10, fieldY);
-    drawField('Truck Number', pkg.truckNumber || 'N/A', sectionX + 10 + colWidth, fieldY);
-
-    fieldY += 15;
-    drawField('BL Number', pkg.blNumber || 'N/A', sectionX + 10, fieldY);
-    drawField('Package Type', pkg.type || 'N/A', sectionX + 10 + colWidth, fieldY);
-
-    fieldY += 15;
-    drawField('Weight', pkg.weight ? `${pkg.weight} kg` : 'N/A', sectionX + 10, fieldY);
-    drawField('Shipped Date', pkg.shippedDate || 'N/A', sectionX + 10 + colWidth, fieldY);
-
-    fieldY += 15;
-    drawField('Estimated Delivery', pkg.estimatedDelivery || 'N/A', sectionX + 10, fieldY);
-
-    y += 60 + 10;
-
-    // QR code placeholder box
-    doc.setFillColor(255, 255, 255);
-    const qrSize = 30;
-    const qrX = pageWidth / 2 - qrSize / 2;
-    doc.rect(qrX, y, qrSize, qrSize);
-    doc.setFontSize(8);
-    doc.setTextColor(greyText);
-    doc.text('Scan to Track', pageWidth / 2, y + qrSize + 5, { align: 'center' });
-    y += qrSize + 15;
-
-    // Section: Current Status box
-    doc.setFillColor(255, 255, 255);
-    const statusBoxHeight = 50;
-    doc.roundedRect(sectionX, y, sectionWidth, statusBoxHeight, 3, 3, 'F');
-    doc.setDrawColor(200);
-    doc.roundedRect(sectionX, y, sectionWidth, statusBoxHeight, 3, 3);
-
-    // Section header
-    doc.setFillColor(39, 50, 114);
-    doc.rect(sectionX, y, sectionWidth, sectionHeaderHeight, 'F');
-    doc.setTextColor(white);
-    doc.setFontSize(14);
-    doc.setFont(undefined, 'bold');
-    doc.text('🚚 Current Status', sectionX + 5, y + 7);
-
-    // Reset text color and font
-    doc.setTextColor(greyText);
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'normal');
-
-    // Draw fields for current status in two columns
-    const statusStartY = y + sectionHeaderHeight + 10;
-    drawField('Current Location', pkg.currentLocation || 'N/A', sectionX + 10, statusStartY);
-    drawField('Next Stop', pkg.nextStop || 'N/A', sectionX + 10 + colWidth, statusStartY);
-    drawField('Next Stop ETA', pkg.nextStopETA || 'N/A', sectionX + 10, statusStartY + 15);
-    drawField('Final Destination', pkg.finalDestination || 'N/A', sectionX + 10 + colWidth, statusStartY + 15);
-
-    // Delivery progress bar
-    const progressBarY = statusStartY + 35;
-    const progressBarX = sectionX + 10;
-    const progressBarWidth = sectionWidth - 20;
-    const progressBarHeight = 6;
-
-    // Draw progress bar background
-    doc.setFillColor(221, 221, 221);
-    doc.roundedRect(progressBarX, progressBarY, progressBarWidth, progressBarHeight, 2, 2, 'F');
-
-    // Function to calculate progress percent
-    function calculateProgress(pkg) {
-      const stages = ['Shipped', 'In Transit', 'Out for Delivery', 'Delivered'];
-      const currentIndex = stages.indexOf(pkg.status);
-      if (currentIndex === -1) return 0;
-      return ((currentIndex + 1) / stages.length) * 100;
+    // Adjust selector to your container element id/class with the package HTML
+    const element = document.getElementById("tracking-content");
+    if (!element) {
+      throw new Error("Tracking content element not found");
     }
 
-    // Draw progress fill
-    const progressPercent = calculateProgress(pkg);
-    doc.setFillColor(39, 50, 114);
-    doc.roundedRect(progressBarX, progressBarY, (progressBarWidth * progressPercent) / 100, progressBarHeight, 2, 2, 'F');
-
-    // Draw stage circles above progress bar
-    const stages = ['Shipped', 'In Transit', 'Out for Delivery', 'Delivered'];
-    const circleRadius = 5;
-    const circleY = progressBarY + progressBarHeight / 2;
-    stages.forEach((stage, i) => {
-      const circleX = progressBarX + (progressBarWidth * (i / (stages.length - 1)));
-      let fillColor = '#ddd';
-      if (i < stages.indexOf(pkg.status)) fillColor = darkBlue;
-      else if (stage === pkg.status) fillColor = '#ffb600'; // yellow for current
-      else fillColor = '#ddd';
-
-      doc.setFillColor(fillColor);
-      doc.circle(circleX, circleY, circleRadius, 'F');
-
-      // Label below circles
-      doc.setTextColor(darkBlue);
-      doc.setFontSize(8);
-      doc.text(stage, circleX, circleY + 10, { align: 'center' });
+    // Capture element to canvas
+    const canvas = await html2canvas(element, {
+      scale: 2,       // improve resolution
+      useCORS: true,  // if images come from other origins
+      scrollY: -window.scrollY, // fix for scrolling
     });
 
-    y += statusBoxHeight + 20;
+    const imgData = canvas.toDataURL("image/png");
 
-    // Section: Shipping Address
-    doc.setFillColor(255, 255, 255);
-    const addrBoxHeight = 30;
-    doc.roundedRect(sectionX, y, sectionWidth, addrBoxHeight, 3, 3, 'F');
-    doc.setDrawColor(200);
-    doc.roundedRect(sectionX, y, sectionWidth, addrBoxHeight, 3, 3);
+    // Create jsPDF instance (A4 paper size)
+    const pdf = new jsPDF({
+      unit: "pt",
+      format: "a4",
+    });
 
-    // Section header
-    doc.setFillColor(39, 50, 114);
-    doc.rect(sectionX, y, sectionWidth, sectionHeaderHeight, 'F');
-    doc.setTextColor(white);
-    doc.setFontSize(14);
-    doc.setFont(undefined, 'bold');
-    doc.text('🏠 Shipping Address', sectionX + 5, y + 7);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    doc.setTextColor(greyText);
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'normal');
-    const shippingAddrStr = typeof pkg.shippingAddress === 'object' && pkg.shippingAddress !== null
-  ? Object.values(pkg.shippingAddress).join(', ')
-  : String(pkg.shippingAddress || 'N/A');
+    // Image properties for aspect ratio
+    const imgProps = pdf.getImageProperties(imgData);
+    const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-    doc.text(shippingAddrStr, sectionX + 10, y + sectionHeaderHeight + 15, { maxWidth: sectionWidth - 20 });
+    let position = 0;
 
-    y += addrBoxHeight + 20;
+    if (imgHeight < pdfHeight) {
+      // Fits on one page
+      pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+    } else {
+      // If content too tall, split across pages (simple approach)
+      let heightLeft = imgHeight;
 
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor('#888');
-    doc.text('Thank you for choosing Texmon Logistics.', pageWidth / 2, doc.internal.pageSize.getHeight() - 15, { align: 'center' });
+      while (heightLeft > 0) {
+        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+        position -= pdfHeight;
+        if (heightLeft > 0) {
+          pdf.addPage();
+        }
+      }
+    }
 
-    // Save PDF
-    doc.save(`Package_${pkg.containerNumber || 'unknown'}.pdf`);
+    pdf.save("package-details.pdf");
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    console.error("Error generating PDF:", error);
+    alert("Failed to generate PDF: " + error.message);
   }
-};
-
+}
 
 
 async function loadJsPDFLibrary() {
