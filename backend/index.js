@@ -49,7 +49,7 @@ app.use(addTokenToRequest);
 app.use('/users', UserRoutes);
 app.use('/package', PackageRoutes);
 app.use('/activity', ActivityRoutes);
-a
+
 app.get('/', (req, res) => {
     res.json({ message: "Confirmed Connection to Texmon LOGISTICS" });
 });
