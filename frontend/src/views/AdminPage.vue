@@ -31,7 +31,8 @@
           <p v-if="!sidebarCollapsed || isMobileDevice" class="text-xs uppercase text-gray-500 font-medium px-3 py-2">
             Main Navigation</p>
           <nav class="space-y-1">
-            <button @click="navigateToView('dashboard')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Dashboard' : ''"
+            <button @click="navigateToView('dashboard')"
+              :title="(sidebarCollapsed && !isMobileDevice) ? 'Dashboard' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
                 'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
@@ -93,7 +94,7 @@
         </div>
       </div>
 
-       <!-- Sidebar Toggle (Desktop only) -->
+      <!-- Sidebar Toggle (Desktop only) -->
       <div v-if="!isMobileDevice" :class="[
         'p-2 transition-all duration-300',
         sidebarCollapsed ? 'flex justify-center' : 'flex justify-end'
@@ -151,7 +152,8 @@
               <button v-if="isMobileDevice && isAuthenticated" @click="toggleMobileMenu"
                 class="mr-3 p-1 rounded-md hover:bg-white/10 transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                  </path>
                 </svg>
               </button>
               <span class="text-sm">
@@ -531,7 +533,8 @@
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.blNumber }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.currentLocation">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
+                            :title="pkg.currentLocation">
                             {{ pkg.currentLocation }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nextStop">
@@ -1467,7 +1470,7 @@
             <div class="flex-1 min-w-0">
               <h2 class="text-lg sm:text-xl font-semibold truncate">Package Tracking Details</h2>
               <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedPackage?.containerNumber
-                }}</p>
+              }}</p>
             </div>
             <div class="flex items-center gap-2 sm:gap-3 ml-4">
               <!-- Action Buttons -->
@@ -1504,7 +1507,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted} from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import {
   MagnifyingGlassIcon,
   PencilIcon,
@@ -2150,6 +2153,11 @@ const closeTrackingDialog = () => {
 
 // Enhanced Print Function
 const handlePrint = async () => {
+  if (isMobileDevice.value) {
+    await nextTick() // wait for DOM to be updated
+    await handleDownloadPDF()
+    return
+  }
 
   try {
     // Wait for any images to load
@@ -2173,18 +2181,16 @@ const handlePrint = async () => {
         <title>Package Tracking - ${selectedPackage.value?.containerNumber}</title>
         <meta charset="utf-8">
         <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
+
           
           body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: white;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
+            background-color: #f9f9f9;
           }
           
           .print-content {
@@ -2251,92 +2257,97 @@ const handlePrint = async () => {
   }
 }
 
-// Enhanced PDF Download Function
 const handleDownloadPDF = async () => {
   try {
-    // Load html2pdf library if not already loaded
-    if (!window.html2pdf) {
-      await loadHtml2PdfLibrary()
+    await nextTick(); // DOM updates
+    await waitForImages(); // Ensure images like QR code are loaded
+
+    const printContent = document.getElementById('tracking-content');
+    if (!printContent) {
+      console.error('Tracking content not found');
+      alert('Tracking content not found');
+      return;
     }
 
-    // Wait for any images to load
-    await waitForImages()
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
 
-    const element = document.getElementById('tracking-content')
-    if (!element) {
-      console.error('Tracking content not found')
-      return
-    }
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Package Tracking - ${selectedPackage.value?.containerNumber}</title>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 800px;
+              margin: 0 auto;
+              padding: 20px;
+              background-color: #f9f9f9;
+            }
 
-    // Clone the element to avoid modifying the original
-    const clonedElement = element.cloneNode(true)
+            .print-content {
+              max-width: 800px;
+              margin: 0 auto;
+            }
 
-    // Ensure all images have proper dimensions
-    const images = clonedElement.querySelectorAll('img')
-    images.forEach(img => {
-      if (img.src.includes('qrserver.com') || img.classList.contains('qr-code')) {
-        img.style.width = '100px'
-        img.style.height = '100px'
-        img.style.display = 'block'
-        img.style.margin = '0 auto'
-      }
-      // Set crossOrigin for external images
-      if (img.src.startsWith('http')) {
-        img.crossOrigin = 'anonymous'
-      }
-    })
+            img {
+              max-width: 100%;
+              height: auto;
+              display: block;
+            }
 
-    // Create a temporary container
-    const tempContainer = document.createElement('div')
-    tempContainer.style.position = 'absolute'
-    tempContainer.style.left = '-9999px'
-    tempContainer.style.top = '-9999px'
-    tempContainer.style.width = '800px'
-    tempContainer.style.backgroundColor = '#ffffff'
-    tempContainer.style.padding = '20px'
-    tempContainer.appendChild(clonedElement)
-    document.body.appendChild(tempContainer)
+            .qr-code img {
+              width: 100px !important;
+              height: 100px !important;
+            }
 
-    const opt = {
-      margin: [0.5, 0.5, 0.5, 0.5],
-      filename: `Texmon_Package_${selectedPackage.value.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`,
-      image: {
-        type: 'jpeg',
-        quality: 0.98,
-        crossOrigin: 'anonymous'
-      },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        width: 800,
-        height: tempContainer.scrollHeight,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: 800,
-        windowHeight: tempContainer.scrollHeight
-      },
-      jsPDF: {
-        unit: 'in',
-        format: 'a4',
-        orientation: 'portrait',
-        compress: true
-      }
-    }
+            @media print {
+              body {
+                margin: 0;
+                padding: 10px;
+              }
+              * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+              }
+            }
 
-    // Generate PDF
-    await window.html2pdf().from(tempContainer).set(opt).save()
+            @page {
+              margin: 0.5in;
+              size: A4;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-content">
+            ${printContent.innerHTML}
+          </div>
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+                window.close();
+              }, 800);
+            };
+          <\/script>
+        </body>
+      </html>
+    `);
 
-    // Clean up
-    document.body.removeChild(tempContainer)
-
+    printWindow.document.close();
   } catch (error) {
-    console.error('Error generating PDF:', error)
-    alert('Failed to generate PDF: ' + error.message)
+    console.error('Error creating PDF-like print window:', error);
+    alert('Failed to generate PDF');
   }
-}
+};
+
+
+
+
 
 // Helper function to wait for images to load
 const waitForImages = () => {
@@ -2370,22 +2381,6 @@ const waitForImages = () => {
     setTimeout(resolve, 3000)
   })
 }
-
-const loadHtml2PdfLibrary = () => {
-  return new Promise((resolve, reject) => {
-    if (window.html2pdf) {
-      resolve()
-      return
-    }
-
-    const script = document.createElement('script')
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
-    script.onload = resolve
-    script.onerror = reject
-    document.head.appendChild(script)
-  })
-}
-
 
 const printPackageDetails = (pkg) => {
   // For now, open tracking dialog - you can implement a separate view modal if needed
@@ -2703,25 +2698,20 @@ onUnmounted(() => {
 
 @media print {
   .print-content {
-    margin: 0;
-    padding: 20px;
-  }
-
-  /* Hide everything except the print content when printing */
-  body * {
-    visibility: hidden;
-  }
-
-  .print-content, .print-content * {
-    visibility: visible;
-  }
-
-  .print-content {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
+  max-width: 800px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  background: white;
+  padding: 20px;
+}
+.print-content img {
+  max-width: 100%;
+  height: auto;
+}
+.qr-code img {
+  width: 100px;
+  height: 100px;
+}
 }
 
 .scrollbar-thin {
