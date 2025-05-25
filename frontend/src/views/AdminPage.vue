@@ -1989,11 +1989,25 @@ const validateUserForm = () => {
   }
 
   if (!newUser.value.password) {
-    userFormErrors.value.password = 'Password is required'
-    isValid = false
+    userFormErrors.value.password = 'Password is required';
+    isValid = false;
   } else if (newUser.value.password.length < 8) {
-    userFormErrors.value.password = 'Password must be at least 8 characters'
-    isValid = false
+    userFormErrors.value.password = 'Password must be at least 8 characters';
+    isValid = false;
+  } else if (!/[A-Z]/.test(newUser.value.password)) {
+    userFormErrors.value.password = 'Password must contain at least one uppercase letter';
+    isValid = false;
+  } else if (!/[a-z]/.test(newUser.value.password)) {
+    userFormErrors.value.password = 'Password must contain at least one lowercase letter';
+    isValid = false;
+  } else if (!/[0-9]/.test(newUser.value.password)) {
+    userFormErrors.value.password = 'Password must contain at least one number';
+    isValid = false;
+  } else if (!/[^A-Za-z0-9]/.test(newUser.value.password)) {
+    userFormErrors.value.password = 'Password must contain at least one special character';
+    isValid = false;
+  } else {
+    userFormErrors.value.password = ''; // Clear error if all rules are satisfied
   }
 
   if (!newUser.value.role) {
@@ -2261,7 +2275,7 @@ const handlePrint = async () => {
 
 async function handleDownloadPDF() {
   try {
-     if (!window.jspdf) {
+    if (!window.jspdf) {
       await loadJsPDFLibrary();
     }
     const element = document.getElementById("tracking-content");
@@ -2304,7 +2318,7 @@ async function handleDownloadPDF() {
       if (heightLeft > 0) pdf.addPage();
     }
 
- pdf.save(`Texmon_Package_${pkg.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
+    pdf.save(`Texmon_Package_${pkg.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
 
   } catch (error) {
     console.error("Error generating PDF:", error);
@@ -2678,20 +2692,22 @@ onUnmounted(() => {
 
 @media print {
   .print-content {
-  max-width: 800px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
-  background: white;
-  padding: 20px;
-}
-.print-content img {
-  max-width: 100%;
-  height: auto;
-}
-.qr-code img {
-  width: 100px;
-  height: 100px;
-}
+    max-width: 800px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background: white;
+    padding: 20px;
+  }
+
+  .print-content img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .qr-code img {
+    width: 100px;
+    height: 100px;
+  }
 }
 
 .scrollbar-thin {
