@@ -1533,6 +1533,32 @@ import {
 import { LogOut } from 'lucide-vue-next'
 import { mockPackages } from '../data/mock-data'
 import PackageTracking from './PackageTracking.vue'
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+async function generatePdfFromHtml() {
+  const element = document.getElementById('packageDetails'); // your HTML container
+
+  const canvas = await html2canvas(element, { scale: 2 });
+  const imgData = canvas.toDataURL('image/png');
+
+  const pdf = new jsPDF({
+    unit: 'pt',
+    format: 'a4'
+  });
+
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
+
+  // Scale image to fit width, adjust height proportionally
+  const imgProps = pdf.getImageProperties(imgData);
+  const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+  pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
+
+  pdf.save('package-details.pdf');
+}
+
 import ShippingProgress from '../components/ShippingProgress.vue'
 
 
