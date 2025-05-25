@@ -1,3 +1,4 @@
+const { query } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
@@ -8,7 +9,7 @@ const pool = new Pool({
 });
 
 
-pool.connect((err, client, release) => {
+query.connect((err, client, release) => {
   if (err) {
     console.error('Error acquiring client', err.stack);
   } else {
