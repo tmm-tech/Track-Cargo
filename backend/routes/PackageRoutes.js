@@ -1,6 +1,6 @@
 const express = require('express');
 const PackageRoutes = express.Router();
-const packageController = require('../controllers/packageController');
+const packageController = require('../controllers/PackageControllers');
 
 // Create a new package
 PackageRoutes.post('/', packageController.createPackage);
