@@ -2259,56 +2259,17 @@ const handlePrint = async () => {
 
 const handleDownloadPDF = async () => {
   try {
-    await nextTick(); // wait for DOM updates
-    await waitForImages(); // wait for images to load (QR code etc)
-
     if (!window.jspdf) {
-      await loadJsPDFLibrary();
+      await loadJsPDFLibrary();  // Make sure this loads the jsPDF library properly
     }
-
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const margin = 10;
-    let y = margin;
-
-    const pkg = selectedPackage.value;
-
-    // Title
-    doc.setFontSize(18);
-    doc.setTextColor('#273272');
-    doc.text('Package Tracking Details', margin, y);
-    y += 10;
-
-    // Basic Details
-    doc.setFontSize(12);
-    doc.setTextColor('#000000');
-    doc.text(`Container Number: ${pkg?.containerNumber || 'N/A'}`, margin, y);
-    y += 7;
-    doc.text(`Tracking Number: ${pkg?.trackingNumber || 'N/A'}`, margin, y);
-    y += 7;
-    doc.text(`Status: ${pkg?.status || 'Unknown'}`, margin, y);
-    y += 10;
-
-    // Add QR code image - make sure you get correct data URL from <img>
-    const qrImg = document.querySelector('#tracking-content .qr-code img');
-    if (qrImg && qrImg.src.startsWith('data:image')) {
-      doc.addImage(qrImg.src, 'PNG', margin, y, 40, 40);
-      y += 50;
-    }
-
-    doc.setFontSize(10);
-    doc.text('Generated from the tracking system', margin, y);
-
-    const fileName = `Package_Tracking_${pkg?.containerNumber || 'Unknown'}.pdf`;
-
-    // On mobile, just download the PDF file directly
-    doc.save(fileName);
-
-    alert('PDF downloaded. Please open it from your downloads to print or share.');
-
+    const doc = new jsPDF();
+    doc.text("Test PDF Generation Works!", 10, 10);
+    doc.save("test.pdf");
+    alert("PDF generated successfully!");
   } catch (error) {
-    console.error('Error generating PDF:', error);
-    alert('Failed to generate PDF. Please try again.');
+    console.error("Error generating PDF:", error);
+    alert("Failed to generate PDF. Please try again.");
   }
 };
 
