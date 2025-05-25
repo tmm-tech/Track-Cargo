@@ -2454,7 +2454,11 @@ const handleDownloadPDF = async () => {
     doc.setTextColor(greyText);
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
-    doc.text(pkg.shippingAddress || 'N/A', sectionX + 10, y + sectionHeaderHeight + 15, { maxWidth: sectionWidth - 20 });
+    const shippingAddrStr = typeof pkg.shippingAddress === 'object' && pkg.shippingAddress !== null
+  ? Object.values(pkg.shippingAddress).join(', ')
+  : String(pkg.shippingAddress || 'N/A');
+
+    doc.text(shippingAddrStr, sectionX + 10, y + sectionHeaderHeight + 15, { maxWidth: sectionWidth - 20 });
 
     y += addrBoxHeight + 20;
 
