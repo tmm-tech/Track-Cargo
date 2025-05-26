@@ -10,17 +10,26 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@reduxjs/toolkit": "^2.2.7",
     "@supabase/supabase-js": "^2.49.8",
     "bcrypt": "^6.0.0",
+     "body-parser": "^1.20.3",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "handlebars": "^4.7.7",
+    "http-proxy-middleware": "^2.0.6",
     "express": "^5.1.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
+    "js-cookie": "^3.0.5",
     "nodemailer": "^7.0.3",
+    "morgan": "^1.10.0",
+    "mssql": "^9.1.1",
     "pg": "^8.16.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "node-cron": "^3.0.2",
+    "react-redux": "^9.1.2"
   }
 }
