@@ -1,4 +1,4 @@
-const { pool } = require('../config/sqlConfig');
+const { query } = require('../config/sqlConfig');
 const { v4: uuidv4 } = require('uuid');
 
 // Create a new package
@@ -27,7 +27,7 @@ const createPackage = async (req, res) => {
       RETURNING *;
     `;
 
-    const result = await pool.query(insertQuery, [
+    const result = await query(insertQuery, [
       sender_name,
       receiver_name,
       origin,
@@ -52,7 +52,7 @@ const createPackage = async (req, res) => {
 // Get all packages (not deleted)
 const getAllPackages = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const result = await query(`
       SELECT * FROM packages WHERE is_deleted = FALSE ORDER BY created_at DESC;
     `);
     res.status(200).json(result.rows);
@@ -66,7 +66,7 @@ const getAllPackages = async (req, res) => {
 const getPackageById = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query(`
+    const result = await query(`
       SELECT * FROM packages WHERE id = $1 AND is_deleted = FALSE;
     `, [id]);
 
@@ -96,7 +96,7 @@ const updatePackage = async (req, res) => {
 
     const updated_at = new Date();
 
-    const result = await pool.query(`
+    const result = await query(`
       UPDATE packages SET
         sender_name = $1,
         receiver_name = $2,
@@ -137,7 +137,7 @@ const deletePackage = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = await pool.query(`
+    const result = await query(`
       UPDATE packages SET is_deleted = TRUE, updated_at = NOW()
       WHERE id = $1 RETURNING *;
     `, [id]);
@@ -158,7 +158,7 @@ const trackPackageByTrackingNumber = async (req, res) => {
   try {
     const { tracking_number } = req.params;
 
-    const result = await pool.query(`
+    const result = await query(`
       SELECT * FROM packages
       WHERE tracking_number = $1 AND is_deleted = FALSE;
     `, [tracking_number]);
