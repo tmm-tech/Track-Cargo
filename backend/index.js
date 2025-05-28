@@ -11,8 +11,7 @@ const app = express();
 
 
 const allowedOrigins = [
-    // 'https://ketrb-cms-one.vercel.app',
-    // 'https://ketrb.netlify.app'
+    'https://track-cargo.vercel.app/',
   ];
   
   const corsOptions = {

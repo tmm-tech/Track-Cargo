@@ -1,12 +1,11 @@
 const express = require('express');
-const { getNotifications, updateNotificationStatus } = require('../controllers/ActivityController');
+const ActivityRoutes = express.Router();
+const activityController = require('../controllers/activityController');
 
-const NotificationRoutes = express.Router();
+// POST /activities - add new activity log
+ActivityRoutes.post('/', activityController.addActivity);
 
-// Get all notifications for the user
-NotificationRoutes.get('/', getNotifications);
+// GET /activities - get all activity logs
+ActivityRoutes.get('/', activityController.getAllActivities);
 
-// Update notification status (read/unread)
-NotificationRoutes.put('/:id/status', updateNotificationStatus);
-
-module.exports = NotificationRoutes;
+module.exports = ActivityRoutes;

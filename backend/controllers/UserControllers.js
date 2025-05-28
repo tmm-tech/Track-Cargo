@@ -14,27 +14,44 @@ module.exports = {
             let hashed_pwd = await bcrypt.hash(value.password, 8);
 
             const insertUserQuery = `
-                INSERT INTO profile (fullname, email, password, roles, status)
-                VALUES ($1, $2, $3, $4, $5, $6)
-                RETURNING id;
-            `;
+      INSERT INTO profile (fullname, email, password, roles, status, permissions, lastLogin)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id;
+    `;
+
+            // Provide default values if not present
             const params = [
                 value.fullname,
                 value.email,
                 hashed_pwd,
                 value.roles,
-                'active',
+                value.status || 'active',
+                JSON.stringify(value.permissions || []),  // Store permissions as JSON string
+                value.lastLogin || null,
             ];
 
             const result = await query(insertUserQuery, params);
-            reportService.sendAccountCreation(value.email, value.password, value.fullname, value.roles);
 
-            res.json({ success: true, message: 'Registration successful', userId: result.rows[0].id });
+            await reportService.sendAccountCreation(
+                value.email,
+                value.password,
+                value.fullname,
+                value.roles
+            );
+
+            res.json({
+                success: true,
+                message: 'Registration successful',
+                userId: result.rows[0].id,
+            });
         } catch (error) {
             console.error('Error registering user:', error);
-            res.status(500).json({ success: false, message: `Error registering user: ${error.message}` });
+            res
+                .status(500)
+                .json({ success: false, message: `Error registering user: ${error.message}` });
         }
     },
+
 
     // User login and JWT token generation
     loginUser: async (req, res) => {
@@ -135,51 +152,51 @@ module.exports = {
 
     // Update user details
     // Update user details
-updateUser: async (req, res) => {
-    const { fullname, email, roles, password } = req.body;
-    const { id } = req.params;
+    updateUser: async (req, res) => {
+        const { fullname, email, roles, password } = req.body;
+        const { id } = req.params;
 
-    try {
-        // Build the query and parameters
-        let updateUserQuery = `
+        try {
+            // Build the query and parameters
+            let updateUserQuery = `
             UPDATE profile
             SET fullname = $1, email = $2, roles = $3
         `;
-        let params = [fullname, email, roles];
+            let params = [fullname, email, roles];
 
-        // Check if the password is being updated
-        if (password) {
-            // Hash the password before updating it in the database
-            const hashedPassword = await bcrypt.hash(password, 8); // Ensure bcrypt is imported
-            updateUserQuery += `, password = $4`;
-            params.push(hashedPassword); // Add the hashed password to the parameters
+            // Check if the password is being updated
+            if (password) {
+                // Hash the password before updating it in the database
+                const hashedPassword = await bcrypt.hash(password, 8); // Ensure bcrypt is imported
+                updateUserQuery += `, password = $4`;
+                params.push(hashedPassword); // Add the hashed password to the parameters
+            }
+
+            // Finalize the query
+            updateUserQuery += ` WHERE id = $${params.length + 1} RETURNING *;`;
+            params.push(id);
+
+            // Execute the query
+            const result = await query(updateUserQuery, params);
+
+            if (result.rowCount > 0) {
+                const emailContent = {
+                    email: result.rows[0].email,
+                    fullname: result.rows[0].fullname,
+                    roles: result.rows[0].roles,
+                    password: password  // Indicate if the password was updated
+                };
+                // Send email notification
+                await reportService.sendPasswordUpdate(emailContent);
+                res.json({ success: true, message: 'User updated successfully', data: result.rows[0] });
+            } else {
+                res.status(404).json({ success: false, message: 'User not found' });
+            }
+        } catch (error) {
+            console.error('Error updating user:', error);
+            res.status(500).json({ success: false, message: `Error updating user: ${error.message}` });
         }
-
-        // Finalize the query
-        updateUserQuery += ` WHERE id = $${params.length + 1} RETURNING *;`;
-        params.push(id);
-
-        // Execute the query
-        const result = await query(updateUserQuery, params);
-
-        if (result.rowCount > 0) {
-            const emailContent = {
-                email: result.rows[0].email,
-                fullname: result.rows[0].fullname,
-                roles: result.rows[0].roles,
-                password: password  // Indicate if the password was updated
-            };
-            // Send email notification
-            await reportService.sendPasswordUpdate(emailContent);
-            res.json({ success: true, message: 'User updated successfully', data: result.rows[0] });
-        } else {
-            res.status(404).json({ success: false, message: 'User not found' });
-        }
-    } catch (error) {
-        console.error('Error updating user:', error);
-        res.status(500).json({ success: false, message: `Error updating user: ${error.message}` });
-    }
-},
+    },
 
 
     // Soft delete (deactivate) user
@@ -310,7 +327,7 @@ updateUser: async (req, res) => {
 
             if (userResult.rows.length > 0) {
                 const user = userResult.rows[0];
-                
+
                 // Notify admins of the password reset request
                 await query(
                     'INSERT INTO notifications (notification_type, item_id, message, sender_id, target_role, is_read) VALUES ($1, $2, $3, $4, $5, $6)',
@@ -332,5 +349,5 @@ updateUser: async (req, res) => {
             console.error('Error handling password reset:', error);
             return res.status(500).json({ success: false, message: 'Internal server error.' });
         }
-    },              
+    },
 };

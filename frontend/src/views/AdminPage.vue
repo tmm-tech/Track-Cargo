@@ -1536,7 +1536,8 @@ import PackageTracking from './PackageTracking.vue'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ShippingProgress from '../components/ShippingProgress.vue'
-
+import userService from '../Services/userServices.js'
+import { useRouter } from 'vue-router'
 
 // Authentication state
 const isAuthenticated = ref(false)
@@ -1626,51 +1627,6 @@ const users = ref([
       users: true,
       reports: true
     }
-  },
-  {
-    id: 2,
-    name: 'John Operator',
-    email: 'john@texmonlogistics.co.ke',
-    username: 'john',
-    password: 'password123',
-    role: 'operator',
-    status: 'active',
-    lastLogin: '2025-05-21 02:15 PM',
-    permissions: {
-      packages: true,
-      users: false,
-      reports: true
-    }
-  },
-  {
-    id: 3,
-    name: 'Sarah Viewer',
-    email: 'sarah@texmonlogistics.co.ke',
-    username: 'sarah',
-    password: 'password123',
-    role: 'viewer',
-    status: 'active',
-    lastLogin: '2025-05-20 11:45 AM',
-    permissions: {
-      packages: false,
-      users: false,
-      reports: true
-    }
-  },
-  {
-    id: 4,
-    name: 'Michael Johnson',
-    email: 'michael@texmonlogistics.co.ke',
-    username: 'michael',
-    password: 'password123',
-    role: 'operator',
-    status: 'inactive',
-    lastLogin: '2025-05-15 10:30 AM',
-    permissions: {
-      packages: true,
-      users: false,
-      reports: false
-    }
   }
 ])
 const userSearchTerm = ref('')
@@ -1708,62 +1664,6 @@ const activityLogs = ref([
     message: 'User logged in successfully',
     details: 'IP Address: 192.168.1.1, Browser: Chrome 120.0.0'
   },
-  {
-    id: 2,
-    type: 'package',
-    user: 'John Operator',
-    time: '2025-05-23 10:15 AM',
-    message: 'Package location updated',
-    details: 'Package MSCU7654321 location changed from "Nairobi Warehouse" to "Nairobi Distribution Center"'
-  },
-  {
-    id: 3,
-    type: 'user',
-    user: 'Admin User',
-    time: '2025-05-22 03:45 PM',
-    message: 'New user account created',
-    details: 'Created user account for Sarah Viewer with viewer role'
-  },
-  {
-    id: 4,
-    type: 'package',
-    user: 'John Operator',
-    time: '2025-05-22 01:30 PM',
-    message: 'New package added',
-    details: 'Added package CMAU2345678 to the system'
-  },
-  {
-    id: 5,
-    type: 'login',
-    user: 'Sarah Viewer',
-    time: '2025-05-22 11:45 AM',
-    message: 'User logged in successfully',
-    details: 'IP Address: 192.168.1.5, Browser: Firefox 98.0.0'
-  },
-  {
-    id: 6,
-    type: 'package',
-    user: 'John Operator',
-    time: '2025-05-21 09:20 AM',
-    message: 'Package comment added',
-    details: 'Added comment to package MAEU3456789: "Customer requested priority handling"'
-  },
-  {
-    id: 7,
-    type: 'user',
-    user: 'Admin User',
-    time: '2025-05-20 04:15 PM',
-    message: 'User permissions updated',
-    details: 'Updated permissions for John Operator: added report access'
-  },
-  {
-    id: 8,
-    type: 'system',
-    user: 'System',
-    time: '2025-05-20 12:00 AM',
-    message: 'Daily backup completed',
-    details: 'Database backup completed successfully. Size: 256MB'
-  }
 ])
 const activitySearchTerm = ref('')
 const activityFilter = ref('all')
@@ -1945,21 +1845,31 @@ const closeAddUserModal = () => {
   showAddUserModal.value = false
 }
 
-const addNewUser = () => {
+const addNewUser = async () => {
   if (validateUserForm()) {
     const newUserToAdd = {
-      id: users.value.length + 1,
-      ...newUser.value,
-      status: 'active',
-      lastLogin: null
+      fullname: newUser.value.name,
+      email: newUser.value.email,
+      password: newUser.value.password,
+      roles: newUser.value.role,
+      status: newUser.value.status || 'active',
+      permissions: newUser.value.permissions || [],
+      lastLogin: null,
     }
 
-    users.value.push(newUserToAdd)
+    try {
+      const response = await userService.registerUser(newUserToAdd)
 
-    // Log the activity
-    logActivity('user', currentUser.value.name, 'New user account created', `Created user account for ${newUserToAdd.name} with ${newUserToAdd.role} role`)
 
-    closeAddUserModal()
+      if (response.success) {
+        closeAddUserModal();
+      } else {
+        console.error('Failed to add new user:', response.message);
+      }
+    } catch (error) {
+      console.error('Error adding new user:', error)
+      // Optionally show error feedback to user
+    }
   }
 }
 
