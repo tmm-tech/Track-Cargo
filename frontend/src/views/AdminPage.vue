@@ -1225,6 +1225,13 @@
               </div>
             </div>
           </div>
+
+          <!-- Success Message -->
+          <div v-if="successMessage"
+            class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded shadow z-50">
+            {{ successMessage }}
+          </div>
+
           <!-- Add User Modal -->
           <div v-if="showAddUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             @click="closeAddUserModal">
@@ -1303,9 +1310,17 @@
                       @click="closeAddUserModal">
                       Cancel
                     </button>
-                    <button type="submit"
+                    <button type="submit" :disabled="isSubmitting"
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                      Add User
+                      <span v-if="!isSubmitting">Add User</span>
+                      <span v-else class="flex items-center">
+                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                            fill="none" />
+                          <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Saving...
+                      </span>
                     </button>
                   </div>
                 </form>
@@ -1544,7 +1559,8 @@ const isAuthenticated = ref(false)
 const username = ref('')
 const password = ref('')
 const loginError = ref('')
-
+const isSubmitting = ref(false)
+const successMessage = ref('')
 // Sidebar state
 const sidebarCollapsed = ref(false)
 
@@ -1843,6 +1859,19 @@ const openAddUserModal = () => {
 
 const closeAddUserModal = () => {
   showAddUserModal.value = false
+  userFormErrors.value = {}
+  newUser.value = {
+    name: '',
+    email: '',
+    username: '',
+    password: '',
+    role: '',
+    permissions: {
+      packages: false,
+      users: false,
+      reports: false,
+    }
+  }
 }
 
 const addNewUser = async () => {
@@ -1860,15 +1889,21 @@ const addNewUser = async () => {
     try {
       const response = await userService.registerUser(newUserToAdd)
 
-
+      isSubmitting.value = true
+      successMessage.value = ''
       if (response.success) {
+        successMessage.value = 'User created successfully'
         closeAddUserModal();
+        //refresh the user list
+        window.location.reload();
       } else {
         console.error('Failed to add new user:', response.message);
       }
     } catch (error) {
       console.error('Error adding new user:', error)
       // Optionally show error feedback to user
+    } finally {
+      isSubmitting.value = false
     }
   }
 }
@@ -1893,7 +1928,7 @@ const validateUserForm = () => {
   if (!newUser.value.username) {
     userFormErrors.value.username = 'Username is required'
     isValid = false
-  } 
+  }
 
   if (!newUser.value.password) {
     userFormErrors.value.password = 'Password is required';
