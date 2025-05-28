@@ -1,7 +1,5 @@
 const Joi = require('joi');
 
-const Joi = require('joi');
-
 const registrationSchema = Joi.object({
   fullname: Joi.string()
     .min(5)
@@ -30,7 +28,7 @@ const registrationSchema = Joi.object({
 
   status: Joi.string().valid('active', 'inactive').default('active'),
 
-  permissions: Joi.array().items(Joi.string())
+  permissions: Joi.array().items(Joi.string()),
 });
 
 
