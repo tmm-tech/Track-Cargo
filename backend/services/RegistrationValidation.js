@@ -29,6 +29,8 @@ const registrationSchema = Joi.object({
   status: Joi.string().valid('active', 'inactive').default('active'),
 
   permissions: Joi.array().items(Joi.string()),
+  
+  lastlogin: Joi.date().allow(null).default(null),
 });
 
 

@@ -1879,6 +1879,7 @@ const addNewUser = async () => {
     const newUserToAdd = {
       fullname: newUser.value.name,
       email: newUser.value.email,
+      username: newUser.value.username,
       password: newUser.value.password,
       roles: newUser.value.role,
       status: newUser.value.status || 'active',
