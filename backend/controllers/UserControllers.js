@@ -14,7 +14,7 @@ module.exports = {
             let hashed_pwd = await bcrypt.hash(value.password, 8);
 
             const insertUserQuery = `
-      INSERT INTO profile (fullname, email, password, roles, status, permissions, lastLogin)
+      INSERT INTO profile (fullname, username, email, password, roles, status, permissions, lastlogin)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING id;
     `;
@@ -22,6 +22,7 @@ module.exports = {
             // Provide default values if not present
             const params = [
                 value.fullname,
+                value.username,
                 value.email,
                 hashed_pwd,
                 value.roles,
