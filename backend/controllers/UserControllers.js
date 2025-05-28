@@ -52,6 +52,44 @@ module.exports = {
         }
     },
 
+    // check if  username exists
+    checkUsername: async (req, res) => {
+        const { username} = req.params;
+        try {
+            const checkUsernameQuery = `
+            SELECT * FROM profile WHERE username = $1;
+        `;
+            const result = await query(checkUsernameQuery, [username]);
+            if (result.rows.length > 0) {
+                res.json({ success: true, message: 'Username already exists' });
+            } else {
+                res.json({ success: false, message: 'Username is available' });
+            }
+        } catch (error) {
+            console.error('Error checking username:', error);
+            res.status(500).json({ success: false, message: `Error checking username: ${error.message}` });
+        }
+    },
+
+    // Check if email exists
+    checkEmail: async (req, res) => {
+        const { email } = req.params;
+        try {
+            const checkEmailQuery = `
+            SELECT * FROM profile WHERE email = $1;
+        `;
+            const result = await query(checkEmailQuery, [email]);
+            if (result.rows.length > 0) {
+                res.json({ success: true, message: 'Email already exists' });
+            } else {
+                res.json({ success: false, message: 'Email is available' });
+            }
+        } catch (error) {
+            console.error('Error checking email:', error);
+            res.status(500).json({ success: false, message: `Error checking email: ${error.message}` });
+        }
+    },
+
 
     // User login and JWT token generation
     loginUser: async (req, res) => {

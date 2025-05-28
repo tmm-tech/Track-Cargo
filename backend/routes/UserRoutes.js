@@ -9,7 +9,9 @@ const {
     Logout,
     checkAuth,
     forgotPassword,
-    refreshUserStatus
+    refreshUserStatus,
+    checkUsername,
+    checkEmail
 } = require('../controllers/UserControllers');
 
 // create and insert data into the table
@@ -26,6 +28,14 @@ UserRoutes.put('/activate/:userId', refreshUserStatus);
 UserRoutes.put('/update/:id', updateUser)
 // login a user
 UserRoutes.post('/login', loginUser)
+
+// check if username exists
+UserRoutes.get('/check-username/:username', checkUsername)
+
+// check if email exists
+UserRoutes.get('/check-email/:email', checkEmail)
+
+
 //Forgot Password 
 UserRoutes.post('/forgotpassword', forgotPassword)
 // logout user

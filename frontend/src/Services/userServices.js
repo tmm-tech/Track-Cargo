@@ -51,6 +51,12 @@ export default {
     // Check authentication
     checkAuth() {
         return axios.get(`${API_BASE}/protected`);
-    }
+    },
+
+    //checkUsername
+    checkUsername(username) {
+        return axios.get(`${API_BASE}/check-username/${username}`);
+    },
+
 
 };
