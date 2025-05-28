@@ -30,7 +30,7 @@ const registrationSchema = Joi.object({
 
   status: Joi.string().valid('active', 'inactive').default('active'),
 
-  permissions: Joi.array().items(Joi.string()),
+  permissions: Joi.array().items(Joi.string())
 });
 
 
