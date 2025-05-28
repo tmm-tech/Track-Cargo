@@ -30,7 +30,7 @@ const registrationSchema = Joi.object({
 
   permissions: Joi.array().items(Joi.string()),
   
-  lastlogin: Joi.date().allow(null).default(null),
+  lastLogin: Joi.date().allow(null).default(null),
 });
 
 

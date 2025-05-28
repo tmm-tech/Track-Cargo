@@ -1883,7 +1883,9 @@ const addNewUser = async () => {
       password: newUser.value.password,
       roles: newUser.value.role,
       status: newUser.value.status || 'active',
-      permissions: newUser.value.permissions || [],
+       permissions: Object.entries(newUser.value.permissions)
+    .filter(([_, isChecked]) => isChecked)
+    .map(([permission]) => permission),
       lastLogin: null,
     }
 
