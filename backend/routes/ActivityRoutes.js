@@ -1,5 +1,5 @@
 const ActivityRoutes = require('express').Router();
-const {addActivity, getAllActivities} = require('../controllers/ActivityControllers');
+const {addActivity, getAllActivities} = require('../controllers/ActivityController');
 
 
 // POST /activities - add new activity log
