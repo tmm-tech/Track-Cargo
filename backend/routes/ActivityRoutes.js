@@ -1,11 +1,11 @@
-const express = require('express');
-const ActivityRoutes = express.Router();
-const activityController = require('../controllers/activityController');
+const ActivityRoutes = require('express').Router();
+const {addActivity, getAllActivities} = require('../controllers/ActivityControllers');
+
 
 // POST /activities - add new activity log
-ActivityRoutes.post('/', activityController.addActivity);
+ActivityRoutes.post('/', addActivity);
 
 // GET /activities - get all activity logs
-ActivityRoutes.get('/', activityController.getAllActivities);
+ActivityRoutes.get('/', getAllActivities);
 
 module.exports = ActivityRoutes;
