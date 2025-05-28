@@ -1893,10 +1893,7 @@ const validateUserForm = () => {
   if (!newUser.value.username) {
     userFormErrors.value.username = 'Username is required'
     isValid = false
-  } else if (users.value.some(user => user.username === newUser.value.username)) {
-    userFormErrors.value.username = 'Username already exists'
-    isValid = false
-  }
+  } 
 
   if (!newUser.value.password) {
     userFormErrors.value.password = 'Password is required';
