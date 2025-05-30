@@ -260,8 +260,6 @@ module.exports = {
         `;
             const result = await query(deleteUserQuery, [id]);
             if (result.rowCount > 0) {
-                // Send the account deletion email
-                reportService.sendAccountDeletion(email, fullname);
                 // Return success response
                 return res.json({ success: true, message: 'User deleted successfully', user: result.rows[0] });
             } else {
