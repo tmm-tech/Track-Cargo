@@ -218,12 +218,6 @@ module.exports = {
             const result = await query(updateUserQuery, params);
 
             if (result.rowCount > 0) {
-                const emailContent = {
-                    email: result.rows[0].email,
-                    fullname: result.rows[0].fullname,
-                    roles: result.rows[0].roles,
-                    password: password  // Indicate if the password was updated
-                };
         
                 res.json({ success: true, message: 'User updated successfully', data: result.rows[0] });
             } else {
