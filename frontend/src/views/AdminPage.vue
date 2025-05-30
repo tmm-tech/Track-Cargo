@@ -2,7 +2,11 @@
   <div class="flex h-screen">
 
     <!-- Alert Component -->
-    <Alert v-if="showAlert" :message="alertMessage" :type="alertType" :show="showAlert" @close="hideAlert" />
+
+    <div v-if="alertMessage" :class="['alert', alertType]">
+      <Alert v-if="showAlert" :message="alertMessage" :type="alertType" :show="showAlert" @close="hideAlert" />
+    </div>
+
 
     <!-- Mobile Menu Overlay -->
     <div v-if="showMobileMenu && isAuthenticated" class="fixed inset-0 z-50 bg-black/50 md:hidden"
@@ -460,6 +464,12 @@
                               @click="editUser(user)">
                               <PencilIcon class="h-4 w-4 mr-1" />
                               Edit
+                            </button>
+                            <button
+                              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                              @click="resetUserPassword(user)">
+                              <KeyIcon class="h-4 w-4 mr-1" />
+                              Reset
                             </button>
                             <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-9 px-3"
@@ -1921,6 +1931,54 @@
         </div>
       </main>
 
+      <!-- Reset Password Modal -->
+      <div v-if="showResetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        @click="closeResetPasswordModal">
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+          <div class="p-6">
+            <div class="flex flex-col space-y-1.5 pb-4">
+              <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
+              <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
+                  }}</strong></p>
+            </div>
+
+            <form @submit.prevent="saveNewPassword">
+              <div class="space-y-4">
+                <div class="space-y-2">
+                  <label for="newPassword" class="text-sm font-medium">New Password</label>
+                  <input id="newPassword" v-model="resetPasswordUser.newPassword" type="password"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    :class="{ 'border-red-500': resetPasswordErrors.newPassword }" placeholder="••••••••" />
+                  <p v-if="resetPasswordErrors.newPassword" class="text-red-500 text-xs mt-1">{{
+                    resetPasswordErrors.newPassword }}</p>
+                </div>
+
+                <div class="space-y-2">
+                  <label for="confirmNewPassword" class="text-sm font-medium">Confirm New Password</label>
+                  <input id="confirmNewPassword" v-model="resetPasswordUser.confirmNewPassword" type="password"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    :class="{ 'border-red-500': resetPasswordErrors.confirmNewPassword }" placeholder="••••••••" />
+                  <p v-if="resetPasswordErrors.confirmNewPassword" class="text-red-500 text-xs mt-1">{{
+                    resetPasswordErrors.confirmNewPassword }}</p>
+                </div>
+              </div>
+
+              <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-6">
+                <button type="button"
+                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                  @click="closeResetPasswordModal">
+                  Cancel
+                </button>
+                <button type="submit" @click="resetPassword"
+                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                  Reset Password
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
       <!-- Package Tracking Dialog -->
       <div v-if="showTrackingDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
         @click="closeTrackingDialog">
@@ -1988,6 +2046,7 @@ import {
   BellIcon,
   CheckCircleIcon,
   TruckIcon,
+  KeyIcon,
   ExclamationTriangleIcon,
   ArchiveBoxIcon
 } from '@heroicons/vue/24/outline'
@@ -2005,12 +2064,164 @@ import Alert from '../components/ui/Alert.vue';
 
 const showAlert = ref(false);
 const alertMessage = ref('');
-const alertType = ref('success');
-// Alert component state
-const setAlert = (message, type = 'success') => {
+const alertType = ref('');
+
+
+
+
+// User management functions
+const closeUserManagement = () => {
+  showUserManagement.value = false
+}
+
+
+const closeUserFormModal = () => {
+  showUserFormModal.value = false
+}
+
+const validateUserForm = () => {
+  userFormErrors.value = {}
+  let isValid = true
+
+  if (!editingUser.value.name) {
+    userFormErrors.value.name = 'Name is required'
+    isValid = false
+  }
+
+  if (!editingUser.value.username) {
+    userFormErrors.value.username = 'Username is required'
+    isValid = false
+  } else if (
+    !editingUser.value.id &&
+    users.value.some(u => u.username.toLowerCase() === editingUser.value.username.toLowerCase())
+  ) {
+    userFormErrors.value.username = 'Username already exists'
+    isValid = false
+  }
+
+  if (!editingUser.value.email) {
+    userFormErrors.value.email = 'Email is required'
+    isValid = false
+  } else if (!/\S+@\S+\.\S+/.test(editingUser.value.email)) {
+    userFormErrors.value.email = 'Email is invalid'
+    isValid = false
+  }
+
+  if (!editingUser.value.id) {
+    if (!editingUser.value.password) {
+      userFormErrors.value.password = 'Password is required'
+      isValid = false
+    } else if (editingUser.value.password.length < 6) {
+      userFormErrors.value.password = 'Password must be at least 6 characters'
+      isValid = false
+    }
+
+    if (!editingUser.value.confirmPassword) {
+      userFormErrors.value.confirmPassword = 'Please confirm your password'
+      isValid = false
+    } else if (editingUser.value.password !== editingUser.value.confirmPassword) {
+      userFormErrors.value.confirmPassword = 'Passwords do not match'
+      isValid = false
+    }
+  }
+
+  return isValid
+}
+
+const saveUser = () => {
+  if (!validateUserForm()) return
+
+  if (editingUser.value.id) {
+    // Update existing user
+    users.value = users.value.map(user =>
+      user.id === editingUser.value.id ? { ...editingUser.value } : user
+    )
+  } else {
+    // Create new user
+    const newUser = {
+      id: users.value.length + 1,
+      name: editingUser.value.name,
+      username: editingUser.value.username,
+      email: editingUser.value.email,
+      role: editingUser.value.role,
+      lastLogin: 'Never'
+    }
+    users.value.push(newUser)
+  }
+
+  closeUserFormModal()
+}
+
+const resetPasswordUser = ref({
+  id: null,
+  username: '',
+  newPassword: '',
+  confirmNewPassword: ''
+})
+const resetPasswordErrors = ref({})
+const showResetPasswordModal = ref(false)
+
+const resetUserPassword = (user) => {
+  resetPasswordUser.value = {
+    id: user.id,
+    username: user.username,
+    newPassword: '',
+    confirmNewPassword: ''
+  }
+  resetPasswordErrors.value = {}
+  showResetPasswordModal.value = true
+}
+
+const closeResetPasswordModal = () => {
+  showResetPasswordModal.value = false
+}
+
+const validateResetPasswordForm = () => {
+  resetPasswordErrors.value = {}
+  let isValid = true
+
+  if (!resetPasswordUser.value.newPassword) {
+    resetPasswordErrors.value.newPassword = 'New password is required'
+    isValid = false
+  } else if (resetPasswordUser.value.newPassword.length < 6) {
+    resetPasswordErrors.value.newPassword = 'Password must be at least 6 characters'
+    isValid = false
+  }
+
+  if (!resetPasswordUser.value.confirmNewPassword) {
+    resetPasswordErrors.value.confirmNewPassword = 'Please confirm your password'
+    isValid = false
+  } else if (resetPasswordUser.value.newPassword !== resetPasswordUser.value.confirmNewPassword) {
+    resetPasswordErrors.value.confirmNewPassword = 'Passwords do not match'
+    isValid = false
+  }
+
+  return isValid
+}
+
+const saveNewPassword = () => {
+  if (!validateResetPasswordForm()) return
+
+  // In a real application, you would send this to your API
+  console.log(`Password reset for user ${resetPasswordUser.value.username}`)
+
+  // Show success message
+  alert(`Password has been reset for ${resetPasswordUser.value.username}`)
+
+  closeResetPasswordModal()
+}
+
+// Call this function to show alert
+const setAlert = (message, type) => {
   alertMessage.value = message
   alertType.value = type
   showAlert.value = true
+
+  // Optional: auto clear after 3 seconds
+  setTimeout(() => {
+    alertMessage.value = ''
+    alertType.value = ''
+  }, 3000)
 }
 
 const hideAlert = () => {
@@ -2386,63 +2597,24 @@ const addNewUser = async () => {
     } catch (error) {
       setAlert('Error adding new user.', 'error');
       // Optionally show error feedback to user
+      const rawMessage = error.response?.data?.message || 'An error occurred.';
+      const userMessage = rawMessage.includes('profiles_email_key')
+        ? 'A user with this email already exists.'
+        : rawMessage.includes('profiles_username_key')
+          ? 'A user with this username already exists.'
+          : rawMessage.includes('duplicate key')
+            ? 'Duplicate entry. Please use different credentials.'
+            : rawMessage;
+
+      setAlert(userMessage, 'error');
+
     } finally {
       isSubmitting.value = false
     }
   }
 }
 
-const validateUserForm = () => {
-  userFormErrors.value = {}
-  let isValid = true
 
-  if (!newUser.value.name) {
-    userFormErrors.value.name = 'Name is required'
-    isValid = false
-  }
-
-  if (!newUser.value.email) {
-    userFormErrors.value.email = 'Email is required'
-    isValid = false
-  } else if (!isValidEmail(newUser.value.email)) {
-    userFormErrors.value.email = 'Invalid email format'
-    isValid = false
-  }
-
-  if (!newUser.value.username) {
-    userFormErrors.value.username = 'Username is required'
-    isValid = false
-  }
-
-  if (!newUser.value.password) {
-    userFormErrors.value.password = 'Password is required';
-    isValid = false;
-  } else if (newUser.value.password.length < 8) {
-    userFormErrors.value.password = 'Password must be at least 8 characters';
-    isValid = false;
-  } else if (!/[A-Z]/.test(newUser.value.password)) {
-    userFormErrors.value.password = 'Password must contain at least one uppercase letter';
-    isValid = false;
-  } else if (!/[a-z]/.test(newUser.value.password)) {
-    userFormErrors.value.password = 'Password must contain at least one lowercase letter';
-    isValid = false;
-  } else if (!/[0-9]/.test(newUser.value.password)) {
-    userFormErrors.value.password = 'Password must contain at least one number';
-    isValid = false;
-  } else if (!/[^A-Za-z0-9]/.test(newUser.value.password)) {
-    userFormErrors.value.password = 'Password must contain at least one special character';
-    isValid = false;
-  } else {
-    userFormErrors.value.password = ''; // Clear error if all rules are satisfied
-  }
-
-  if (!newUser.value.role) {
-    userFormErrors.value.role = 'Role is required'
-    isValid = false
-  }
-
-  return isValid
-}
 
 const isValidEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -2498,36 +2670,44 @@ const closeEditUserModal = () => {
   editingUser.value = null
 }
 
-const updateUser = () => {
-  if (!editingUser.value) return
+const updateUser = async () => {
+  if (!editingUser.value) return;
 
-  // Update the user in the users array
-  users.value = users.value.map(user => {
-    if (user.id === editingUser.value.id) {
-      const updatedUser = {
-        ...user,
-        name: editingUser.value.name,
-        email: editingUser.value.email,
-        role: editingUser.value.role,
-        status: editingUser.value.status,
-        permissions: { ...editingUser.value.permissions }
-      }
+  try {
+    const updatedUser = {
+      id: editingUser.value.id,
+      name: editingUser.value.fullname,
+      email: editingUser.value.email,
+      role: editingUser.value.roles,
+      status: editingUser.value.status,
+      permissions: editingUser.value.permissions,
+    };
 
-      // Update password if provided
-      if (editingUser.value.newPassword) {
-        updatedUser.password = editingUser.value.newPassword
-      }
-
-      return updatedUser
+    if (editingUser.value.newPassword) {
+      updatedUser.password = editingUser.value.newPassword;
     }
-    return user
-  })
 
-  // Log the activity
-  logActivity('user', currentUser.value.name, 'User account updated', `Updated user account for ${editingUser.value.name}`)
+    const response = await userService.updateUser(editingUser.value.id, updatedUser);
 
-  closeEditUserModal()
-}
+    if (response.error) {
+      setAlert(response.error, 'error');
+      return;
+    }
+
+    setAlert('User updated successfully.', 'success');
+    closeEditUserModal();
+    // Refresh the user list
+    await fetchUsers();
+
+
+
+
+  } catch (error) {
+    console.error('Error updating user:', error);
+    setAlert('Failed to update user. Please try again.', 'error');
+  }
+};
+
 
 const confirmDeleteUser = (user) => {
   userToDelete.value = user
@@ -3337,6 +3517,8 @@ const handleNewPackageLocationChange = () => {
   newPackage.value.nextStop = getNextStop(newPackage.value.currentLocation)
   newPackage.value.nextStopETA = calculateEstimatedArrival(newPackage.value.currentLocation)
 }
+
+
 
 // Date formatting function
 const formatDate = (dateString) => {

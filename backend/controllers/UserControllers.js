@@ -224,8 +224,7 @@ module.exports = {
                     roles: result.rows[0].roles,
                     password: password  // Indicate if the password was updated
                 };
-                // Send email notification
-                await reportService.sendPasswordUpdate(emailContent);
+        
                 res.json({ success: true, message: 'User updated successfully', data: result.rows[0] });
             } else {
                 res.status(404).json({ success: false, message: 'User not found' });
