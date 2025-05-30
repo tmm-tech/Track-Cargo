@@ -2676,9 +2676,9 @@ const updateUser = async () => {
   try {
     const updatedUser = {
       id: editingUser.value.id,
-      name: editingUser.value.fullname,
+      fullname: editingUser.value.fullname,
       email: editingUser.value.email,
-      role: editingUser.value.roles,
+      roles: editingUser.value.roles,
       status: editingUser.value.status,
       permissions: editingUser.value.permissions,
     };
