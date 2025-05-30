@@ -258,7 +258,7 @@ module.exports = {
             WHERE id = $1
             RETURNING *;
         `;
-            const result = await query(deleteUserQuery, [userId]);
+            const result = await query(deleteUserQuery, [id]);
             if (result.rowCount > 0) {
                 // Send the account deletion email
                 reportService.sendAccountDeletion(email, fullname);
