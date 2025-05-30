@@ -1,5 +1,9 @@
 <template>
   <div class="flex h-screen">
+
+    <!-- Alert Component -->
+    <Alert v-if="showAlert" :message="alertMessage" :type="alertType" :show="showAlert" @close="hideAlert" />
+
     <!-- Mobile Menu Overlay -->
     <div v-if="showMobileMenu && isAuthenticated" class="fixed inset-0 z-50 bg-black/50 md:hidden"
       @click="closeMobileMenu"></div>
@@ -57,7 +61,19 @@
                 class="flex-shrink-0" />
               <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Packages</span>
             </button>
-
+            <button @click="navigateToView('locations')"
+              :title="(sidebarCollapsed && !isMobileDevice) ? 'Locations' : ''"
+              class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
+              :class="{
+                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
+                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'bg-[#273272] text-white': currentView === 'locations'
+              }">
+              <MapPinIcon
+                :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
+                class="flex-shrink-0" />
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Locations</span>
+            </button>
             <button @click="navigateToView('users')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Users' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
@@ -408,7 +424,7 @@
                           <div class="flex items-center">
                             <div
                               class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-[#273272] font-medium">
-                              {{ getInitials(user.name) }}
+                              {{ getInitials(user.fullname) }}
                             </div>
                             <div class="ml-4">
                               <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
@@ -420,11 +436,11 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                           <span :class="[
                             'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
-                            user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                              user.role === 'operator' ? 'bg-blue-100 text-blue-800' :
+                            user.roles === 'admin' ? 'bg-purple-100 text-purple-800' :
+                              user.roles === 'operator' ? 'bg-blue-100 text-blue-800' :
                                 'bg-green-100 text-green-800'
                           ]">
-                            {{ user.role.charAt(0).toUpperCase() + user.role.slice(1) }}
+                            {{ user.roles.charAt(0).toUpperCase() + user.roles.slice(1) }}
                           </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -875,7 +891,445 @@
               </div>
             </div>
           </div>
+          <!-- Locations Management View -->
+          <div v-if="currentView === 'locations'" class="space-y-8">
+            <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
+              <div class="flex flex-row items-center justify-between bg-[#273272] text-white p-6 rounded-t-lg">
+                <div>
+                  <h2 class="text-xl font-semibold">Location Management</h2>
+                  <p class="text-gray-200">
+                    Manage shipping locations and transit points
+                  </p>
+                </div>
+                <button @click="openAddLocationModal"
+                  class="bg-transparent text-white border border-white hover:bg-[#ffb600] hover:border-[#ffb600] hover:text-[#273272] transition-colors duration-300 px-4 py-2 rounded inline-flex items-center">
+                  <PlusIcon class="h-4 w-4 mr-2" />
+                  Add Location
+                </button>
+              </div>
+              <div class="p-6">
+                <div class="mb-6">
+                  <div class="relative">
+                    <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                    <input placeholder="Search locations by name, code, or country" v-model="locationSearchTerm"
+                      class="flex h-10 w-full rounded-md border border-input bg-background pl-10 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" />
+                  </div>
+                </div>
 
+                <div class="rounded-md border border-gray-200 overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Location Name
+                        </th>
+                        <th scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Code
+                        </th>
+                        <th scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Type
+                        </th>
+                        <th scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Country
+                        </th>
+                        <th scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th scope="col"
+                          class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                      <tr v-if="filteredLocations.length === 0">
+                        <td colspan="6" class="text-center py-4 text-gray-500">No locations found</td>
+                      </tr>
+                      <tr v-for="location in filteredLocations" :key="location.id">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <div
+                              class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
+                              <MapPinIcon class="h-5 w-5 text-[#273272]" />
+                            </div>
+                            <div class="ml-4">
+                              <div class="text-sm font-medium text-gray-900">{{ location.name }}</div>
+                              <div class="text-sm text-gray-500">{{ location.address }}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">{{ location.code }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span :class="[
+                            'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                            location.type === 'warehouse' ? 'bg-blue-100 text-blue-800' :
+                              location.type === 'port' ? 'bg-green-100 text-green-800' :
+                                location.type === 'transit' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-gray-100 text-gray-800'
+                          ]">
+                            {{ location.type.charAt(0).toUpperCase() + location.type.slice(1) }}
+                          </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ location.country }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span :class="[
+                            'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                            location.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          ]">
+                            {{ location.status.charAt(0).toUpperCase() + location.status.slice(1) }}
+                          </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div class="flex justify-end gap-2">
+                            <button
+                              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                              @click="viewLocation(location)">
+                              <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                </path>
+                              </svg>
+                              View
+                            </button>
+                            <button
+                              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                              @click="editLocation(location)">
+                              <PencilIcon class="h-4 w-4 mr-1" />
+                              Edit
+                            </button>
+                            <button
+                              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-9 px-3"
+                              @click="confirmDeleteLocation(location)">
+                              <TrashIcon class="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Location Modal -->
+          <div v-if="showAddLocationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeAddLocationModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Location</h2>
+                  <p class="text-sm text-muted-foreground">Create a new shipping location or transit point.</p>
+                </div>
+
+                <form @submit.prevent="addNewLocation" class="space-y-4 py-4">
+                  <div class="space-y-2">
+                    <label for="location-name" class="text-sm font-medium">Location Name</label>
+                    <input id="location-name" v-model="newLocation.name"
+                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.name ? 'border-red-500' : '']" />
+                    <p v-if="locationFormErrors.name" class="text-red-500 text-sm">{{ locationFormErrors.name }}</p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="location-code" class="text-sm font-medium">Location Code</label>
+                    <input id="location-code" v-model="newLocation.code" placeholder="e.g., NBO, MSA, KIS"
+                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.code ? 'border-red-500' : '']" />
+                    <p v-if="locationFormErrors.code" class="text-red-500 text-sm">{{ locationFormErrors.code }}</p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="location-type" class="text-sm font-medium">Type</label>
+                    <select id="location-type" v-model="newLocation.type"
+                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.type ? 'border-red-500' : '']">
+                      <option value="" disabled selected>Select type</option>
+                      <option value="warehouse">Warehouse</option>
+                      <option value="port">Port</option>
+                      <option value="transit">Transit Point</option>
+                      <option value="destination">Destination</option>
+                    </select>
+                    <p v-if="locationFormErrors.type" class="text-red-500 text-sm">{{ locationFormErrors.type }}</p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="location-address" class="text-sm font-medium">Address</label>
+                    <textarea id="location-address" v-model="newLocation.address" rows="3"
+                      :class="['flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.address ? 'border-red-500' : '']"></textarea>
+                    <p v-if="locationFormErrors.address" class="text-red-500 text-sm">{{ locationFormErrors.address }}
+                    </p>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label for="location-city" class="text-sm font-medium">City</label>
+                      <input id="location-city" v-model="newLocation.city"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.city ? 'border-red-500' : '']" />
+                      <p v-if="locationFormErrors.city" class="text-red-500 text-sm">{{ locationFormErrors.city }}</p>
+                    </div>
+                    <div class="space-y-2">
+                      <label for="location-country" class="text-sm font-medium">Country</label>
+                      <input id="location-country" v-model="newLocation.country"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.country ? 'border-red-500' : '']" />
+                      <p v-if="locationFormErrors.country" class="text-red-500 text-sm">{{ locationFormErrors.country }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="location-coordinates" class="text-sm font-medium">Coordinates (Optional)</label>
+                    <input id="location-coordinates" v-model="newLocation.coordinates"
+                      placeholder="e.g., -1.2921, 36.8219"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                  </div>
+
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button type="button"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                      @click="closeAddLocationModal">
+                      Cancel
+                    </button>
+                    <button type="submit" :disabled="isSubmitting"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                      <span v-if="!isSubmitting">Add Location</span>
+                      <span v-else class="flex items-center">
+                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                            fill="none" />
+                          <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Saving...
+                      </span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edit Location Modal -->
+          <div v-if="showEditLocationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeEditLocationModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Edit Location</h2>
+                  <p class="text-sm text-muted-foreground">Update location information.</p>
+                </div>
+
+                <form @submit.prevent="updateLocation" class="space-y-4 py-4">
+                  <div class="space-y-2">
+                    <label for="edit-location-name" class="text-sm font-medium">Location Name</label>
+                    <input id="edit-location-name" v-model="editingLocation.name"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="edit-location-code" class="text-sm font-medium">Location Code</label>
+                    <input id="edit-location-code" v-model="editingLocation.code"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="edit-location-type" class="text-sm font-medium">Type</label>
+                    <select id="edit-location-type" v-model="editingLocation.type"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                      <option value="warehouse">Warehouse</option>
+                      <option value="port">Port</option>
+                      <option value="transit">Transit Point</option>
+                      <option value="destination">Destination</option>
+                    </select>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="edit-location-address" class="text-sm font-medium">Address</label>
+                    <textarea id="edit-location-address" v-model="editingLocation.address" rows="3"
+                      class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label for="edit-location-city" class="text-sm font-medium">City</label>
+                      <input id="edit-location-city" v-model="editingLocation.city"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+                    <div class="space-y-2">
+                      <label for="edit-location-country" class="text-sm font-medium">Country</label>
+                      <input id="edit-location-country" v-model="editingLocation.country"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="edit-location-coordinates" class="text-sm font-medium">Coordinates</label>
+                    <input id="edit-location-coordinates" v-model="editingLocation.coordinates"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="edit-location-status" class="text-sm font-medium">Status</label>
+                    <select id="edit-location-status" v-model="editingLocation.status"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button type="button"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                      @click="closeEditLocationModal">
+                      Cancel
+                    </button>
+                    <button type="submit"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                      Update Location
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- View Location Modal -->
+          <div v-if="showViewLocationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeViewLocationModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-lg w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Location Details</h2>
+                  <p class="text-sm text-muted-foreground" v-if="viewingLocation">
+                    {{ viewingLocation.code }} - {{ viewingLocation.name }}
+                  </p>
+                </div>
+
+                <div v-if="viewingLocation" class="space-y-6">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Location Name</p>
+                      <p class="text-lg">{{ viewingLocation.name }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Code</p>
+                      <p class="text-lg font-mono">{{ viewingLocation.code }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Type</p>
+                      <span :class="[
+                        'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        viewingLocation.type === 'warehouse' ? 'bg-blue-100 text-blue-800' :
+                          viewingLocation.type === 'port' ? 'bg-green-100 text-green-800' :
+                            viewingLocation.type === 'transit' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                      ]">
+                        {{ viewingLocation.type.charAt(0).toUpperCase() + viewingLocation.type.slice(1) }}
+                      </span>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Status</p>
+                      <span :class="[
+                        'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        viewingLocation.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      ]">
+                        {{ viewingLocation.status.charAt(0).toUpperCase() + viewingLocation.status.slice(1) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-sm font-medium text-gray-500 mb-2">Address</p>
+                    <div class="bg-gray-50 p-3 rounded-md">
+                      <p>{{ viewingLocation.address }}</p>
+                      <p class="text-sm text-gray-600 mt-1">{{ viewingLocation.city }}, {{ viewingLocation.country }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div v-if="viewingLocation.coordinates">
+                    <p class="text-sm font-medium text-gray-500 mb-2">Coordinates</p>
+                    <p class="font-mono text-sm bg-gray-50 p-2 rounded">{{ viewingLocation.coordinates }}</p>
+                  </div>
+
+                  <div>
+                    <p class="text-sm font-medium text-gray-500 mb-2">Created</p>
+                    <p class="text-sm">{{ viewingLocation.createdAt }}</p>
+                  </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                    @click="closeViewLocationModal">
+                    Close
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                    @click="editFromViewLocationModal">
+                    <PencilIcon class="h-4 w-4 mr-2" />
+                    Edit Location
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete Location Confirmation Modal -->
+          <div v-if="showDeleteLocationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
+                  <p class="text-sm text-muted-foreground">Are you sure you want to delete this location? This action
+                    cannot be undone.</p>
+                </div>
+
+                <div class="p-4 bg-red-50 rounded-md mb-4">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                      <div class="mt-2 text-sm text-red-700">
+                        <p>Deleting this location may affect existing packages and tracking history.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="locationToDelete" class="py-4 border-t border-b">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
+                      <MapPinIcon class="h-5 w-5 text-[#273272]" />
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">{{ locationToDelete.name }}</div>
+                      <div class="text-sm text-gray-500">{{ locationToDelete.code }} - {{ locationToDelete.city }}, {{
+                        locationToDelete.country }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                    @click="closeDeleteLocationModal">
+                    Cancel
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
+                    @click="deleteLocation">
+                    Delete Location
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
           <!-- View Package Modal -->
           <div v-if="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             @click="closeViewModal">
@@ -1226,11 +1680,7 @@
             </div>
           </div>
 
-          <!-- Success Message -->
-          <div v-if="successMessage"
-            class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded shadow z-50">
-            {{ successMessage }}
-          </div>
+
 
           <!-- Add User Modal -->
           <div v-if="showAddUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
@@ -1509,6 +1959,7 @@
         </div>
       </div>
 
+
       <!-- Footer -->
       <footer class="bg-[#1a1a1a] text-white py-4">
         <div class="container mx-auto px-4 flex justify-center items-center">
@@ -1552,7 +2003,24 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ShippingProgress from '../components/ShippingProgress.vue'
 import userService from '../Services/userServices.js'
-import { useRouter } from 'vue-router'
+import Alert from '../components/ui/Alert.vue';
+
+
+
+
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('success');
+// Alert component state
+const setAlert = (message, type = 'success') => {
+  alertMessage.value = message
+  alertType.value = type
+  showAlert.value = true
+}
+
+const hideAlert = () => {
+  showAlert.value = false
+}
 
 // Authentication state
 const isAuthenticated = ref(false)
@@ -1560,7 +2028,6 @@ const username = ref('')
 const password = ref('')
 const loginError = ref('')
 const isSubmitting = ref(false)
-const successMessage = ref('')
 // Sidebar state
 const sidebarCollapsed = ref(false)
 
@@ -1628,24 +2095,8 @@ const searchTerm = ref('')
 const currentYear = computed(() => new Date().getFullYear())
 
 // User management state
-const users = ref([
-  {
-    id: 1,
-    name: 'Admin User',
-    email: 'admin@texmonlogistics.co.ke',
-    username: 'admin',
-    password: 'texmon2024',
-    role: 'admin',
-    status: 'active',
-    lastLogin: '2025-05-22 09:30 AM',
-    permissions: {
-      packages: true,
-      users: true,
-      reports: true
-    }
-  }
-])
-const userSearchTerm = ref('')
+const users = ref([]);
+const userSearchTerm = ref('');
 const showAddUserModal = ref(false)
 const showEditUserModal = ref(false)
 const showDeleteUserModal = ref(false)
@@ -1702,16 +2153,28 @@ const filteredPackages = computed(() => {
   )
 })
 
+// Load users from the service
+const fetchUsers = async () => {
+  try {
+    const response = await userService.getAllUsers();
+    users.value = response.data.data;
+
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
+};
+
 // Filtered users based on search term
 const filteredUsers = computed(() => {
-  if (!userSearchTerm.value) return users.value
+  if (!userSearchTerm.value) return users.value || []
 
   return users.value.filter(user =>
-    user.name.toLowerCase().includes(userSearchTerm.value.toLowerCase()) ||
-    user.email.toLowerCase().includes(userSearchTerm.value.toLowerCase()) ||
-    user.username.toLowerCase().includes(userSearchTerm.value.toLowerCase())
+    (user.fullname || '').toLowerCase().includes(userSearchTerm.value.toLowerCase()) ||
+    (user.email || '').toLowerCase().includes(userSearchTerm.value.toLowerCase()) ||
+    (user.username || '').toLowerCase().includes(userSearchTerm.value.toLowerCase())
   )
 })
+
 
 // Filtered activities based on search term and filter
 const filteredActivities = computed(() => {
@@ -1811,6 +2274,8 @@ const getActivityIcon = (type) => {
       return ArchiveBoxIcon
     case 'user':
       return UsersIcon
+    case 'location':
+      return MapPinIcon
     default:
       return CogIcon
   }
@@ -1858,7 +2323,6 @@ const openAddUserModal = () => {
 }
 
 const closeAddUserModal = () => {
-  showAddUserModal.value = false
   userFormErrors.value = {}
   newUser.value = {
     name: '',
@@ -1872,10 +2336,14 @@ const closeAddUserModal = () => {
       reports: false,
     }
   }
+  showAddUserModal.value = false
 }
 
+
 const addNewUser = async () => {
+
   if (validateUserForm()) {
+    isSubmitting.value = true
     const newUserToAdd = {
       fullname: newUser.value.name,
       email: newUser.value.email,
@@ -1883,27 +2351,22 @@ const addNewUser = async () => {
       password: newUser.value.password,
       roles: newUser.value.role,
       status: newUser.value.status || 'active',
-       permissions: Object.entries(newUser.value.permissions)
-    .filter(([_, isChecked]) => isChecked)
-    .map(([permission]) => permission),
+      permissions: Object.entries(newUser.value.permissions)
+        .filter(([_, isChecked]) => isChecked)
+        .map(([permission]) => permission),
       lastLogin: null,
     }
 
     try {
       const response = await userService.registerUser(newUserToAdd)
-
-      isSubmitting.value = true
-      successMessage.value = ''
       if (response.success) {
-        successMessage.value = 'User created successfully'
-        closeAddUserModal();
-        //refresh the user list
-        window.location.reload();
+        setAlert('User created successfully!', 'success')
+        closeAddUserModal()
       } else {
-        console.error('Failed to add new user:', response.message);
+        setAlert('Failed to add new user.', 'error');
       }
     } catch (error) {
-      console.error('Error adding new user:', error)
+      setAlert('Error adding new user.', 'error');
       // Optionally show error feedback to user
     } finally {
       isSubmitting.value = false
@@ -2089,6 +2552,243 @@ const handleLogin = () => {
   } else {
     loginError.value = 'Invalid username or password'
   }
+}
+
+
+// Locations management state
+const locations = ref([
+  {
+    id: 1,
+    name: 'Nairobi Warehouse',
+    code: 'NBO-WH',
+    type: 'warehouse',
+    address: 'Industrial Area, Nairobi',
+    city: 'Nairobi',
+    country: 'Kenya',
+    coordinates: '-1.2921, 36.8219',
+    status: 'active',
+    createdAt: '2024-01-15'
+  },
+  {
+    id: 2,
+    name: 'Mombasa Port',
+    code: 'MSA-PT',
+    type: 'port',
+    address: 'Kilindini Harbour, Mombasa',
+    city: 'Mombasa',
+    country: 'Kenya',
+    coordinates: '-4.0435, 39.6682',
+    status: 'active',
+    createdAt: '2024-01-15'
+  },
+  {
+    id: 3,
+    name: 'Kisumu Transit Point',
+    code: 'KIS-TP',
+    type: 'transit',
+    address: 'Kisumu Industrial Area',
+    city: 'Kisumu',
+    country: 'Kenya',
+    coordinates: '-0.0917, 34.7680',
+    status: 'active',
+    createdAt: '2024-01-20'
+  }
+])
+
+const locationSearchTerm = ref('')
+const showAddLocationModal = ref(false)
+const showEditLocationModal = ref(false)
+const showViewLocationModal = ref(false)
+const showDeleteLocationModal = ref(false)
+const locationToDelete = ref(null)
+const locationFormErrors = ref({})
+
+// New location form
+const newLocation = ref({
+  name: '',
+  code: '',
+  type: '',
+  address: '',
+  city: '',
+  country: '',
+  coordinates: '',
+  status: 'active'
+})
+
+// Editing location
+const editingLocation = ref(null)
+const viewingLocation = ref(null)
+
+const filteredLocations = computed(() => {
+  if (!locationSearchTerm.value) return locations.value
+
+  return locations.value.filter(location =>
+    location.name.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
+    location.code.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
+    location.country.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
+    location.city.toLowerCase().includes(locationSearchTerm.value.toLowerCase())
+  )
+})
+
+
+// Location management functions
+const openAddLocationModal = () => {
+  showAddLocationModal.value = true
+  resetNewLocationForm()
+}
+
+const closeAddLocationModal = () => {
+  locationFormErrors.value = {}
+  resetNewLocationForm()
+  showAddLocationModal.value = false
+}
+
+const addNewLocation = () => {
+  if (validateLocationForm()) {
+    isSubmitting.value = true
+
+    const newLocationToAdd = {
+      id: Date.now(),
+      name: newLocation.value.name,
+      code: newLocation.value.code.toUpperCase(),
+      type: newLocation.value.type,
+      address: newLocation.value.address,
+      city: newLocation.value.city,
+      country: newLocation.value.country,
+      coordinates: newLocation.value.coordinates,
+      status: newLocation.value.status,
+      createdAt: new Date().toISOString().split('T')[0]
+    }
+
+    locations.value.push(newLocationToAdd)
+
+    logActivity('location', currentUser.value.name, 'New location added',
+      `Added location ${newLocationToAdd.name} (${newLocationToAdd.code})`)
+
+    setAlert('Location added successfully!', 'success')
+    closeAddLocationModal()
+    isSubmitting.value = false
+  }
+}
+
+const validateLocationForm = () => {
+  locationFormErrors.value = {}
+  let isValid = true
+
+  if (!newLocation.value.name) {
+    locationFormErrors.value.name = 'Location name is required'
+    isValid = false
+  }
+
+  if (!newLocation.value.code) {
+    locationFormErrors.value.code = 'Location code is required'
+    isValid = false
+  } else if (locations.value.some(loc => loc.code.toLowerCase() === newLocation.value.code.toLowerCase())) {
+    locationFormErrors.value.code = 'Location code already exists'
+    isValid = false
+  }
+
+  if (!newLocation.value.type) {
+    locationFormErrors.value.type = 'Location type is required'
+    isValid = false
+  }
+
+  if (!newLocation.value.address) {
+    locationFormErrors.value.address = 'Address is required'
+    isValid = false
+  }
+
+  if (!newLocation.value.city) {
+    locationFormErrors.value.city = 'City is required'
+    isValid = false
+  }
+
+  if (!newLocation.value.country) {
+    locationFormErrors.value.country = 'Country is required'
+    isValid = false
+  }
+
+  return isValid
+}
+
+const resetNewLocationForm = () => {
+  newLocation.value = {
+    name: '',
+    code: '',
+    type: '',
+    address: '',
+    city: '',
+    country: '',
+    coordinates: '',
+    status: 'active'
+  }
+  locationFormErrors.value = {}
+}
+
+const editLocation = (location) => {
+  editingLocation.value = { ...location }
+  showEditLocationModal.value = true
+}
+
+const closeEditLocationModal = () => {
+  showEditLocationModal.value = false
+  editingLocation.value = null
+}
+
+const updateLocation = () => {
+  if (!editingLocation.value) return
+
+  locations.value = locations.value.map(location => {
+    if (location.id === editingLocation.value.id) {
+      return { ...editingLocation.value }
+    }
+    return location
+  })
+
+  logActivity('location', currentUser.value.name, 'Location updated',
+    `Updated location ${editingLocation.value.name} (${editingLocation.value.code})`)
+
+  setAlert('Location updated successfully!', 'success')
+  closeEditLocationModal()
+}
+
+const viewLocation = (location) => {
+  viewingLocation.value = { ...location }
+  showViewLocationModal.value = true
+}
+
+const closeViewLocationModal = () => {
+  showViewLocationModal.value = false
+  viewingLocation.value = null
+}
+
+const editFromViewLocationModal = () => {
+  if (viewingLocation.value) {
+    closeViewLocationModal()
+    editLocation(viewingLocation.value)
+  }
+}
+
+const confirmDeleteLocation = (location) => {
+  locationToDelete.value = location
+  showDeleteLocationModal.value = true
+}
+
+const closeDeleteLocationModal = () => {
+  showDeleteLocationModal.value = false
+  locationToDelete.value = null
+}
+
+const deleteLocation = () => {
+  if (!locationToDelete.value) return
+
+  locations.value = locations.value.filter(location => location.id !== locationToDelete.value.id)
+
+  logActivity('location', currentUser.value.name, 'Location deleted',
+    `Deleted location ${locationToDelete.value.name} (${locationToDelete.value.code})`)
+
+  setAlert('Location deleted successfully!', 'success')
+  closeDeleteLocationModal()
 }
 
 // Handle logout function
@@ -2605,6 +3305,7 @@ const formatDate = (dateString) => {
 // Event listeners
 onMounted(() => {
   checkMobileDevice()
+  fetchUsers()
   window.addEventListener('resize', checkMobileDevice)
   // Auto-login for demo
   isAuthenticated.value = true
