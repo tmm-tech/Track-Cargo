@@ -1791,7 +1791,7 @@
                 <form @submit.prevent="updateUser" class="space-y-4 py-4">
                   <div class="space-y-2">
                     <label for="edit-name" class="text-sm font-medium">Full Name</label>
-                    <input id="edit-name" v-model="editingUser.name"
+                    <input id="edit-name" v-model="editingUser.fullname"
                       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                   </div>
 
@@ -1817,7 +1817,7 @@
 
                   <div class="space-y-2">
                     <label for="edit-role" class="text-sm font-medium">Role</label>
-                    <select id="edit-role" v-model="editingUser.role"
+                    <select id="edit-role" v-model="editingUser.roles"
                       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                       <option value="admin">Admin</option>
                       <option value="operator">Operator</option>
@@ -1837,20 +1837,15 @@
                   <div class="space-y-2">
                     <label class="text-sm font-medium">Permissions</label>
                     <div class="space-y-2">
-                      <div class="flex items-center">
-                        <input id="edit-perm-packages" type="checkbox" v-model="editingUser.permissions.packages"
+                      <div class="flex items-center" v-for="perm in permissionOptions" :key="perm">
+                        <input type="checkbox" :id="'edit-perm-' + perm" :checked="hasPermission(perm)"
+                          @change="togglePermission(perm)"
                           class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                        <label for="edit-perm-packages" class="ml-2 text-sm text-gray-700">Manage Packages</label>
-                      </div>
-                      <div class="flex items-center">
-                        <input id="edit-perm-users" type="checkbox" v-model="editingUser.permissions.users"
-                          class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                        <label for="edit-perm-users" class="ml-2 text-sm text-gray-700">Manage Users</label>
-                      </div>
-                      <div class="flex items-center">
-                        <input id="edit-perm-reports" type="checkbox" v-model="editingUser.permissions.reports"
-                          class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                        <label for="edit-perm-reports" class="ml-2 text-sm text-gray-700">View Reports</label>
+                        <label :for="'edit-perm-' + perm" class="ml-2 text-sm text-gray-700">
+                          {{ perm === 'packages' ? 'Manage Packages' :
+                            perm === 'users' ? 'Manage Users' :
+                              perm === 'reports' ? 'View Reports' : perm }}
+                        </label>
                       </div>
                     </div>
                   </div>
@@ -2068,6 +2063,7 @@ const toggleSidebar = () => {
   }
 }
 
+
 // Package Tracking Dialog state
 const showTrackingDialog = ref(false)
 const selectedPackage = ref(null)
@@ -2119,8 +2115,30 @@ const newUser = ref({
 })
 
 // Editing user
-const editingUser = ref(null)
+const editingUser = ref({
+  fullname: '',
+  email: '',
+  username: '',
+  newPassword: '',
+  role: 'viewer',
+  status: 'active',
+  permissions: []
+})
 
+const permissionOptions = ['packages', 'users', 'reports']
+
+const hasPermission = (perm) => {
+  return editingUser.value?.permissions?.includes(perm)
+}
+
+const togglePermission = (perm) => {
+  const perms = editingUser.value.permissions || []
+  if (perms.includes(perm)) {
+    editingUser.value.permissions = perms.filter(p => p !== perm)
+  } else {
+    editingUser.value.permissions = [...perms, perm]
+  }
+}
 // Activity log state
 const activityLogs = ref([
   {
@@ -2448,9 +2466,31 @@ const resetNewUserForm = () => {
   userFormErrors.value = {}
 }
 
-const editUser = (user) => {
-  editingUser.value = { ...user, newPassword: '' }
-  showEditUserModal.value = true
+const editUser = async (user) => {
+  try {
+
+    const response = await userService.getUserById(user.id)
+
+    if (!response || response.error) {
+      setAlert('Failed to fetch user details.', 'error')
+      return
+    }
+
+    // Populate editingUser with fetched data
+    editingUser.value = { ...response.data.data, newPassword: '' }
+
+    // Populate editingUser with fetched data
+    editingUser.value = {
+      ...response.data.data,
+      permissions: response.data.data.permissions || [],
+      newPassword: ''
+    }
+
+    showEditUserModal.value = true
+  } catch (error) {
+    console.error('Error fetching user data:', error)
+    setAlert('Failed to load user data for editing.', 'error')
+  }
 }
 
 const closeEditUserModal = () => {
@@ -2499,16 +2539,25 @@ const closeDeleteUserModal = () => {
   userToDelete.value = null
 }
 
-const deleteUser = () => {
+const deleteUser = async () => {
   if (!userToDelete.value) return
 
-  // Remove the user from the users array
-  users.value = users.value.filter(user => user.id !== userToDelete.value.id)
+  try {
+    const response = await userService.deleteUser(userToDelete.value.id)
 
-  // Log the activity
-  logActivity('user', currentUser.value.name, 'User account deleted', `Deleted user account for ${userToDelete.value.name}`)
-
-  closeDeleteUserModal()
+    if (response.error) {
+      setAlert(response.error, 'error')
+    } else {
+      setAlert('User deleted successfully.', 'success')
+      users.value = users.value.filter(u => u.id !== userToDelete.value.id)
+    }
+  } catch (error) {
+    console.error('Delete error:', error)
+    setAlert('An error occurred while deleting the user.', 'error')
+  } finally {
+    closeDeleteUserModal()
+    userToDelete.value = null
+  }
 }
 
 // Add comment function

@@ -20,6 +20,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
+import { computed } from 'vue';
 import { CheckCircle, AlertTriangle } from 'lucide-vue-next';
 
 const props = defineProps({

@@ -55,7 +55,7 @@ module.exports = {
 
     // check if  username exists
     checkUsername: async (req, res) => {
-        const { username} = req.params;
+        const { username } = req.params;
         try {
             const checkUsernameQuery = `
             SELECT * FROM profile WHERE username = $1;
@@ -190,7 +190,6 @@ module.exports = {
     },
 
     // Update user details
-    // Update user details
     updateUser: async (req, res) => {
         const { fullname, email, roles, password } = req.body;
         const { id } = req.params;
@@ -236,40 +235,33 @@ module.exports = {
             res.status(500).json({ success: false, message: `Error updating user: ${error.message}` });
         }
     },
-
-
-    // Soft delete (deactivate) user
-    SoftDeleteUser: async (req, res) => {
-        const { userId } = req.params;
+    // Permanently delete user
+    deleteUser: async (req, res) => {
+        const { id } = req.params;
         try {
             // Query to get the user's email and full name before deleting
             const getUserQuery = `
-            SELECT email, fullname 
-            FROM profile 
+            SELECT email, fullname
+            FROM profile
             WHERE id = $1;
         `;
-            const userResult = await query(getUserQuery, [userId]);
-
+            const userResult = await query(getUserQuery, [id]);
             if (userResult.rowCount === 0) {
                 return res.status(404).json({ success: false, message: 'User not found' });
             }
-
+            console.log('User found:', userResult.rows[0]);
             // Store the email and full name from the database result
             const { email, fullname } = userResult.rows[0];
-
-            // Perform the soft delete
+            // Perform the permanent delete
             const deleteUserQuery = `
-            UPDATE profile 
-            SET isdeleted = TRUE, status = 'inactive' 
-            WHERE id = $1 
+            DELETE FROM profile
+            WHERE id = $1
             RETURNING *;
         `;
             const result = await query(deleteUserQuery, [userId]);
-
             if (result.rowCount > 0) {
-                // Send the account deactivation email
-                reportService.sendAccountDeactivation(email, fullname);
-
+                // Send the account deletion email
+                reportService.sendAccountDeletion(email, fullname);
                 // Return success response
                 return res.json({ success: true, message: 'User deleted successfully', user: result.rows[0] });
             } else {
@@ -280,9 +272,8 @@ module.exports = {
             return res.status(500).json({ success: false, message: `Remove User Error: ${error.message}` });
         }
     },
-
     // Example check for authentication in your routes (backend)
-    checkAuth: (req, res, next) => {
+    checkAuth: (req, res) => {
         const token = req.cookies ? req.cookies.token : null;
         if (token) {
             try {

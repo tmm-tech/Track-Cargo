@@ -3,7 +3,6 @@ const {
     createUser,  
     getAllUser,
     updateUser,
-    SoftDeleteUser,
     loginUser,
     getAUser,
     Logout,
@@ -11,7 +10,8 @@ const {
     forgotPassword,
     refreshUserStatus,
     checkUsername,
-    checkEmail
+    checkEmail,
+    deleteUser
 } = require('../controllers/UserControllers');
 
 // create and insert data into the table
@@ -20,8 +20,9 @@ UserRoutes.post('/register', createUser)
 UserRoutes.get('/allusers', getAllUser)
 //read for a specific id
 UserRoutes.get('/user/:id', getAUser)
-//soft delete item of a specific id
-UserRoutes.put('/delete/:userId', SoftDeleteUser)
+
+//hard delete item of a specific id
+UserRoutes.delete('/delete/:id', deleteUser)
 //activate user
 UserRoutes.put('/activate/:userId', refreshUserStatus);
 //update items
