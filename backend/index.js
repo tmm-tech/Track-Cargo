@@ -4,7 +4,8 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const UserRoutes = require('./routes/UserRoutes');
 const PackageRoutes = require('./routes/PackageRoutes');
-const ActivityRoutes = require('./routes/ActivityRoutes'); 
+const ActivityRoutes = require('./routes/ActivityRoutes');
+const LocationRoutes = require('./routes/LocationRoutes'); 
 const cookieParser = require('cookie-parser');
 
 const app = express(); 
@@ -48,6 +49,7 @@ app.use(addTokenToRequest);
 app.use('/users', UserRoutes);
 app.use('/package', PackageRoutes);
 app.use('/activity', ActivityRoutes);
+app.use('/location', LocationRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: "Confirmed Connection to Texmon LOGISTICS" });

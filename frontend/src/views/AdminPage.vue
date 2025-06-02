@@ -2063,8 +2063,9 @@ import { mockPackages } from '../data/mock-data'
 import PackageTracking from './PackageTracking.vue'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import ShippingProgress from '../components/ShippingProgress.vue'
-import userService from '../Services/userServices.js'
+import ShippingProgress from '../components/ShippingProgress.vue';
+import userService from '../Services/userServices.js';
+import locationService from '../Services/locationServices.js';
 import Alert from '../components/ui/Alert.vue';
 
 
@@ -2530,28 +2531,12 @@ const openAddUserModal = () => {
 }
 
 const closeAddUserModal = () => {
-  userFormErrors.value = {}
-  newUser.value = {
-    fullname: '',
-    email: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
-    status: 'active',
-    roles: '',
-    permissions: {
-      packages: false,
-      users: false,
-      reports: false,
-    }
-  }
   showAddUserModal.value = false
+  resetNewUserForm()
 }
 
 
 const addNewUser = async () => {
-
-  isSubmitting.value = true;
   if (validateUserForm()) {
     isSubmitting.value = true
     const newUserToAdd = {
@@ -2594,10 +2579,7 @@ const addNewUser = async () => {
     }
   }
 }
-const isValidEmail = (email) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return re.test(email)
-}
+
 
 const resetNewUserForm = () => {
   newUser.value = {
@@ -2760,46 +2742,6 @@ const handleLogin = () => {
 }
 
 
-// Locations management state
-const locations = ref([
-  {
-    id: 1,
-    name: 'Nairobi Warehouse',
-    code: 'NBO-WH',
-    type: 'warehouse',
-    address: 'Industrial Area, Nairobi',
-    city: 'Nairobi',
-    country: 'Kenya',
-    coordinates: '-1.2921, 36.8219',
-    status: 'active',
-    createdAt: '2024-01-15'
-  },
-  {
-    id: 2,
-    name: 'Mombasa Port',
-    code: 'MSA-PT',
-    type: 'port',
-    address: 'Kilindini Harbour, Mombasa',
-    city: 'Mombasa',
-    country: 'Kenya',
-    coordinates: '-4.0435, 39.6682',
-    status: 'active',
-    createdAt: '2024-01-15'
-  },
-  {
-    id: 3,
-    name: 'Kisumu Transit Point',
-    code: 'KIS-TP',
-    type: 'transit',
-    address: 'Kisumu Industrial Area',
-    city: 'Kisumu',
-    country: 'Kenya',
-    coordinates: '-0.0917, 34.7680',
-    status: 'active',
-    createdAt: '2024-01-20'
-  }
-])
-
 const locationSearchTerm = ref('')
 const showAddLocationModal = ref(false)
 const showEditLocationModal = ref(false)
@@ -2824,6 +2766,15 @@ const newLocation = ref({
 const editingLocation = ref(null)
 const viewingLocation = ref(null)
 
+const fetchLocation = async () => {
+  try {
+    const response = await locationService.getLocations();
+    locations.value = response.data.data;
+
+  } catch (error) {
+    console.error('Error fetching Locations:', error);
+  }
+};
 const filteredLocations = computed(() => {
   if (!locationSearchTerm.value) return locations.value
 
@@ -3524,6 +3475,7 @@ const formatDate = (dateString) => {
 onMounted(() => {
   checkMobileDevice()
   fetchUsers()
+  fetchLocation()
   window.addEventListener('resize', checkMobileDevice)
   // Auto-login for demo
   isAuthenticated.value = true
