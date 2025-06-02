@@ -2,7 +2,6 @@ const { query } = require('../config/sqlConfig');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const validateCreateUserSchema = require('../services/RegistrationValidation');
-const reportService = require('../services/SendEmailService');
 const { createToken } = require('../services/jwtServices');
 
 module.exports = {
@@ -32,13 +31,6 @@ module.exports = {
             ];
 
             const result = await query(insertUserQuery, params);
-
-            await reportService.sendAccountCreation(
-                value.email,
-                value.password,
-                value.fullname,
-                value.roles
-            );
 
             res.json({
                 success: true,
@@ -308,7 +300,7 @@ module.exports = {
 
             if (result.rowCount > 0) {
                 res.json({ success: true, message: 'Account Activated successfully', user: result.rows[0] });
-                reportService.sendAccountActivation(email, fullname);
+     
             } else {
                 res.status(404).json({ success: false, message: 'User not found' });
             }

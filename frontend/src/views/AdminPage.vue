@@ -2550,12 +2550,6 @@ const closeAddUserModal = () => {
 
 
 const addNewUser = async () => {
-  console.log("Start adding new user");
-  const isValids = validateUserForm();
-  console.log("Is form valid?", isValids);
-  console.log("Validation errors:", userFormErrors.value);
-
-  if (!isValids) return;
 
   isSubmitting.value = true;
   if (validateUserForm()) {
