@@ -2819,7 +2819,7 @@ const addNewLocation = async () => {
       createdAt: new Date().toISOString().split('T')[0]
     }
     try {
-      const response = await userService.addLocation(newLocationToAdd)
+      const response = await locationService.addLocation(newLocationToAdd)
       if (response.success) {
         setAlert('Location added successfully!', 'success')
         closeAddLocationModal()
