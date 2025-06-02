@@ -1949,7 +1949,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2761,7 +2761,7 @@ const newLocation = ref({
   address: '',
   city: '',
   country: '',
-  coordinates: '',
+  coordinates: null,
   status: 'active'
 })
 
@@ -2806,6 +2806,9 @@ const addNewLocation = async () => {
   if (validateLocationForm()) {
     isSubmitting.value = true
 
+    if (!newLocation.value.coordinates) {
+      newLocation.value.coordinates = null; // or a valid fallback JSON
+    }
     const newLocationToAdd = {
       id: Date.now(),
       name: newLocation.value.name,
@@ -2815,8 +2818,7 @@ const addNewLocation = async () => {
       city: newLocation.value.city,
       country: newLocation.value.country,
       coordinates: newLocation.value.coordinates,
-      status: newLocation.value.status,
-      createdAt: new Date().toISOString().split('T')[0]
+      status: newLocation.value.status
     }
     try {
       const response = await locationService.addLocation(newLocationToAdd)

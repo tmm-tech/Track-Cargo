@@ -4,14 +4,14 @@ const { query } = require('../config/sqlConfig');
 module.exports = {
     // Add a new location
     addLocation: async (req, res) => {
-        const { name, code, type, address, city, country, coordinates, status, created_at, updated_at } = req.body;
+        const { name, code, type, address, city, country, coordinates, status} = req.body;
 
         try {
             const insertQuery = `
-      INSERT INTO locations (name, code, type, address, city, country, coordinates, status, created_at, updated_at)
+      INSERT INTO locations (name, code, type, address, city, country, coordinates, status)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
 
-            const params = [name, code, type, address, city, country, coordinates, status, created_at, updated_at || {}];
+            const params = [name, code, type, address, city, country, coordinates, status || {}];
             const result = await query(insertQuery, params);
 
             res.json({ success: true, location: result.rows[0] });
