@@ -2083,40 +2083,40 @@ const validateUserForm = () => {
   userFormErrors.value = {}
   let isValid = true
 
-  if (!editingUser.value.fullname) {
+  if (!newUser.value.fullname) {
     userFormErrors.value.fullname = 'Name is required'
     isValid = false
   }
 
-  if (!editingUser.value.username) {
+  if (!newUser.value.username) {
     userFormErrors.value.username = 'Username is required'
     isValid = false
   } else if (
-    !editingUser.value.id &&
-    users.value.some(u => u.username.toLowerCase() === editingUser.value.username.toLowerCase())
+    !newUser.value.id &&
+    users.value.some(u => u.username.toLowerCase() === newUser.value.username.toLowerCase())
   )
 
-    if (!editingUser.value.email) {
+    if (!newUser.value.email) {
       userFormErrors.value.email = 'Email is required'
       isValid = false
-    } else if (!/\S+@\S+\.\S+/.test(editingUser.value.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(newUser.value.email)) {
       userFormErrors.value.email = 'Email is invalid'
       isValid = false
     }
 
-  if (!editingUser.value.id) {
-    if (!editingUser.value.password) {
+  if (!newUser.value.id) {
+    if (!newUser.value.password) {
       userFormErrors.value.password = 'Password is required'
       isValid = false
-    } else if (editingUser.value.password.length < 6) {
+    } else if (newUser.value.password.length < 6) {
       userFormErrors.value.password = 'Password must be at least 6 characters'
       isValid = false
     }
 
-    if (!editingUser.value.confirmPassword) {
+    if (!newUser.value.confirmPassword) {
       userFormErrors.value.confirmPassword = 'Please confirm your password'
       isValid = false
-    } else if (editingUser.value.password !== editingUser.value.confirmPassword) {
+    } else if (newUser.value.password !== newUser.value.confirmPassword) {
       userFormErrors.value.confirmPassword = 'Passwords do not match'
       isValid = false
     }
@@ -2124,6 +2124,7 @@ const validateUserForm = () => {
 
   return isValid
 }
+
 
 
 const resetPasswordUser = ref({
@@ -2542,6 +2543,21 @@ const closeAddUserModal = () => {
 
 
 const addNewUser = async () => {
+  console.log("Start adding new user");
+  if (validateUserForm()) {
+    isSubmitting.value = true
+    const newUserToAdd = {
+      fullname: newUser.value.fullname,
+      email: newUser.value.email,
+      username: newUser.value.username,
+      password: newUser.value.password,
+      roles: newUser.value.roles,
+      status: newUser.value.status || 'active',
+      permissions: Object.entries(newUser.value.permissions)
+        .filter(([_, isChecked]) => isChecked)
+        .map(([permission]) => permission),
+      lastLogin: null,
+    }
     try {
       const response = await userService.registerUser(newUserToAdd)
       if (response.success) {
@@ -2568,9 +2584,7 @@ const addNewUser = async () => {
       isSubmitting.value = false
     }
 }
-
-
-
+}
 const isValidEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return re.test(email)
