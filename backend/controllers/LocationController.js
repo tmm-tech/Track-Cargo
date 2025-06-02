@@ -9,9 +9,7 @@ module.exports = {
         try {
             const insertQuery = `
       INSERT INTO locations (name, code, type, address, city, country, coordinates, status, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW(), NOW())
-      ON CONFLICT (name, city, country) DO UPDATE;
-    `;
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW(), NOW())`;
 
             const params = [name, code, type, address, city, country, coordinates, status, created_at, updated_at || {}];
             const result = await query(insertQuery, params);
