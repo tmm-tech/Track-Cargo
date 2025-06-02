@@ -135,8 +135,8 @@
             {{ currentUser.initials }}
           </div>
           <div class="ml-3 overflow-hidden">
-            <p class="text-sm font-medium text-white truncate">{{ currentUser.name }}</p>
-            <p class="text-xs text-gray-400">{{ currentUser.role }}</p>
+            <p class="text-sm font-medium text-white truncate">{{ currentUser.fullname }}</p>
+            <p class="text-xs text-gray-400">{{ currentUser.roles }}</p>
           </div>
         </div>
         <div v-else class="flex justify-center mb-3">
@@ -431,7 +431,7 @@
                               {{ getInitials(user.fullname) }}
                             </div>
                             <div class="ml-4">
-                              <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
+                              <div class="text-sm font-medium text-gray-900">{{ user.fullname }}</div>
                               <div class="text-sm text-gray-500">{{ user.username }}</div>
                             </div>
                           </div>
@@ -1704,10 +1704,10 @@
 
                 <form @submit.prevent="addNewUser" class="space-y-4 py-4">
                   <div class="space-y-2">
-                    <label for="name" class="text-sm font-medium">Full Name</label>
-                    <input id="name" v-model="newUser.name"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.name ? 'border-red-500' : '']" />
-                    <p v-if="userFormErrors.name" class="text-red-500 text-sm">{{ userFormErrors.name }}</p>
+                    <label for="fullname" class="text-sm font-medium">Full Name</label>
+                    <input id="fullname" v-model="newUser.fullname"
+                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.fullname ? 'border-red-500' : '']" />
+                    <p v-if="userFormErrors.fullname" class="text-red-500 text-sm">{{ userFormErrors.fullname }}</p>
                   </div>
 
                   <div class="space-y-2">
@@ -1939,7 +1939,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2083,8 +2083,8 @@ const validateUserForm = () => {
   userFormErrors.value = {}
   let isValid = true
 
-  if (!editingUser.value.name) {
-    userFormErrors.value.name = 'Name is required'
+  if (!editingUser.value.fullname) {
+    userFormErrors.value.fullname = 'Name is required'
     isValid = false
   }
 
@@ -2094,18 +2094,15 @@ const validateUserForm = () => {
   } else if (
     !editingUser.value.id &&
     users.value.some(u => u.username.toLowerCase() === editingUser.value.username.toLowerCase())
-  ) {
-    userFormErrors.value.username = 'Username already exists'
-    isValid = false
-  }
+  )
 
-  if (!editingUser.value.email) {
-    userFormErrors.value.email = 'Email is required'
-    isValid = false
-  } else if (!/\S+@\S+\.\S+/.test(editingUser.value.email)) {
-    userFormErrors.value.email = 'Email is invalid'
-    isValid = false
-  }
+    if (!editingUser.value.email) {
+      userFormErrors.value.email = 'Email is required'
+      isValid = false
+    } else if (!/\S+@\S+\.\S+/.test(editingUser.value.email)) {
+      userFormErrors.value.email = 'Email is invalid'
+      isValid = false
+    }
 
   if (!editingUser.value.id) {
     if (!editingUser.value.password) {
@@ -2128,29 +2125,6 @@ const validateUserForm = () => {
   return isValid
 }
 
-const saveUser = () => {
-  if (!validateUserForm()) return
-
-  if (editingUser.value.id) {
-    // Update existing user
-    users.value = users.value.map(user =>
-      user.id === editingUser.value.id ? { ...editingUser.value } : user
-    )
-  } else {
-    // Create new user
-    const newUser = {
-      id: users.value.length + 1,
-      name: editingUser.value.name,
-      username: editingUser.value.username,
-      email: editingUser.value.email,
-      role: editingUser.value.role,
-      lastLogin: 'Never'
-    }
-    users.value.push(newUser)
-  }
-
-  closeUserFormModal()
-}
 
 const resetPasswordUser = ref({
   id: null,
@@ -2202,11 +2176,9 @@ const validateResetPasswordForm = () => {
 const saveNewPassword = () => {
   if (!validateResetPasswordForm()) return
 
-  // In a real application, you would send this to your API
-  console.log(`Password reset for user ${resetPasswordUser.value.username}`)
 
   // Show success message
-  alert(`Password has been reset for ${resetPasswordUser.value.username}`)
+  setAlert(`Password has been reset for ${resetPasswordUser.value.username}`)
 
   closeResetPasswordModal()
 }
@@ -2289,10 +2261,10 @@ const currentView = ref('dashboard')
 // Current user
 const currentUser = ref({
   id: 1,
-  name: 'Admin User',
+  fullname: 'Admin User',
   email: 'admin@texmonlogistics.co.ke',
   username: 'admin',
-  role: 'Administrator',
+  roles: 'Administrator',
   initials: 'AU'
 })
 
@@ -2312,11 +2284,11 @@ const userFormErrors = ref({})
 
 // New user form
 const newUser = ref({
-  name: '',
+  fullname: '',
   email: '',
   username: '',
   password: '',
-  role: '',
+  roles: '',
   status: 'active',
   permissions: {
     packages: false,
@@ -2331,7 +2303,7 @@ const editingUser = ref({
   email: '',
   username: '',
   newPassword: '',
-  role: 'viewer',
+  roles: 'viewer',
   status: 'active',
   permissions: []
 })
@@ -2490,9 +2462,9 @@ const newComment = ref({
 })
 
 // Helper functions
-const getInitials = (name) => {
-  if (!name) return 'NA'
-  return name.split(' ').map(n => n[0]).join('').toUpperCase()
+const getInitials = (fullname) => {
+  if (!fullname) return 'NA'
+  return fullname.split(' ').map(n => n[0]).join('').toUpperCase()
 }
 
 const getActivityIcon = (type) => {
@@ -2554,11 +2526,11 @@ const openAddUserModal = () => {
 const closeAddUserModal = () => {
   userFormErrors.value = {}
   newUser.value = {
-    name: '',
+    fullname: '',
     email: '',
     username: '',
     password: '',
-    role: '',
+    roles: '',
     permissions: {
       packages: false,
       users: false,
@@ -2570,22 +2542,6 @@ const closeAddUserModal = () => {
 
 
 const addNewUser = async () => {
-
-  if (validateUserForm()) {
-    isSubmitting.value = true
-    const newUserToAdd = {
-      fullname: newUser.value.name,
-      email: newUser.value.email,
-      username: newUser.value.username,
-      password: newUser.value.password,
-      roles: newUser.value.role,
-      status: newUser.value.status || 'active',
-      permissions: Object.entries(newUser.value.permissions)
-        .filter(([_, isChecked]) => isChecked)
-        .map(([permission]) => permission),
-      lastLogin: null,
-    }
-
     try {
       const response = await userService.registerUser(newUserToAdd)
       if (response.success) {
@@ -2611,7 +2567,6 @@ const addNewUser = async () => {
     } finally {
       isSubmitting.value = false
     }
-  }
 }
 
 
@@ -2623,11 +2578,11 @@ const isValidEmail = (email) => {
 
 const resetNewUserForm = () => {
   newUser.value = {
-    name: '',
+    fullname: '',
     email: '',
     username: '',
     password: '',
-    role: '',
+    roles: '',
     status: 'active',
     permissions: {
       packages: false,
@@ -2758,9 +2713,6 @@ const addComment = (packageId) => {
     }
     return pkg
   })
-
-  // Log the activity
-  logActivity('package', currentUser.value.name, 'Comment added to package', `Added comment to package ${packageId}: "${newComment.value.text.substring(0, 30)}${newComment.value.text.length > 30 ? '...' : ''}"`)
 
   // Reset the comment form
   newComment.value.text = ''
