@@ -53,7 +53,8 @@
               <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Dashboard</span>
             </button>
 
-            <button @click="navigateToView('packages')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Shippings' : ''"
+            <button @click="navigateToView('packages')"
+              :title="(sidebarCollapsed && !isMobileDevice) ? 'Shippings' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
                 'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
@@ -1348,7 +1349,8 @@
                 <div class="flex flex-col space-y-1.5 pb-4">
                   <h2 class="text-lg font-semibold leading-none tracking-tight">Shipping Details</h2>
                   <p class="text-sm text-muted-foreground" v-if="viewingShipping">
-                    Container Number: {{ viewingShipping.containerNumber }} | Truck Number: {{ viewingShipping.truckNumber
+                    Container Number: {{ viewingShipping.containerNumber }} | Truck Number: {{
+                      viewingShipping.truckNumber
                     }}
                     |
                     BL Number: {{ viewingShipping.blNumber }}
@@ -1947,7 +1949,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2281,6 +2283,7 @@ const currentYear = computed(() => new Date().getFullYear())
 
 // User management state
 const users = ref([]);
+const locations = ref([]);
 const userSearchTerm = ref('');
 const showAddUserModal = ref(false)
 const showEditUserModal = ref(false)
@@ -2768,15 +2771,15 @@ const viewingLocation = ref(null)
 
 const fetchLocation = async () => {
   try {
-    const response = await locationService.getLocations();
-    locations.value = response.data.data;
+    const responses = await locationService.getLocations();
+    locations.value = responses.data.data;
 
   } catch (error) {
     console.error('Error fetching Locations:', error);
   }
 };
 const filteredLocations = computed(() => {
-  if (!locationSearchTerm.value) return locations.value
+  if (!locationSearchTerm.value) return locations.value || []
 
   return locations.value.filter(location =>
     location.name.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
@@ -2844,10 +2847,14 @@ const validateLocationForm = () => {
   if (!newLocation.value.code) {
     locationFormErrors.value.code = 'Location code is required'
     isValid = false
-  } else if (locations.value.some(loc => loc.code.toLowerCase() === newLocation.value.code.toLowerCase())) {
+  } else if (
+    Array.isArray(locations.value) &&
+    locations.value.some(loc => loc.code?.toLowerCase() === newLocation.value.code.toLowerCase())
+  ) {
     locationFormErrors.value.code = 'Location code already exists'
     isValid = false
   }
+
 
   if (!newLocation.value.type) {
     locationFormErrors.value.type = 'Location type is required'
@@ -2915,7 +2922,7 @@ const updateLocation = () => {
 
 const viewLocation = async () => {
   showViewLocationModal.value = true
-   try {
+  try {
     const response = await locationService.getLocations();
     viewingLocation.value = response.data.data;
 
