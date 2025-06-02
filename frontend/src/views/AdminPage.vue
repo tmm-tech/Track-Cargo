@@ -53,7 +53,7 @@
               <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Dashboard</span>
             </button>
 
-            <button @click="navigateToView('packages')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Packages' : ''"
+            <button @click="navigateToView('packages')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Shippings' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
                 'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
@@ -63,7 +63,7 @@
               <ArchiveBoxIcon
                 :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
                 class="flex-shrink-0" />
-              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Packages</span>
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Shippings</span>
             </button>
             <button @click="navigateToView('locations')"
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Locations' : ''"
@@ -261,7 +261,7 @@
                     <ArchiveBoxIcon class="h-4 w-4 sm:h-6 sm:w-6 text-[#273272]" />
                   </div>
                   <div>
-                    <p class="text-xs sm:text-sm text-gray-500">Total Packages</p>
+                    <p class="text-xs sm:text-sm text-gray-500">Total Shippings</p>
                     <p class="text-lg sm:text-2xl font-bold">{{ packages.length }}</p>
                   </div>
                 </div>
@@ -274,7 +274,7 @@
                   </div>
                   <div>
                     <p class="text-xs sm:text-sm text-gray-500">In Transit</p>
-                    <p class="text-lg sm:text-2xl font-bold">{{ getPackagesByStatus('transit') }}</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getShippingsByStatus('transit') }}</p>
                   </div>
                 </div>
               </div>
@@ -286,7 +286,7 @@
                   </div>
                   <div>
                     <p class="text-xs sm:text-sm text-gray-500">Delivered</p>
-                    <p class="text-lg sm:text-2xl font-bold">{{ getPackagesByStatus('delivered') }}</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getShippingsByStatus('delivered') }}</p>
                   </div>
                 </div>
               </div>
@@ -298,7 +298,7 @@
                   </div>
                   <div>
                     <p class="text-xs sm:text-sm text-gray-500">Delayed</p>
-                    <p class="text-lg sm:text-2xl font-bold">{{ getPackagesByStatus('delayed') }}</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getShippingsByStatus('delayed') }}</p>
                   </div>
                 </div>
               </div>
@@ -486,21 +486,21 @@
             </div>
           </div>
 
-          <!-- Package Management View -->
+          <!-- Shipping Management View -->
           <div v-if="currentView === 'packages'" class="space-y-6 sm:space-y-8">
             <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-6 sm:mb-8">
               <div
                 class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#273272] text-white p-4 sm:p-6 rounded-t-lg gap-4 sm:gap-0">
                 <div>
-                  <h2 class="text-lg sm:text-xl font-semibold">Package Management</h2>
+                  <h2 class="text-lg sm:text-xl font-semibold">Shipping Management</h2>
                   <p class="text-gray-200 text-sm">
                     Update the current location and next stop information for packages
                   </p>
                 </div>
-                <button @click="openAddPackageModal"
+                <button @click="openAddShippingModal"
                   class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-3 sm:px-4 py-2 rounded inline-flex items-center text-sm">
                   <PlusIcon class="h-4 w-4 mr-2" />
-                  <span class="hidden sm:inline">Add Package</span>
+                  <span class="hidden sm:inline">Add Shipping</span>
                   <span class="sm:hidden">Add</span>
                 </button>
               </div>
@@ -546,10 +546,10 @@
                         </tr>
                       </thead>
                       <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="filteredPackages.length === 0">
+                        <tr v-if="filteredShippings.length === 0">
                           <td colspan="8" class="text-center py-4 text-gray-500">No packages found</td>
                         </tr>
-                        <tr v-for="pkg in filteredPackages" :key="pkg.id" class="hover:bg-gray-50">
+                        <tr v-for="pkg in filteredShippings" :key="pkg.id" class="hover:bg-gray-50">
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
                             {{ pkg.containerNumber }}
                           </td>
@@ -576,17 +576,17 @@
                             <div class="flex justify-end gap-1">
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
-                                @click="viewPackageDetails(pkg)" title="View Details">
+                                @click="viewShippingDetails(pkg)" title="View Details">
                                 View
                               </button>
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
-                                @click="editPackage(pkg)" title="Edit Package">
+                                @click="editShipping(pkg)" title="Edit Shipping">
                                 <PencilIcon class="h-3 w-3" />
                               </button>
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
-                                @click="printPackageDetails(pkg)" title="Print Details">
+                                @click="printShippingDetails(pkg)" title="Print Details">
                                 <PrinterIcon class="h-3 w-3" />
                               </button>
                             </div>
@@ -600,7 +600,7 @@
                 <!-- Mobile-friendly card view for smaller screens -->
                 <div class="block md:hidden">
                   <div class="space-y-4">
-                    <div v-for="pkg in filteredPackages" :key="pkg.id"
+                    <div v-for="pkg in filteredShippings" :key="pkg.id"
                       class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                       <div class="flex justify-between items-start mb-3">
                         <div class="flex-1">
@@ -608,7 +608,7 @@
                           <p class="text-xs text-gray-500 mt-1">{{ pkg.truckNumber }} • {{ pkg.blNumber }}</p>
                         </div>
                         <div class="flex gap-1 ml-2">
-                          <button @click="viewPackageDetails(pkg)"
+                          <button @click="viewShippingDetails(pkg)"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="View Details">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -619,12 +619,12 @@
                               </path>
                             </svg>
                           </button>
-                          <button @click="editPackage(pkg)"
+                          <button @click="editShipping(pkg)"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="Print Details">
                             <PencilIcon class="h-4 w-4" />
                           </button>
-                          <button @click="printPackageDetails(pkg)"
+                          <button @click="printShippingDetails(pkg)"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="Print Details">
                             <PrinterIcon class="h-4 w-4" />
@@ -677,7 +677,7 @@
                     class="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm">
                     <option value="all">All Activities</option>
                     <option value="login">Login Events</option>
-                    <option value="package">Package Updates</option>
+                    <option value="package">Shipping Updates</option>
                     <option value="user">User Management</option>
                   </select>
                 </div>
@@ -740,30 +740,30 @@
               </div>
             </div>
           </div>
-          <!-- Edit Package Modal -->
+          <!-- Edit Shipping Modal -->
           <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             @click="closeEditModal">
             <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
               <div class="p-6">
                 <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Update Package Information</h2>
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Update Shipping Information</h2>
                   <p class="text-sm text-muted-foreground">Update the package location and shipping address information.
                   </p>
                 </div>
 
-                <div v-if="editingPackage" class="space-y-4 py-4">
+                <div v-if="editingShipping" class="space-y-4 py-4">
                   <div class="flex justify-between items-center">
                     <div>
                       <p class="text-sm font-medium text-gray-500">Container Number</p>
-                      <p>{{ editingPackage.containerNumber }}</p>
+                      <p>{{ editingShipping.containerNumber }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Truck Number</p>
-                      <p>{{ editingPackage.truckNumber }}</p>
+                      <p>{{ editingShipping.truckNumber }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">BL Number</p>
-                      <p>{{ editingPackage.blNumber }}</p>
+                      <p>{{ editingShipping.blNumber }}</p>
                     </div>
                   </div>
 
@@ -857,8 +857,8 @@
                 <!-- Comments Section in Edit Modal -->
                 <div class="mt-6 pt-6 border-t">
                   <h3 class="text-lg font-medium mb-4">Comments</h3>
-                  <div v-if="editingPackage.comments && editingPackage.comments.length > 0" class="space-y-4 mb-6">
-                    <div v-for="(comment, index) in editingPackage.comments" :key="index"
+                  <div v-if="editingShipping.comments && editingShipping.comments.length > 0" class="space-y-4 mb-6">
+                    <div v-for="(comment, index) in editingShipping.comments" :key="index"
                       class="bg-gray-50 p-4 rounded-md">
                       <div class="flex justify-between items-start">
                         <div>
@@ -871,7 +871,7 @@
                   </div>
                   <div v-else class="text-gray-500 mb-6">No comments yet</div>
 
-                  <form @submit.prevent="addComment(editingPackage.id)" class="space-y-4">
+                  <form @submit.prevent="addComment(editingShipping.id)" class="space-y-4">
                     <div class="space-y-2">
                       <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
                       <textarea id="editCommentText" v-model="newComment.text" rows="3"
@@ -893,9 +893,9 @@
                   </button>
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                    @click="savePackageChanges">
+                    @click="saveShippingChanges">
                     <DocumentCheckIcon class="h-4 w-4 mr-2" />
-                    Update Package
+                    Update Shipping
                   </button>
                 </div>
               </div>
@@ -1340,46 +1340,46 @@
               </div>
             </div>
           </div>
-          <!-- View Package Modal -->
+          <!-- View Shipping Modal -->
           <div v-if="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             @click="closeViewModal">
             <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
               <div class="p-6">
                 <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Package Details</h2>
-                  <p class="text-sm text-muted-foreground" v-if="viewingPackage">
-                    Container Number: {{ viewingPackage.containerNumber }} | Truck Number: {{ viewingPackage.truckNumber
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Shipping Details</h2>
+                  <p class="text-sm text-muted-foreground" v-if="viewingShipping">
+                    Container Number: {{ viewingShipping.containerNumber }} | Truck Number: {{ viewingShipping.truckNumber
                     }}
                     |
-                    BL Number: {{ viewingPackage.blNumber }}
+                    BL Number: {{ viewingShipping.blNumber }}
                   </p>
                 </div>
 
-                <div v-if="viewingPackage" class="space-y-6">
+                <div v-if="viewingShipping" class="space-y-6">
                   <div class="grid grid-cols-2 gap-4">
                     <div>
-                      <p class="text-sm font-medium text-gray-500">Package Type</p>
-                      <p class="text-lg">{{ viewingPackage.type }}</p>
+                      <p class="text-sm font-medium text-gray-500">Shipping Type</p>
+                      <p class="text-lg">{{ viewingShipping.type }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Weight</p>
-                      <p class="text-lg">{{ viewingPackage.weight }} kg</p>
+                      <p class="text-lg">{{ viewingShipping.weight }} kg</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Shipped Date</p>
-                      <p class="text-lg">{{ viewingPackage.shippedDate }}</p>
+                      <p class="text-lg">{{ viewingShipping.shippedDate }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
-                      <p class="text-lg">{{ viewingPackage.estimatedDelivery }}</p>
+                      <p class="text-lg">{{ viewingShipping.estimatedDelivery }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Final Destination</p>
-                      <p class="text-lg">{{ viewingPackage.finalDestination }}</p>
+                      <p class="text-lg">{{ viewingShipping.finalDestination }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Last Updated</p>
-                      <p class="text-lg">{{ viewingPackage.lastUpdated }}</p>
+                      <p class="text-lg">{{ viewingShipping.lastUpdated }}</p>
                     </div>
                   </div>
 
@@ -1390,24 +1390,24 @@
                       <h3 class="text-xl font-semibold">Shipping Address</h3>
                     </div>
                     <div class="p-6">
-                      <div v-if="viewingPackage.shippingAddress" class="space-y-1">
-                        <p class="font-medium">{{ viewingPackage.shippingAddress.recipientName }}</p>
-                        <p>{{ viewingPackage.shippingAddress.streetAddress }}</p>
+                      <div v-if="viewingShipping.shippingAddress" class="space-y-1">
+                        <p class="font-medium">{{ viewingShipping.shippingAddress.recipientName }}</p>
+                        <p>{{ viewingShipping.shippingAddress.streetAddress }}</p>
                         <p>
-                          {{ viewingPackage.shippingAddress.city }}, {{ viewingPackage.shippingAddress.state }}
-                          {{ viewingPackage.shippingAddress.postalCode }}
+                          {{ viewingShipping.shippingAddress.city }}, {{ viewingShipping.shippingAddress.state }}
+                          {{ viewingShipping.shippingAddress.postalCode }}
                         </p>
-                        <p>{{ viewingPackage.shippingAddress.country }}</p>
+                        <p>{{ viewingShipping.shippingAddress.country }}</p>
                       </div>
                       <p v-else class="text-gray-500">No shipping address information available</p>
                     </div>
                   </div>
 
                   <!-- Shipping Progress -->
-                  <ShippingProgress :trackingHistory="viewingPackage.trackingHistory"
-                    :currentLocation="viewingPackage.currentLocation" :nextStop="viewingPackage.nextStop"
-                    :nextStopETA="viewingPackage.nextStopETA" :finalDestination="viewingPackage.finalDestination"
-                    :estimatedDelivery="viewingPackage.estimatedDelivery" showComments />
+                  <ShippingProgress :trackingHistory="viewingShipping.trackingHistory"
+                    :currentLocation="viewingShipping.currentLocation" :nextStop="viewingShipping.nextStop"
+                    :nextStopETA="viewingShipping.nextStopETA" :finalDestination="viewingShipping.finalDestination"
+                    :estimatedDelivery="viewingShipping.estimatedDelivery" showComments />
                 </div>
 
                 <!-- Comments Section -->
@@ -1417,8 +1417,8 @@
                     <h3 class="text-xl font-semibold">Comments</h3>
                   </div>
                   <div class="p-6">
-                    <div v-if="viewingPackage.comment && viewingPackage.comment.length > 0" class="space-y-4 mb-6">
-                      <div v-for="(comment, index) in viewingPackage.comment" :key="index"
+                    <div v-if="viewingShipping.comment && viewingShipping.comment.length > 0" class="space-y-4 mb-6">
+                      <div v-for="(comment, index) in viewingShipping.comment" :key="index"
                         class="bg-gray-50 p-4 rounded-md">
                         <div class="flex justify-between items-start">
                           <div>
@@ -1431,7 +1431,7 @@
                     </div>
                     <div v-else class="text-gray-500 mb-6">No comments yet</div>
 
-                    <form @submit.prevent="addComment(viewingPackage.id)" class="space-y-4">
+                    <form @submit.prevent="addComment(viewingShipping.id)" class="space-y-4">
                       <div class="space-y-2">
                         <label for="commentText" class="text-sm font-medium">Add Comment</label>
                         <textarea id="commentText" v-model="newComment.text" rows="3"
@@ -1456,7 +1456,7 @@
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 space-y-2 sm:space-y-0"
                     @click="editFromViewModal">
                     <PencilIcon class="h-4 w-4 mr-2" />
-                    Edit Package
+                    Edit Shipping
                   </button>
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 space-y-2 sm:space-y-0"
@@ -1469,13 +1469,13 @@
             </div>
           </div>
 
-          <!-- Add Package Modal -->
+          <!-- Add Shipping Modal -->
           <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             @click="closeAddModal">
             <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
               <div class="p-6">
                 <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Package</h2>
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Shipping</h2>
                   <p class="text-sm text-muted-foreground">Enter the details for the new package and its tracking
                     history.
                   </p>
@@ -1487,25 +1487,25 @@
                     <button :class="[
                       'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                      addPackageTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                    ]" @click="addPackageTab = 'details'">
-                      Package Details
+                      addShippingTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addShippingTab = 'details'">
+                      Shipping Details
                     </button>
                     <button :class="[
                       'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                      addPackageTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                    ]" @click="addPackageTab = 'stops'">
+                      addShippingTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addShippingTab = 'stops'">
                       Tracking Stops
                     </button>
                   </div>
 
 
-                  <div v-if="addPackageTab === 'details'" class="space-y-4 mt-4">
+                  <div v-if="addShippingTab === 'details'" class="space-y-4 mt-4">
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="containerNumber" class="text-sm font-medium">Container Number</label>
-                        <input id="containerNumber" v-model="newPackage.containerNumber"
+                        <input id="containerNumber" v-model="newShipping.containerNumber"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.containerNumber ? 'border-red-500' : '']" />
                         <p v-if="formErrors.containerNumber" class="text-red-500 text-sm">{{ formErrors.containerNumber
                         }}
@@ -1513,13 +1513,13 @@
                       </div>
                       <div class="space-y-2">
                         <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
-                        <input id="truckNumber" v-model="newPackage.truckNumber"
+                        <input id="truckNumber" v-model="newShipping.truckNumber"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truckNumber ? 'border-red-500' : '']" />
                         <p v-if="formErrors.truckNumber" class="text-red-500 text-sm">{{ formErrors.truckNumber }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="blNumber" class="text-sm font-medium">BL Number</label>
-                        <input id="blNumber" v-model="newPackage.blNumber"
+                        <input id="blNumber" v-model="newShipping.blNumber"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.blNumber ? 'border-red-500' : '']" />
                         <p v-if="formErrors.blNumber" class="text-red-500 text-sm">{{ formErrors.blNumber }}</p>
                       </div>
@@ -1527,14 +1527,14 @@
 
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
-                        <label for="type" class="text-sm font-medium">Package Type</label>
-                        <input id="type" v-model="newPackage.type"
+                        <label for="type" class="text-sm font-medium">Shipping Type</label>
+                        <input id="type" v-model="newShipping.type"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.type ? 'border-red-500' : '']" />
                         <p v-if="formErrors.type" class="text-red-500 text-sm">{{ formErrors.type }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="weight" class="text-sm font-medium">Weight (kg)</label>
-                        <input id="weight" v-model="newPackage.weight"
+                        <input id="weight" v-model="newShipping.weight"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.weight ? 'border-red-500' : '']" />
                         <p v-if="formErrors.weight" class="text-red-500 text-sm">{{ formErrors.weight }}</p>
                       </div>
@@ -1543,13 +1543,13 @@
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
-                        <input id="shippedDate" type="date" v-model="newPackage.shippedDate"
+                        <input id="shippedDate" type="date" v-model="newShipping.shippedDate"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shippedDate ? 'border-red-500' : '']" />
                         <p v-if="formErrors.shippedDate" class="text-red-500 text-sm">{{ formErrors.shippedDate }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="estimatedDelivery" class="text-sm font-medium">Estimated Delivery</label>
-                        <input id="estimatedDelivery" type="date" v-model="newPackage.estimatedDelivery"
+                        <input id="estimatedDelivery" type="date" v-model="newShipping.estimatedDelivery"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.estimatedDelivery ? 'border-red-500' : '']" />
                         <p v-if="formErrors.estimatedDelivery" class="text-red-500 text-sm">{{
                           formErrors.estimatedDelivery
@@ -1560,8 +1560,8 @@
 
                     <div class="space-y-2">
                       <label for="currentLocation" class="text-sm font-medium">Current Location</label>
-                      <select id="currentLocation" v-model="newPackage.currentLocation"
-                        @change="handleNewPackageLocationChange"
+                      <select id="currentLocation" v-model="newShipping.currentLocation"
+                        @change="handleNewShippingLocationChange"
                         :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.currentLocation ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select location</option>
                         <option v-for="location in allLocations" :key="location" :value="location">{{ location }}
@@ -1574,20 +1574,20 @@
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                        <input id="nextStop" v-model="newPackage.nextStop" readonly
+                        <input id="nextStop" v-model="newShipping.nextStop" readonly
                           class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         <p class="text-xs text-gray-500">Automatically determined based on current location</p>
                       </div>
                       <div class="space-y-2">
                         <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                        <input id="nextStopETA" type="date" v-model="newPackage.nextStopETA" readonly
+                        <input id="nextStopETA" type="date" v-model="newShipping.nextStopETA" readonly
                           class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                       </div>
                     </div>
 
                     <div class="space-y-2">
                       <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
-                      <input id="finalDestination" v-model="newPackage.finalDestination"
+                      <input id="finalDestination" v-model="newShipping.finalDestination"
                         :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.finalDestination ? 'border-red-500' : '']" />
                       <p v-if="formErrors.finalDestination" class="text-red-500 text-sm">{{ formErrors.finalDestination
                       }}
@@ -1595,7 +1595,7 @@
                     </div>
                   </div>
 
-                  <div v-if="addPackageTab === 'stops'" class="space-y-4 mt-4">
+                  <div v-if="addShippingTab === 'stops'" class="space-y-4 mt-4">
                     <div v-if="stopErrors.general" class="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">{{
                       stopErrors.general }}</div>
 
@@ -1604,7 +1604,7 @@
                       <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="space-y-2">
                           <label for="status" class="text-sm font-medium">Status</label>
-                          <input id="status" placeholder="e.g., Package received, In transit" v-model="newStop.status"
+                          <input id="status" placeholder="e.g., Shipping received, In transit" v-model="newStop.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.status ? 'border-red-500' : '']" />
                           <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                         </div>
@@ -1682,8 +1682,8 @@
                   </button>
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                    @click="addNewPackage">
-                    Add Package
+                    @click="addNewShipping">
+                    Add Shipping
                   </button>
                 </div>
               </div>
@@ -1757,7 +1757,7 @@
                       <div class="flex items-center">
                         <input id="perm-packages" type="checkbox" v-model="newUser.permissions.packages"
                           class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                        <label for="perm-packages" class="ml-2 text-sm text-gray-700">Manage Packages</label>
+                        <label for="perm-packages" class="ml-2 text-sm text-gray-700">Manage Shippings</label>
                       </div>
                       <div class="flex items-center">
                         <input id="perm-users" type="checkbox" v-model="newUser.permissions.users"
@@ -1860,7 +1860,7 @@
                           @change="togglePermission(perm)"
                           class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
                         <label :for="'edit-perm-' + perm" class="ml-2 text-sm text-gray-700">
-                          {{ perm === 'packages' ? 'Manage Packages' :
+                          {{ perm === 'packages' ? 'Manage Shippings' :
                             perm === 'users' ? 'Manage Users' :
                               perm === 'reports' ? 'View Reports' : perm }}
                         </label>
@@ -1947,7 +1947,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -1987,15 +1987,15 @@
         </div>
       </div>
 
-      <!-- Package Tracking Dialog -->
+      <!-- Shipping Tracking Dialog -->
       <div v-if="showTrackingDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
         @click="closeTrackingDialog">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden" @click.stop>
           <!-- Dialog Header -->
           <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-[#273272] text-white">
             <div class="flex-1 min-w-0">
-              <h2 class="text-lg sm:text-xl font-semibold truncate">Package Tracking Details</h2>
-              <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedPackage?.containerNumber
+              <h2 class="text-lg sm:text-xl font-semibold truncate">Shipping Tracking Details</h2>
+              <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedShipping?.containerNumber
               }}</p>
             </div>
             <div class="flex items-center gap-2 sm:gap-3 ml-4">
@@ -2015,7 +2015,7 @@
 
           <!-- Dialog Content -->
           <div class="overflow-y-auto max-h-[calc(95vh-120px)]" id="tracking-content">
-            <PackageTracking v-if="selectedPackage" :pkg="selectedPackage" class="print-content" />
+            <ShippingTracking v-if="selectedShipping" :pkg="selectedShipping" class="print-content" />
           </div>
         </div>
       </div>
@@ -2059,7 +2059,7 @@ import {
   ArchiveBoxIcon
 } from '@heroicons/vue/24/outline'
 import { LogOut } from 'lucide-vue-next'
-import { mockPackages } from '../data/mock-data'
+import { mockShippings } from '../data/mock-data'
 import PackageTracking from './PackageTracking.vue'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -2252,9 +2252,9 @@ const toggleSidebar = () => {
 }
 
 
-// Package Tracking Dialog state
+// Shipping Tracking Dialog state
 const showTrackingDialog = ref(false)
-const selectedPackage = ref(null)
+const selectedShipping = ref(null)
 
 // Device detection
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
@@ -2273,8 +2273,8 @@ const currentUser = ref({
   initials: 'AU'
 })
 
-// Package management state
-const packages = ref([...mockPackages])
+// Shipping management state
+const packages = ref([...mockShippings])
 const searchTerm = ref('')
 const currentYear = computed(() => new Date().getFullYear())
 
@@ -2350,7 +2350,7 @@ const recentActivity = computed(() => {
 
 
 // Filtered packages based on search term
-const filteredPackages = computed(() => {
+const filteredShippings = computed(() => {
   if (!searchTerm.value) return packages.value
 
   return packages.value.filter(pkg =>
@@ -2404,7 +2404,7 @@ const filteredActivities = computed(() => {
 
 // Edit package state
 const showEditModal = ref(false)
-const editingPackage = ref(null)
+const editingShipping = ref(null)
 const activeEditTab = ref('location')
 const editData = ref({
   currentLocation: '',
@@ -2422,12 +2422,12 @@ const editData = ref({
 
 // View package state
 const showViewModal = ref(false)
-const viewingPackage = ref(null)
+const viewingShipping = ref(null)
 
 // Add package state
 const showAddModal = ref(false)
-const addPackageTab = ref('details')
-const newPackage = ref({
+const addShippingTab = ref('details')
+const newShipping = ref({
   containerNumber: '',
   truckNumber: '',
   blNumber: '',
@@ -2488,7 +2488,7 @@ const getActivityIcon = (type) => {
   }
 }
 
-const getPackagesByStatus = (status) => {
+const getShippingsByStatus = (status) => {
   if (status === 'transit') {
     return packages.value.filter(pkg =>
       pkg.trackingHistory.some(event => event.status.toLowerCase().includes('transit'))
@@ -2848,7 +2848,7 @@ const closeAddLocationModal = () => {
   showAddLocationModal.value = false
 }
 
-const addNewLocation = () => {
+const addNewLocation = async () => {
   if (validateLocationForm()) {
     isSubmitting.value = true
 
@@ -2864,15 +2864,20 @@ const addNewLocation = () => {
       status: newLocation.value.status,
       createdAt: new Date().toISOString().split('T')[0]
     }
-
-    locations.value.push(newLocationToAdd)
-
-    logActivity('location', currentUser.value.name, 'New location added',
-      `Added location ${newLocationToAdd.name} (${newLocationToAdd.code})`)
-
-    setAlert('Location added successfully!', 'success')
-    closeAddLocationModal()
-    isSubmitting.value = false
+    try {
+      const response = await userService.addLocation(newLocationToAdd)
+      if (response.success) {
+        setAlert('Location added successfully!', 'success')
+        closeAddLocationModal()
+      }
+      else {
+        setAlert('Failed to add new location.', 'error')
+      }
+    } catch (error) {
+      setAlert('Error adding new location.', 'error')
+    } finally {
+      isSubmitting.value = false
+    }
   }
 }
 
@@ -2957,9 +2962,15 @@ const updateLocation = () => {
   closeEditLocationModal()
 }
 
-const viewLocation = (location) => {
-  viewingLocation.value = { ...location }
+const viewLocation = async () => {
   showViewLocationModal.value = true
+   try {
+    const response = await locationService.getLocations();
+    viewingLocation.value = response.data.data;
+
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
 }
 
 const closeViewLocationModal = () => {
@@ -3006,15 +3017,15 @@ const logout = () => {
   password.value = ''
 }
 
-// Package Tracking Dialog functions
+// Shipping Tracking Dialog functions
 const openTrackingDialog = (pkg) => {
-  selectedPackage.value = pkg
+  selectedShipping.value = pkg
   showTrackingDialog.value = true
 }
 
 const closeTrackingDialog = () => {
   showTrackingDialog.value = false
-  selectedPackage.value = null
+  selectedShipping.value = null
 }
 
 // Enhanced Print Function
@@ -3044,7 +3055,7 @@ const handlePrint = async () => {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Package Tracking - ${selectedPackage.value?.containerNumber}</title>
+        <title>Shipping Tracking - ${selectedShipping.value?.containerNumber}</title>
         <meta charset="utf-8">
         <style>
 
@@ -3134,7 +3145,7 @@ async function handleDownloadPDF() {
     // Save original styles
     const originalMaxHeight = element.style.maxHeight;
     const originalOverflowY = element.style.overflowY;
-    const pkg = selectedPackage.value
+    const pkg = selectedShipping.value
     // Temporarily remove scroll & height limits to show all content
     element.style.maxHeight = "none";
     element.style.overflowY = "visible";
@@ -3168,7 +3179,7 @@ async function handleDownloadPDF() {
       if (heightLeft > 0) pdf.addPage();
     }
 
-    pdf.save(`Texmon_Package_${pkg.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
+    pdf.save(`Texmon_Shipping_${pkg.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
 
   } catch (error) {
     console.error("Error generating PDF:", error);
@@ -3226,7 +3237,7 @@ const waitForImages = () => {
   })
 }
 
-const printPackageDetails = (pkg) => {
+const printShippingDetails = (pkg) => {
   // For now, open tracking dialog - you can implement a separate view modal if needed
   openTrackingDialog(pkg)
 }
@@ -3235,8 +3246,8 @@ const printPackageDetails = (pkg) => {
 
 
 // Edit package functions
-const openEditPackageModal = (pkg) => {
-  editingPackage.value = { ...pkg }
+const openEditShippingModal = (pkg) => {
+  editingShipping.value = { ...pkg }
   editData.value = {
     currentLocation: pkg.currentLocation,
     nextStop: pkg.nextStop,
@@ -3248,23 +3259,23 @@ const openEditPackageModal = (pkg) => {
 
 const closeEditModal = () => {
   showEditModal.value = false
-  editingPackage.value = null
+  editingShipping.value = null
 }
 
-const editPackage = (pkg) => {
-  openEditPackageModal(pkg)
+const editShipping = (pkg) => {
+  openEditShippingModal(pkg)
 }
 
-const savePackageChanges = () => {
-  if (!editingPackage.value) return
+const saveShippingChanges = () => {
+  if (!editingShipping.value) return
 
   // Update the package in the packages array
   packages.value = packages.value.map(pkg => {
 
-    const oldLocation = editingPackage.value.currentLocation
+    const oldLocation = editingShipping.value.currentLocation
     const newLocation = editData.value.currentLocation
 
-    if (pkg.id === editingPackage.value.id) {
+    if (pkg.id === editingShipping.value.id) {
       return {
         ...pkg,
         currentLocation: editData.value.currentLocation,
@@ -3279,40 +3290,40 @@ const savePackageChanges = () => {
 
   // Log the activity if location changed
   if (oldLocation !== newLocation) {
-    logActivity('package', currentUser.value.name, 'Package location updated',
-      `Package ${editingPackage.value.containerNumber} location changed from "${oldLocation}" to "${newLocation}"`)
+    logActivity('package', currentUser.value.name, 'Shipping location updated',
+      `Shipping ${editingShipping.value.containerNumber} location changed from "${oldLocation}" to "${newLocation}"`)
   }
 
   closeEditModal()
 }
 
 // View package functions
-const openViewPackageModal = (pkg) => {
-  viewingPackage.value = { ...pkg }
+const openViewShippingModal = (pkg) => {
+  viewingShipping.value = { ...pkg }
   showViewModal.value = true
 }
 
 const closeViewModal = () => {
   showViewModal.value = false
-  viewingPackage.value = null
+  viewingShipping.value = null
 }
 
-const viewPackageDetails = (pkg) => {
-  openViewPackageModal(pkg)
+const viewShippingDetails = (pkg) => {
+  openViewShippingModal(pkg)
 }
 
 const editFromViewModal = () => {
-  if (viewingPackage.value) {
+  if (viewingShipping.value) {
     closeViewModal()
-    editPackage(viewingPackage.value)
+    editShipping(viewingShipping.value)
   }
 }
 
 // Add package functions
-const openAddPackageModal = () => {
+const openAddShippingModal = () => {
   showAddModal.value = true
-  addPackageTab.value = 'details'
-  resetNewPackageForm()
+  addShippingTab.value = 'details'
+  resetNewShippingForm()
   resetTrackingStops()
 }
 
@@ -3320,32 +3331,32 @@ const closeAddModal = () => {
   showAddModal.value = false
 }
 
-const addNewPackage = () => {
+const addNewShipping = () => {
   if (validateForm()) {
-    const newPackageToAdd = {
+    const newShippingToAdd = {
       id: Date.now(),
-      containerNumber: newPackage.value.containerNumber,
-      truckNumber: newPackage.value.truckNumber,
-      blNumber: newPackage.value.blNumber,
-      type: newPackage.value.type,
-      weight: newPackage.value.weight,
-      shippedDate: newPackage.value.shippedDate,
-      estimatedDelivery: newPackage.value.estimatedDelivery,
-      currentLocation: newPackage.value.currentLocation,
-      nextStop: newPackage.value.nextStop,
-      nextStopETA: newPackage.value.nextStopETA,
-      finalDestination: newPackage.value.finalDestination,
-      shippingAddress: { ...newPackage.value.shippingAddress },
+      containerNumber: newShipping.value.containerNumber,
+      truckNumber: newShipping.value.truckNumber,
+      blNumber: newShipping.value.blNumber,
+      type: newShipping.value.type,
+      weight: newShipping.value.weight,
+      shippedDate: newShipping.value.shippedDate,
+      estimatedDelivery: newShipping.value.estimatedDelivery,
+      currentLocation: newShipping.value.currentLocation,
+      nextStop: newShipping.value.nextStop,
+      nextStopETA: newShipping.value.nextStopETA,
+      finalDestination: newShipping.value.finalDestination,
+      shippingAddress: { ...newShipping.value.shippingAddress },
       lastUpdated: new Date().toLocaleDateString(),
       trackingHistory: [...trackingStops.value],
       comments: []
     }
 
-    packages.value.push(newPackageToAdd)
+    packages.value.push(newShippingToAdd)
 
     // Log the activity
     logActivity('package', currentUser.value.name, 'New package added',
-      `Added package ${newPackageToAdd.containerNumber} to the system`)
+      `Added package ${newShippingToAdd.containerNumber} to the system`)
 
     closeAddModal()
   }
@@ -3355,47 +3366,47 @@ const validateForm = () => {
   formErrors.value = {}
   let isValid = true
 
-  if (!newPackage.value.containerNumber) {
+  if (!newShipping.value.containerNumber) {
     formErrors.value.containerNumber = 'Container number is required'
     isValid = false
   }
 
-  if (!newPackage.value.truckNumber) {
+  if (!newShipping.value.truckNumber) {
     formErrors.value.truckNumber = 'Truck number is required'
     isValid = false
   }
 
-  if (!newPackage.value.blNumber) {
+  if (!newShipping.value.blNumber) {
     formErrors.value.blNumber = 'BL number is required'
     isValid = false
   }
 
-  if (!newPackage.value.type) {
-    formErrors.value.type = 'Package type is required'
+  if (!newShipping.value.type) {
+    formErrors.value.type = 'Shipping type is required'
     isValid = false
   }
 
-  if (!newPackage.value.weight) {
+  if (!newShipping.value.weight) {
     formErrors.value.weight = 'Weight is required'
     isValid = false
   }
 
-  if (!newPackage.value.shippedDate) {
+  if (!newShipping.value.shippedDate) {
     formErrors.value.shippedDate = 'Shipped date is required'
     isValid = false
   }
 
-  if (!newPackage.value.estimatedDelivery) {
+  if (!newShipping.value.estimatedDelivery) {
     formErrors.value.estimatedDelivery = 'Estimated delivery is required'
     isValid = false
   }
 
-  if (!newPackage.value.currentLocation) {
+  if (!newShipping.value.currentLocation) {
     formErrors.value.currentLocation = 'Current location is required'
     isValid = false
   }
 
-  if (!newPackage.value.finalDestination) {
+  if (!newShipping.value.finalDestination) {
     formErrors.value.finalDestination = 'Final destination is required'
     isValid = false
   }
@@ -3410,8 +3421,8 @@ const validateForm = () => {
   return isValid
 }
 
-const resetNewPackageForm = () => {
-  newPackage.value = {
+const resetNewShippingForm = () => {
+  newShipping.value = {
     containerNumber: '',
     truckNumber: '',
     blNumber: '',
@@ -3489,9 +3500,9 @@ const handleLocationChange = () => {
   editData.value.nextStopETA = calculateEstimatedArrival(editData.value.currentLocation)
 }
 
-const handleNewPackageLocationChange = () => {
-  newPackage.value.nextStop = getNextStop(newPackage.value.currentLocation)
-  newPackage.value.nextStopETA = calculateEstimatedArrival(newPackage.value.currentLocation)
+const handleNewShippingLocationChange = () => {
+  newShipping.value.nextStop = getNextStop(newShipping.value.currentLocation)
+  newShipping.value.nextStopETA = calculateEstimatedArrival(newShipping.value.currentLocation)
 }
 
 
