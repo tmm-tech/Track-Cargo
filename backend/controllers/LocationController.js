@@ -4,7 +4,7 @@ const { query } = require('../config/sqlConfig');
 module.exports = {
 // Add a new location
 addLocation: async (req, res) => {
-  const { name, city, country, coordinates } = req.body;
+  const { name, code, type, address, city, country, coordinates, status, created_at, updated_at } = req.body;
 
   try {
     const insertQuery = `
@@ -14,7 +14,7 @@ addLocation: async (req, res) => {
       RETURNING *;
     `;
 
-    const params = [name, city, country, coordinates || {}];
+    const params = [name, code, type, address, city, country, coordinates, status, created_at, updated_at || {}];
     const result = await query(insertQuery, params);
 
     res.json({ success: true, location: result.rows[0] });
