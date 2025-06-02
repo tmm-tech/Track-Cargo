@@ -24,17 +24,24 @@ const registrationSchema = Joi.object({
       'string.max': 'Password must not exceed 12 characters',
     }),
 
+  confirmPassword: Joi.string()
+    .valid(Joi.ref('password'))
+    .required()
+    .messages({
+      'any.only': 'Passwords do not match',
+    }),
+
   roles: Joi.string().required(),
 
   status: Joi.string().valid('active', 'inactive').default('active'),
 
   permissions: Joi.array().items(Joi.string()),
-  
+
   lastLogin: Joi.date().allow(null).default(null),
 });
 
 
 const validateCreateUserSchema = (payload) => {
-    return registrationSchema.validateAsync(payload, { abortEarly: false })
+  return registrationSchema.validateAsync(payload, { abortEarly: false })
 }
 module.exports = validateCreateUserSchema

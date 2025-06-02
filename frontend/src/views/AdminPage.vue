@@ -1732,15 +1732,23 @@
                   </div>
 
                   <div class="space-y-2">
+                    <label for="confirmPassword" class="text-sm font-medium">Confirm Password</label>
+                    <input id="confirmPassword" type="password" v-model="newUser.confirmPassword"
+                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.confirmPassword ? 'border-red-500' : '']" />
+                    <p v-if="userFormErrors.confirmPassword" class="text-red-500 text-sm">{{
+                      userFormErrors.confirmPassword }}</p>
+                  </div>
+
+                  <div class="space-y-2">
                     <label for="role" class="text-sm font-medium">Role</label>
-                    <select id="role" v-model="newUser.role"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.role ? 'border-red-500' : '']">
+                    <select id="role" v-model="newUser.roles"
+                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.roles ? 'border-red-500' : '']">
                       <option value="" disabled selected>Select role</option>
                       <option value="admin">Admin</option>
                       <option value="operator">Operator</option>
                       <option value="viewer">Viewer</option>
                     </select>
-                    <p v-if="userFormErrors.role" class="text-red-500 text-sm">{{ userFormErrors.role }}</p>
+                    <p v-if="userFormErrors.role" class="text-red-500 text-sm">{{ userFormErrors.roles }}</p>
                   </div>
 
                   <div class="space-y-2">
@@ -1939,7 +1947,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2091,36 +2099,32 @@ const validateUserForm = () => {
   if (!newUser.value.username) {
     userFormErrors.value.username = 'Username is required'
     isValid = false
-  } else if (
-    !newUser.value.id &&
-    users.value.some(u => u.username.toLowerCase() === newUser.value.username.toLowerCase())
-  )
-
-    if (!newUser.value.email) {
-      userFormErrors.value.email = 'Email is required'
-      isValid = false
-    } else if (!/\S+@\S+\.\S+/.test(newUser.value.email)) {
-      userFormErrors.value.email = 'Email is invalid'
-      isValid = false
-    }
-
-  if (!newUser.value.id) {
-    if (!newUser.value.password) {
-      userFormErrors.value.password = 'Password is required'
-      isValid = false
-    } else if (newUser.value.password.length < 6) {
-      userFormErrors.value.password = 'Password must be at least 6 characters'
-      isValid = false
-    }
-
-    if (!newUser.value.confirmPassword) {
-      userFormErrors.value.confirmPassword = 'Please confirm your password'
-      isValid = false
-    } else if (newUser.value.password !== newUser.value.confirmPassword) {
-      userFormErrors.value.confirmPassword = 'Passwords do not match'
-      isValid = false
-    }
   }
+  if (!newUser.value.email) {
+    userFormErrors.value.email = 'Email is required'
+    isValid = false
+  } else if (!/\S+@\S+\.\S+/.test(newUser.value.email)) {
+    userFormErrors.value.email = 'Email is invalid'
+    isValid = false
+  }
+
+
+  if (!newUser.value.password) {
+    userFormErrors.value.password = 'Password is required'
+    isValid = false
+  } else if (newUser.value.password.length < 6) {
+    userFormErrors.value.password = 'Password must be at least 6 characters'
+    isValid = false
+  }
+
+  if (!newUser.value.confirmPassword) {
+    userFormErrors.value.confirmPassword = 'Please confirm your password'
+    isValid = false
+  } else if (newUser.value.password !== newUser.value.confirmPassword) {
+    userFormErrors.value.confirmPassword = 'Passwords do not match'
+    isValid = false
+  }
+
 
   return isValid
 }
@@ -2289,6 +2293,7 @@ const newUser = ref({
   email: '',
   username: '',
   password: '',
+  confirmPassword: '',
   roles: '',
   status: 'active',
   permissions: {
@@ -2531,6 +2536,8 @@ const closeAddUserModal = () => {
     email: '',
     username: '',
     password: '',
+    confirmPassword: '',
+    status: 'active',
     roles: '',
     permissions: {
       packages: false,
@@ -2544,6 +2551,13 @@ const closeAddUserModal = () => {
 
 const addNewUser = async () => {
   console.log("Start adding new user");
+  const isValids = validateUserForm();
+  console.log("Is form valid?", isValids);
+  console.log("Validation errors:", userFormErrors.value);
+
+  if (!isValids) return;
+
+  isSubmitting.value = true;
   if (validateUserForm()) {
     isSubmitting.value = true
     const newUserToAdd = {
@@ -2551,6 +2565,7 @@ const addNewUser = async () => {
       email: newUser.value.email,
       username: newUser.value.username,
       password: newUser.value.password,
+      confirmPassword: newUser.value.confirmPassword,
       roles: newUser.value.roles,
       status: newUser.value.status || 'active',
       permissions: Object.entries(newUser.value.permissions)
@@ -2583,7 +2598,7 @@ const addNewUser = async () => {
     } finally {
       isSubmitting.value = false
     }
-}
+  }
 }
 const isValidEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -2596,6 +2611,7 @@ const resetNewUserForm = () => {
     email: '',
     username: '',
     password: '',
+    confirmPassword: '',
     roles: '',
     status: 'active',
     permissions: {
