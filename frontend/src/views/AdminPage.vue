@@ -2015,7 +2015,7 @@
 
           <!-- Dialog Content -->
           <div class="overflow-y-auto max-h-[calc(95vh-120px)]" id="tracking-content">
-            <ShippingTracking v-if="selectedShipping" :pkg="selectedShipping" class="print-content" />
+            <PackageTracking v-if="selectedShipping" :pkg="selectedShipping" class="print-content" />
           </div>
         </div>
       </div>
@@ -2059,7 +2059,7 @@ import {
   ArchiveBoxIcon
 } from '@heroicons/vue/24/outline'
 import { LogOut } from 'lucide-vue-next'
-import { mockShippings } from '../data/mock-data'
+import { mockPackages } from '../data/mock-data'
 import PackageTracking from './PackageTracking.vue'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -2274,7 +2274,7 @@ const currentUser = ref({
 })
 
 // Shipping management state
-const packages = ref([...mockShippings])
+const packages = ref([...mockPackages])
 const searchTerm = ref('')
 const currentYear = computed(() => new Date().getFullYear())
 
@@ -2506,7 +2506,7 @@ const getShippingsByStatus = (status) => {
 }
 
 const getUsersByRole = (role) => {
-  return users.value.filter(user => user.role === role).length
+  return users.value.filter(user => user.roles === role).length
 }
 
 // Activity logging function
