@@ -1,6 +1,6 @@
 const express = require('express');
-require('dotenv').config();
 const cors = require('cors');
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const UserRoutes = require('./routes/UserRoutes');
 const PackageRoutes = require('./routes/PackageRoutes');
@@ -9,20 +9,16 @@ const LocationRoutes = require('./routes/LocationRoutes');
 const cookieParser = require('cookie-parser');
 
 const app = express(); 
-
-
-const allowedOrigins = [
-    'https://track-cargo.vercel.app/',
-  ];
-  
-  const corsOptions = {
-    origin: true,
-    methods: 'GET,POST,PUT,DELETE',
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization']
-  };
-  
-app.use(cors(corsOptions));
+// Middleware to parse cookies
+app.use(cookieParser());
+// CORS configuration
+app.use(cors());
+// OR (for stricter production settings)
+app.use(cors({
+  origin: 'https://track-cargo.vercel.app/',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // Body parsing
 app.use(express.json({ limit: '50mb' }));
