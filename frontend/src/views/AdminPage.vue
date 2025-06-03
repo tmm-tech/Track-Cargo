@@ -937,10 +937,6 @@
                         </th>
                         <th scope="col"
                           class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Code
-                        </th>
-                        <th scope="col"
-                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Type
                         </th>
                         <th scope="col"
@@ -1201,7 +1197,7 @@
                 <div class="flex flex-col space-y-1.5 pb-4">
                   <h2 class="text-lg font-semibold leading-none tracking-tight">Location Details</h2>
                   <p class="text-sm text-muted-foreground" v-if="viewingLocation">
-                     {{ viewingLocation.name }}
+                    {{ viewingLocation.name }}
                   </p>
                 </div>
 
@@ -1931,7 +1927,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2753,7 +2749,7 @@ const viewingLocation = ref(null)
 const fetchLocation = async () => {
   try {
     const responses = await locationService.getLocations();
-    locations.value = responses.data.locations || []; 
+    locations.value = responses.data.locations || [];
 
   } catch (error) {
     console.error('Error fetching Locations:', error);
@@ -2790,7 +2786,6 @@ const addNewLocation = async () => {
       newLocation.value.coordinates = null; // or a valid fallback JSON
     }
     const newLocationToAdd = {
-      id: Date.now(),
       name: newLocation.value.name,
       type: newLocation.value.type,
       address: newLocation.value.address,
@@ -2801,12 +2796,14 @@ const addNewLocation = async () => {
     }
     try {
       const response = await locationService.addLocation(newLocationToAdd)
+      console.log('Response:', response)
       if (response.success) {
         setAlert('Location added successfully!', 'success')
         closeAddLocationModal()
       }
       else {
         setAlert('Failed to add new location.', 'error')
+        console.log(response.error)
       }
     } catch (error) {
       setAlert('Error adding new location.', 'error')
@@ -2862,9 +2859,23 @@ const resetNewLocationForm = () => {
   locationFormErrors.value = {}
 }
 
-const editLocation = (location) => {
-  editingLocation.value = { ...location }
-  showEditLocationModal.value = true
+const editLocation = async (location) => {
+  try {
+
+    const response = await locationService.getLocationById(location.id)
+
+    if (!response || response.error) {
+      setAlert('Failed to fetch location details.', 'error')
+      return
+    }
+
+    // Populate editingLocation with fetched data
+    editingLocation.value = { ...response.data.location }
+    showEditLocationModal.value = true
+  } catch (error) {
+    console.error('Error fetching Location data:', error)
+    setAlert('Failed to load location data for editing.', 'error')
+  }
 }
 
 const closeEditLocationModal = () => {
@@ -2872,26 +2883,64 @@ const closeEditLocationModal = () => {
   editingLocation.value = null
 }
 
-const updateLocation = () => {
+const updateLocation = async () => {
   if (!editingLocation.value) return
 
-  locations.value = locations.value.map(location => {
-    if (location.id === editingLocation.value.id) {
-      return { ...editingLocation.value }
+
+  try {
+    const updatedLocation = {
+      name: editingLocation.value.name,
+      type: editingLocation.value.type,
+      address: editingLocation.value.address,
+      city: editingLocation.value.city,
+      country: editingLocation.value.country,
+      coordinates: editingLocation.value.coordinates,
+      status: editingLocation.value.status
+    };
+
+    if (!updatedLocation.coordinates) {
+      updatedLocation.coordinates = null; // or a valid fallback JSON
     }
-    return location
-  })
+    const response = await locationService.updateLocation(editingLocation.value.id, updatedLocation);
 
-  logActivity('location', currentUser.value.name, 'Location updated',
-    `Updated location ${editingLocation.value.name}`)
+    if (response.error) {
+      setAlert(response.error, 'error');
+      return;
+    }
 
-  setAlert('Location updated successfully!', 'success')
-  closeEditLocationModal()
+    setAlert('Location updated successfully!', 'success')
+    closeEditLocationModal()
+    // Refresh the user list
+    await fetchLocation();
+
+
+
+
+  } catch (error) {
+    console.error('Error updating Location:', error);
+    setAlert('Failed to update Location. Please try again.', 'error');
+  }
+
+
 }
 
 const viewLocation = async (location) => {
-  viewingLocation.value = { ...location }
-  showViewLocationModal.value = true
+  try {
+
+    const response = await locationService.getLocationById(location.id)
+
+    if (!response || response.error) {
+      setAlert('Failed to fetch location details.', 'error')
+      return
+    }
+
+    // Populate editingLocation with fetched data
+    viewingLocation.value = { ...response.data.location }
+    showViewLocationModal.value = true
+  } catch (error) {
+    console.error('Error fetching Location data:', error)
+    setAlert('Failed to load location data for editing.', 'error')
+  }
 }
 
 const closeViewLocationModal = () => {
@@ -2916,16 +2965,28 @@ const closeDeleteLocationModal = () => {
   locationToDelete.value = null
 }
 
-const deleteLocation = () => {
+const deleteLocation = async () => {
   if (!locationToDelete.value) return
+  try {
+    const response = await locationService.deleteLocation(locationToDelete.value.id)
 
-  locations.value = locations.value.filter(location => location.id !== locationToDelete.value.id)
+    if (response.error) {
+      setAlert(response.error, 'error')
+    } else {
+      setAlert('Location deleted successfully!', 'success')
+      locations.value = locations.value.filter(u => u.id !== locationToDelete.value.id)
+    }
+  } catch (error) {
+    console.error('Delete error:', error)
+    setAlert('An error occurred while deleting the user.', 'error')
+  } finally {
+    closeDeleteLocationModal()
+    locationToDelete.value = null
+  }
 
-  logActivity('location', currentUser.value.name, 'Location deleted',
-    `Deleted location ${locationToDelete.value.name}`)
 
-  setAlert('Location deleted successfully!', 'success')
-  closeDeleteLocationModal()
+
+
 }
 
 // Handle logout function

@@ -9,7 +9,7 @@ module.exports = {
         try {
             const insertQuery = `
       INSERT INTO locations (name, type, address, city, country, coordinates, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
 
             const params = [name, type, address, city, country, coordinates, status || {}];
             const result = await query(insertQuery, params);
