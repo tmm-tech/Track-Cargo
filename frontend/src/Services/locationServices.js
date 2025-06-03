@@ -20,9 +20,9 @@ export default {
   },
 
   // Get a single location by ID
-  getLocationById(locationId) {
+  getLocationById(id) {
 
-    return axios.get(`${API_URL}/${locationId}`);
+    return axios.get(`${API_URL}/${id}`);
 
   },
 

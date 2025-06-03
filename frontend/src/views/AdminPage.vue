@@ -922,7 +922,7 @@
                 <div class="mb-6">
                   <div class="relative">
                     <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                    <input placeholder="Search locations by name, code, or country" v-model="locationSearchTerm"
+                    <input placeholder="Search locations by name, or country" v-model="locationSearchTerm"
                       class="flex h-10 w-full rounded-md border border-input bg-background pl-10 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" />
                   </div>
                 </div>
@@ -974,7 +974,6 @@
                             </div>
                           </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">{{ location.code }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                           <span :class="[
                             'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
@@ -1046,13 +1045,6 @@
                     <input id="location-name" v-model="newLocation.name"
                       :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.name ? 'border-red-500' : '']" />
                     <p v-if="locationFormErrors.name" class="text-red-500 text-sm">{{ locationFormErrors.name }}</p>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="location-code" class="text-sm font-medium">Location Code</label>
-                    <input id="location-code" v-model="newLocation.code" placeholder="e.g., NBO, MSA, KIS"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.code ? 'border-red-500' : '']" />
-                    <p v-if="locationFormErrors.code" class="text-red-500 text-sm">{{ locationFormErrors.code }}</p>
                   </div>
 
                   <div class="space-y-2">
@@ -1141,12 +1133,6 @@
                   </div>
 
                   <div class="space-y-2">
-                    <label for="edit-location-code" class="text-sm font-medium">Location Code</label>
-                    <input id="edit-location-code" v-model="editingLocation.code"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                  </div>
-
-                  <div class="space-y-2">
                     <label for="edit-location-type" class="text-sm font-medium">Type</label>
                     <select id="edit-location-type" v-model="editingLocation.type"
                       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
@@ -1215,7 +1201,7 @@
                 <div class="flex flex-col space-y-1.5 pb-4">
                   <h2 class="text-lg font-semibold leading-none tracking-tight">Location Details</h2>
                   <p class="text-sm text-muted-foreground" v-if="viewingLocation">
-                    {{ viewingLocation.code }} - {{ viewingLocation.name }}
+                     {{ viewingLocation.name }}
                   </p>
                 </div>
 
@@ -1224,10 +1210,6 @@
                     <div>
                       <p class="text-sm font-medium text-gray-500">Location Name</p>
                       <p class="text-lg">{{ viewingLocation.name }}</p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Code</p>
-                      <p class="text-lg font-mono">{{ viewingLocation.code }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Type</p>
@@ -1268,7 +1250,7 @@
 
                   <div>
                     <p class="text-sm font-medium text-gray-500 mb-2">Created</p>
-                    <p class="text-sm">{{ viewingLocation.createdAt }}</p>
+                    <p class="text-sm">{{ formatDate(viewingLocation.created_at) }}</p>
                   </div>
                 </div>
 
@@ -1280,7 +1262,7 @@
                   </button>
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                    @click="editFromViewLocationModal">
+                    @click="editFromViewLocationModal(viewingLocation)">
                     <PencilIcon class="h-4 w-4 mr-2" />
                     Edit Location
                   </button>
@@ -1320,7 +1302,7 @@
                     </div>
                     <div class="ml-4">
                       <div class="text-sm font-medium text-gray-900">{{ locationToDelete.name }}</div>
-                      <div class="text-sm text-gray-500">{{ locationToDelete.code }} - {{ locationToDelete.city }}, {{
+                      <div class="text-sm text-gray-500">{{ locationToDelete.city }}, {{
                         locationToDelete.country }}</div>
                     </div>
                   </div>
@@ -2756,7 +2738,6 @@ const locationFormErrors = ref({})
 // New location form
 const newLocation = ref({
   name: '',
-  code: '',
   type: '',
   address: '',
   city: '',
@@ -2772,7 +2753,7 @@ const viewingLocation = ref(null)
 const fetchLocation = async () => {
   try {
     const responses = await locationService.getLocations();
-    locations.value = responses.data.data;
+    locations.value = responses.data.locations || []; 
 
   } catch (error) {
     console.error('Error fetching Locations:', error);
@@ -2783,7 +2764,6 @@ const filteredLocations = computed(() => {
 
   return locations.value.filter(location =>
     location.name.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
-    location.code.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
     location.country.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
     location.city.toLowerCase().includes(locationSearchTerm.value.toLowerCase())
   )
@@ -2812,7 +2792,6 @@ const addNewLocation = async () => {
     const newLocationToAdd = {
       id: Date.now(),
       name: newLocation.value.name,
-      code: newLocation.value.code.toUpperCase(),
       type: newLocation.value.type,
       address: newLocation.value.address,
       city: newLocation.value.city,
@@ -2846,17 +2825,6 @@ const validateLocationForm = () => {
     isValid = false
   }
 
-  if (!newLocation.value.code) {
-    locationFormErrors.value.code = 'Location code is required'
-    isValid = false
-  } else if (
-    Array.isArray(locations.value) &&
-    locations.value.some(loc => loc.code?.toLowerCase() === newLocation.value.code.toLowerCase())
-  ) {
-    locationFormErrors.value.code = 'Location code already exists'
-    isValid = false
-  }
-
 
   if (!newLocation.value.type) {
     locationFormErrors.value.type = 'Location type is required'
@@ -2884,7 +2852,6 @@ const validateLocationForm = () => {
 const resetNewLocationForm = () => {
   newLocation.value = {
     name: '',
-    code: '',
     type: '',
     address: '',
     city: '',
@@ -2916,21 +2883,15 @@ const updateLocation = () => {
   })
 
   logActivity('location', currentUser.value.name, 'Location updated',
-    `Updated location ${editingLocation.value.name} (${editingLocation.value.code})`)
+    `Updated location ${editingLocation.value.name}`)
 
   setAlert('Location updated successfully!', 'success')
   closeEditLocationModal()
 }
 
-const viewLocation = async () => {
+const viewLocation = async (location) => {
+  viewingLocation.value = { ...location }
   showViewLocationModal.value = true
-  try {
-    const response = await locationService.getLocations();
-    viewingLocation.value = response.data.data;
-
-  } catch (error) {
-    console.error('Error fetching users:', error);
-  }
 }
 
 const closeViewLocationModal = () => {
@@ -2938,10 +2899,10 @@ const closeViewLocationModal = () => {
   viewingLocation.value = null
 }
 
-const editFromViewLocationModal = () => {
+const editFromViewLocationModal = (location) => {
   if (viewingLocation.value) {
     closeViewLocationModal()
-    editLocation(viewingLocation.value)
+    editLocation(location)
   }
 }
 
@@ -2961,7 +2922,7 @@ const deleteLocation = () => {
   locations.value = locations.value.filter(location => location.id !== locationToDelete.value.id)
 
   logActivity('location', currentUser.value.name, 'Location deleted',
-    `Deleted location ${locationToDelete.value.name} (${locationToDelete.value.code})`)
+    `Deleted location ${locationToDelete.value.name}`)
 
   setAlert('Location deleted successfully!', 'success')
   closeDeleteLocationModal()
