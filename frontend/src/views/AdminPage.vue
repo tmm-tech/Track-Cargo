@@ -2255,12 +2255,13 @@ const currentUser = ref({
 })
 
 // Shipping management state
-const packages = ref([...mockPackages])
+const packages = ref([]);
 const searchTerm = ref('')
 const currentYear = computed(() => new Date().getFullYear())
 
 // User management state
 const users = ref([]);
+// Location management state
 const locations = ref([]);
 const userSearchTerm = ref('');
 const showAddUserModal = ref(false)
