@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(cors());
 // OR (for stricter production settings)
 app.use(cors({
-  origin: 'https://track-cargo.vercel.app/admin',
+  origin: 'https://track-cargo.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
