@@ -2329,7 +2329,16 @@ const recentActivity = computed(() => {
   return activityLogs.value.slice(0, 5)
 })
 
+// Load Shipping Details from the service
+const fetchShippings = async () => {
+  try {
+    const response = await userService.getAllUsers();
+    users.value = response.data.data;
 
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
+};
 
 // Filtered packages based on search term
 const filteredShippings = computed(() => {
@@ -2797,7 +2806,7 @@ const addNewLocation = async () => {
     try {
       const response = await locationService.addLocation(newLocationToAdd)
       console.log('Response:', response)
-      if (response.success) {
+      if (response.data.success) {
         setAlert('Location added successfully!', 'success')
         closeAddLocationModal()
       }
