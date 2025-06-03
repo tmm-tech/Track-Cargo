@@ -2332,8 +2332,8 @@ const recentActivity = computed(() => {
 // Load Shipping Details from the service
 const fetchShippings = async () => {
   try {
-    const response = await userService.getAllUsers();
-    users.value = response.data.data;
+    const response = await ShippingServices.getPackages();
+    packages.value = response.data.data;
 
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -3516,6 +3516,7 @@ onMounted(() => {
   checkMobileDevice()
   fetchUsers()
   fetchLocation()
+  fetchShippings()
   window.addEventListener('resize', checkMobileDevice)
   // Auto-login for demo
   isAuthenticated.value = true
