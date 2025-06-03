@@ -2333,7 +2333,7 @@ const recentActivity = computed(() => {
 const fetchShippings = async () => {
   try {
     const response = await ShippingServices.getPackages();
-    packages.value = response.data.data;
+    packages.value = response.data;
 
   } catch (error) {
     console.error('Error fetching users:', error);
