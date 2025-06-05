@@ -1,5 +1,5 @@
 const express = require("express")
-const PackageController = require("../controllers/PackageController")
+const {PackageController} = require(".../controllers/PackageController")
 const {
   validatePackageCreation,
   validatePackageUpdate,
