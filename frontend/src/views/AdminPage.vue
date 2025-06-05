@@ -64,7 +64,7 @@
               <ArchiveBoxIcon
                 :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
                 class="flex-shrink-0" />
-              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Shippings</span>
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Ship Management</span>
             </button>
             <button @click="navigateToView('locations')"
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Locations' : ''"
@@ -495,7 +495,7 @@
                 <div>
                   <h2 class="text-lg sm:text-xl font-semibold">Shipping Management</h2>
                   <p class="text-gray-200 text-sm">
-                    Update the current location and next stop information for packages
+                    Update the current location and next stop information for shipments.
                   </p>
                 </div>
                 <button @click="openAddShippingModal"
@@ -548,7 +548,7 @@
                       </thead>
                       <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="filteredShippings.length === 0">
-                          <td colspan="8" class="text-center py-4 text-gray-500">No packages found</td>
+                          <td colspan="8" class="text-center py-4 text-gray-500">No shipment found</td>
                         </tr>
                         <tr v-for="pkg in filteredShippings" :key="pkg.id" class="hover:bg-gray-50">
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
@@ -1285,7 +1285,7 @@
                     <div class="ml-3">
                       <h3 class="text-sm font-medium text-red-800">Warning</h3>
                       <div class="mt-2 text-sm text-red-700">
-                        <p>Deleting this location may affect existing packages and tracking history.</p>
+                        <p>Deleting this location may affect existing shipment and tracking history.</p>
                       </div>
                     </div>
                   </div>
@@ -1737,7 +1737,7 @@
                       <div class="flex items-center">
                         <input id="perm-packages" type="checkbox" v-model="newUser.permissions.packages"
                           class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                        <label for="perm-packages" class="ml-2 text-sm text-gray-700">Manage Shippings</label>
+                        <label for="perm-packages" class="ml-2 text-sm text-gray-700">Manage Shipments</label>
                       </div>
                       <div class="flex items-center">
                         <input id="perm-users" type="checkbox" v-model="newUser.permissions.users"
