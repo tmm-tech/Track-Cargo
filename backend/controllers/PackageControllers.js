@@ -1,11 +1,11 @@
-const { query } = require('../config/sqlConfig')
+const { query } = require("../config/sqlConfig")
 const { v4: uuidv4 } = require("uuid")
 const { validationResult } = require("express-validator")
 
 // Enhanced package controller with improved error handling and features
-module.exports =  {
+module.exports = {
   // Helper method for handling database transactions
-async withTransaction(callback) {
+  async withTransaction(callback) {
     const client = await query.getClient()
     try {
       await client.query("BEGIN")
@@ -49,7 +49,7 @@ async withTransaction(callback) {
   async createPackage(req, res) {
     try {
       // Check for validation errors
-      const validationError = handleValidationErrors(req, res)
+      const validationError = this.handleValidationErrors(req, res)
       if (validationError) return validationError
 
       const {
@@ -82,7 +82,7 @@ async withTransaction(callback) {
       const updated_at = created_at
 
       // Use transaction for package creation
-      const result = await withTransaction(async (client) => {
+      const result = await this.withTransaction(async (client) => {
         // Insert package
         const packageResult = await client.query(
           `
@@ -152,10 +152,10 @@ async withTransaction(callback) {
         return newPackage
       })
 
-      return sendResponse(res, 201, true, "Package created successfully", result, { tracking_number })
+      return this.sendResponse(res, 201, true, "Package created successfully", result, { tracking_number })
     } catch (error) {
       console.error("Error creating package:", error)
-      return sendResponse(res, 500, false, "Failed to create package", null, { error: error.message })
+      return this.sendResponse(res, 500, false, "Failed to create package", null, { error: error.message })
     }
   },
 
@@ -189,15 +189,6 @@ async withTransaction(callback) {
           paramCount++
           whereClause += ` AND ${condition} $${paramCount}`
           queryParams.push(value)
-        }
-      }
-
-      const addLikeFilter = (fields, value) => {
-        if (value) {
-          paramCount++
-          const conditions = fields.map(() => `ILIKE $${paramCount}`).join(" OR ")
-          whereClause += ` AND (${fields.map((field) => `${field} ${conditions.split(" OR ")[0]}`).join(" OR ")})`
-          queryParams.push(`%${value}%`)
         }
       }
 
@@ -264,7 +255,7 @@ async withTransaction(callback) {
         shipping_address: pkg.shipping_address ? JSON.parse(pkg.shipping_address) : null,
       }))
 
-      return sendResponse(res, 200, true, "Packages retrieved successfully", packages, {
+      return this.sendResponse(res, 200, true, "Packages retrieved successfully", packages, {
         pagination: {
           page: Number(page),
           limit: Number(limit),
@@ -277,7 +268,7 @@ async withTransaction(callback) {
       })
     } catch (error) {
       console.error("Error fetching packages:", error)
-      return sendResponse(res, 500, false, "Failed to retrieve packages", null, {
+      return this.sendResponse(res, 500, false, "Failed to retrieve packages", null, {
         error: error.message,
       })
     }
@@ -298,7 +289,7 @@ async withTransaction(callback) {
       )
 
       if (packageResult.rowCount === 0) {
-        return sendResponse(res, 404, false, "Package not found")
+        return this.sendResponse(res, 404, false, "Package not found")
       }
 
       const packageData = packageResult.rows[0]
@@ -350,10 +341,10 @@ async withTransaction(callback) {
         new Date(packageData.estimated_delivery) < new Date() &&
         packageData.status !== "Delivered"
 
-      return sendResponse(res, 200, true, "Package retrieved successfully", packageData)
+      return this.sendResponse(res, 200, true, "Package retrieved successfully", packageData)
     } catch (error) {
       console.error("Error fetching package:", error)
-      return sendResponse(res, 500, false, "Failed to retrieve package", null, {
+      return this.sendResponse(res, 500, false, "Failed to retrieve package", null, {
         error: error.message,
       })
     }
@@ -362,7 +353,7 @@ async withTransaction(callback) {
   // Update package with comprehensive tracking
   async updatePackage(req, res) {
     try {
-      const validationError = handleValidationErrors(req, res)
+      const validationError = this.handleValidationErrors(req, res)
       if (validationError) return validationError
 
       const { id } = req.params
@@ -376,7 +367,7 @@ async withTransaction(callback) {
       const updated_at = new Date()
       updateData.updated_at = updated_at
 
-      const result = await withTransaction(async (client) => {
+      const result = await this.withTransaction(async (client) => {
         // Build dynamic update query
         const updateFields = Object.keys(updateData).filter((key) => updateData[key] !== undefined)
         const setClause = updateFields.map((field, index) => `${field} = $${index + 1}`).join(", ")
@@ -430,10 +421,10 @@ async withTransaction(callback) {
       result.dimensions = result.dimensions ? JSON.parse(result.dimensions) : null
       result.shipping_address = result.shipping_address ? JSON.parse(result.shipping_address) : null
 
-      return sendResponse(res, 200, true, "Package updated successfully", result)
+      return this.sendResponse(res, 200, true, "Package updated successfully", result)
     } catch (error) {
       console.error("Error updating package:", error)
-      return sendResponse(
+      return this.sendResponse(
         res,
         500,
         false,
@@ -450,7 +441,7 @@ async withTransaction(callback) {
       const { id } = req.params
       const { reason = "Cancelled by administrator" } = req.body
 
-      const result = await withTransaction(async (client) => {
+      const result = await this.withTransaction(async (client) => {
         const deleteResult = await client.query(
           `
           UPDATE packages SET is_deleted = TRUE, updated_at = NOW()
@@ -480,13 +471,13 @@ async withTransaction(callback) {
         return deleteResult.rows[0]
       })
 
-      return sendResponse(res, 200, true, "Package deleted successfully", {
+      return this.sendResponse(res, 200, true, "Package deleted successfully", {
         id: result.id,
         tracking_number: result.tracking_number,
       })
     } catch (error) {
       console.error("Error deleting package:", error)
-      return sendResponse(
+      return this.sendResponse(
         res,
         500,
         false,
@@ -524,7 +515,7 @@ async withTransaction(callback) {
       )
 
       if (result.rowCount === 0) {
-        return sendResponse(res, 404, false, "Package not found with the provided tracking number")
+        return this.sendResponse(res, 404, false, "Package not found with the provided tracking number")
       }
 
       const packageData = result.rows[0]
@@ -571,16 +562,10 @@ async withTransaction(callback) {
         }
       }
 
-      return sendResponse(
-        res,
-        200,
-        true,
-        "Package tracking information retrieved successfully",
-        packageData,
-      )
+      return this.sendResponse(res, 200, true, "Package tracking information retrieved successfully", packageData)
     } catch (error) {
       console.error("Error tracking package:", error)
-      return sendResponse(res, 500, false, "Failed to retrieve tracking information", null, {
+      return this.sendResponse(res, 500, false, "Failed to retrieve tracking information", null, {
         error: error.message,
       })
     }
@@ -589,13 +574,13 @@ async withTransaction(callback) {
   // Add tracking event to existing package
   async addTrackingEvent(req, res) {
     try {
-      const validationError = handleValidationErrors(req, res)
+      const validationError = this.handleValidationErrors(req, res)
       if (validationError) return validationError
 
       const { id } = req.params
       const { status, location, comment, event_type = "status_update", notify_customer = false } = req.body
 
-      const result = await withTransaction(async (client) => {
+      const result = await this.withTransaction(async (client) => {
         // Verify package exists
         const packageCheck = await client.query(
           "SELECT id, status, current_location FROM packages WHERE id = $1 AND is_deleted = FALSE",
@@ -633,10 +618,10 @@ async withTransaction(callback) {
         return trackingResult.rows[0]
       })
 
-      return sendResponse(res, 201, true, "Tracking event added successfully", result)
+      return this.sendResponse(res, 201, true, "Tracking event added successfully", result)
     } catch (error) {
       console.error("Error adding tracking event:", error)
-      return sendResponse(
+      return this.sendResponse(
         res,
         500,
         false,
@@ -723,7 +708,7 @@ async withTransaction(callback) {
         `),
       ])
 
-      return sendResponse(
+      return this.sendResponse(
         res,
         200,
         true,
@@ -749,7 +734,7 @@ async withTransaction(callback) {
       )
     } catch (error) {
       console.error("Error fetching package stats:", error)
-      return sendResponse(res, 500, false, "Failed to retrieve package statistics", null, {
+      return this.sendResponse(res, 500, false, "Failed to retrieve package statistics", null, {
         error: error.message,
       })
     }
@@ -761,7 +746,7 @@ async withTransaction(callback) {
       const { q: searchTerm, limit = 20, include_deleted = false } = req.query
 
       if (!searchTerm || searchTerm.trim().length < 2) {
-        return sendResponse(res, 400, false, "Search term must be at least 2 characters long")
+        return this.sendResponse(res, 400, false, "Search term must be at least 2 characters long")
       }
 
       const whereClause = include_deleted === "true" ? "WHERE" : "WHERE p.is_deleted = FALSE AND"
@@ -813,21 +798,14 @@ async withTransaction(callback) {
         shipping_address: pkg.shipping_address ? JSON.parse(pkg.shipping_address) : null,
       }))
 
-      return sendResponse(
-        res,
-        200,
-        true,
-        `Found ${packages.length} packages matching your search`,
-        packages,
-        {
-          search_term: searchTerm.trim(),
-          result_count: packages.length,
-          max_results: Number(limit),
-        },
-      )
+      return this.sendResponse(res, 200, true, `Found ${packages.length} packages matching your search`, packages, {
+        search_term: searchTerm.trim(),
+        result_count: packages.length,
+        max_results: Number(limit),
+      })
     } catch (error) {
       console.error("Error searching packages:", error)
-      return sendResponse(res, 500, false, "Failed to search packages", null, {
+      return this.sendResponse(res, 500, false, "Failed to search packages", null, {
         error: error.message,
       })
     }
@@ -839,14 +817,14 @@ async withTransaction(callback) {
       const { package_ids, updates, add_tracking_event = false } = req.body
 
       if (!package_ids || !Array.isArray(package_ids) || package_ids.length === 0) {
-        return sendResponse(res, 400, false, "Package IDs array is required")
+        return this.sendResponse(res, 400, false, "Package IDs array is required")
       }
 
       if (!updates || Object.keys(updates).length === 0) {
-        return sendResponse(res, 400, false, "Updates object is required")
+        return this.sendResponse(res, 400, false, "Updates object is required")
       }
 
-      const result = await withTransaction(async (client) => {
+      const result = await this.withTransaction(async (client) => {
         const updated_at = new Date()
         updates.updated_at = updated_at
 
@@ -892,14 +870,14 @@ async withTransaction(callback) {
         return updateResult.rows
       })
 
-      return sendResponse(res, 200, true, `Successfully updated ${result.length} packages`, result, {
+      return this.sendResponse(res, 200, true, `Successfully updated ${result.length} packages`, result, {
         requested_count: package_ids.length,
         updated_count: result.length,
         updates_applied: updates,
       })
     } catch (error) {
       console.error("Error in bulk update:", error)
-      return sendResponse(res, 500, false, "Failed to perform bulk update", null, {
+      return this.sendResponse(res, 500, false, "Failed to perform bulk update", null, {
         error: error.message,
       })
     }
@@ -946,7 +924,7 @@ async withTransaction(callback) {
       )
 
       if (format === "json") {
-        return sendResponse(res, 200, true, "Packages exported successfully", result.rows, {
+        return this.sendResponse(res, 200, true, "Packages exported successfully", result.rows, {
           export_format: "json",
           record_count: result.rows.length,
           exported_at: new Date().toISOString(),
@@ -974,9 +952,9 @@ async withTransaction(callback) {
       return res.status(200).send(csvContent)
     } catch (error) {
       console.error("Error exporting packages:", error)
-      return sendResponse(res, 500, false, "Failed to export packages", null, {
+      return this.sendResponse(res, 500, false, "Failed to export packages", null, {
         error: error.message,
       })
     }
   },
-};
+}
