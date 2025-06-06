@@ -101,7 +101,7 @@ module.exports = {
                 if (match) {
                     // Create JWT Token
                     let token = await createToken({ email: user.email, id: user.id });
-
+                    console.log('Generated Token:', token);
                     // Set token as a cookie (HttpOnly and valid for 1 hour)
                     res.cookie('token', token, {
                         httpOnly: true,
