@@ -1,11 +1,11 @@
 // Authentication guard for Vue Router
-import userService from "../Services/userServices.js"
+import userServices from "..userServices.js"
 
 export const authGuard = async (to, from, next) => {
   try {
     // Check if route requires authentication
     if (to.meta.requiresAuth) {
-      const token = userService.getAuthToken()
+      const token = userServices.getAuthToken()
 
       if (!token) {
         // No token, redirect to login
@@ -14,7 +14,7 @@ export const authGuard = async (to, from, next) => {
       }
 
       // Verify token with backend
-      const response = await userService.verifyToken()
+      const response = await userServices.verifyToken()
 
       if (response.success) {
         // Token is valid, allow access

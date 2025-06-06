@@ -1,8 +1,8 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Alert Component -->
-    <div v-if="showAlert" :class="['alert', alertType]">
-      <Alert :message="alertMessage" :type="alertType" :show="showAlert" @close="hideAlert" />
+    <div v-if="alertMessage" :class="['alert', alertType]">
+      <Alert v-if="showAlert" :message="alertMessage" :type="alertType" :show="showAlert" @close="hideAlert" />
     </div>
 
     <!-- Loading Screen -->
@@ -80,9 +80,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import AppHeader from '../components/AdminHeader.vue'
+import AppHeader from '../components/shared/AppHeader.vue'
 import Alert from '../components/ui/Alert.vue'
-import userServices from '../services/userServices.js'
+import userService from '../services/userServices.js'
 
 const router = useRouter()
 
@@ -104,7 +104,7 @@ const handleLogin = async () => {
     isSubmitting.value = true
     loginError.value = ''
     
-    const response = await userServices.login(username.value, password.value)
+    const response = await userService.login(username.value, password.value)
 
     if (response.success && response.data.user) {
       // Store authentication token
@@ -152,7 +152,7 @@ const checkAuthStatus = async () => {
     const token = localStorage.getItem('authToken')
     
     if (token) {
-      const response = await userServices.verifyToken()
+      const response = await userService.verifyToken()
       
       if (response.success && response.data.user) {
         // User is already authenticated, redirect to admin

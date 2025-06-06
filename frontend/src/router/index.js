@@ -2,13 +2,13 @@ import { createRouter, createWebHistory } from "vue-router"
 import TrackPage from "../views/TrackPage.vue"
 import ResultsPage from "../views/ResultsPage.vue"
 import AdminPage from "../views/AdminPage.vue"
-import userService from "../Services/userServices.js"
+import userServices from "../services/userServices.js"
 
 // Authentication guard
 const authGuard = async (to, from, next) => {
   try {
     // Check if user has a valid token
-    const token = userService.checkAuth()
+    const token = userServices.checkAuth()
 
     if (!token) {
       // No token, allow access to admin page (it will show login form)
@@ -17,7 +17,7 @@ const authGuard = async (to, from, next) => {
     }
 
     // Verify token with backend
-    const response = await userService.verifyToken()
+    const response = await userServices.verifyToken()
 
     if (response.success) {
       // Token is valid, allow access
@@ -38,11 +38,11 @@ const authGuard = async (to, from, next) => {
 // Guest guard - for pages that should redirect authenticated users
 const guestGuard = async (to, from, next) => {
   try {
-    const token = userService.getAuthToken()
+    const token = userServices.getAuthToken()
 
     if (token) {
       // Verify if token is still valid
-      const response = await userService.verifyToken()
+      const response = await userServices.verifyToken()
 
       if (response.success) {
         // User is authenticated, redirect to admin dashboard
