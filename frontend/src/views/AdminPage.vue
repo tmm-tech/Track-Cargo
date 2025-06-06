@@ -6,7 +6,7 @@
       <Alert v-if="showAlert" :message="alertMessage" :type="alertType" :show="showAlert" @close="hideAlert" />
     </div>
 
-        <!-- Loading Screen -->
+    <!-- Loading Screen -->
     <div v-if="isCheckingAuth" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
       <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#273272] mx-auto mb-4"></div>
@@ -1932,7 +1932,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2729,7 +2729,10 @@ const handleLogin = async () => {
     // Call the user service to perform login
     const response = await userServices.login(userData)
     if (response.success) {
-      isAuthenticated.value = true
+    
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+      isAuthenticated.value = true;
       currentUser.value = response.data.user
       setAlert('Login successful!', 'success')
       // Optionally redirect to dashboard or home page
@@ -2753,7 +2756,7 @@ const checkAuthStatus = async () => {
     isCheckingAuth.value = true
     // Call the user service to check authentication
     const response = await userServices.checkAuth()
-    
+
     if (response.success && response.data.user) {
       isAuthenticated.value = true
       currentUser.value = {
