@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import TrackPage from "../views/TrackPage.vue"
 import ResultsPage from "../views/ResultsPage.vue"
 import AdminPage from "../views/AdminPage.vue"
-import userServices from "../services/userServices.js"
+import userServices from "../Services/userServices.js"
 
 // Authentication guard
 const authGuard = async (to, from, next) => {
@@ -38,7 +38,7 @@ const authGuard = async (to, from, next) => {
 // Guest guard - for pages that should redirect authenticated users
 const guestGuard = async (to, from, next) => {
   try {
-    const token = userServices.getAuthToken()
+    const token = userServices.checkAuth()
 
     if (token) {
       // Verify if token is still valid
