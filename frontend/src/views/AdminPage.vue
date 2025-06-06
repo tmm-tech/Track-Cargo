@@ -2341,7 +2341,7 @@ const fetchCargos = async () => {
   try {
     const response = await CargoServices.getPackages();
     packages.value = response.data.data || [];
-
+    console.log('Cargo data loaded:', packages.value)
   } catch (error) {
     console.error('Error fetching Cargo:', error);
     setAlert('Failed to load cargo data', 'error')

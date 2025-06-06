@@ -8,6 +8,7 @@ const ActivityRoutes = require('./routes/ActivityRoutes');
 const LocationRoutes = require('./routes/LocationRoutes'); 
 const cookieParser = require('cookie-parser');
 
+app.set('trust proxy', 1); // Trust first proxy for secure cookies in production
 const app = express(); 
 // Middleware to parse cookies
 app.use(cookieParser());
