@@ -2706,19 +2706,40 @@ const addComment = (packageId) => {
 }
 
 
-// Handle login function
-const handleLogin = async () => {
+const handleLogin = async (loginData) => {
   try {
     isSubmitting.value = true
-    const response = await userService.login(username.value, password.value)
+    loginError.value = ''
+    loginSuccess.value = ''
+    
+    const response = await userService.login(loginData.username, loginData.password, loginData.rememberMe)
 
-    if (response.success) {
-      isAuthenticated.value = true
-      currentUser.value = response.data.user
-      setAlert('Login successful!', 'success')
-      // Optionally redirect to dashboard or home page
+    if (response.success && response.data.user) {
+      // Store authentication token
+      if (response.data.token) {
+        if (loginData.rememberMe) {
+          localStorage.setItem('authToken', response.data.token)
+        } else {
+          sessionStorage.setItem('authToken', response.data.token)
+        }
+      }
+      
+      // Set user data
+      currentUser.value = {
+        ...response.data.user,
+        initials: getInitials(response.data.user.fullname)
+      }
+      
+      loginSuccess.value = 'Login successful! Redirecting...'
+      
+      // Delay to show success message
+      setTimeout(() => {
+        isAuthenticated.value = true
+        setAlert('Welcome back!', 'success')
+      }, 1000)
+      
     } else {
-      loginError.value = response.error || 'Login failed. Please try again.'
+      loginError.value = response.error || 'Invalid username or password'
       setAlert(loginError.value, 'error')
     }
   } catch (error) {
@@ -2730,6 +2751,57 @@ const handleLogin = async () => {
   }
 }
 
+// Forgot password handler
+const handleForgotPassword = async (emailOrUsername) => {
+  try {
+    const response = await userService.requestPasswordReset(emailOrUsername)
+    
+    if (response.success) {
+      setAlert('Password reset instructions sent to your email', 'success')
+    } else {
+      setAlert(response.error || 'Failed to send reset instructions', 'error')
+    }
+  } catch (error) {
+    console.error('Forgot password error:', error)
+    setAlert('An error occurred. Please try again.', 'error')
+  }
+}
+
+// Check authentication status
+const checkAuthStatus = async () => {
+  try {
+    isCheckingAuth.value = true
+    
+    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
+    
+    if (!token) {
+      isAuthenticated.value = false
+      isCheckingAuth.value = false
+      return
+    }
+
+    const response = await userService.verifyToken()
+    
+    if (response.success && response.data.user) {
+      isAuthenticated.value = true
+      currentUser.value = {
+        ...response.data.user,
+        initials: getInitials(response.data.user.fullname)
+      }
+    } else {
+      localStorage.removeItem('authToken')
+      sessionStorage.removeItem('authToken')
+      isAuthenticated.value = false
+    }
+  } catch (error) {
+    console.error('Auth check error:', error)
+    localStorage.removeItem('authToken')
+    sessionStorage.removeItem('authToken')
+    isAuthenticated.value = false
+  } finally {
+    isCheckingAuth.value = false
+  }
+}
 
 const locationSearchTerm = ref('')
 const showAddLocationModal = ref(false)
