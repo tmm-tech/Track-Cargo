@@ -2045,7 +2045,7 @@ import html2canvas from 'html2canvas';
 import ShippingProgress from '../components/ShippingProgress.vue';
 import userService from '../Services/userServices.js';
 import locationService from '../Services/locationServices.js';
-import ShippingService from '../Services/ShippingServices.js';
+import ShippingServices from '../Services/ShippingServices.js';
 import Alert from '../components/ui/Alert.vue';
 
 
