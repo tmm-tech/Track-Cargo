@@ -1932,7 +1932,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2729,13 +2729,14 @@ const handleLogin = async () => {
     const userData = { username: username.value, password: password.value }
     // Call the user service to perform login
     const response = await userServices.login(userData)
+    console.log('Login response:', response)
     if (response.success) {
-      
+
       isAuthenticated.value = true;
-      currentUser.value = response.data.user
+      currentUser.value = response.data
       setAlert('Login successful!', 'success')
       // Optionally redirect to dashboard or home page
-      router.push('/admin') 
+      router.push('/admin')
     } else {
       isAuthenticated.value = false
       loginError.value = response.error || 'Login failed. Please try again.'
@@ -3580,22 +3581,19 @@ const formatDate = (dateString) => {
 
 // Event listeners
 onMounted(() => {
-   fetchUsers()
-   fetchCargos()
+  fetchUsers()
+  fetchCargos()
   fetchLocation()
   window.addEventListener('resize', checkMobileDevice)
 })
 
 
 onUnmounted(() => {
+
   window.removeEventListener('resize', checkMobileDevice)
 })
 
-watch(isAuthenticated, (value) => {
-  if (value) {
-    router.push('/admin') 
-  }
-})
+
 
 </script>
 
