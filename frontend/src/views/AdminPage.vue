@@ -1927,7 +1927,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -3254,45 +3254,76 @@ const closeEditModal = () => {
   editingShipping.value = null
 }
 
-const editShipping = (pkg) => {
-  openEditShippingModal(pkg)
+const editShipping = async (pkg) => {
+  try {
+    const response = await ShippingServices.getPackageById(pkg.id)
+    if (!response || response.error) {
+      setAlert('Failed to fetch package details for editing.', 'error')
+      return
+    }
+    // Populate editingShipping with fetched data
+    editingShipping.value = { ...response.data.package }
+    editData.value = {
+      currentLocation: editingShipping.value.currentLocation,
+      nextStop: editingShipping.value.nextStop,
+      nextStopETA: editingShipping.value.nextStopETA,
+      shippingAddress: { ...editingShipping.value.shippingAddress }
+    }
+    showEditModal.value = true
+  } catch (error) {
+    console.error('Error fetching package data:', error)
+    setAlert('Failed to load package data for editing.', 'error')
+  }
 }
-
-const saveShippingChanges = () => {
+const saveEditedShipping = async () => {
   if (!editingShipping.value) return
 
-  // Update the package in the packages array
-  packages.value = packages.value.map(pkg => {
-
-    const oldLocation = editingShipping.value.currentLocation
-    const newLocation = editData.value.currentLocation
-
-    if (pkg.id === editingShipping.value.id) {
-      return {
-        ...pkg,
-        currentLocation: editData.value.currentLocation,
-        nextStop: editData.value.nextStop,
-        nextStopETA: editData.value.nextStopETA,
-        shippingAddress: { ...editData.value.shippingAddress },
-        lastUpdated: new Date().toLocaleDateString()
-      }
-    }
-    return pkg
-  })
-
-  // Log the activity if location changed
-  if (oldLocation !== newLocation) {
-    logActivity('package', currentUser.value.name, 'Shipping location updated',
-      `Shipping ${editingShipping.value.containerNumber} location changed from "${oldLocation}" to "${newLocation}"`)
+  // Validate the edited data
+  if (!editData.value.currentLocation || !editData.value.nextStop || !editData.value.nextStopETA) {
+    setAlert('Please fill in all required fields.', 'error')
+    return
   }
 
-  closeEditModal()
+  // Update the package data
+  editingShipping.value.currentLocation = editData.value.currentLocation
+  editingShipping.value.nextStop = editData.value.nextStop
+  editingShipping.value.nextStopETA = editData.value.nextStopETA
+  editingShipping.value.shippingAddress = { ...editData.value.shippingAddress }
+  editingShipping.value.lastUpdated = new Date().toLocaleDateString()
+
+  try {
+    const response = await ShippingServices.updatePackage(editingShipping.value.id, editingShipping.value)
+    if (response.success) {
+      setAlert('Shipping details updated successfully!', 'success')
+      closeEditModal()
+    } else {
+      setAlert('Failed to update shipping details.', 'error')
+      console.error(response.error)
+    }
+  } catch (error) {
+    console.error('Error updating shipping details:', error)
+    setAlert('Failed to update shipping details.', 'error')
+  }
 }
 
 // View package functions
-const openViewShippingModal = (pkg) => {
-  viewingShipping.value = { ...pkg }
-  showViewModal.value = true
+const openViewShippingModal = async (pkg) => {
+  try {
+    const response = await ShippingServices.getPackageById(pkg.id)
+    if (!response || response.error) {
+      setAlert('Failed to fetch package details for viewing.', 'error')
+      return
+    }
+
+    // Populate viewingShipping with fetched data
+    viewingShipping.value = { ...pkg }
+    showViewModal.value = true
+  } catch (error) {
+    console.error('Error fetching package data:', error)
+    setAlert('Failed to load package data for viewing.', 'error')
+    return
+  }
+
 }
 
 const closeViewModal = () => {
@@ -3323,7 +3354,7 @@ const closeAddModal = () => {
   showAddModal.value = false
 }
 
-const addNewShipping = () => {
+const addNewShipping = async () => {
   if (validateForm()) {
     const newShippingToAdd = {
       id: Date.now(),
@@ -3343,14 +3374,24 @@ const addNewShipping = () => {
       trackingHistory: [...trackingStops.value],
       comments: []
     }
+    try {
+      // Simulate API call
+      const response = await ShippingServices.addPackage(newShippingToAdd)
+      if (response.success) {
+        setAlert('Shipping added successfully!', 'success')
+        resetNewShippingForm()
+        resetTrackingStops()
+        closeAddModal()
+      } else {
+        setAlert('Failed to add new shipping.', 'error')
+        console.error(response.error)
+        return
+      }
+    } catch (error) {
+      console.error('Error adding new shipping:', error)
+      setAlert('Failed to add new shipping.', 'error')
+    }
 
-    packages.value.push(newShippingToAdd)
-
-    // Log the activity
-    logActivity('package', currentUser.value.name, 'New package added',
-      `Added package ${newShippingToAdd.containerNumber} to the system`)
-
-    closeAddModal()
   }
 }
 
