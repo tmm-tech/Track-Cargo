@@ -1,5 +1,6 @@
 const express = require("express")
-const { trackPackageByTrackingNumber, createPackage,getAllPackages,getPackageStats, exportPackages, updatePackage, deletePackage} = require("../controllers/PackageController")
+const PackageRoute = express.Router()
+const { trackPackageByTrackingNumber, createPackage,getAllPackages,getPackageStats, exportPackages, updatePackage, deletePackage} = require("../controllers/PackageControllers")
 const {
   validatePackageCreation,
   validatePackageUpdate,
@@ -12,7 +13,7 @@ const { rateLimiter, trackingRateLimiter } = require("../middleware/rateLimiter"
 const { authenticateToken, requireRole } = require("../middleware/auth")
 const { logRequest } = require("../middleware/logging")
 
-const PackageRoute = express.Router()
+
 
 // Apply logging middleware to all routes
 router.use(logRequest)
