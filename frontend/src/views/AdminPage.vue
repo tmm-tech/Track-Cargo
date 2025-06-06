@@ -2749,38 +2749,32 @@ const handleLogin = async () => {
   }
 }
 
-// Check authentication status
 const checkAuthStatus = async () => {
   try {
     isCheckingAuth.value = true
-    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-    if (!token) {
-      isAuthenticated.value = false
-      return
-    }
-    // Call the user service to verify the token
-    const response = await userServices.checkAuth(token)
-    if (response.success) {
+
+    // Make a request to the backend to verify the token stored in the cookie
+    const response = await userServices.checkAuth()
+
+    if (response.success && response.data.user) {
       isAuthenticated.value = true
       currentUser.value = response.data.user || {}
-      // Optionally fetch user-specific data like permissions, roles, etc.
+
+      // Optionally fetch additional data after confirming auth
       await fetchUsers()
       await fetchCargos()
       await fetchLocation()
     } else {
       isAuthenticated.value = false
-      localStorage.removeItem('authToken')
-      sessionStorage.removeItem('authToken')
     }
   } catch (error) {
     console.error('Auth check error:', error)
-    localStorage.removeItem('authToken')
-    sessionStorage.removeItem('authToken')
     isAuthenticated.value = false
   } finally {
     isCheckingAuth.value = false
   }
 }
+
 
 const locationSearchTerm = ref('')
 const showAddLocationModal = ref(false)

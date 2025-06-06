@@ -49,12 +49,11 @@ export default {
     },
 
     // Check authentication
-    checkAuth(token) {
+    checkAuth() {
         return axios.get(`${API_BASE}/protected`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+            withCredentials: true // 🔒 Send HttpOnly cookies
         });
     },
+
 
 };
