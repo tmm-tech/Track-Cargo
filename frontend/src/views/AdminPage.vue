@@ -2729,11 +2729,10 @@ const handleLogin = async () => {
     const userData = { username: username.value, password: password.value }
     // Call the user service to perform login
     const response = await userServices.login(userData)
-    console.log('Login response:', response)
-    if (response.addTrackingStop.success) {
+    if (response.data.success) {
 
       isAuthenticated.value = true;
-      currentUser.value = response.data.add
+      currentUser.value = response.data.data
       setAlert('Login successful!', 'success')
       // Optionally redirect to dashboard or home page
       router.push('/admin')
