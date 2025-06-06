@@ -2750,16 +2750,8 @@ const handleLogin = async () => {
 const checkAuthStatus = async () => {
   try {
     isCheckingAuth.value = true
-    
-    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
-    
-    if (!token) {
-      isAuthenticated.value = false
-      isCheckingAuth.value = false
-      return
-    }
-
-    const response = await userService.verifyToken()
+    // Call the user service to check authentication
+    const response = await userServices.checkAuth()
     
     if (response.success && response.data.user) {
       isAuthenticated.value = true
@@ -3607,16 +3599,23 @@ const formatDate = (dateString) => {
 
 
 // Event listeners
-onMounted(() => {
-  checkAuthStatus()
+onMounted(async () => {
+  // Ensure auth check is complete before continuing
+  const isAuth = await checkAuthStatus()
+
+  if (!isAuth) {
+    isAuthenticated.value = false
+    return // Stop execution if not authenticated
+  }
+
+  isAuthenticated.value = true
   checkMobileDevice()
   fetchUsers()
   fetchLocation()
   fetchCargos()
   window.addEventListener('resize', checkMobileDevice)
-  // Auto-login for demo
-  isAuthenticated.value = false
 })
+
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkMobileDevice)
