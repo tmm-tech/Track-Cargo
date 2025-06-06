@@ -10,6 +10,7 @@ const {
   validateExport,
 } = require("../middleware/packageValidation")
 const { rateLimiter, trackingRateLimiter } = require("../middleware/rateLimiter")
+const {requireRole } = require("../middleware/auth")
 const { logRequest } = require("../middleware/logging")
 
 
@@ -28,6 +29,7 @@ PackageRoute.post(
   "/packages",
   rateLimiter,
   validatePackageCreation,
+  requireRole(["admin", "operator"]),
   createPackage,
 )
 
