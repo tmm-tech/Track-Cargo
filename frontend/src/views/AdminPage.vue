@@ -2245,7 +2245,15 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.use
 const currentView = ref('dashboard')
 
 // Current user
-const currentUser = ref({})
+// Current user
+const currentUser = ref({
+  id: 1,
+  fullname: 'Admin User',
+  email: 'admin@texmonlogistics.co.ke',
+  username: 'admin',
+  roles: 'Administrator',
+  initials: 'AU'
+})
 
 // Shipping management state
 const packages = ref([]);
