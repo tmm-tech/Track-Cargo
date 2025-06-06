@@ -2734,6 +2734,7 @@ const handleLogin = async () => {
       currentUser.value = response.data.user
       setAlert('Login successful!', 'success')
       // Optionally redirect to dashboard or home page
+      router.push('/admin') 
     } else {
       isAuthenticated.value = false
       loginError.value = response.error || 'Login failed. Please try again.'
