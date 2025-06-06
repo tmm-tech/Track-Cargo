@@ -2729,9 +2729,7 @@ const handleLogin = async () => {
     // Call the user service to perform login
     const response = await userServices.login(userData)
     if (response.success) {
-
-      const token = response.data.token;
-      localStorage.setItem("authToken", token);
+      
       isAuthenticated.value = true;
       currentUser.value = response.data.user
       setAlert('Login successful!', 'success')

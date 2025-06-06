@@ -92,7 +92,6 @@ module.exports = {
                 SELECT * FROM profile WHERE username = $1;
             `;
             const userResult = await query(findUserQuery, [details.username]);
-            console.log('User Result:', userResult.rows);
             // Check if user exists
             if (userResult.rows.length > 0) {
                 const user = userResult.rows[0];
@@ -101,7 +100,7 @@ module.exports = {
                 if (match) {
                     // Create JWT Token
                     let token = await createToken({ email: user.email, id: user.id });
-                    console.log('Generated Token:', token);
+                    
                     // Set token as a cookie (HttpOnly and valid for 1 hour)
                     res.cookie('token', token, {
                         httpOnly: true,
