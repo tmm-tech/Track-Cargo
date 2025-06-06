@@ -28,7 +28,6 @@ PackageRoute.post(
   "/packages",
   rateLimiter,
   validatePackageCreation,
-  requireRole(["admin", "operator"]),
   createPackage,
 )
 
