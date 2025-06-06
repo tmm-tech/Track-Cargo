@@ -557,26 +557,26 @@
                         </tr>
                         <tr v-for="pkg in filteredCargos" :key="pkg.id" class="hover:bg-gray-50">
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
-                            {{ pkg.containerNumber }}
+                            {{ pkg.container_number }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.truckNumber }}
+                            {{ pkg.truck_number }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.blNumber }}
+                            {{ pkg.bl_number }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
-                            :title="pkg.currentLocation">
-                            {{ pkg.currentLocation }}
+                            :title="pkg.current_location">
+                            {{ pkg.current_location }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nextStop">
-                            {{ pkg.nextStop }}
+                            {{ pkg.next_stop }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.nextStopETA }}
+                            {{ pkg.next_stop_eta }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.lastUpdated }}
+                            {{ pkg.latest_timestamp }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
                             <div class="flex justify-end gap-1">
