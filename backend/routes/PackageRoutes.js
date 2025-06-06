@@ -1,6 +1,6 @@
 const express = require("express")
 const PackageRoute = express.Router()
-const { trackPackageByTrackingNumber, createPackage,getAllPackages,getPackageStats, exportPackages, updatePackage, deletePackage} = require("../controllers/PackageControllers")
+const { trackPackageByTrackingNumber, createPackage,getAllPackages,getPackageStats, exportPackages, addTrackingEvent,  updatePackage, deletePackage, searchPackages,bulkUpdatePackages,  getPackageById} = require("../controllers/PackageControllers")
 const {
   validatePackageCreation,
   validatePackageUpdate,
@@ -38,11 +38,11 @@ PackageRoute.get("/packages", rateLimiter, getAllPackages)
 
 PackageRoute.get("/packages/stats", requireRole(["admin", "manager"]), getPackageStats)
 
-PackageRoute.get("/packages/search", validateSearch, PackageController.searchPackages)
+PackageRoute.get("/packages/search", validateSearch, searchPackages)
 
 PackageRoute.get("/packages/export", validateExport, requireRole(["admin", "manager"]), exportPackages)
 
-PackageRoute.get("/packages/:id", PackageController.getPackageById)
+PackageRoute.get("/packages/:id", getPackageById)
 
 PackageRoute.put("/packages/:id", validatePackageUpdate, requireRole(["admin", "operator"]), updatePackage)
 
@@ -53,7 +53,7 @@ PackageRoute.post(
   "/packages/:id/tracking",
   validateTrackingEvent,
   requireRole(["admin", "operator"]),
-  PackageController.addTrackingEvent,
+  addTrackingEvent,
 )
 
 // Bulk operations
@@ -61,7 +61,7 @@ PackageRoute.put(
   "/packages/bulk",
   validateBulkUpdate,
   requireRole(["admin", "manager"]),
-  PackageController.bulkUpdatePackages,
+  bulkUpdatePackages,
 )
 
 // Advanced routes
@@ -69,7 +69,7 @@ PackageRoute.get("/packages/:id/timeline", async (req, res) => {
   // Get package with detailed tracking timeline
   req.query.include_events = "true"
   req.query.include_comments = "true"
-  return PackageController.getPackageById(req, res)
+  return getPackageById(req, res)
 })
 
 // Health check endpoint
