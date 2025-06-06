@@ -563,7 +563,7 @@
                             {{ pkg.truck_number || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.bl_number || 'N/A'}}
+                            {{ pkg.bl_number || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
                             :title="pkg.current_location">
@@ -573,7 +573,7 @@
                             {{ pkg.next_stop || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.next_stop_eta || 'N/A'}}
+                            {{ pkg.next_stop_eta || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.updated_at || 'N/A' }}
@@ -640,19 +640,23 @@
                       <div class="grid grid-cols-1 gap-2 text-xs">
                         <div class="flex justify-between">
                           <span class="text-gray-500">Current:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.current_location || 'N/A'}}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.current_location ||
+                            'N/A'}}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Next:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A' }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A'
+                            }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">ETA:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop_eta || 'N/A' }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ formatDate(pkg.next_stop_eta)
+                            || 'N/A' }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Updated:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.updated_at || 'N/A'}}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{
+                            formatDate(pkg.latest_timestamp) || 'N/A'}}</span>
                         </div>
                       </div>
                     </div>
@@ -761,15 +765,15 @@
                   <div class="flex justify-between items-center">
                     <div>
                       <p class="text-sm font-medium text-gray-500">Container Number</p>
-                      <p>{{ editingCargo.containerNumber }}</p>
+                      <p>{{ editingCargo.container_number }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Truck Number</p>
-                      <p>{{ editingCargo.truckNumber }}</p>
+                      <p>{{ editingCargo.truck_number }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">BL Number</p>
-                      <p>{{ editingCargo.blNumber }}</p>
+                      <p>{{ editingCargo.bl_number }}</p>
                     </div>
                   </div>
 
@@ -821,25 +825,25 @@
                     <div v-if="activeEditTab === 'address'" class="space-y-4 mt-4">
                       <div class="space-y-2">
                         <label for="recipientName" class="text-sm font-medium">Recipient Name</label>
-                        <input id="recipientName" v-model="editData.shippingAddress.recipientName"
+                        <input id="recipientName" v-model="editData.shipping_address.recipientName"
                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                       </div>
 
                       <div class="space-y-2">
                         <label for="streetAddress" class="text-sm font-medium">Street Address</label>
-                        <input id="streetAddress" v-model="editData.shippingAddress.streetAddress"
+                        <input id="streetAddress" v-model="editData.shipping_address.streetAddress"
                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                       </div>
 
                       <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
                           <label for="city" class="text-sm font-medium">City</label>
-                          <input id="city" v-model="editData.shippingAddress.city"
+                          <input id="city" v-model="editData.shipping_address.city"
                             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         </div>
                         <div class="space-y-2">
                           <label for="state" class="text-sm font-medium">State/Province</label>
-                          <input id="state" v-model="editData.shippingAddress.state"
+                          <input id="state" v-model="editData.shipping_address.state"
                             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         </div>
                       </div>
@@ -847,12 +851,12 @@
                       <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
                           <label for="postalCode" class="text-sm font-medium">Postal Code</label>
-                          <input id="postalCode" v-model="editData.shippingAddress.postalCode"
+                          <input id="postalCode" v-model="editData.shipping_address.postalCode"
                             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         </div>
                         <div class="space-y-2">
                           <label for="country" class="text-sm font-medium">Country</label>
-                          <input id="country" v-model="editData.shippingAddress.country"
+                          <input id="country" v-model="editData.shipping_address.country"
                             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         </div>
                       </div>
@@ -1332,11 +1336,11 @@
                 <div class="flex flex-col space-y-1.5 pb-4">
                   <h2 class="text-lg font-semibold leading-none tracking-tight">Cargo Details</h2>
                   <p class="text-sm text-muted-foreground" v-if="viewingCargo">
-                    Container Number: {{ viewingCargo.containerNumber }} | Truck Number: {{
-                      viewingCargo.truckNumber
+                    Container Number: {{ viewingCargo.container_number }} | Truck Number: {{
+                      viewingCargo.truck_number
                     }}
                     |
-                    BL Number: {{ viewingCargo.blNumber }}
+                    BL Number: {{ viewingCargo.bl_number }}
                   </p>
                 </div>
 
@@ -1352,19 +1356,19 @@
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Shipped Date</p>
-                      <p class="text-lg">{{ viewingCargo.shippedDate }}</p>
+                      <p class="text-lg">{{ viewingCargo.shipped_date }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
-                      <p class="text-lg">{{ viewingCargo.estimatedDelivery }}</p>
+                      <p class="text-lg">{{ viewingCargo.estimated_Delivery }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Final Destination</p>
-                      <p class="text-lg">{{ viewingCargo.finalDestination }}</p>
+                      <p class="text-lg">{{ viewingCargo.final_destination }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Last Updated</p>
-                      <p class="text-lg">{{ viewingCargo.lastUpdated }}</p>
+                      <p class="text-lg">{{ viewingCargo.latest_timestamp }}</p>
                     </div>
                   </div>
 
@@ -1375,14 +1379,14 @@
                       <h3 class="text-xl font-semibold">Cargo Address</h3>
                     </div>
                     <div class="p-6">
-                      <div v-if="viewingCargo.shippingAddress" class="space-y-1">
-                        <p class="font-medium">{{ viewingCargo.shippingAddress.recipientName }}</p>
-                        <p>{{ viewingCargo.shippingAddress.streetAddress }}</p>
+                      <div v-if="viewingCargo.shipping_address" class="space-y-1">
+                        <p class="font-medium">{{ viewingCargo.shipping_address.recipientName }}</p>
+                        <p>{{ viewingCargo.shipping_address.streetAddress }}</p>
                         <p>
-                          {{ viewingCargo.shippingAddress.city }}, {{ viewingCargo.shippingAddress.state }}
-                          {{ viewingCargo.shippingAddress.postalCode }}
+                          {{ viewingCargo.shipping_address.city }}, {{ viewingCargo.shipping_address.state }}
+                          {{ viewingCargo.shipping_address.postalCode }}
                         </p>
-                        <p>{{ viewingCargo.shippingAddress.country }}</p>
+                        <p>{{ viewingCargo.shipping_address.country }}</p>
                       </div>
                       <p v-else class="text-gray-500">No shipping address information available</p>
                     </div>
@@ -1390,9 +1394,9 @@
 
                   <!-- Cargo Progress -->
                   <ShippingProgress :trackingHistory="viewingCargo.trackingHistory"
-                    :currentLocation="viewingCargo.currentLocation" :nextStop="viewingCargo.nextStop"
-                    :nextStopETA="viewingCargo.nextStopETA" :finalDestination="viewingCargo.finalDestination"
-                    :estimatedDelivery="viewingCargo.estimatedDelivery" showComments />
+                    :current_location="viewingCargo.current_location" :nextStop="viewingCargo.next_Stop"
+                    :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
+                    :estimated_delivery="viewingCargo.estimated_delivery" showComments />
                 </div>
 
                 <!-- Comments Section -->
@@ -1490,7 +1494,7 @@
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="containerNumber" class="text-sm font-medium">Container Number</label>
-                        <input id="containerNumber" v-model="newCargo.containerNumber"
+                        <input id="containerNumber" v-model="newCargo.container_number"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.containerNumber ? 'border-red-500' : '']" />
                         <p v-if="formErrors.containerNumber" class="text-red-500 text-sm">{{ formErrors.containerNumber
                         }}
@@ -1498,13 +1502,13 @@
                       </div>
                       <div class="space-y-2">
                         <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
-                        <input id="truckNumber" v-model="newCargo.truckNumber"
+                        <input id="truckNumber" v-model="newCargo.truck_number"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truckNumber ? 'border-red-500' : '']" />
                         <p v-if="formErrors.truckNumber" class="text-red-500 text-sm">{{ formErrors.truckNumber }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="blNumber" class="text-sm font-medium">BL Number</label>
-                        <input id="blNumber" v-model="newCargo.blNumber"
+                        <input id="blNumber" v-model="newCargo.bl_number"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.blNumber ? 'border-red-500' : '']" />
                         <p v-if="formErrors.blNumber" class="text-red-500 text-sm">{{ formErrors.blNumber }}</p>
                       </div>
@@ -1528,13 +1532,13 @@
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
-                        <input id="shippedDate" type="date" v-model="newCargo.shippedDate"
+                        <input id="shippedDate" type="date" v-model="newCargo.shipped_date"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shippedDate ? 'border-red-500' : '']" />
                         <p v-if="formErrors.shippedDate" class="text-red-500 text-sm">{{ formErrors.shippedDate }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="estimatedDelivery" class="text-sm font-medium">Estimated Delivery</label>
-                        <input id="estimatedDelivery" type="date" v-model="newCargo.estimatedDelivery"
+                        <input id="estimatedDelivery" type="date" v-model="newCargo.estimated_delivery"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.estimatedDelivery ? 'border-red-500' : '']" />
                         <p v-if="formErrors.estimatedDelivery" class="text-red-500 text-sm">{{
                           formErrors.estimatedDelivery
@@ -1545,7 +1549,7 @@
 
                     <div class="space-y-2">
                       <label for="currentLocation" class="text-sm font-medium">Current Location</label>
-                      <select id="currentLocation" v-model="newCargo.currentLocation"
+                      <select id="currentLocation" v-model="newCargo.current_location"
                         @change="handleNewCargoLocationChange"
                         :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.currentLocation ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select location</option>
@@ -1559,20 +1563,20 @@
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                        <input id="nextStop" v-model="newCargo.nextStop" readonly
+                        <input id="nextStop" v-model="newCargo.next_stop" readonly
                           class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         <p class="text-xs text-gray-500">Automatically determined based on current location</p>
                       </div>
                       <div class="space-y-2">
                         <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                        <input id="nextStopETA" type="date" v-model="newCargo.nextStopETA" readonly
+                        <input id="nextStopETA" type="date" v-model="newCargo.next_stop_eta" readonly
                           class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                       </div>
                     </div>
 
                     <div class="space-y-2">
                       <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
-                      <input id="finalDestination" v-model="newCargo.finalDestination"
+                      <input id="finalDestination" v-model="newCargo.final_destination"
                         :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.finalDestination ? 'border-red-500' : '']" />
                       <p v-if="formErrors.finalDestination" class="text-red-500 text-sm">{{ formErrors.finalDestination
                       }}
@@ -1589,13 +1593,13 @@
                       <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="space-y-2">
                           <label for="status" class="text-sm font-medium">Status</label>
-                          <input id="status" placeholder="e.g., Cargo received, In transit" v-model="newStop.status"
+                          <input id="status" placeholder="e.g., Cargo received, In transit" v-model="new_stop.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.status ? 'border-red-500' : '']" />
                           <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                         </div>
                         <div class="space-y-2">
                           <label for="location" class="text-sm font-medium">Location</label>
-                          <input id="location" placeholder="e.g., Nairobi Warehouse" v-model="newStop.location"
+                          <input id="location" placeholder="e.g., Nairobi Warehouse" v-model="new_stop.location"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.location ? 'border-red-500' : '']" />
                           <p v-if="stopErrors.location" class="text-red-500 text-sm">{{ stopErrors.location }}</p>
                         </div>
@@ -1932,7 +1936,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -1980,7 +1984,7 @@
           <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-[#273272] text-white">
             <div class="flex-1 min-w-0">
               <h2 class="text-lg sm:text-xl font-semibold truncate">Cargo Tracking Details</h2>
-              <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedCargo?.containerNumber
+              <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedCargo?.container_number
               }}</p>
             </div>
             <div class="flex items-center gap-2 sm:gap-3 ml-4">
@@ -2341,7 +2345,6 @@ const fetchCargos = async () => {
   try {
     const response = await CargoServices.getPackages();
     packages.value = response.data.data || [];
-    console.log('Cargo data loaded:', packages.value)
   } catch (error) {
     console.error('Error fetching Cargo:', error);
     setAlert('Failed to load cargo data', 'error')
@@ -2409,7 +2412,7 @@ const editData = ref({
   currentLocation: '',
   nextStop: '',
   nextStopETA: '',
-  shippingAddress: {
+  shipping_address: {
     recipientName: '',
     streetAddress: '',
     city: '',
@@ -2427,18 +2430,16 @@ const viewingCargo = ref(null)
 const showAddModal = ref(false)
 const addCargoTab = ref('details')
 const newCargo = ref({
-  containerNumber: '',
-  truckNumber: '',
-  blNumber: '',
-  type: '',
-  weight: '',
-  shippedDate: '',
-  estimatedDelivery: '',
-  currentLocation: '',
-  nextStop: '',
-  nextStopETA: '',
-  finalDestination: '',
-  shippingAddress: {
+  container_number: '',
+  truck_number: '',
+  bl_number: '',
+  cargo_type: '',
+  cargo_description: '',
+  current_location: '',
+  next_stop: '',
+  next_stop_eta: '',
+  tracking_history: [],
+  shipping_address: {
     recipientName: '',
     streetAddress: '',
     city: '',
@@ -3069,7 +3070,7 @@ const handlePrint = async () => {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Cargo Tracking - ${selectedCargo.value?.containerNumber}</title>
+        <title>Cargo Tracking - ${selectedCargo.value?.container_number}</title>
         <meta charset="utf-8">
         <style>
 
@@ -3193,7 +3194,7 @@ async function handleDownloadPDF() {
       if (heightLeft > 0) pdf.addPage();
     }
 
-    pdf.save(`Texmon_Cargo_${pkg.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
+    pdf.save(`Texmon_Cargo_${pkg.container_number}_${new Date().toISOString().split('T')[0]}.pdf`);
 
   } catch (error) {
     console.error("Error generating PDF:", error);
@@ -3263,10 +3264,10 @@ const printCargoDetails = (pkg) => {
 const openEditCargoModal = (pkg) => {
   editingCargo.value = { ...pkg }
   editData.value = {
-    currentLocation: pkg.currentLocation,
-    nextStop: pkg.nextStop,
-    nextStopETA: pkg.nextStopETA,
-    shippingAddress: { ...pkg.shippingAddress }
+   current_location: pkg.current_location,
+    next_stop: pkg.next_stop,
+    next_stop_eta: pkg.next_stop_eta,
+    shipping_address: { ...pkg.shipping_address }
   }
   showEditModal.value = true
 }
@@ -3286,10 +3287,10 @@ const editCargo = async (pkg) => {
     // Populate editingCargo with fetched data
     editingCargo.value = { ...response.data.package }
     editData.value = {
-      currentLocation: editingCargo.value.currentLocation,
-      nextStop: editingCargo.value.nextStop,
-      nextStopETA: editingCargo.value.nextStopETA,
-      shippingAddress: { ...editingCargo.value.shippingAddress }
+      current_location: editingCargo.value.current_location,
+      next_stop: editingCargo.value.next_stop,
+      next_stop_eta: editingCargo.value.next_stop_eta,
+      shipping_address: { ...editingCargo.value.shipping_address }
     }
     showEditModal.value = true
   } catch (error) {
@@ -3301,16 +3302,16 @@ const saveEditedCargo = async () => {
   if (!editingCargo.value) return
 
   // Validate the edited data
-  if (!editData.value.currentLocation || !editData.value.nextStop || !editData.value.nextStopETA) {
+  if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta) {
     setAlert('Please fill in all required fields.', 'error')
     return
   }
 
   // Update the package data
-  editingCargo.value.currentLocation = editData.value.currentLocation
-  editingCargo.value.nextStop = editData.value.nextStop
-  editingCargo.value.nextStopETA = editData.value.nextStopETA
-  editingCargo.value.shippingAddress = { ...editData.value.shippingAddress }
+  editingCargo.value.current_location = editData.value.current_location
+  editingCargo.value.next_stop = editData.value.next_stop
+  editingCargo.value.next_stop_eta = editData.value.next_stop_eta
+  editingCargo.value.shipping_address = { ...editData.value.shipping_address }
   editingCargo.value.lastUpdated = new Date().toLocaleDateString()
 
   try {
@@ -3380,21 +3381,21 @@ const addNewCargo = async () => {
   if (validateForm()) {
     const newCargoToAdd = {
       id: Date.now(),
-      containerNumber: newCargo.value.containerNumber,
-      truckNumber: newCargo.value.truckNumber,
-      blNumber: newCargo.value.blNumber,
+      container_number: newCargo.value.container_number,
+      truck_number: newCargo.value.truck_number,
+      bl_number: newCargo.value.bl_number,
       type: newCargo.value.type,
       weight: newCargo.value.weight,
-      shippedDate: newCargo.value.shippedDate,
-      estimatedDelivery: newCargo.value.estimatedDelivery,
-      currentLocation: newCargo.value.currentLocation,
-      nextStop: newCargo.value.nextStop,
-      nextStopETA: newCargo.value.nextStopETA,
-      finalDestination: newCargo.value.finalDestination,
-      shippingAddress: { ...newCargo.value.shippingAddress },
-      lastUpdated: new Date().toLocaleDateString(),
-      trackingHistory: [...trackingStops.value],
-      comments: []
+      shipped_date: newCargo.value.shipped_date,
+      estimated_delivery: newCargo.value.estimated_delivery,
+      current_location: newCargo.value.current_location,
+      next_stop: newCargo.value.next_stop,
+      next_stop_eta: newCargo.value.next_stop_eta,
+      final_destination: newCargo.value.final_destination,
+      shipping_address: { ...newCargo.value.shipping_address },
+      trackingHistory: trackingStops.value,
+      created_at: new Date().toLocaleDateString(),
+      last_updated: new Date().toLocaleDateString()
     }
     try {
       // Simulate API call
@@ -3421,18 +3422,18 @@ const validateForm = () => {
   formErrors.value = {}
   let isValid = true
 
-  if (!newCargo.value.containerNumber) {
-    formErrors.value.containerNumber = 'Container number is required'
+  if (!newCargo.value.container_number) {
+    formErrors.value.container_number = 'Container number is required'
     isValid = false
   }
 
-  if (!newCargo.value.truckNumber) {
-    formErrors.value.truckNumber = 'Truck number is required'
+  if (!newCargo.value.truck_number) {
+    formErrors.value.truckN_number = 'Truck number is required'
     isValid = false
   }
 
-  if (!newCargo.value.blNumber) {
-    formErrors.value.blNumber = 'BL number is required'
+  if (!newCargo.value.bl_number) {
+    formErrors.value.bl_number = 'BL number is required'
     isValid = false
   }
 
@@ -3446,23 +3447,23 @@ const validateForm = () => {
     isValid = false
   }
 
-  if (!newCargo.value.shippedDate) {
-    formErrors.value.shippedDate = 'Shipped date is required'
+  if (!newCargo.value.shipped_date) {
+    formErrors.value.shipped_date = 'Shipped date is required'
     isValid = false
   }
 
-  if (!newCargo.value.estimatedDelivery) {
-    formErrors.value.estimatedDelivery = 'Estimated delivery is required'
+  if (!newCargo.value.estimated_delivery) {
+    formErrors.value.estimated_delivery = 'Estimated delivery is required'
     isValid = false
   }
 
-  if (!newCargo.value.currentLocation) {
-    formErrors.value.currentLocation = 'Current location is required'
+  if (!newCargo.value.currentL_location) {
+    formErrors.value.current_location = 'Current location is required'
     isValid = false
   }
 
-  if (!newCargo.value.finalDestination) {
-    formErrors.value.finalDestination = 'Final destination is required'
+  if (!newCargo.value.final_destination) {
+    formErrors.value.final_destination = 'Final destination is required'
     isValid = false
   }
 
@@ -3478,18 +3479,18 @@ const validateForm = () => {
 
 const resetNewCargoForm = () => {
   newCargo.value = {
-    containerNumber: '',
-    truckNumber: '',
-    blNumber: '',
+    container_number: '',
+    truck_number: '',
+    bl_number: '',
     type: '',
     weight: '',
-    shippedDate: '',
-    estimatedDelivery: '',
-    currentLocation: '',
-    nextStop: '',
-    nextStopETA: '',
-    finalDestination: '',
-    shippingAddress: {
+    shipped_date: '',
+    estimated_delivery: '',
+    current_location: '',
+    next_stop: '',
+    next_stop_eta: '',
+    final_destination: '',
+    shipping_address: {
       recipientName: '',
       streetAddress: '',
       city: '',
@@ -3551,13 +3552,13 @@ const resetTrackingStops = () => {
 
 // Location change handlers
 const handleLocationChange = () => {
-  editData.value.nextStop = getNextStop(editData.value.currentLocation)
-  editData.value.nextStopETA = calculateEstimatedArrival(editData.value.currentLocation)
+  editData.value.next_stop = getNextStop(editData.value.current_location)
+  editData.value.next_stop_eta = calculateEstimatedArrival(editData.value.current_location)
 }
 
 const handleNewCargoLocationChange = () => {
-  newCargo.value.nextStop = getNextStop(newCargo.value.currentLocation)
-  newCargo.value.nextStopETA = calculateEstimatedArrival(newCargo.value.currentLocation)
+  newCargo.value.next_stop = getNextStop(newCargo.value.curren_location)
+  newCargo.value.next_stop_eta = calculateEstimatedArrival(newCargo.value.current_location)
 }
 
 
