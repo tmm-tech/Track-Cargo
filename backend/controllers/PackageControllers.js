@@ -268,7 +268,9 @@ const PackageController = {
       const packages = result.rows.map((pkg) => ({
         ...pkg,
         dimensions: pkg.dimensions ? JSON.parse(pkg.dimensions) : null,
-        shipping_address: pkg.shipping_address ? JSON.parse(pkg.shipping_address) : null,
+        shipping_address: typeof pkg.shipping_address === 'string'
+          ? JSON.parse(pkg.shipping_address)
+          : pkg.shipping_address,
       }))
 
       return PackageController.sendResponse(res, 200, true, "Packages retrieved successfully", packages, {
@@ -566,8 +568,8 @@ const PackageController = {
             days_in_transit:
               packageData.status === "Delivered"
                 ? Math.ceil(
-                    (new Date(packageData.updated_at) - new Date(packageData.created_at)) / (1000 * 60 * 60 * 24),
-                  )
+                  (new Date(packageData.updated_at) - new Date(packageData.created_at)) / (1000 * 60 * 60 * 24),
+                )
                 : Math.ceil((new Date() - new Date(packageData.created_at)) / (1000 * 60 * 60 * 24)),
             last_update: trackingHistory.rows[0]?.timestamp || packageData.updated_at,
           }
