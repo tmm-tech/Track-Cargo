@@ -16,7 +16,7 @@ const { logRequest } = require("../middleware/logging")
 
 
 // Apply logging middleware to all routes
-router.use(logRequest)
+PackageRoute.use(logRequest)
 
 // Public routes (no authentication required)
 // Track package by tracking number - with rate limiting for public access
