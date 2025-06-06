@@ -89,9 +89,9 @@ module.exports = {
         const details = req.body;
         try {
             const findUserQuery = `
-                SELECT * FROM profile WHERE email = $1;
+                SELECT * FROM profile WHERE username = $1;
             `;
-            const userResult = await query(findUserQuery, [details.email]);
+            const userResult = await query(findUserQuery, [details.username]);
 
             if (userResult.rows.length > 0) {
                 const user = userResult.rows[0];
