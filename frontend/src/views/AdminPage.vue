@@ -54,7 +54,7 @@
             </button>
 
             <button @click="navigateToView('packages')"
-              :title="(sidebarCollapsed && !isMobileDevice) ? 'Shippings' : ''"
+              :title="(sidebarCollapsed && !isMobileDevice) ? 'Cargos' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
                 'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
@@ -64,7 +64,7 @@
               <ArchiveBoxIcon
                 :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
                 class="flex-shrink-0" />
-              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Ship Management</span>
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Cargo Management</span>
             </button>
             <button @click="navigateToView('locations')"
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Locations' : ''"
@@ -262,7 +262,7 @@
                     <ArchiveBoxIcon class="h-4 w-4 sm:h-6 sm:w-6 text-[#273272]" />
                   </div>
                   <div>
-                    <p class="text-xs sm:text-sm text-gray-500">Total Shippings</p>
+                    <p class="text-xs sm:text-sm text-gray-500">Total Cargos</p>
                     <p class="text-lg sm:text-2xl font-bold">{{ packages.length }}</p>
                   </div>
                 </div>
@@ -275,7 +275,7 @@
                   </div>
                   <div>
                     <p class="text-xs sm:text-sm text-gray-500">In Transit</p>
-                    <p class="text-lg sm:text-2xl font-bold">{{ getShippingsByStatus('transit') }}</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getCargosByStatus('transit') }}</p>
                   </div>
                 </div>
               </div>
@@ -287,7 +287,7 @@
                   </div>
                   <div>
                     <p class="text-xs sm:text-sm text-gray-500">Delivered</p>
-                    <p class="text-lg sm:text-2xl font-bold">{{ getShippingsByStatus('delivered') }}</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getCargosByStatus('delivered') }}</p>
                   </div>
                 </div>
               </div>
@@ -299,7 +299,7 @@
                   </div>
                   <div>
                     <p class="text-xs sm:text-sm text-gray-500">Delayed</p>
-                    <p class="text-lg sm:text-2xl font-bold">{{ getShippingsByStatus('delayed') }}</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getCargosByStatus('delayed') }}</p>
                   </div>
                 </div>
               </div>
@@ -487,21 +487,21 @@
             </div>
           </div>
 
-          <!-- Shipping Management View -->
+          <!-- Cargo Management View -->
           <div v-if="currentView === 'packages'" class="space-y-6 sm:space-y-8">
             <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-6 sm:mb-8">
               <div
                 class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#273272] text-white p-4 sm:p-6 rounded-t-lg gap-4 sm:gap-0">
                 <div>
-                  <h2 class="text-lg sm:text-xl font-semibold">Shipping Management</h2>
+                  <h2 class="text-lg sm:text-xl font-semibold">Cargo Management</h2>
                   <p class="text-gray-200 text-sm">
                     Update the current location and next stop information for shipments.
                   </p>
                 </div>
-                <button @click="openAddShippingModal"
+                <button @click="openAddCargoModal"
                   class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-3 sm:px-4 py-2 rounded inline-flex items-center text-sm">
                   <PlusIcon class="h-4 w-4 mr-2" />
-                  <span class="hidden sm:inline">Add Shipping</span>
+                  <span class="hidden sm:inline">Add Cargo</span>
                   <span class="sm:hidden">Add</span>
                 </button>
               </div>
@@ -547,10 +547,10 @@
                         </tr>
                       </thead>
                       <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="filteredShippings.length === 0">
+                        <tr v-if="filteredCargos.length === 0">
                           <td colspan="8" class="text-center py-4 text-gray-500">No shipment found</td>
                         </tr>
-                        <tr v-for="pkg in filteredShippings" :key="pkg.id" class="hover:bg-gray-50">
+                        <tr v-for="pkg in filteredCargos" :key="pkg.id" class="hover:bg-gray-50">
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
                             {{ pkg.containerNumber }}
                           </td>
@@ -577,17 +577,17 @@
                             <div class="flex justify-end gap-1">
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
-                                @click="viewShippingDetails(pkg)" title="View Details">
+                                @click="viewCargoDetails(pkg)" title="View Details">
                                 View
                               </button>
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
-                                @click="editShipping(pkg)" title="Edit Shipping">
+                                @click="editCargo(pkg)" title="Edit Cargo">
                                 <PencilIcon class="h-3 w-3" />
                               </button>
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
-                                @click="printShippingDetails(pkg)" title="Print Details">
+                                @click="printCargoDetails(pkg)" title="Print Details">
                                 <PrinterIcon class="h-3 w-3" />
                               </button>
                             </div>
@@ -601,7 +601,7 @@
                 <!-- Mobile-friendly card view for smaller screens -->
                 <div class="block md:hidden">
                   <div class="space-y-4">
-                    <div v-for="pkg in filteredShippings" :key="pkg.id"
+                    <div v-for="pkg in filteredCargos" :key="pkg.id"
                       class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                       <div class="flex justify-between items-start mb-3">
                         <div class="flex-1">
@@ -609,7 +609,7 @@
                           <p class="text-xs text-gray-500 mt-1">{{ pkg.truckNumber }} • {{ pkg.blNumber }}</p>
                         </div>
                         <div class="flex gap-1 ml-2">
-                          <button @click="viewShippingDetails(pkg)"
+                          <button @click="viewCargoDetails(pkg)"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="View Details">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -620,12 +620,12 @@
                               </path>
                             </svg>
                           </button>
-                          <button @click="editShipping(pkg)"
+                          <button @click="editCargo(pkg)"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="Print Details">
                             <PencilIcon class="h-4 w-4" />
                           </button>
-                          <button @click="printShippingDetails(pkg)"
+                          <button @click="printCargoDetails(pkg)"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="Print Details">
                             <PrinterIcon class="h-4 w-4" />
@@ -678,7 +678,7 @@
                     class="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm">
                     <option value="all">All Activities</option>
                     <option value="login">Login Events</option>
-                    <option value="package">Shipping Updates</option>
+                    <option value="package">Cargo Updates</option>
                     <option value="user">User Management</option>
                   </select>
                 </div>
@@ -741,30 +741,30 @@
               </div>
             </div>
           </div>
-          <!-- Edit Shipping Modal -->
+          <!-- Edit Cargo Modal -->
           <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             @click="closeEditModal">
             <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
               <div class="p-6">
                 <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Update Shipping Information</h2>
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Update Cargo Information</h2>
                   <p class="text-sm text-muted-foreground">Update the package location and shipping address information.
                   </p>
                 </div>
 
-                <div v-if="editingShipping" class="space-y-4 py-4">
+                <div v-if="editingCargo" class="space-y-4 py-4">
                   <div class="flex justify-between items-center">
                     <div>
                       <p class="text-sm font-medium text-gray-500">Container Number</p>
-                      <p>{{ editingShipping.containerNumber }}</p>
+                      <p>{{ editingCargo.containerNumber }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Truck Number</p>
-                      <p>{{ editingShipping.truckNumber }}</p>
+                      <p>{{ editingCargo.truckNumber }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">BL Number</p>
-                      <p>{{ editingShipping.blNumber }}</p>
+                      <p>{{ editingCargo.blNumber }}</p>
                     </div>
                   </div>
 
@@ -783,7 +783,7 @@
                         'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                         activeEditTab === 'address' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
                       ]" @click="activeEditTab = 'address'">
-                        Shipping Address
+                        Cargo Address
                       </button>
                     </div>
                     <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
@@ -858,8 +858,8 @@
                 <!-- Comments Section in Edit Modal -->
                 <div class="mt-6 pt-6 border-t">
                   <h3 class="text-lg font-medium mb-4">Comments</h3>
-                  <div v-if="editingShipping.comments && editingShipping.comments.length > 0" class="space-y-4 mb-6">
-                    <div v-for="(comment, index) in editingShipping.comments" :key="index"
+                  <div v-if="editingCargo.comments && editingCargo.comments.length > 0" class="space-y-4 mb-6">
+                    <div v-for="(comment, index) in editingCargo.comments" :key="index"
                       class="bg-gray-50 p-4 rounded-md">
                       <div class="flex justify-between items-start">
                         <div>
@@ -872,7 +872,7 @@
                   </div>
                   <div v-else class="text-gray-500 mb-6">No comments yet</div>
 
-                  <form @submit.prevent="addComment(editingShipping.id)" class="space-y-4">
+                  <form @submit.prevent="addComment(editingCargo.id)" class="space-y-4">
                     <div class="space-y-2">
                       <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
                       <textarea id="editCommentText" v-model="newComment.text" rows="3"
@@ -894,9 +894,9 @@
                   </button>
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                    @click="saveShippingChanges">
+                    @click="saveCargoChanges">
                     <DocumentCheckIcon class="h-4 w-4 mr-2" />
-                    Update Shipping
+                    Update Cargo
                   </button>
                 </div>
               </div>
@@ -1319,75 +1319,75 @@
               </div>
             </div>
           </div>
-          <!-- View Shipping Modal -->
+          <!-- View Cargo Modal -->
           <div v-if="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             @click="closeViewModal">
             <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
               <div class="p-6">
                 <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Shipping Details</h2>
-                  <p class="text-sm text-muted-foreground" v-if="viewingShipping">
-                    Container Number: {{ viewingShipping.containerNumber }} | Truck Number: {{
-                      viewingShipping.truckNumber
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Cargo Details</h2>
+                  <p class="text-sm text-muted-foreground" v-if="viewingCargo">
+                    Container Number: {{ viewingCargo.containerNumber }} | Truck Number: {{
+                      viewingCargo.truckNumber
                     }}
                     |
-                    BL Number: {{ viewingShipping.blNumber }}
+                    BL Number: {{ viewingCargo.blNumber }}
                   </p>
                 </div>
 
-                <div v-if="viewingShipping" class="space-y-6">
+                <div v-if="viewingCargo" class="space-y-6">
                   <div class="grid grid-cols-2 gap-4">
                     <div>
-                      <p class="text-sm font-medium text-gray-500">Shipping Type</p>
-                      <p class="text-lg">{{ viewingShipping.type }}</p>
+                      <p class="text-sm font-medium text-gray-500">Cargo Type</p>
+                      <p class="text-lg">{{ viewingCargo.type }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Weight</p>
-                      <p class="text-lg">{{ viewingShipping.weight }} kg</p>
+                      <p class="text-lg">{{ viewingCargo.weight }} kg</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Shipped Date</p>
-                      <p class="text-lg">{{ viewingShipping.shippedDate }}</p>
+                      <p class="text-lg">{{ viewingCargo.shippedDate }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
-                      <p class="text-lg">{{ viewingShipping.estimatedDelivery }}</p>
+                      <p class="text-lg">{{ viewingCargo.estimatedDelivery }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Final Destination</p>
-                      <p class="text-lg">{{ viewingShipping.finalDestination }}</p>
+                      <p class="text-lg">{{ viewingCargo.finalDestination }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Last Updated</p>
-                      <p class="text-lg">{{ viewingShipping.lastUpdated }}</p>
+                      <p class="text-lg">{{ viewingCargo.lastUpdated }}</p>
                     </div>
                   </div>
 
-                  <!-- Shipping Address Card -->
+                  <!-- Cargo Address Card -->
                   <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
                     <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
                       <MapPinIcon class="h-5 w-5 mr-2" />
-                      <h3 class="text-xl font-semibold">Shipping Address</h3>
+                      <h3 class="text-xl font-semibold">Cargo Address</h3>
                     </div>
                     <div class="p-6">
-                      <div v-if="viewingShipping.shippingAddress" class="space-y-1">
-                        <p class="font-medium">{{ viewingShipping.shippingAddress.recipientName }}</p>
-                        <p>{{ viewingShipping.shippingAddress.streetAddress }}</p>
+                      <div v-if="viewingCargo.shippingAddress" class="space-y-1">
+                        <p class="font-medium">{{ viewingCargo.shippingAddress.recipientName }}</p>
+                        <p>{{ viewingCargo.shippingAddress.streetAddress }}</p>
                         <p>
-                          {{ viewingShipping.shippingAddress.city }}, {{ viewingShipping.shippingAddress.state }}
-                          {{ viewingShipping.shippingAddress.postalCode }}
+                          {{ viewingCargo.shippingAddress.city }}, {{ viewingCargo.shippingAddress.state }}
+                          {{ viewingCargo.shippingAddress.postalCode }}
                         </p>
-                        <p>{{ viewingShipping.shippingAddress.country }}</p>
+                        <p>{{ viewingCargo.shippingAddress.country }}</p>
                       </div>
                       <p v-else class="text-gray-500">No shipping address information available</p>
                     </div>
                   </div>
 
-                  <!-- Shipping Progress -->
-                  <ShippingProgress :trackingHistory="viewingShipping.trackingHistory"
-                    :currentLocation="viewingShipping.currentLocation" :nextStop="viewingShipping.nextStop"
-                    :nextStopETA="viewingShipping.nextStopETA" :finalDestination="viewingShipping.finalDestination"
-                    :estimatedDelivery="viewingShipping.estimatedDelivery" showComments />
+                  <!-- Cargo Progress -->
+                  <ShippingProgress :trackingHistory="viewingCargo.trackingHistory"
+                    :currentLocation="viewingCargo.currentLocation" :nextStop="viewingCargo.nextStop"
+                    :nextStopETA="viewingCargo.nextStopETA" :finalDestination="viewingCargo.finalDestination"
+                    :estimatedDelivery="viewingCargo.estimatedDelivery" showComments />
                 </div>
 
                 <!-- Comments Section -->
@@ -1397,8 +1397,8 @@
                     <h3 class="text-xl font-semibold">Comments</h3>
                   </div>
                   <div class="p-6">
-                    <div v-if="viewingShipping.comment && viewingShipping.comment.length > 0" class="space-y-4 mb-6">
-                      <div v-for="(comment, index) in viewingShipping.comment" :key="index"
+                    <div v-if="viewingCargo.comment && viewingCargo.comment.length > 0" class="space-y-4 mb-6">
+                      <div v-for="(comment, index) in viewingCargo.comment" :key="index"
                         class="bg-gray-50 p-4 rounded-md">
                         <div class="flex justify-between items-start">
                           <div>
@@ -1411,7 +1411,7 @@
                     </div>
                     <div v-else class="text-gray-500 mb-6">No comments yet</div>
 
-                    <form @submit.prevent="addComment(viewingShipping.id)" class="space-y-4">
+                    <form @submit.prevent="addComment(viewingCargo.id)" class="space-y-4">
                       <div class="space-y-2">
                         <label for="commentText" class="text-sm font-medium">Add Comment</label>
                         <textarea id="commentText" v-model="newComment.text" rows="3"
@@ -1436,7 +1436,7 @@
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 space-y-2 sm:space-y-0"
                     @click="editFromViewModal">
                     <PencilIcon class="h-4 w-4 mr-2" />
-                    Edit Shipping
+                    Edit Cargo
                   </button>
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 space-y-2 sm:space-y-0"
@@ -1449,13 +1449,13 @@
             </div>
           </div>
 
-          <!-- Add Shipping Modal -->
+          <!-- Add Cargo Modal -->
           <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             @click="closeAddModal">
             <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
               <div class="p-6">
                 <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Shipping</h2>
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Cargo</h2>
                   <p class="text-sm text-muted-foreground">Enter the details for the new package and its tracking
                     history.
                   </p>
@@ -1467,25 +1467,25 @@
                     <button :class="[
                       'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                      addShippingTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                    ]" @click="addShippingTab = 'details'">
-                      Shipping Details
+                      addCargoTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addCargoTab = 'details'">
+                      Cargo Details
                     </button>
                     <button :class="[
                       'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                      addShippingTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                    ]" @click="addShippingTab = 'stops'">
+                      addCargoTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addCargoTab = 'stops'">
                       Tracking Stops
                     </button>
                   </div>
 
 
-                  <div v-if="addShippingTab === 'details'" class="space-y-4 mt-4">
+                  <div v-if="addCargoTab === 'details'" class="space-y-4 mt-4">
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="containerNumber" class="text-sm font-medium">Container Number</label>
-                        <input id="containerNumber" v-model="newShipping.containerNumber"
+                        <input id="containerNumber" v-model="newCargo.containerNumber"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.containerNumber ? 'border-red-500' : '']" />
                         <p v-if="formErrors.containerNumber" class="text-red-500 text-sm">{{ formErrors.containerNumber
                         }}
@@ -1493,13 +1493,13 @@
                       </div>
                       <div class="space-y-2">
                         <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
-                        <input id="truckNumber" v-model="newShipping.truckNumber"
+                        <input id="truckNumber" v-model="newCargo.truckNumber"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truckNumber ? 'border-red-500' : '']" />
                         <p v-if="formErrors.truckNumber" class="text-red-500 text-sm">{{ formErrors.truckNumber }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="blNumber" class="text-sm font-medium">BL Number</label>
-                        <input id="blNumber" v-model="newShipping.blNumber"
+                        <input id="blNumber" v-model="newCargo.blNumber"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.blNumber ? 'border-red-500' : '']" />
                         <p v-if="formErrors.blNumber" class="text-red-500 text-sm">{{ formErrors.blNumber }}</p>
                       </div>
@@ -1507,14 +1507,14 @@
 
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
-                        <label for="type" class="text-sm font-medium">Shipping Type</label>
-                        <input id="type" v-model="newShipping.type"
+                        <label for="type" class="text-sm font-medium">Cargo Type</label>
+                        <input id="type" v-model="newCargo.type"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.type ? 'border-red-500' : '']" />
                         <p v-if="formErrors.type" class="text-red-500 text-sm">{{ formErrors.type }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="weight" class="text-sm font-medium">Weight (kg)</label>
-                        <input id="weight" v-model="newShipping.weight"
+                        <input id="weight" v-model="newCargo.weight"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.weight ? 'border-red-500' : '']" />
                         <p v-if="formErrors.weight" class="text-red-500 text-sm">{{ formErrors.weight }}</p>
                       </div>
@@ -1523,13 +1523,13 @@
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
-                        <input id="shippedDate" type="date" v-model="newShipping.shippedDate"
+                        <input id="shippedDate" type="date" v-model="newCargo.shippedDate"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shippedDate ? 'border-red-500' : '']" />
                         <p v-if="formErrors.shippedDate" class="text-red-500 text-sm">{{ formErrors.shippedDate }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="estimatedDelivery" class="text-sm font-medium">Estimated Delivery</label>
-                        <input id="estimatedDelivery" type="date" v-model="newShipping.estimatedDelivery"
+                        <input id="estimatedDelivery" type="date" v-model="newCargo.estimatedDelivery"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.estimatedDelivery ? 'border-red-500' : '']" />
                         <p v-if="formErrors.estimatedDelivery" class="text-red-500 text-sm">{{
                           formErrors.estimatedDelivery
@@ -1540,8 +1540,8 @@
 
                     <div class="space-y-2">
                       <label for="currentLocation" class="text-sm font-medium">Current Location</label>
-                      <select id="currentLocation" v-model="newShipping.currentLocation"
-                        @change="handleNewShippingLocationChange"
+                      <select id="currentLocation" v-model="newCargo.currentLocation"
+                        @change="handleNewCargoLocationChange"
                         :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.currentLocation ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select location</option>
                         <option v-for="location in allLocations" :key="location" :value="location">{{ location }}
@@ -1554,20 +1554,20 @@
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                        <input id="nextStop" v-model="newShipping.nextStop" readonly
+                        <input id="nextStop" v-model="newCargo.nextStop" readonly
                           class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         <p class="text-xs text-gray-500">Automatically determined based on current location</p>
                       </div>
                       <div class="space-y-2">
                         <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                        <input id="nextStopETA" type="date" v-model="newShipping.nextStopETA" readonly
+                        <input id="nextStopETA" type="date" v-model="newCargo.nextStopETA" readonly
                           class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                       </div>
                     </div>
 
                     <div class="space-y-2">
                       <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
-                      <input id="finalDestination" v-model="newShipping.finalDestination"
+                      <input id="finalDestination" v-model="newCargo.finalDestination"
                         :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.finalDestination ? 'border-red-500' : '']" />
                       <p v-if="formErrors.finalDestination" class="text-red-500 text-sm">{{ formErrors.finalDestination
                       }}
@@ -1575,7 +1575,7 @@
                     </div>
                   </div>
 
-                  <div v-if="addShippingTab === 'stops'" class="space-y-4 mt-4">
+                  <div v-if="addCargoTab === 'stops'" class="space-y-4 mt-4">
                     <div v-if="stopErrors.general" class="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">{{
                       stopErrors.general }}</div>
 
@@ -1584,7 +1584,7 @@
                       <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="space-y-2">
                           <label for="status" class="text-sm font-medium">Status</label>
-                          <input id="status" placeholder="e.g., Shipping received, In transit" v-model="newStop.status"
+                          <input id="status" placeholder="e.g., Cargo received, In transit" v-model="newStop.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.status ? 'border-red-500' : '']" />
                           <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                         </div>
@@ -1662,8 +1662,8 @@
                   </button>
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                    @click="addNewShipping">
-                    Add Shipping
+                    @click="addNewCargo">
+                    Add Cargo
                   </button>
                 </div>
               </div>
@@ -1840,7 +1840,7 @@
                           @change="togglePermission(perm)"
                           class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
                         <label :for="'edit-perm-' + perm" class="ml-2 text-sm text-gray-700">
-                          {{ perm === 'packages' ? 'Manage Shippings' :
+                          {{ perm === 'packages' ? 'Manage Cargos' :
                             perm === 'users' ? 'Manage Users' :
                               perm === 'reports' ? 'View Reports' : perm }}
                         </label>
@@ -1967,15 +1967,15 @@
         </div>
       </div>
 
-      <!-- Shipping Tracking Dialog -->
+      <!-- Cargo Tracking Dialog -->
       <div v-if="showTrackingDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
         @click="closeTrackingDialog">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden" @click.stop>
           <!-- Dialog Header -->
           <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-[#273272] text-white">
             <div class="flex-1 min-w-0">
-              <h2 class="text-lg sm:text-xl font-semibold truncate">Shipping Tracking Details</h2>
-              <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedShipping?.containerNumber
+              <h2 class="text-lg sm:text-xl font-semibold truncate">Cargo Tracking Details</h2>
+              <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedCargo?.containerNumber
               }}</p>
             </div>
             <div class="flex items-center gap-2 sm:gap-3 ml-4">
@@ -1995,7 +1995,7 @@
 
           <!-- Dialog Content -->
           <div class="overflow-y-auto max-h-[calc(95vh-120px)]" id="tracking-content">
-            <PackageTracking v-if="selectedShipping" :pkg="selectedShipping" class="print-content" />
+            <PackageTracking v-if="selectedCargo" :pkg="selectedCargo" class="print-content" />
           </div>
         </div>
       </div>
@@ -2045,7 +2045,7 @@ import html2canvas from 'html2canvas';
 import ShippingProgress from '../components/ShippingProgress.vue';
 import userService from '../Services/userServices.js';
 import locationService from '../Services/locationServices.js';
-import ShippingServices from '../Services/ShippingServices.js';
+import CargoServices from '../Services/ShippingServices.js';
 import Alert from '../components/ui/Alert.vue';
 
 
@@ -2233,9 +2233,9 @@ const toggleSidebar = () => {
 }
 
 
-// Shipping Tracking Dialog state
+// Cargo Tracking Dialog state
 const showTrackingDialog = ref(false)
-const selectedShipping = ref(null)
+const selectedCargo = ref(null)
 
 // Device detection
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
@@ -2255,7 +2255,7 @@ const currentUser = ref({
   initials: 'AU'
 })
 
-// Shipping management state
+// Cargo management state
 const packages = ref([]);
 const searchTerm = ref('')
 const currentYear = computed(() => new Date().getFullYear())
@@ -2331,19 +2331,19 @@ const recentActivity = computed(() => {
   return activityLogs.value.slice(0, 5)
 })
 
-// Load Shipping Details from the service
-const fetchShippings = async () => {
+// Load Cargo Details from the service
+const fetchCargos = async () => {
   try {
-    const response = await ShippingServices.getPackages();
+    const response = await CargoServices.getPackages();
     packages.value = response.data;
 
   } catch (error) {
-    console.error('Error fetching Shipment:', error);
+    console.error('Error fetching Cargo:', error);
   }
 };
 
 // Filtered packages based on search term
-const filteredShippings = computed(() => {
+const filteredCargos = computed(() => {
   if (!searchTerm.value) return packages.value
 
   return packages.value.filter(pkg =>
@@ -2397,7 +2397,7 @@ const filteredActivities = computed(() => {
 
 // Edit package state
 const showEditModal = ref(false)
-const editingShipping = ref(null)
+const editingCargo = ref(null)
 const activeEditTab = ref('location')
 const editData = ref({
   currentLocation: '',
@@ -2415,12 +2415,12 @@ const editData = ref({
 
 // View package state
 const showViewModal = ref(false)
-const viewingShipping = ref(null)
+const viewingCargo = ref(null)
 
 // Add package state
 const showAddModal = ref(false)
-const addShippingTab = ref('details')
-const newShipping = ref({
+const addCargoTab = ref('details')
+const newCargo = ref({
   containerNumber: '',
   truckNumber: '',
   blNumber: '',
@@ -2481,7 +2481,7 @@ const getActivityIcon = (type) => {
   }
 }
 
-const getShippingsByStatus = (status) => {
+const getCargosByStatus = (status) => {
   if (status === 'transit') {
     return packages.value.filter(pkg =>
       pkg.trackingHistory.some(event => event.status.toLowerCase().includes('transit'))
@@ -3022,15 +3022,15 @@ const logout = async() => {
   }
 }
 
-// Shipping Tracking Dialog functions
+// Cargo Tracking Dialog functions
 const openTrackingDialog = (pkg) => {
-  selectedShipping.value = pkg
+  selectedCargo.value = pkg
   showTrackingDialog.value = true
 }
 
 const closeTrackingDialog = () => {
   showTrackingDialog.value = false
-  selectedShipping.value = null
+  selectedCargo.value = null
 }
 
 // Enhanced Print Function
@@ -3060,7 +3060,7 @@ const handlePrint = async () => {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Shipping Tracking - ${selectedShipping.value?.containerNumber}</title>
+        <title>Cargo Tracking - ${selectedCargo.value?.containerNumber}</title>
         <meta charset="utf-8">
         <style>
 
@@ -3150,7 +3150,7 @@ async function handleDownloadPDF() {
     // Save original styles
     const originalMaxHeight = element.style.maxHeight;
     const originalOverflowY = element.style.overflowY;
-    const pkg = selectedShipping.value
+    const pkg = selectedCargo.value
     // Temporarily remove scroll & height limits to show all content
     element.style.maxHeight = "none";
     element.style.overflowY = "visible";
@@ -3184,7 +3184,7 @@ async function handleDownloadPDF() {
       if (heightLeft > 0) pdf.addPage();
     }
 
-    pdf.save(`Texmon_Shipping_${pkg.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
+    pdf.save(`Texmon_Cargo_${pkg.containerNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
 
   } catch (error) {
     console.error("Error generating PDF:", error);
@@ -3242,7 +3242,7 @@ const waitForImages = () => {
   })
 }
 
-const printShippingDetails = (pkg) => {
+const printCargoDetails = (pkg) => {
   // For now, open tracking dialog - you can implement a separate view modal if needed
   openTrackingDialog(pkg)
 }
@@ -3251,8 +3251,8 @@ const printShippingDetails = (pkg) => {
 
 
 // Edit package functions
-const openEditShippingModal = (pkg) => {
-  editingShipping.value = { ...pkg }
+const openEditCargoModal = (pkg) => {
+  editingCargo.value = { ...pkg }
   editData.value = {
     currentLocation: pkg.currentLocation,
     nextStop: pkg.nextStop,
@@ -3264,23 +3264,23 @@ const openEditShippingModal = (pkg) => {
 
 const closeEditModal = () => {
   showEditModal.value = false
-  editingShipping.value = null
+  editingCargo.value = null
 }
 
-const editShipping = async (pkg) => {
+const editCargo = async (pkg) => {
   try {
-    const response = await ShippingServices.getPackageById(pkg.id)
+    const response = await CargoServices.getPackageById(pkg.id)
     if (!response || response.error) {
       setAlert('Failed to fetch package details for editing.', 'error')
       return
     }
-    // Populate editingShipping with fetched data
-    editingShipping.value = { ...response.data.package }
+    // Populate editingCargo with fetched data
+    editingCargo.value = { ...response.data.package }
     editData.value = {
-      currentLocation: editingShipping.value.currentLocation,
-      nextStop: editingShipping.value.nextStop,
-      nextStopETA: editingShipping.value.nextStopETA,
-      shippingAddress: { ...editingShipping.value.shippingAddress }
+      currentLocation: editingCargo.value.currentLocation,
+      nextStop: editingCargo.value.nextStop,
+      nextStopETA: editingCargo.value.nextStopETA,
+      shippingAddress: { ...editingCargo.value.shippingAddress }
     }
     showEditModal.value = true
   } catch (error) {
@@ -3288,8 +3288,8 @@ const editShipping = async (pkg) => {
     setAlert('Failed to load package data for editing.', 'error')
   }
 }
-const saveEditedShipping = async () => {
-  if (!editingShipping.value) return
+const saveEditedCargo = async () => {
+  if (!editingCargo.value) return
 
   // Validate the edited data
   if (!editData.value.currentLocation || !editData.value.nextStop || !editData.value.nextStopETA) {
@@ -3298,16 +3298,16 @@ const saveEditedShipping = async () => {
   }
 
   // Update the package data
-  editingShipping.value.currentLocation = editData.value.currentLocation
-  editingShipping.value.nextStop = editData.value.nextStop
-  editingShipping.value.nextStopETA = editData.value.nextStopETA
-  editingShipping.value.shippingAddress = { ...editData.value.shippingAddress }
-  editingShipping.value.lastUpdated = new Date().toLocaleDateString()
+  editingCargo.value.currentLocation = editData.value.currentLocation
+  editingCargo.value.nextStop = editData.value.nextStop
+  editingCargo.value.nextStopETA = editData.value.nextStopETA
+  editingCargo.value.shippingAddress = { ...editData.value.shippingAddress }
+  editingCargo.value.lastUpdated = new Date().toLocaleDateString()
 
   try {
-    const response = await ShippingServices.updatePackage(editingShipping.value.id, editingShipping.value)
+    const response = await CargoServices.updatePackage(editingCargo.value.id, editingCargo.value)
     if (response.success) {
-      setAlert('Shipping details updated successfully!', 'success')
+      setAlert('Cargo details updated successfully!', 'success')
       closeEditModal()
     } else {
       setAlert('Failed to update shipping details.', 'error')
@@ -3320,16 +3320,16 @@ const saveEditedShipping = async () => {
 }
 
 // View package functions
-const openViewShippingModal = async (pkg) => {
+const openViewCargoModal = async (pkg) => {
   try {
-    const response = await ShippingServices.getPackageById(pkg.id)
+    const response = await CargoServices.getPackageById(pkg.id)
     if (!response || response.error) {
       setAlert('Failed to fetch package details for viewing.', 'error')
       return
     }
 
-    // Populate viewingShipping with fetched data
-    viewingShipping.value = { ...pkg }
+    // Populate viewingCargo with fetched data
+    viewingCargo.value = { ...pkg }
     showViewModal.value = true
   } catch (error) {
     console.error('Error fetching package data:', error)
@@ -3341,25 +3341,25 @@ const openViewShippingModal = async (pkg) => {
 
 const closeViewModal = () => {
   showViewModal.value = false
-  viewingShipping.value = null
+  viewingCargo.value = null
 }
 
-const viewShippingDetails = (pkg) => {
-  openViewShippingModal(pkg)
+const viewCargoDetails = (pkg) => {
+  openViewCargoModal(pkg)
 }
 
 const editFromViewModal = () => {
-  if (viewingShipping.value) {
+  if (viewingCargo.value) {
     closeViewModal()
-    editShipping(viewingShipping.value)
+    editCargo(viewingCargo.value)
   }
 }
 
 // Add package functions
-const openAddShippingModal = () => {
+const openAddCargoModal = () => {
   showAddModal.value = true
-  addShippingTab.value = 'details'
-  resetNewShippingForm()
+  addCargoTab.value = 'details'
+  resetNewCargoForm()
   resetTrackingStops()
 }
 
@@ -3367,32 +3367,32 @@ const closeAddModal = () => {
   showAddModal.value = false
 }
 
-const addNewShipping = async () => {
+const addNewCargo = async () => {
   if (validateForm()) {
-    const newShippingToAdd = {
+    const newCargoToAdd = {
       id: Date.now(),
-      containerNumber: newShipping.value.containerNumber,
-      truckNumber: newShipping.value.truckNumber,
-      blNumber: newShipping.value.blNumber,
-      type: newShipping.value.type,
-      weight: newShipping.value.weight,
-      shippedDate: newShipping.value.shippedDate,
-      estimatedDelivery: newShipping.value.estimatedDelivery,
-      currentLocation: newShipping.value.currentLocation,
-      nextStop: newShipping.value.nextStop,
-      nextStopETA: newShipping.value.nextStopETA,
-      finalDestination: newShipping.value.finalDestination,
-      shippingAddress: { ...newShipping.value.shippingAddress },
+      containerNumber: newCargo.value.containerNumber,
+      truckNumber: newCargo.value.truckNumber,
+      blNumber: newCargo.value.blNumber,
+      type: newCargo.value.type,
+      weight: newCargo.value.weight,
+      shippedDate: newCargo.value.shippedDate,
+      estimatedDelivery: newCargo.value.estimatedDelivery,
+      currentLocation: newCargo.value.currentLocation,
+      nextStop: newCargo.value.nextStop,
+      nextStopETA: newCargo.value.nextStopETA,
+      finalDestination: newCargo.value.finalDestination,
+      shippingAddress: { ...newCargo.value.shippingAddress },
       lastUpdated: new Date().toLocaleDateString(),
       trackingHistory: [...trackingStops.value],
       comments: []
     }
     try {
       // Simulate API call
-      const response = await ShippingServices.addPackage(newShippingToAdd)
+      const response = await CargoServices.addPackage(newCargoToAdd)
       if (response.success) {
-        setAlert('Shipping added successfully!', 'success')
-        resetNewShippingForm()
+        setAlert('Cargo added successfully!', 'success')
+        resetNewCargoForm()
         resetTrackingStops()
         closeAddModal()
       } else {
@@ -3412,47 +3412,47 @@ const validateForm = () => {
   formErrors.value = {}
   let isValid = true
 
-  if (!newShipping.value.containerNumber) {
+  if (!newCargo.value.containerNumber) {
     formErrors.value.containerNumber = 'Container number is required'
     isValid = false
   }
 
-  if (!newShipping.value.truckNumber) {
+  if (!newCargo.value.truckNumber) {
     formErrors.value.truckNumber = 'Truck number is required'
     isValid = false
   }
 
-  if (!newShipping.value.blNumber) {
+  if (!newCargo.value.blNumber) {
     formErrors.value.blNumber = 'BL number is required'
     isValid = false
   }
 
-  if (!newShipping.value.type) {
-    formErrors.value.type = 'Shipping type is required'
+  if (!newCargo.value.type) {
+    formErrors.value.type = 'Cargo type is required'
     isValid = false
   }
 
-  if (!newShipping.value.weight) {
+  if (!newCargo.value.weight) {
     formErrors.value.weight = 'Weight is required'
     isValid = false
   }
 
-  if (!newShipping.value.shippedDate) {
+  if (!newCargo.value.shippedDate) {
     formErrors.value.shippedDate = 'Shipped date is required'
     isValid = false
   }
 
-  if (!newShipping.value.estimatedDelivery) {
+  if (!newCargo.value.estimatedDelivery) {
     formErrors.value.estimatedDelivery = 'Estimated delivery is required'
     isValid = false
   }
 
-  if (!newShipping.value.currentLocation) {
+  if (!newCargo.value.currentLocation) {
     formErrors.value.currentLocation = 'Current location is required'
     isValid = false
   }
 
-  if (!newShipping.value.finalDestination) {
+  if (!newCargo.value.finalDestination) {
     formErrors.value.finalDestination = 'Final destination is required'
     isValid = false
   }
@@ -3467,8 +3467,8 @@ const validateForm = () => {
   return isValid
 }
 
-const resetNewShippingForm = () => {
-  newShipping.value = {
+const resetNewCargoForm = () => {
+  newCargo.value = {
     containerNumber: '',
     truckNumber: '',
     blNumber: '',
@@ -3546,9 +3546,9 @@ const handleLocationChange = () => {
   editData.value.nextStopETA = calculateEstimatedArrival(editData.value.currentLocation)
 }
 
-const handleNewShippingLocationChange = () => {
-  newShipping.value.nextStop = getNextStop(newShipping.value.currentLocation)
-  newShipping.value.nextStopETA = calculateEstimatedArrival(newShipping.value.currentLocation)
+const handleNewCargoLocationChange = () => {
+  newCargo.value.nextStop = getNextStop(newCargo.value.currentLocation)
+  newCargo.value.nextStopETA = calculateEstimatedArrival(newCargo.value.currentLocation)
 }
 
 
@@ -3571,7 +3571,7 @@ onMounted(() => {
   checkMobileDevice()
   fetchUsers()
   fetchLocation()
-  fetchShippings()
+  fetchCargos()
   window.addEventListener('resize', checkMobileDevice)
   // Auto-login for demo
   isAuthenticated.value = true
