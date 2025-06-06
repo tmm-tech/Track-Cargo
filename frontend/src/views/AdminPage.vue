@@ -2739,6 +2739,7 @@ const handleLogin = async () => {
     } else {
       isAuthenticated.value = false
       loginError.value = response.error || 'Login failed. Please try again.'
+      console.log(response.error)
       setAlert(loginError.value, 'error')
     }
   } catch (error) {
