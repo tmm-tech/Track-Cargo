@@ -2488,21 +2488,17 @@ const getActivityIcon = (type) => {
 }
 
 const getCargosByStatus = (status) => {
-  if (status === 'transit') {
-    return packages.value.filter(pkg =>
-      pkg.trackingHistory.some(event => event.status.toLowerCase().includes('transit'))
-    ).length
-  } else if (status === 'delivered') {
-    return packages.value.filter(pkg =>
-      pkg.trackingHistory.some(event => event.status.toLowerCase().includes('delivered'))
-    ).length
-  } else if (status === 'delayed') {
-    return packages.value.filter(pkg =>
-      pkg.trackingHistory.some(event => event.status.toLowerCase().includes('delay'))
-    ).length
-  }
-  return 0
-}
+  return packages.value.filter(pkg => {
+    const history = pkg.trackingHistory;
+    if (!Array.isArray(history)) return false;
+
+    const statusLower = status.toLowerCase();
+    return history.some(event =>
+      event.status && event.status.toLowerCase().includes(statusLower === 'delayed' ? 'delay' : statusLower)
+    );
+  }).length;
+};
+
 
 const getUsersByRole = (role) => {
   return users.value.filter(user => user.roles === role).length
