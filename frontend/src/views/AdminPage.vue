@@ -2717,18 +2717,26 @@ const addComment = (packageId) => {
 
 
 // Handle login function
-const handleLogin = () => {
-  if (username.value === 'admin' && password.value === 'texmon2024') {
-    isAuthenticated.value = true
-    loginError.value = ''
+const handleLogin = async() => {
+  try {
+    isSubmitting.value = true
+    const response = await userService.login(username.value, password.value)
 
-    // Log the login activity
-    logActivity('login', 'Admin User', 'User logged in successfully', 'IP Address: 192.168.1.1, Browser: Chrome 120.0.0')
-
-    // Set current view to dashboard
-    currentView.value = 'dashboard'
-  } else {
-    loginError.value = 'Invalid username or password'
+    if (response.success) {
+      isAuthenticated.value = true
+      currentUser.value = response.data.user
+      setAlert('Login successful!', 'success')
+      // Optionally redirect to dashboard or home page
+    } else {
+      loginError.value = response.error || 'Login failed. Please try again.'
+      setAlert(loginError.value, 'error')
+    }
+  } catch (error) {
+    console.error('Login error:', error)
+    loginError.value = 'An error occurred during login. Please try again.'
+    setAlert(loginError.value, 'error')
+  } finally {
+    isSubmitting.value = false
   }
 }
 
@@ -3000,13 +3008,17 @@ const deleteLocation = async () => {
 }
 
 // Handle logout function
-const logout = () => {
-  // Log the logout activity
-  logActivity('login', currentUser.value.name, 'User logged out', 'Session ended')
-
-  isAuthenticated.value = false
-  username.value = ''
-  password.value = ''
+const logout = async() => {
+  try {
+    await userService.logout()
+    isAuthenticated.value = false
+    currentUser.value = null
+    setAlert('Logout successful!', 'success')
+    // Optionally redirect to login page
+  } catch (error) {
+    console.error('Logout error:', error)
+    setAlert('An error occurred during logout. Please try again.', 'error')
+  }
 }
 
 // Shipping Tracking Dialog functions
