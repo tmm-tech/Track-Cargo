@@ -69,7 +69,7 @@
               <ArchiveBoxIcon
                 :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
                 class="flex-shrink-0" />
-              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Cargo Managhhisement</span>
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Cargo Management</span>
             </button>
             <button @click="navigateToView('locations')"
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Locations' : ''"
