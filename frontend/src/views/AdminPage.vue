@@ -557,26 +557,26 @@
                         </tr>
                         <tr v-for="pkg in filteredCargos" :key="pkg.id" class="hover:bg-gray-50">
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
-                            {{ pkg.container_number }}
+                            {{ pkg.container_number || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.truck_number }}
+                            {{ pkg.truck_number || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.bl_number }}
+                            {{ pkg.bl_number || 'N/A'}}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
                             :title="pkg.current_location">
-                            {{ pkg.current_location }}
+                            {{ pkg.current_location || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nex_stop">
-                            {{ pkg.next_stop }}
+                            {{ pkg.next_stop || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.next_stop_eta }}
+                            {{ pkg.next_stop_eta || 'N/A'}}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.latest_timestamp }}
+                            {{ pkg.updated_at || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
                             <div class="flex justify-end gap-1">
@@ -640,19 +640,19 @@
                       <div class="grid grid-cols-1 gap-2 text-xs">
                         <div class="flex justify-between">
                           <span class="text-gray-500">Current:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.currentLocation }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.current_location || 'N/A'}}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Next:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.nextStop }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A' }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">ETA:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.nextStopETA }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop_eta || 'N/A' }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Updated:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.lastUpdated }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.updated_at || 'N/A'}}</span>
                         </div>
                       </div>
                     </div>
@@ -2340,10 +2340,11 @@ const recentActivity = computed(() => {
 const fetchCargos = async () => {
   try {
     const response = await CargoServices.getPackages();
-    packages.value = response.data;
+    packages.value = response.data.data || [];
 
   } catch (error) {
     console.error('Error fetching Cargo:', error);
+    setAlert('Failed to load cargo data', 'error')
   }
 };
 
