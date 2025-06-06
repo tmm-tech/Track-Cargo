@@ -105,10 +105,6 @@ PackageRoute.get("/docs", (req, res) => {
         "GET /packages/export": "Export packages (admin/manager)",
       },
     },
-    authentication: {
-      type: "Bearer Token",
-      header: "Authorization: Bearer <token>",
-    },
     rate_limits: {
       general: "100 requests per 15 minutes",
       tracking: "50 requests per 15 minutes",
