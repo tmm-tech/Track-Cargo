@@ -569,7 +569,7 @@
                             :title="pkg.current_location">
                             {{ pkg.current_location }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nextStop">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nex_stop">
                             {{ pkg.next_stop }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
