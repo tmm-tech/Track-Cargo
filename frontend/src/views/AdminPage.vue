@@ -2725,8 +2725,9 @@ const addComment = (packageId) => {
 const handleLogin = async () => {
   try {
     isSubmitting.value = true
-    const response = await userServices.login(username.value, password.value)
-
+    const userData = { username: username.value, password: password.value }
+    // Call the user service to perform login
+    const response = await userServices.login(userData)
     if (response.success) {
       isAuthenticated.value = true
       currentUser.value = response.data.user
