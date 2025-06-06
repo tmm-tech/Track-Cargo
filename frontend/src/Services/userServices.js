@@ -51,6 +51,12 @@ export default {
     // Check authentication
     checkAuth() {
         return axios.get(`${API_BASE}/protected`);
-    }
+    },
+
+    // Verify token
+    verifyToken() {
+        const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        return axios.post(`${API_BASE}/verify`, { token });
+    },
 
 };

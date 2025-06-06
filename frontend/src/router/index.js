@@ -8,7 +8,7 @@ import userService from "../Services/userServices.js"
 const authGuard = async (to, from, next) => {
   try {
     // Check if user has a valid token
-    const token = userService.getAuthToken()
+    const token = userService.checkAuth()
 
     if (!token) {
       // No token, allow access to admin page (it will show login form)
