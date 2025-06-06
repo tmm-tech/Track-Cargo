@@ -10,7 +10,6 @@ const {
   validateExport,
 } = require("../middleware/packageValidation")
 const { rateLimiter, trackingRateLimiter } = require("../middleware/rateLimiter")
-const { authenticateToken, requireRole } = require("../middleware/auth")
 const { logRequest } = require("../middleware/logging")
 
 
@@ -22,8 +21,7 @@ PackageRoute.use(logRequest)
 // Track package by tracking number - with rate limiting for public access
 PackageRoute.get("/track/:tracking_number", trackingRateLimiter, trackPackageByTrackingNumber)
 
-// Protected routes (authentication required)
-PackageRoute.use(authenticateToken) // Apply authentication to all routes below
+
 
 // Package CRUD operations
 PackageRoute.post(
