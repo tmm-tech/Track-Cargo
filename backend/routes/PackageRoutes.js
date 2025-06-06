@@ -20,13 +20,13 @@ PackageRoute.use(logRequest)
 
 // Public routes (no authentication required)
 // Track package by tracking number - with rate limiting for public access
-router.get("/track/:tracking_number", trackingRateLimiter, trackPackageByTrackingNumber)
+PackageRoute.get("/track/:tracking_number", trackingRateLimiter, trackPackageByTrackingNumber)
 
 // Protected routes (authentication required)
-router.use(authenticateToken) // Apply authentication to all routes below
+PackageRoute.use(authenticateToken) // Apply authentication to all routes below
 
 // Package CRUD operations
-router.post(
+PackageRoute.post(
   "/packages",
   rateLimiter,
   validatePackageCreation,
@@ -34,22 +34,22 @@ router.post(
   createPackage,
 )
 
-router.get("/packages", rateLimiter, getAllPackages)
+PackageRoute.get("/packages", rateLimiter, getAllPackages)
 
-router.get("/packages/stats", requireRole(["admin", "manager"]), getPackageStats)
+PackageRoute.get("/packages/stats", requireRole(["admin", "manager"]), getPackageStats)
 
-router.get("/packages/search", validateSearch, PackageController.searchPackages)
+PackageRoute.get("/packages/search", validateSearch, PackageController.searchPackages)
 
-router.get("/packages/export", validateExport, requireRole(["admin", "manager"]), exportPackages)
+PackageRoute.get("/packages/export", validateExport, requireRole(["admin", "manager"]), exportPackages)
 
-router.get("/packages/:id", PackageController.getPackageById)
+PackageRoute.get("/packages/:id", PackageController.getPackageById)
 
-router.put("/packages/:id", validatePackageUpdate, requireRole(["admin", "operator"]), updatePackage)
+PackageRoute.put("/packages/:id", validatePackageUpdate, requireRole(["admin", "operator"]), updatePackage)
 
-router.delete("/packages/:id", requireRole(["admin"]), deletePackage)
+PackageRoute.delete("/packages/:id", requireRole(["admin"]), deletePackage)
 
 // Tracking operations
-router.post(
+PackageRoute.post(
   "/packages/:id/tracking",
   validateTrackingEvent,
   requireRole(["admin", "operator"]),
@@ -57,7 +57,7 @@ router.post(
 )
 
 // Bulk operations
-router.put(
+PackageRoute.put(
   "/packages/bulk",
   validateBulkUpdate,
   requireRole(["admin", "manager"]),
@@ -65,7 +65,7 @@ router.put(
 )
 
 // Advanced routes
-router.get("/packages/:id/timeline", async (req, res) => {
+PackageRoute.get("/packages/:id/timeline", async (req, res) => {
   // Get package with detailed tracking timeline
   req.query.include_events = "true"
   req.query.include_comments = "true"
@@ -73,7 +73,7 @@ router.get("/packages/:id/timeline", async (req, res) => {
 })
 
 // Health check endpoint
-router.get("/health", (req, res) => {
+PackageRoute.get("/health", (req, res) => {
   res.json({
     success: true,
     message: "Package API is healthy",
@@ -83,7 +83,7 @@ router.get("/health", (req, res) => {
 })
 
 // API documentation endpoint
-router.get("/docs", (req, res) => {
+PackageRoute.get("/docs", (req, res) => {
   res.json({
     success: true,
     message: "Package Management API Documentation",
@@ -116,8 +116,8 @@ router.get("/docs", (req, res) => {
   })
 })
 
-// Error handling middleware for this router
-router.use((error, req, res, next) => {
+// Error handling middleware for this PackageRoute
+PackageRoute.use((error, req, res, next) => {
   console.error("Package routes error:", error)
 
   if (error.type === "entity.parse.failed") {
