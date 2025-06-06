@@ -1,5 +1,5 @@
 const express = require("express")
-const {PackageController} = require(".../controllers/PackageController")
+const { trackPackageByTrackingNumber, createPackage,getAllPackages,getPackageStats, exportPackages, updatePackage, deletePackage} = require("../controllers/PackageController")
 const {
   validatePackageCreation,
   validatePackageUpdate,
@@ -19,7 +19,7 @@ router.use(logRequest)
 
 // Public routes (no authentication required)
 // Track package by tracking number - with rate limiting for public access
-router.get("/track/:tracking_number", trackingRateLimiter, PackageController.trackPackageByTrackingNumber)
+router.get("/track/:tracking_number", trackingRateLimiter, trackPackageByTrackingNumber)
 
 // Protected routes (authentication required)
 router.use(authenticateToken) // Apply authentication to all routes below
@@ -30,22 +30,22 @@ router.post(
   rateLimiter,
   validatePackageCreation,
   requireRole(["admin", "operator"]),
-  PackageController.createPackage,
+  createPackage,
 )
 
-router.get("/packages", rateLimiter, PackageController.getAllPackages)
+router.get("/packages", rateLimiter, getAllPackages)
 
-router.get("/packages/stats", requireRole(["admin", "manager"]), PackageController.getPackageStats)
+router.get("/packages/stats", requireRole(["admin", "manager"]), getPackageStats)
 
 router.get("/packages/search", validateSearch, PackageController.searchPackages)
 
-router.get("/packages/export", validateExport, requireRole(["admin", "manager"]), PackageController.exportPackages)
+router.get("/packages/export", validateExport, requireRole(["admin", "manager"]), exportPackages)
 
 router.get("/packages/:id", PackageController.getPackageById)
 
-router.put("/packages/:id", validatePackageUpdate, requireRole(["admin", "operator"]), PackageController.updatePackage)
+router.put("/packages/:id", validatePackageUpdate, requireRole(["admin", "operator"]), updatePackage)
 
-router.delete("/packages/:id", requireRole(["admin"]), PackageController.deletePackage)
+router.delete("/packages/:id", requireRole(["admin"]), deletePackage)
 
 // Tracking operations
 router.post(

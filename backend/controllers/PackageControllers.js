@@ -3,9 +3,9 @@ const { v4: uuidv4 } = require("uuid")
 const { validationResult } = require("express-validator")
 
 // Enhanced package controller with improved error handling and features
-class PackageController {
+module.exports =  {
   // Helper method for handling database transactions
-  static async withTransaction(callback) {
+async withTransaction(callback) {
     const client = await query.getClient()
     try {
       await client.query("BEGIN")
@@ -18,10 +18,10 @@ class PackageController {
     } finally {
       client.release()
     }
-  }
+  },
 
   // Helper method for standardized responses
-  static sendResponse(res, statusCode, success, message, data = null, meta = null) {
+  sendResponse(res, statusCode, success, message, data = null, meta = null) {
     const response = {
       success,
       message,
@@ -32,10 +32,10 @@ class PackageController {
     if (meta !== null) response.meta = meta
 
     return res.status(statusCode).json(response)
-  }
+  },
 
   // Helper method for handling validation errors
-  static handleValidationErrors(req, res) {
+  handleValidationErrors(req, res) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return this.sendResponse(res, 400, false, "Validation failed", null, {
@@ -43,10 +43,10 @@ class PackageController {
       })
     }
     return null
-  }
+  },
 
   // Create a new package with enhanced features
-  static async createPackage(req, res) {
+  async createPackage(req, res) {
     try {
       // Check for validation errors
       const validationError = PackageController.handleValidationErrors(req, res)
@@ -157,10 +157,10 @@ class PackageController {
       console.error("Error creating package:", error)
       return PackageController.sendResponse(res, 500, false, "Failed to create package", null, { error: error.message })
     }
-  }
+  },
 
   // Get all packages with advanced filtering, sorting, and pagination
-  static async getAllPackages(req, res) {
+  async getAllPackages(req, res) {
     try {
       const {
         page = 1,
@@ -281,10 +281,10 @@ class PackageController {
         error: error.message,
       })
     }
-  }
+  },
 
   // Get package by ID with complete tracking history
-  static async getPackageById(req, res) {
+  async getPackageById(req, res) {
     try {
       const { id } = req.params
       const { include_events = true, include_comments = true } = req.query
@@ -357,10 +357,10 @@ class PackageController {
         error: error.message,
       })
     }
-  }
+  },
 
   // Update package with comprehensive tracking
-  static async updatePackage(req, res) {
+  async updatePackage(req, res) {
     try {
       const validationError = PackageController.handleValidationErrors(req, res)
       if (validationError) return validationError
@@ -442,10 +442,10 @@ class PackageController {
         { error: error.message },
       )
     }
-  }
+  },
 
   // Soft delete package with tracking
-  static async deletePackage(req, res) {
+  async deletePackage(req, res) {
     try {
       const { id } = req.params
       const { reason = "Cancelled by administrator" } = req.body
@@ -495,10 +495,10 @@ class PackageController {
         { error: error.message },
       )
     }
-  }
+  },
 
   // Enhanced package tracking by tracking number
-  static async trackPackageByTrackingNumber(req, res) {
+  async trackPackageByTrackingNumber(req, res) {
     try {
       const { tracking_number } = req.params
       const { detailed = false } = req.query
@@ -584,10 +584,10 @@ class PackageController {
         error: error.message,
       })
     }
-  }
+  },
 
   // Add tracking event to existing package
-  static async addTrackingEvent(req, res) {
+  async addTrackingEvent(req, res) {
     try {
       const validationError = PackageController.handleValidationErrors(req, res)
       if (validationError) return validationError
@@ -645,10 +645,10 @@ class PackageController {
         { error: error.message },
       )
     }
-  }
+  },
 
   // Get comprehensive package statistics
-  static async getPackageStats(req, res) {
+  async getPackageStats(req, res) {
     try {
       const { period = "30", group_by = "day" } = req.query
 
@@ -753,10 +753,10 @@ class PackageController {
         error: error.message,
       })
     }
-  }
+  },
 
   // Advanced search with filters
-  static async searchPackages(req, res) {
+  async searchPackages(req, res) {
     try {
       const { q: searchTerm, limit = 20, include_deleted = false } = req.query
 
@@ -831,10 +831,10 @@ class PackageController {
         error: error.message,
       })
     }
-  }
+  },
 
   // Bulk operations for packages
-  static async bulkUpdatePackages(req, res) {
+  async bulkUpdatePackages(req, res) {
     try {
       const { package_ids, updates, add_tracking_event = false } = req.body
 
@@ -903,10 +903,10 @@ class PackageController {
         error: error.message,
       })
     }
-  }
+  },
 
   // Export packages to CSV
-  static async exportPackages(req, res) {
+  async exportPackages(req, res) {
     try {
       const { format = "csv", status, date_from, date_to } = req.query
 
@@ -978,7 +978,5 @@ class PackageController {
         error: error.message,
       })
     }
-  }
-}
-
-module.exports = PackageController
+  },
+};
