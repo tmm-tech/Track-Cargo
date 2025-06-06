@@ -2731,7 +2731,7 @@ const handleLogin = async () => {
     if (response.success) {
 
       const token = response.data.token;
-      localStorage.setItem("token", token);
+      localStorage.setItem("authToken", token);
       isAuthenticated.value = true;
       currentUser.value = response.data.user
       setAlert('Login successful!', 'success')
