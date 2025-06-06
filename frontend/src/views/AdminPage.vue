@@ -2352,9 +2352,9 @@ const filteredCargos = computed(() => {
   if (!searchTerm.value) return packages.value
 
   return packages.value.filter(pkg =>
-    pkg.containerNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    pkg.truckNumber.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    pkg.blNumber.toLowerCase().includes(searchTerm.value.toLowerCase())
+    pkg.container_number.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    pkg.truck_number.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    pkg.bl_number.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
 })
 
