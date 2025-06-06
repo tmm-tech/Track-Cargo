@@ -2019,7 +2019,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   MagnifyingGlassIcon,
   PencilIcon,
@@ -2055,7 +2056,7 @@ import Alert from '../components/ui/Alert.vue';
 
 
 
-
+const router = useRouter()
 const showAlert = ref(false);
 const alertMessage = ref('');
 const alertType = ref('');
@@ -3588,6 +3589,12 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkMobileDevice)
+})
+
+watch(isAuthenticated, (value) => {
+  if (value) {
+    router.push('/admin') 
+  }
 })
 
 </script>
