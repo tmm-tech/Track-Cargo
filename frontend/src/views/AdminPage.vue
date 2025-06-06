@@ -2749,31 +2749,7 @@ const handleLogin = async () => {
   }
 }
 
-const checkAuthStatus = async () => {
-  try {
-    isCheckingAuth.value = true
 
-    // Make a request to the backend to verify the token stored in the cookie
-    const response = await userServices.checkAuth()
-
-    if (response.success && response.data.user) {
-      isAuthenticated.value = true
-      currentUser.value = response.data.user || {}
-
-      // Optionally fetch additional data after confirming auth
-      await fetchUsers()
-      await fetchCargos()
-      await fetchLocation()
-    } else {
-      isAuthenticated.value = false
-    }
-  } catch (error) {
-    console.error('Auth check error:', error)
-    isAuthenticated.value = false
-  } finally {
-    isCheckingAuth.value = false
-  }
-}
 
 
 const locationSearchTerm = ref('')
@@ -3602,7 +3578,11 @@ const formatDate = (dateString) => {
 
 // Event listeners
 onMounted(() => {
-  checkAuthStatus()
+   fetchUsers()
+   fetchCargos()
+  fetchLocation()
+  fetchActivityLogs()
+  fetchPackages()
   window.addEventListener('resize', checkMobileDevice)
 })
 

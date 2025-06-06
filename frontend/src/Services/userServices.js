@@ -51,7 +51,7 @@ export default {
     // Check authentication
     checkAuth() {
         return axios.get(`${API_BASE}/protected`, {
-            withCredentials: true // 🔒 Send HttpOnly cookies
+            withCredentials: true 
         });
     },
 
