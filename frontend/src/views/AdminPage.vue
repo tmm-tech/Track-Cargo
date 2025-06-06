@@ -2048,7 +2048,7 @@ import PackageTracking from './PackageTracking.vue'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ShippingProgress from '../components/ShippingProgress.vue';
-import userService from '../Services/userServices.js';
+import userServices from '../Services/userServices.js';
 import locationService from '../Services/locationServices.js';
 import CargoServices from '../Services/ShippingServices.js';
 import Alert from '../components/ui/Alert.vue';
@@ -2360,7 +2360,7 @@ const filteredCargos = computed(() => {
 // Load users from the service
 const fetchUsers = async () => {
   try {
-    const response = await userService.getAllUsers();
+    const response = await userServices.getAllUsers();
     users.value = response.data.data;
 
   } catch (error) {
@@ -2549,7 +2549,7 @@ const addNewUser = async () => {
       lastLogin: null,
     }
     try {
-      const response = await userService.registerUser(newUserToAdd)
+      const response = await userServices.registerUser(newUserToAdd)
       if (response.success) {
         setAlert('User created successfully!', 'success')
         closeAddUserModal()
@@ -2598,7 +2598,7 @@ const resetNewUserForm = () => {
 const editUser = async (user) => {
   try {
 
-    const response = await userService.getUserById(user.id)
+    const response = await userServices.getUserById(user.id)
 
     if (!response || response.error) {
       setAlert('Failed to fetch user details.', 'error')
@@ -2644,7 +2644,7 @@ const updateUser = async () => {
       updatedUser.password = editingUser.value.newPassword;
     }
 
-    const response = await userService.updateUser(editingUser.value.id, updatedUser);
+    const response = await userServices.updateUser(editingUser.value.id, updatedUser);
 
     if (response.error) {
       setAlert(response.error, 'error');
@@ -2680,7 +2680,7 @@ const deleteUser = async () => {
   if (!userToDelete.value) return
 
   try {
-    const response = await userService.deleteUser(userToDelete.value.id)
+    const response = await userServices.deleteUser(userToDelete.value.id)
 
     if (response.error) {
       setAlert(response.error, 'error')
@@ -2725,7 +2725,7 @@ const addComment = (packageId) => {
 const handleLogin = async () => {
   try {
     isSubmitting.value = true
-    const response = await userService.login(username.value, password.value)
+    const response = await userServices.login(username.value, password.value)
 
     if (response.success) {
       isAuthenticated.value = true
@@ -3043,7 +3043,7 @@ const deleteLocation = async () => {
 // Handle logout function
 const logout = async () => {
   try {
-    await userService.logout()
+    await userServices.logout()
     isAuthenticated.value = false
     currentUser.value = null
     setAlert('Logout successful!', 'success')
