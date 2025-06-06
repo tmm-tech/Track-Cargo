@@ -2,11 +2,17 @@
   <div class="flex h-screen">
 
     <!-- Alert Component -->
-
     <div v-if="alertMessage" :class="['alert', alertType]">
       <Alert v-if="showAlert" :message="alertMessage" :type="alertType" :show="showAlert" @close="hideAlert" />
     </div>
 
+        <!-- Loading Screen -->
+    <div v-if="isCheckingAuth" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#273272] mx-auto mb-4"></div>
+        <p class="text-gray-600">Checking authentication...</p>
+      </div>
+    </div>
 
     <!-- Mobile Menu Overlay -->
     <div v-if="showMobileMenu && isAuthenticated" class="fixed inset-0 z-50 bg-black/50 md:hidden"
@@ -53,8 +59,7 @@
               <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Dashboard</span>
             </button>
 
-            <button @click="navigateToView('packages')"
-              :title="(sidebarCollapsed && !isMobileDevice) ? 'Cargos' : ''"
+            <button @click="navigateToView('packages')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Cargos' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
                 'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
@@ -64,7 +69,7 @@
               <ArchiveBoxIcon
                 :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
                 class="flex-shrink-0" />
-              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Cargo Management</span>
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Cargo Managhhisement</span>
             </button>
             <button @click="navigateToView('locations')"
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Locations' : ''"
@@ -1927,7 +1932,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2054,8 +2059,7 @@ import Alert from '../components/ui/Alert.vue';
 const showAlert = ref(false);
 const alertMessage = ref('');
 const alertType = ref('');
-
-
+const isCheckingAuth = ref(true)
 
 
 // User management functions
@@ -2718,7 +2722,7 @@ const addComment = (packageId) => {
 
 
 // Handle login function
-const handleLogin = async() => {
+const handleLogin = async () => {
   try {
     isSubmitting.value = true
     const response = await userService.login(username.value, password.value)
@@ -2729,6 +2733,7 @@ const handleLogin = async() => {
       setAlert('Login successful!', 'success')
       // Optionally redirect to dashboard or home page
     } else {
+      isAuthenticated.value = false
       loginError.value = response.error || 'Login failed. Please try again.'
       setAlert(loginError.value, 'error')
     }
@@ -2741,6 +2746,41 @@ const handleLogin = async() => {
   }
 }
 
+// Check authentication status
+const checkAuthStatus = async () => {
+  try {
+    isCheckingAuth.value = true
+    
+    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
+    
+    if (!token) {
+      isAuthenticated.value = false
+      isCheckingAuth.value = false
+      return
+    }
+
+    const response = await userService.verifyToken()
+    
+    if (response.success && response.data.user) {
+      isAuthenticated.value = true
+      currentUser.value = {
+        ...response.data.user,
+        initials: getInitials(response.data.user.fullname)
+      }
+    } else {
+      localStorage.removeItem('authToken')
+      sessionStorage.removeItem('authToken')
+      isAuthenticated.value = false
+    }
+  } catch (error) {
+    console.error('Auth check error:', error)
+    localStorage.removeItem('authToken')
+    sessionStorage.removeItem('authToken')
+    isAuthenticated.value = false
+  } finally {
+    isCheckingAuth.value = false
+  }
+}
 
 const locationSearchTerm = ref('')
 const showAddLocationModal = ref(false)
@@ -3009,7 +3049,7 @@ const deleteLocation = async () => {
 }
 
 // Handle logout function
-const logout = async() => {
+const logout = async () => {
   try {
     await userService.logout()
     isAuthenticated.value = false
@@ -3568,6 +3608,7 @@ const formatDate = (dateString) => {
 
 // Event listeners
 onMounted(() => {
+  checkAuthStatus()
   checkMobileDevice()
   fetchUsers()
   fetchLocation()
