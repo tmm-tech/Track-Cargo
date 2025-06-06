@@ -2039,13 +2039,13 @@ import {
   ArchiveBoxIcon
 } from '@heroicons/vue/24/outline'
 import { LogOut } from 'lucide-vue-next'
-import { mockPackages } from '../data/mock-data'
 import PackageTracking from './PackageTracking.vue'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ShippingProgress from '../components/ShippingProgress.vue';
 import userService from '../Services/userServices.js';
 import locationService from '../Services/locationServices.js';
+import ShippingService from '../Services/ShippingServices.js';
 import Alert from '../components/ui/Alert.vue';
 
 
