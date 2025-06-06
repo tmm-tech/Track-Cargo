@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid")
 const { validationResult } = require("express-validator")
 
 // Enhanced package controller with improved error handling and features
-module.exports = {
+const PackageController = {
   // Helper method for handling database transactions
   async withTransaction(callback) {
     const client = await query.getClient()
@@ -38,7 +38,7 @@ module.exports = {
   handleValidationErrors(req, res) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-      return this.sendResponse(res, 400, false, "Validation failed", null, {
+      return PackageController.sendResponse(res, 400, false, "Validation failed", null, {
         errors: errors.array(),
       })
     }
@@ -49,7 +49,7 @@ module.exports = {
   async createPackage(req, res) {
     try {
       // Check for validation errors
-      const validationError = this.handleValidationErrors(req, res)
+      const validationError = PackageController.handleValidationErrors(req, res)
       if (validationError) return validationError
 
       const {
@@ -82,7 +82,7 @@ module.exports = {
       const updated_at = created_at
 
       // Use transaction for package creation
-      const result = await this.withTransaction(async (client) => {
+      const result = await PackageController.withTransaction(async (client) => {
         // Insert package
         const packageResult = await client.query(
           `
@@ -152,10 +152,10 @@ module.exports = {
         return newPackage
       })
 
-      return this.sendResponse(res, 201, true, "Package created successfully", result, { tracking_number })
+      return PackageController.sendResponse(res, 201, true, "Package created successfully", result, { tracking_number })
     } catch (error) {
       console.error("Error creating package:", error)
-      return this.sendResponse(res, 500, false, "Failed to create package", null, { error: error.message })
+      return PackageController.sendResponse(res, 500, false, "Failed to create package", null, { error: error.message })
     }
   },
 
@@ -181,7 +181,7 @@ module.exports = {
       const offset = (Number(page) - 1) * Number(limit)
       const queryParams = []
       let paramCount = 0
-      let whereClause = include_deleted === "true" ? "WHERE 1=1" : "WHERE is_deleted = FALSE"
+      let whereClause = include_deleted === "true" ? "WHERE 1=1" : "WHERE p.is_deleted = FALSE"
 
       // Build dynamic where clause
       const addFilter = (condition, value) => {
@@ -193,33 +193,49 @@ module.exports = {
       }
 
       // Apply filters
-      addFilter("status ILIKE", status ? `%${status}%` : null)
-      addFilter("type ILIKE", type ? `%${type}%` : null)
-      addFilter("priority_level =", priority_level)
-      addFilter("origin ILIKE", origin ? `%${origin}%` : null)
-      addFilter("destination ILIKE", destination ? `%${destination}%` : null)
-      addFilter("created_at >=", date_from)
-      addFilter("created_at <=", date_to)
+      addFilter("p.status ILIKE", status ? `%${status}%` : null)
+      addFilter("p.type ILIKE", type ? `%${type}%` : null)
+      addFilter("p.priority_level =", priority_level)
+      addFilter("p.origin ILIKE", origin ? `%${origin}%` : null)
+      addFilter("p.destination ILIKE", destination ? `%${destination}%` : null)
+      addFilter("p.created_at >=", date_from)
+      addFilter("p.created_at <=", date_to)
 
       // Search across multiple fields
       if (search) {
         paramCount++
         whereClause += ` AND (
-          tracking_number ILIKE $${paramCount} OR
-          sender_name ILIKE $${paramCount} OR
-          receiver_name ILIKE $${paramCount} OR
-          container_number ILIKE $${paramCount} OR
-          truck_number ILIKE $${paramCount} OR
-          bl_number ILIKE $${paramCount} OR
-          current_location ILIKE $${paramCount}
+          p.tracking_number ILIKE $${paramCount} OR
+          p.sender_name ILIKE $${paramCount} OR
+          p.receiver_name ILIKE $${paramCount} OR
+          p.container_number ILIKE $${paramCount} OR
+          p.truck_number ILIKE $${paramCount} OR
+          p.bl_number ILIKE $${paramCount} OR
+          p.current_location ILIKE $${paramCount}
         )`
         queryParams.push(`%${search}%`)
       }
 
       // Get total count
-      const countQuery = `SELECT COUNT(*) FROM packages ${whereClause}`
+      const countQuery = `SELECT COUNT(*) FROM packages p ${whereClause}`
       const countResult = await query(countQuery, queryParams)
       const totalCount = Number.parseInt(countResult.rows[0].count)
+
+      // Validate sort_by to prevent SQL injection and ensure column exists
+      const allowedSortFields = [
+        "created_at",
+        "updated_at",
+        "tracking_number",
+        "sender_name",
+        "receiver_name",
+        "origin",
+        "destination",
+        "status",
+        "type",
+        "priority_level",
+      ]
+      const safeSortBy = allowedSortFields.includes(sort_by) ? sort_by : "created_at"
+      const safeSortOrder = ["ASC", "DESC"].includes(sort_order.toUpperCase()) ? sort_order.toUpperCase() : "DESC"
 
       // Main query with latest tracking info
       paramCount++
@@ -242,7 +258,7 @@ module.exports = {
           LIMIT 1
         ) te ON true
         ${whereClause}
-        ORDER BY p.${sort_by} ${sort_order}
+        ORDER BY p.${safeSortBy} ${safeSortOrder}
         LIMIT $${paramCount} OFFSET $${paramCount + 1}
       `
 
@@ -255,7 +271,7 @@ module.exports = {
         shipping_address: pkg.shipping_address ? JSON.parse(pkg.shipping_address) : null,
       }))
 
-      return this.sendResponse(res, 200, true, "Packages retrieved successfully", packages, {
+      return PackageController.sendResponse(res, 200, true, "Packages retrieved successfully", packages, {
         pagination: {
           page: Number(page),
           limit: Number(limit),
@@ -268,7 +284,7 @@ module.exports = {
       })
     } catch (error) {
       console.error("Error fetching packages:", error)
-      return this.sendResponse(res, 500, false, "Failed to retrieve packages", null, {
+      return PackageController.sendResponse(res, 500, false, "Failed to retrieve packages", null, {
         error: error.message,
       })
     }
@@ -289,7 +305,7 @@ module.exports = {
       )
 
       if (packageResult.rowCount === 0) {
-        return this.sendResponse(res, 404, false, "Package not found")
+        return PackageController.sendResponse(res, 404, false, "Package not found")
       }
 
       const packageData = packageResult.rows[0]
@@ -341,10 +357,10 @@ module.exports = {
         new Date(packageData.estimated_delivery) < new Date() &&
         packageData.status !== "Delivered"
 
-      return this.sendResponse(res, 200, true, "Package retrieved successfully", packageData)
+      return PackageController.sendResponse(res, 200, true, "Package retrieved successfully", packageData)
     } catch (error) {
       console.error("Error fetching package:", error)
-      return this.sendResponse(res, 500, false, "Failed to retrieve package", null, {
+      return PackageController.sendResponse(res, 500, false, "Failed to retrieve package", null, {
         error: error.message,
       })
     }
@@ -353,7 +369,7 @@ module.exports = {
   // Update package with comprehensive tracking
   async updatePackage(req, res) {
     try {
-      const validationError = this.handleValidationErrors(req, res)
+      const validationError = PackageController.handleValidationErrors(req, res)
       if (validationError) return validationError
 
       const { id } = req.params
@@ -367,7 +383,7 @@ module.exports = {
       const updated_at = new Date()
       updateData.updated_at = updated_at
 
-      const result = await this.withTransaction(async (client) => {
+      const result = await PackageController.withTransaction(async (client) => {
         // Build dynamic update query
         const updateFields = Object.keys(updateData).filter((key) => updateData[key] !== undefined)
         const setClause = updateFields.map((field, index) => `${field} = $${index + 1}`).join(", ")
@@ -421,10 +437,10 @@ module.exports = {
       result.dimensions = result.dimensions ? JSON.parse(result.dimensions) : null
       result.shipping_address = result.shipping_address ? JSON.parse(result.shipping_address) : null
 
-      return this.sendResponse(res, 200, true, "Package updated successfully", result)
+      return PackageController.sendResponse(res, 200, true, "Package updated successfully", result)
     } catch (error) {
       console.error("Error updating package:", error)
-      return this.sendResponse(
+      return PackageController.sendResponse(
         res,
         500,
         false,
@@ -441,7 +457,7 @@ module.exports = {
       const { id } = req.params
       const { reason = "Cancelled by administrator" } = req.body
 
-      const result = await this.withTransaction(async (client) => {
+      const result = await PackageController.withTransaction(async (client) => {
         const deleteResult = await client.query(
           `
           UPDATE packages SET is_deleted = TRUE, updated_at = NOW()
@@ -471,13 +487,13 @@ module.exports = {
         return deleteResult.rows[0]
       })
 
-      return this.sendResponse(res, 200, true, "Package deleted successfully", {
+      return PackageController.sendResponse(res, 200, true, "Package deleted successfully", {
         id: result.id,
         tracking_number: result.tracking_number,
       })
     } catch (error) {
       console.error("Error deleting package:", error)
-      return this.sendResponse(
+      return PackageController.sendResponse(
         res,
         500,
         false,
@@ -515,7 +531,7 @@ module.exports = {
       )
 
       if (result.rowCount === 0) {
-        return this.sendResponse(res, 404, false, "Package not found with the provided tracking number")
+        return PackageController.sendResponse(res, 404, false, "Package not found with the provided tracking number")
       }
 
       const packageData = result.rows[0]
@@ -562,10 +578,16 @@ module.exports = {
         }
       }
 
-      return this.sendResponse(res, 200, true, "Package tracking information retrieved successfully", packageData)
+      return PackageController.sendResponse(
+        res,
+        200,
+        true,
+        "Package tracking information retrieved successfully",
+        packageData,
+      )
     } catch (error) {
       console.error("Error tracking package:", error)
-      return this.sendResponse(res, 500, false, "Failed to retrieve tracking information", null, {
+      return PackageController.sendResponse(res, 500, false, "Failed to retrieve tracking information", null, {
         error: error.message,
       })
     }
@@ -574,13 +596,13 @@ module.exports = {
   // Add tracking event to existing package
   async addTrackingEvent(req, res) {
     try {
-      const validationError = this.handleValidationErrors(req, res)
+      const validationError = PackageController.handleValidationErrors(req, res)
       if (validationError) return validationError
 
       const { id } = req.params
       const { status, location, comment, event_type = "status_update", notify_customer = false } = req.body
 
-      const result = await this.withTransaction(async (client) => {
+      const result = await PackageController.withTransaction(async (client) => {
         // Verify package exists
         const packageCheck = await client.query(
           "SELECT id, status, current_location FROM packages WHERE id = $1 AND is_deleted = FALSE",
@@ -618,10 +640,10 @@ module.exports = {
         return trackingResult.rows[0]
       })
 
-      return this.sendResponse(res, 201, true, "Tracking event added successfully", result)
+      return PackageController.sendResponse(res, 201, true, "Tracking event added successfully", result)
     } catch (error) {
       console.error("Error adding tracking event:", error)
-      return this.sendResponse(
+      return PackageController.sendResponse(
         res,
         500,
         false,
@@ -708,7 +730,7 @@ module.exports = {
         `),
       ])
 
-      return this.sendResponse(
+      return PackageController.sendResponse(
         res,
         200,
         true,
@@ -734,7 +756,7 @@ module.exports = {
       )
     } catch (error) {
       console.error("Error fetching package stats:", error)
-      return this.sendResponse(res, 500, false, "Failed to retrieve package statistics", null, {
+      return PackageController.sendResponse(res, 500, false, "Failed to retrieve package statistics", null, {
         error: error.message,
       })
     }
@@ -746,7 +768,7 @@ module.exports = {
       const { q: searchTerm, limit = 20, include_deleted = false } = req.query
 
       if (!searchTerm || searchTerm.trim().length < 2) {
-        return this.sendResponse(res, 400, false, "Search term must be at least 2 characters long")
+        return PackageController.sendResponse(res, 400, false, "Search term must be at least 2 characters long")
       }
 
       const whereClause = include_deleted === "true" ? "WHERE" : "WHERE p.is_deleted = FALSE AND"
@@ -798,14 +820,21 @@ module.exports = {
         shipping_address: pkg.shipping_address ? JSON.parse(pkg.shipping_address) : null,
       }))
 
-      return this.sendResponse(res, 200, true, `Found ${packages.length} packages matching your search`, packages, {
-        search_term: searchTerm.trim(),
-        result_count: packages.length,
-        max_results: Number(limit),
-      })
+      return PackageController.sendResponse(
+        res,
+        200,
+        true,
+        `Found ${packages.length} packages matching your search`,
+        packages,
+        {
+          search_term: searchTerm.trim(),
+          result_count: packages.length,
+          max_results: Number(limit),
+        },
+      )
     } catch (error) {
       console.error("Error searching packages:", error)
-      return this.sendResponse(res, 500, false, "Failed to search packages", null, {
+      return PackageController.sendResponse(res, 500, false, "Failed to search packages", null, {
         error: error.message,
       })
     }
@@ -817,14 +846,14 @@ module.exports = {
       const { package_ids, updates, add_tracking_event = false } = req.body
 
       if (!package_ids || !Array.isArray(package_ids) || package_ids.length === 0) {
-        return this.sendResponse(res, 400, false, "Package IDs array is required")
+        return PackageController.sendResponse(res, 400, false, "Package IDs array is required")
       }
 
       if (!updates || Object.keys(updates).length === 0) {
-        return this.sendResponse(res, 400, false, "Updates object is required")
+        return PackageController.sendResponse(res, 400, false, "Updates object is required")
       }
 
-      const result = await this.withTransaction(async (client) => {
+      const result = await PackageController.withTransaction(async (client) => {
         const updated_at = new Date()
         updates.updated_at = updated_at
 
@@ -870,14 +899,14 @@ module.exports = {
         return updateResult.rows
       })
 
-      return this.sendResponse(res, 200, true, `Successfully updated ${result.length} packages`, result, {
+      return PackageController.sendResponse(res, 200, true, `Successfully updated ${result.length} packages`, result, {
         requested_count: package_ids.length,
         updated_count: result.length,
         updates_applied: updates,
       })
     } catch (error) {
       console.error("Error in bulk update:", error)
-      return this.sendResponse(res, 500, false, "Failed to perform bulk update", null, {
+      return PackageController.sendResponse(res, 500, false, "Failed to perform bulk update", null, {
         error: error.message,
       })
     }
@@ -924,7 +953,7 @@ module.exports = {
       )
 
       if (format === "json") {
-        return this.sendResponse(res, 200, true, "Packages exported successfully", result.rows, {
+        return PackageController.sendResponse(res, 200, true, "Packages exported successfully", result.rows, {
           export_format: "json",
           record_count: result.rows.length,
           exported_at: new Date().toISOString(),
@@ -952,9 +981,11 @@ module.exports = {
       return res.status(200).send(csvContent)
     } catch (error) {
       console.error("Error exporting packages:", error)
-      return this.sendResponse(res, 500, false, "Failed to export packages", null, {
+      return PackageController.sendResponse(res, 500, false, "Failed to export packages", null, {
         error: error.message,
       })
     }
   },
 }
+
+module.exports = PackageController
