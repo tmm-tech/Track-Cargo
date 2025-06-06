@@ -3581,8 +3581,6 @@ onMounted(() => {
    fetchUsers()
    fetchCargos()
   fetchLocation()
-  fetchActivityLogs()
-  fetchPackages()
   window.addEventListener('resize', checkMobileDevice)
 })
 
