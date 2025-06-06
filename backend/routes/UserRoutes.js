@@ -46,4 +46,6 @@ UserRoutes.get('/protected', checkAuth, (req, res) => {
     // Handle the request if authenticated
     res.json({ message: 'Access granted to protected route.' });
 });
+
+
 module.exports = UserRoutes

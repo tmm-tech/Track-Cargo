@@ -2059,7 +2059,7 @@ import Alert from '../components/ui/Alert.vue';
 const showAlert = ref(false);
 const alertMessage = ref('');
 const alertType = ref('');
-const isCheckingAuth = ref(true)
+const isCheckingAuth = ref(false)
 
 
 // User management functions
@@ -3615,7 +3615,7 @@ onMounted(() => {
   fetchCargos()
   window.addEventListener('resize', checkMobileDevice)
   // Auto-login for demo
-  isAuthenticated.value = true
+  isAuthenticated.value = false
 })
 
 onUnmounted(() => {
