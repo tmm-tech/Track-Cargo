@@ -1,4 +1,4 @@
-const { query } = require("../config/database")
+const { query } = require('../config/sqlConfig')
 const { v4: uuidv4 } = require("uuid")
 const { validationResult } = require("express-validator")
 
