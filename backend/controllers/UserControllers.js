@@ -109,6 +109,14 @@ module.exports = {
                         sameSite: 'None', // Allows cross-site cookies
                         maxAge: 60 * 60 * 1000 // 1 hour
                     });
+
+                    //Update last login time
+                    const updateLastLoginQuery = `
+                        UPDATE profile
+                        SET lastlogin = NOW()
+                        WHERE id = $1;
+                    `;
+                    await query(updateLastLoginQuery, [user.id]);
                     // Respond with user data
                     res.json({ success: true, data: user });
                 } else {
@@ -211,7 +219,7 @@ module.exports = {
             const result = await query(updateUserQuery, params);
 
             if (result.rowCount > 0) {
-        
+
                 res.json({ success: true, message: 'User updated successfully', data: result.rows[0] });
             } else {
                 res.status(404).json({ success: false, message: 'User not found' });
@@ -258,10 +266,12 @@ module.exports = {
     },
     // Example check for authentication in your routes (backend)
     checkAuth: (req, res) => {
-        const token = req.cookies ? req.cookies.token : null;
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
         if (token) {
             try {
                 const decodedToken = jwt.verify(token, process.env.SECRET);
+                console.log('Decoded Token:', decodedToken);
                 req.user = decodedToken; // Attach decoded token data to request if needed
                 res.status(200).json({ authenticated: true });
             } catch (error) {
@@ -301,7 +311,7 @@ module.exports = {
 
             if (result.rowCount > 0) {
                 res.json({ success: true, message: 'Account Activated successfully', user: result.rows[0] });
-     
+
             } else {
                 res.status(404).json({ success: false, message: 'User not found' });
             }

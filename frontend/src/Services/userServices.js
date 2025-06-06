@@ -49,8 +49,12 @@ export default {
     },
 
     // Check authentication
-    checkAuth() {
-        return axios.get(`${API_BASE}/protected`);
+    checkAuth(token) {
+        return axios.get(`${API_BASE}/protected`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
     },
 
 };

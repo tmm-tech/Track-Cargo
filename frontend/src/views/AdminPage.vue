@@ -2729,7 +2729,7 @@ const handleLogin = async () => {
     // Call the user service to perform login
     const response = await userServices.login(userData)
     if (response.success) {
-    
+
       const token = response.data.token;
       localStorage.setItem("token", token);
       isAuthenticated.value = true;
@@ -2754,19 +2754,24 @@ const handleLogin = async () => {
 const checkAuthStatus = async () => {
   try {
     isCheckingAuth.value = true
-    // Call the user service to check authentication
-    const response = await userServices.checkAuth()
-
-    if (response.success && response.data.user) {
+    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+    if (!token) {
+      isAuthenticated.value = false
+      return
+    }
+    // Call the user service to verify the token
+    const response = await userServices.checkAuth(token)
+    if (response.success) {
       isAuthenticated.value = true
-      currentUser.value = {
-        ...response.data.user,
-        initials: getInitials(response.data.user.fullname)
-      }
+      currentUser.value = response.data.user || {}
+      // Optionally fetch user-specific data like permissions, roles, etc.
+      await fetchUsers()
+      await fetchCargos()
+      await fetchLocation()
     } else {
+      isAuthenticated.value = false
       localStorage.removeItem('authToken')
       sessionStorage.removeItem('authToken')
-      isAuthenticated.value = false
     }
   } catch (error) {
     console.error('Auth check error:', error)
@@ -3603,20 +3608,8 @@ const formatDate = (dateString) => {
 
 
 // Event listeners
-onMounted(async () => {
-  // Ensure auth check is complete before continuing
-  const isAuth = await checkAuthStatus()
-
-  if (!isAuth) {
-    isAuthenticated.value = false
-    return // Stop execution if not authenticated
-  }
-
-  isAuthenticated.value = true
-  checkMobileDevice()
-  fetchUsers()
-  fetchLocation()
-  fetchCargos()
+onMounted(() => {
+  checkAuthStatus()
   window.addEventListener('resize', checkMobileDevice)
 })
 
