@@ -92,7 +92,8 @@ module.exports = {
                 SELECT * FROM profile WHERE username = $1;
             `;
             const userResult = await query(findUserQuery, [details.username]);
-
+            console.log('User Result:', userResult.rows);
+            // Check if user exists
             if (userResult.rows.length > 0) {
                 const user = userResult.rows[0];
                 const match = await bcrypt.compare(details.password, user.password);
@@ -114,7 +115,7 @@ module.exports = {
                     res.status(401).json({ success: false, message: 'Invalid Credentials' });
                 }
             } else {
-                res.status(401).json({ success: false, message: 'Invalid email or password' });
+                res.status(401).json({ success: false, message: 'Invalid Credentials' });
             }
         } catch (error) {
             console.error('Error logging in:', error);
