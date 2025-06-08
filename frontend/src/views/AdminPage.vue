@@ -1564,9 +1564,15 @@
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                        <input id="nextStop" v-model="newCargo.next_stop" readonly
-                          class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                        <p class="text-xs text-gray-500">Automatically determined based on current location</p>
+                        <select id="nextStop" v-model="newCargo.next_stop"
+                          @change="handleNewCargoNextStopChange"
+                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.nextStop ? 'border-red-500' : '']">
+                          <option value="" disabled selected>Select Next Stop</option>
+                          <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{ location.name }}
+                          </option>
+                        </select>
+                      <p v-if="formErrors.nextStop" class="text-red-500 text-sm">{{ formErrors.nextStop }}
+                      </p>
                       </div>
                       <div class="space-y-2">
                         <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
@@ -3558,9 +3564,14 @@ const handleLocationChange = () => {
 }
 
 const handleNewCargoLocationChange = () => {
-  newCargo.value.next_stop = getNextStop(newCargo.value.curren_location)
+  newCargo.value.next_stop = getNextStop(newCargo.value.current_location)
   newCargo.value.next_stop_eta = calculateEstimatedArrival(newCargo.value.current_location)
 }
+
+const handleNewCargoNextStopChange = () => {
+  newCargo.value.next_stop_eta = calculateEstimatedArrival(newCargo.value.next_stop)
+}
+
 
 
 
