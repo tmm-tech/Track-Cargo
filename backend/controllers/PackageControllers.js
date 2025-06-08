@@ -310,16 +310,16 @@ const PackageController = {
         return PackageController.sendResponse(res, 404, false, "Package not found")
       }
 
-      const result = packageResult.rows[0]
+      const pkg = packageResult.rows[0]
 
-      // Parse JSON fields
-       const packageData = result.rows.map((pkg) => ({
+      const packageData = {
         ...pkg,
         dimensions: pkg.dimensions ? JSON.parse(pkg.dimensions) : null,
         shipping_address: typeof pkg.shipping_address === 'string'
           ? JSON.parse(pkg.shipping_address)
           : pkg.shipping_address,
-      }))
+      }
+
 
       // Get tracking events if requested
       if (include_events === "true") {
@@ -440,9 +440,13 @@ const PackageController = {
         return updatedPackage
       })
 
-      // Parse JSON fields for response
-      result.dimensions = result.dimensions ? JSON.parse(result.dimensions) : null
-      result.shipping_address = result.shipping_address ? JSON.parse(result.shipping_address) : null
+      result.dimensions = isValidJSONString(result.dimensions)
+        ? JSON.parse(result.dimensions)
+        : result.dimensions
+
+      result.shipping_address = isValidJSONString(result.shipping_address)
+        ? JSON.parse(result.shipping_address)
+        : result.shipping_address
 
       return PackageController.sendResponse(res, 200, true, "Package updated successfully", result)
     } catch (error) {
