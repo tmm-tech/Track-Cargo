@@ -461,7 +461,7 @@
                             {{ user.status.charAt(0).toUpperCase() + user.status.slice(1) }}
                           </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.lastLogin || 'Never' }}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.lastlogin || 'Never' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div class="flex justify-end gap-2">
@@ -562,6 +562,7 @@
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.truck_number || 'N/A' }}
                           </td>
+                    
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.bl_number || 'N/A' }}
                           </td>
@@ -1553,7 +1554,7 @@
                         @change="handleNewCargoLocationChange"
                         :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.currentLocation ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select location</option>
-                        <option v-for="location in allLocations" :key="location" :value="location">{{ location }}
+                        <option v-for="location in filteredLocations" :key="location" :value="location">{{ location }}
                         </option>
                       </select>
                       <p v-if="formErrors.currentLocation" class="text-red-500 text-sm">{{ formErrors.currentLocation }}
