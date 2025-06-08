@@ -1554,7 +1554,7 @@
                         @change="handleNewCargoLocationChange"
                         :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.currentLocation ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select location</option>
-                        <option v-for="location in filteredLocations" :key="location" :value="location">{{ location }}
+                        <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{ location.name }}
                         </option>
                       </select>
                       <p v-if="formErrors.currentLocation" class="text-red-500 text-sm">{{ formErrors.currentLocation }}
