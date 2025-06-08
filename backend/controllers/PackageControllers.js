@@ -314,11 +314,25 @@ const PackageController = {
 
       const packageData = {
         ...pkg,
-        dimensions: pkg.dimensions ? JSON.parse(pkg.dimensions) : null,
-        shipping_address: typeof pkg.shipping_address === 'string'
-          ? JSON.parse(pkg.shipping_address)
-          : pkg.shipping_address,
+        dimensions:
+          typeof pkg.dimensions === 'string' && isValidJSONString(pkg.dimensions)
+            ? JSON.parse(pkg.dimensions)
+            : pkg.dimensions,
+        shipping_address:
+          typeof pkg.shipping_address === 'string' && isValidJSONString(pkg.shipping_address)
+            ? JSON.parse(pkg.shipping_address)
+            : pkg.shipping_address,
       }
+
+      const isValidJSONString = (str) => {
+        try {
+          const parsed = JSON.parse(str)
+          return typeof parsed === 'object' && parsed !== null
+        } catch {
+          return false
+        }
+      }
+
 
 
       // Get tracking events if requested
