@@ -574,10 +574,10 @@
                             {{ pkg.next_stop || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.next_stop_eta || 'N/A' }}
+                            {{ formatDate(pkg.next_stop_eta)|| 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.updated_at || 'N/A' }}
+                            {{ formatDate(pkg.latest_timestamp) || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
                             <div class="flex justify-end gap-1">

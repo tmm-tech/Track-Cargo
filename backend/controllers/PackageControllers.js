@@ -310,11 +310,16 @@ const PackageController = {
         return PackageController.sendResponse(res, 404, false, "Package not found")
       }
 
-      const packageData = packageResult.rows[0]
+      const result = packageResult.rows[0]
 
       // Parse JSON fields
-      packageData.dimensions = packageData.dimensions ? JSON.parse(packageData.dimensions) : null
-      packageData.shipping_address = packageData.shipping_address ? JSON.parse(packageData.shipping_address) : null
+       const packageData = result.rows.map((pkg) => ({
+        ...pkg,
+        dimensions: pkg.dimensions ? JSON.parse(pkg.dimensions) : null,
+        shipping_address: typeof pkg.shipping_address === 'string'
+          ? JSON.parse(pkg.shipping_address)
+          : pkg.shipping_address,
+      }))
 
       // Get tracking events if requested
       if (include_events === "true") {
