@@ -2073,150 +2073,56 @@ const alertMessage = ref('');
 const alertType = ref('');
 const isCheckingAuth = ref(false)
 
-
-// User management functions
-const closeUserManagement = () => {
-  showUserManagement.value = false
-}
-
-
-const closeUserFormModal = () => {
-  showUserFormModal.value = false
-}
-
-const validateUserForm = () => {
-  userFormErrors.value = {}
-  let isValid = true
-
-  if (!newUser.value.fullname) {
-    userFormErrors.value.fullname = 'Name is required'
-    isValid = false
-  }
-
-  if (!newUser.value.username) {
-    userFormErrors.value.username = 'Username is required'
-    isValid = false
-  }
-  if (!newUser.value.email) {
-    userFormErrors.value.email = 'Email is required'
-    isValid = false
-  } else if (!/\S+@\S+\.\S+/.test(newUser.value.email)) {
-    userFormErrors.value.email = 'Email is invalid'
-    isValid = false
-  }
-
-
-  if (!newUser.value.password) {
-    userFormErrors.value.password = 'Password is required'
-    isValid = false
-  } else if (newUser.value.password.length < 6) {
-    userFormErrors.value.password = 'Password must be at least 6 characters'
-    isValid = false
-  }
-
-  if (!newUser.value.confirmPassword) {
-    userFormErrors.value.confirmPassword = 'Please confirm your password'
-    isValid = false
-  } else if (newUser.value.password !== newUser.value.confirmPassword) {
-    userFormErrors.value.confirmPassword = 'Passwords do not match'
-    isValid = false
-  }
-
-
-  return isValid
-}
-
-
-
-const resetPasswordUser = ref({
-  id: null,
-  username: '',
-  newPassword: '',
-  confirmNewPassword: ''
-})
-const resetPasswordErrors = ref({})
-const showResetPasswordModal = ref(false)
-
-const resetUserPassword = (user) => {
-  resetPasswordUser.value = {
-    id: user.id,
-    username: user.username,
-    newPassword: '',
-    confirmNewPassword: ''
-  }
-  resetPasswordErrors.value = {}
-  showResetPasswordModal.value = true
-}
-
-const closeResetPasswordModal = () => {
-  showResetPasswordModal.value = false
-}
-
-const validateResetPasswordForm = () => {
-  resetPasswordErrors.value = {}
-  let isValid = true
-
-  if (!resetPasswordUser.value.newPassword) {
-    resetPasswordErrors.value.newPassword = 'New password is required'
-    isValid = false
-  } else if (resetPasswordUser.value.newPassword.length < 6) {
-    resetPasswordErrors.value.newPassword = 'Password must be at least 6 characters'
-    isValid = false
-  }
-
-  if (!resetPasswordUser.value.confirmNewPassword) {
-    resetPasswordErrors.value.confirmNewPassword = 'Please confirm your password'
-    isValid = false
-  } else if (resetPasswordUser.value.newPassword !== resetPasswordUser.value.confirmNewPassword) {
-    resetPasswordErrors.value.confirmNewPassword = 'Passwords do not match'
-    isValid = false
-  }
-
-  return isValid
-}
-
-const saveNewPassword = () => {
-  if (!validateResetPasswordForm()) return
-
-
-  // Show success message
-  setAlert(`Password has been reset for ${resetPasswordUser.value.username}`)
-
-  closeResetPasswordModal()
-}
-
-// Call this function to show alert
-const setAlert = (message, type) => {
-  alertMessage.value = message
-  alertType.value = type
-  showAlert.value = true
-
-  // Optional: auto clear after 3 seconds
-  setTimeout(() => {
-    alertMessage.value = ''
-    alertType.value = ''
-  }, 3000)
-}
-
-const hideAlert = () => {
-  showAlert.value = false
-}
-
 // Authentication state
 const isAuthenticated = ref(false)
 const username = ref('')
 const password = ref('')
 const loginError = ref('')
 const isSubmitting = ref(false)
+
 // Sidebar state
 const sidebarCollapsed = ref(false)
 
 
+// Current view state
+const currentView = ref('dashboard')
 
+// Current user
+const currentUser = ref({
+  id: 1,
+  fullname: 'Admin User',
+  email: 'admin@texmonlogistics.co.ke',
+  username: 'admin',
+  roles: 'Administrator',
+  initials: 'AU'
+})
+
+
+const formErrors = ref({})
+
+// Tracking stops state
+const trackingStops = ref([])
+const newStop = ref({
+  status: '',
+  location: '',
+  timestamp: '',
+  comment: []
+})
+const stopErrors = ref({})
+
+// Comments state
+const newComment = ref({
+  text: '',
+  author: 'Admin',
+  timestamp: ''
+})
+
+const permissionOptions = ['packages', 'users', 'reports']
 
 // Mobile state
 const isMobileDevice = ref(false)
 const showMobileMenu = ref(false)
+
 
 // Mobile detection and handling
 const checkMobileDevice = () => {
@@ -2248,168 +2154,19 @@ const toggleSidebar = () => {
   }
 }
 
+// Device detection
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
+
+// Cargo management functions
 
 // Cargo Tracking Dialog state
 const showTrackingDialog = ref(false)
 const selectedCargo = ref(null)
 
-// Device detection
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
-
-
-// Current view state
-const currentView = ref('dashboard')
-
-// Current user
-// Current user
-const currentUser = ref({
-  id: 1,
-  fullname: 'Admin User',
-  email: 'admin@texmonlogistics.co.ke',
-  username: 'admin',
-  roles: 'Administrator',
-  initials: 'AU'
-})
-
 // Cargo management state
 const packages = ref([]);
 const searchTerm = ref('')
 const currentYear = computed(() => new Date().getFullYear())
-
-// User management state
-const users = ref([]);
-// Location management state
-const locations = ref([]);
-const userSearchTerm = ref('');
-const showAddUserModal = ref(false)
-const showEditUserModal = ref(false)
-const showDeleteUserModal = ref(false)
-const userToDelete = ref(null)
-const userFormErrors = ref({})
-
-// New user form
-const newUser = ref({
-  fullname: '',
-  email: '',
-  username: '',
-  password: '',
-  confirmPassword: '',
-  roles: '',
-  status: 'active',
-  permissions: {
-    packages: false,
-    users: false,
-    reports: false
-  }
-})
-
-// Editing user
-const editingUser = ref({
-  fullname: '',
-  email: '',
-  username: '',
-  newPassword: '',
-  roles: 'viewer',
-  status: 'active',
-  permissions: []
-})
-
-const permissionOptions = ['packages', 'users', 'reports']
-
-const hasPermission = (perm) => {
-  return editingUser.value?.permissions?.includes(perm)
-}
-
-const togglePermission = (perm) => {
-  const perms = editingUser.value.permissions || []
-  if (perms.includes(perm)) {
-    editingUser.value.permissions = perms.filter(p => p !== perm)
-  } else {
-    editingUser.value.permissions = [...perms, perm]
-  }
-}
-// Activity log state
-const activityLogs = ref([
-  {
-    id: 1,
-    type: 'login',
-    user: 'Admin User',
-    time: '2025-05-23 09:30 AM',
-    message: 'User logged in successfully',
-    details: 'IP Address: 192.168.1.1, Browser: Chrome 120.0.0'
-  },
-])
-const activitySearchTerm = ref('')
-const activityFilter = ref('all')
-
-// Recent activity for dashboard
-const recentActivity = computed(() => {
-  return activityLogs.value.slice(0, 5)
-})
-
-// Load Cargo Details from the service
-const fetchCargos = async () => {
-  try {
-    const response = await CargoServices.getPackages();
-    packages.value = response.data.data || [];
-  } catch (error) {
-    console.error('Error fetching Cargo:', error);
-    setAlert('Failed to load cargo data', 'error')
-  }
-};
-
-// Filtered packages based on search term
-const filteredCargos = computed(() => {
-  if (!searchTerm.value) return packages.value
-
-  return packages.value.filter(pkg =>
-    pkg.container_number.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    pkg.truck_number.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    pkg.bl_number.toLowerCase().includes(searchTerm.value.toLowerCase())
-  )
-})
-
-// Load users from the service
-const fetchUsers = async () => {
-  try {
-    const response = await userServices.getAllUsers();
-    users.value = response.data.data;
-
-  } catch (error) {
-    console.error('Error fetching users:', error);
-  }
-};
-
-// Filtered users based on search term
-const filteredUsers = computed(() => {
-  if (!userSearchTerm.value) return users.value || []
-
-  return users.value.filter(user =>
-    (user.fullname || '').toLowerCase().includes(userSearchTerm.value.toLowerCase()) ||
-    (user.email || '').toLowerCase().includes(userSearchTerm.value.toLowerCase()) ||
-    (user.username || '').toLowerCase().includes(userSearchTerm.value.toLowerCase())
-  )
-})
-
-
-// Filtered activities based on search term and filter
-const filteredActivities = computed(() => {
-  let filtered = activityLogs.value
-
-  if (activitySearchTerm.value) {
-    filtered = filtered.filter(activity =>
-      activity.message.toLowerCase().includes(activitySearchTerm.value.toLowerCase()) ||
-      activity.user.toLowerCase().includes(activitySearchTerm.value.toLowerCase()) ||
-      (activity.details && activity.details.toLowerCase().includes(activitySearchTerm.value.toLowerCase()))
-    )
-  }
-
-  if (activityFilter.value !== 'all') {
-    filtered = filtered.filter(activity => activity.type === activityFilter.value)
-  }
-
-  return filtered
-})
 
 // Edit package state
 const showEditModal = ref(false)
@@ -2455,589 +2212,29 @@ const newCargo = ref({
     country: '',
   }
 })
-const formErrors = ref({})
 
-// Tracking stops state
-const trackingStops = ref([])
-const newStop = ref({
-  status: '',
-  location: '',
-  timestamp: '',
-  comment: []
-})
-const stopErrors = ref({})
-
-// Comments state
-const newComment = ref({
-  text: '',
-  author: 'Admin',
-  timestamp: ''
-})
-
-// Helper functions
-const getInitials = (fullname) => {
-  if (!fullname) return 'NA'
-  return fullname.split(' ').map(n => n[0]).join('').toUpperCase()
-}
-
-const getActivityIcon = (type) => {
-  switch (type) {
-    case 'login':
-      return LogOut
-    case 'package':
-      return ArchiveBoxIcon
-    case 'user':
-      return UsersIcon
-    case 'location':
-      return MapPinIcon
-    default:
-      return CogIcon
-  }
-}
-
-const getCargosByStatus = (status) => {
-  return packages.value.filter(pkg => {
-    const history = pkg.trackingHistory;
-    if (!Array.isArray(history)) return false;
-
-    const statusLower = status.toLowerCase();
-    return history.some(event =>
-      event.status && event.status.toLowerCase().includes(statusLower === 'delayed' ? 'delay' : statusLower)
-    );
-  }).length;
-};
-
-
-const getUsersByRole = (role) => {
-  return users.value.filter(user => user.roles === role).length
-}
-
-// Activity logging function
-const logActivity = (type, user, message, details = null) => {
-  const newActivity = {
-    id: activityLogs.value.length + 1,
-    type,
-    user,
-    time: new Date().toLocaleString(),
-    message,
-    details
-  }
-
-  activityLogs.value.unshift(newActivity)
-}
-
-// User management functions
-const openAddUserModal = () => {
-  showAddUserModal.value = true
-  resetNewUserForm()
-}
-
-const closeAddUserModal = () => {
-  showAddUserModal.value = false
-  resetNewUserForm()
-}
-
-
-const addNewUser = async () => {
-  if (validateUserForm()) {
-    isSubmitting.value = true
-    const newUserToAdd = {
-      fullname: newUser.value.fullname,
-      email: newUser.value.email,
-      username: newUser.value.username,
-      password: newUser.value.password,
-      confirmPassword: newUser.value.confirmPassword,
-      roles: newUser.value.roles,
-      status: newUser.value.status || 'active',
-      permissions: Object.entries(newUser.value.permissions)
-        .filter(([_, isChecked]) => isChecked)
-        .map(([permission]) => permission),
-      lastLogin: null,
-    }
-    try {
-      const response = await userServices.registerUser(newUserToAdd)
-      if (response.success) {
-        setAlert('User created successfully!', 'success')
-        closeAddUserModal()
-      } else {
-        setAlert('Failed to add new user.', 'error');
-      }
-    } catch (error) {
-      setAlert('Error adding new user.', 'error');
-      // Optionally show error feedback to user
-      const rawMessage = error.response?.data?.message || 'An error occurred.';
-      const userMessage = rawMessage.includes('profiles_email_key')
-        ? 'A user with this email already exists.'
-        : rawMessage.includes('profiles_username_key')
-          ? 'A user with this username already exists.'
-          : rawMessage.includes('duplicate key')
-            ? 'Duplicate entry. Please use different credentials.'
-            : rawMessage;
-
-      setAlert(userMessage, 'error');
-
-    } finally {
-      isSubmitting.value = false
-    }
-  }
-}
-
-
-const resetNewUserForm = () => {
-  newUser.value = {
-    fullname: '',
-    email: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
-    roles: '',
-    status: 'active',
-    permissions: {
-      packages: false,
-      users: false,
-      reports: false
-    }
-  }
-  userFormErrors.value = {}
-}
-
-const editUser = async (user) => {
+// Load Cargo Details from the service
+const fetchCargos = async () => {
   try {
-
-    const response = await userServices.getUserById(user.id)
-
-    if (!response || response.error) {
-      setAlert('Failed to fetch user details.', 'error')
-      return
-    }
-
-    // Populate editingUser with fetched data
-    editingUser.value = { ...response.data.data, newPassword: '' }
-
-    // Populate editingUser with fetched data
-    editingUser.value = {
-      ...response.data.data,
-      permissions: response.data.data.permissions || [],
-      newPassword: ''
-    }
-
-    showEditUserModal.value = true
+    const response = await CargoServices.getPackages();
+    packages.value = response.data.data || [];
   } catch (error) {
-    console.error('Error fetching user data:', error)
-    setAlert('Failed to load user data for editing.', 'error')
-  }
-}
-
-const closeEditUserModal = () => {
-  showEditUserModal.value = false
-  editingUser.value = null
-}
-
-const updateUser = async () => {
-  if (!editingUser.value) return;
-
-  try {
-    const updatedUser = {
-      id: editingUser.value.id,
-      fullname: editingUser.value.fullname,
-      email: editingUser.value.email,
-      roles: editingUser.value.roles,
-      status: editingUser.value.status,
-      permissions: editingUser.value.permissions,
-    };
-
-    if (editingUser.value.newPassword) {
-      updatedUser.password = editingUser.value.newPassword;
-    }
-
-    const response = await userServices.updateUser(editingUser.value.id, updatedUser);
-
-    if (response.error) {
-      setAlert(response.error, 'error');
-      return;
-    }
-
-    setAlert('User updated successfully.', 'success');
-    closeEditUserModal();
-    // Refresh the user list
-    await fetchUsers();
-
-
-
-
-  } catch (error) {
-    console.error('Error updating user:', error);
-    setAlert('Failed to update user. Please try again.', 'error');
+    console.error('Error fetching Cargo:', error);
+    setAlert('Failed to load cargo data', 'error')
   }
 };
 
+// Filtered packages based on search term
+const filteredCargos = computed(() => {
+  if (!searchTerm.value) return packages.value
 
-const confirmDeleteUser = (user) => {
-  userToDelete.value = user
-  showDeleteUserModal.value = true
-}
-
-const closeDeleteUserModal = () => {
-  showDeleteUserModal.value = false
-  userToDelete.value = null
-}
-
-const deleteUser = async () => {
-  if (!userToDelete.value) return
-
-  try {
-    const response = await userServices.deleteUser(userToDelete.value.id)
-
-    if (response.error) {
-      setAlert(response.error, 'error')
-    } else {
-      setAlert('User deleted successfully.', 'success')
-      users.value = users.value.filter(u => u.id !== userToDelete.value.id)
-    }
-  } catch (error) {
-    console.error('Delete error:', error)
-    setAlert('An error occurred while deleting the user.', 'error')
-  } finally {
-    closeDeleteUserModal()
-    userToDelete.value = null
-  }
-}
-
-// Add comment function
-const addComment = (packageId) => {
-  if (!newComment.value.text.trim()) return
-
-  // Set the current timestamp
-  newComment.value.timestamp = new Date().toLocaleString()
-
-  // Find the package and add the comment
-  packages.value = packages.value.map(pkg => {
-    if (pkg.id === packageId) {
-      const comments = pkg.comments || []
-      return {
-        ...pkg,
-        comments: [...comments, { ...newComment.value }]
-      }
-    }
-    return pkg
-  })
-
-  // Reset the comment form
-  newComment.value.text = ''
-}
-
-
-// Handle login function
-const handleLogin = async () => {
-  try {
-    isSubmitting.value = true
-    const userData = { username: username.value, password: password.value }
-    // Call the user service to perform login
-    const response = await userServices.login(userData)
-    if (response.data.success) {
-
-      isAuthenticated.value = true;
-      currentUser.value = response.data.data
-      setAlert('Login successful!', 'success')
-      // Optionally redirect to dashboard or home page
-      router.push('/admin')
-    } else {
-      isAuthenticated.value = false
-      loginError.value = response.error || 'Login failed. Please try again.'
-      console.log(response.error)
-      setAlert(loginError.value, 'error')
-    }
-  } catch (error) {
-    console.error('Login error:', error)
-    loginError.value = 'An error occurred during login. Please try again.'
-    setAlert(loginError.value, 'error')
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-
-
-
-const locationSearchTerm = ref('')
-const showAddLocationModal = ref(false)
-const showEditLocationModal = ref(false)
-const showViewLocationModal = ref(false)
-const showDeleteLocationModal = ref(false)
-const locationToDelete = ref(null)
-const locationFormErrors = ref({})
-
-// New location form
-const newLocation = ref({
-  name: '',
-  type: '',
-  address: '',
-  city: '',
-  country: '',
-  coordinates: null,
-  status: 'active'
-})
-
-// Editing location
-const editingLocation = ref(null)
-const viewingLocation = ref(null)
-
-const fetchLocation = async () => {
-  try {
-    const responses = await locationService.getLocations();
-    locations.value = responses.data.locations || [];
-
-  } catch (error) {
-    console.error('Error fetching Locations:', error);
-  }
-};
-const filteredLocations = computed(() => {
-  if (!locationSearchTerm.value) return locations.value || []
-
-  return locations.value.filter(location =>
-    location.name.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
-    location.country.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
-    location.city.toLowerCase().includes(locationSearchTerm.value.toLowerCase())
+  return packages.value.filter(pkg =>
+    pkg.container_number.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    pkg.truck_number.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    pkg.bl_number.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
 })
 
-
-// Location management functions
-const openAddLocationModal = () => {
-  showAddLocationModal.value = true
-  resetNewLocationForm()
-}
-
-const closeAddLocationModal = () => {
-  locationFormErrors.value = {}
-  resetNewLocationForm()
-  showAddLocationModal.value = false
-}
-
-const addNewLocation = async () => {
-  if (validateLocationForm()) {
-    isSubmitting.value = true
-
-    if (!newLocation.value.coordinates) {
-      newLocation.value.coordinates = null; // or a valid fallback JSON
-    }
-    const newLocationToAdd = {
-      name: newLocation.value.name,
-      type: newLocation.value.type,
-      address: newLocation.value.address,
-      city: newLocation.value.city,
-      country: newLocation.value.country,
-      coordinates: newLocation.value.coordinates,
-      status: newLocation.value.status
-    }
-    try {
-      const response = await locationService.addLocation(newLocationToAdd)
-      console.log('Response:', response)
-      if (response.data.success) {
-        setAlert('Location added successfully!', 'success')
-        closeAddLocationModal()
-      }
-      else {
-        setAlert('Failed to add new location.', 'error')
-        console.log(response.error)
-      }
-    } catch (error) {
-      setAlert('Error adding new location.', 'error')
-    } finally {
-      isSubmitting.value = false
-    }
-  }
-}
-
-const validateLocationForm = () => {
-  locationFormErrors.value = {}
-  let isValid = true
-
-  if (!newLocation.value.name) {
-    locationFormErrors.value.name = 'Location name is required'
-    isValid = false
-  }
-
-
-  if (!newLocation.value.type) {
-    locationFormErrors.value.type = 'Location type is required'
-    isValid = false
-  }
-
-  if (!newLocation.value.address) {
-    locationFormErrors.value.address = 'Address is required'
-    isValid = false
-  }
-
-  if (!newLocation.value.city) {
-    locationFormErrors.value.city = 'City is required'
-    isValid = false
-  }
-
-  if (!newLocation.value.country) {
-    locationFormErrors.value.country = 'Country is required'
-    isValid = false
-  }
-
-  return isValid
-}
-
-const resetNewLocationForm = () => {
-  newLocation.value = {
-    name: '',
-    type: '',
-    address: '',
-    city: '',
-    country: '',
-    coordinates: '',
-    status: 'active'
-  }
-  locationFormErrors.value = {}
-}
-
-const editLocation = async (location) => {
-  try {
-
-    const response = await locationService.getLocationById(location.id)
-
-    if (!response || response.error) {
-      setAlert('Failed to fetch location details.', 'error')
-      return
-    }
-
-    // Populate editingLocation with fetched data
-    editingLocation.value = { ...response.data.location }
-    showEditLocationModal.value = true
-  } catch (error) {
-    console.error('Error fetching Location data:', error)
-    setAlert('Failed to load location data for editing.', 'error')
-  }
-}
-
-const closeEditLocationModal = () => {
-  showEditLocationModal.value = false
-  editingLocation.value = null
-}
-
-const updateLocation = async () => {
-  if (!editingLocation.value) return
-
-
-  try {
-    const updatedLocation = {
-      name: editingLocation.value.name,
-      type: editingLocation.value.type,
-      address: editingLocation.value.address,
-      city: editingLocation.value.city,
-      country: editingLocation.value.country,
-      coordinates: editingLocation.value.coordinates,
-      status: editingLocation.value.status
-    };
-
-    if (!updatedLocation.coordinates) {
-      updatedLocation.coordinates = null; // or a valid fallback JSON
-    }
-    const response = await locationService.updateLocation(editingLocation.value.id, updatedLocation);
-
-    if (response.error) {
-      setAlert(response.error, 'error');
-      return;
-    }
-
-    setAlert('Location updated successfully!', 'success')
-    closeEditLocationModal()
-    // Refresh the user list
-    await fetchLocation();
-
-
-
-
-  } catch (error) {
-    console.error('Error updating Location:', error);
-    setAlert('Failed to update Location. Please try again.', 'error');
-  }
-
-
-}
-
-const viewLocation = async (location) => {
-  try {
-
-    const response = await locationService.getLocationById(location.id)
-
-    if (!response || response.error) {
-      setAlert('Failed to fetch location details.', 'error')
-      return
-    }
-
-    // Populate editingLocation with fetched data
-    viewingLocation.value = { ...response.data.location }
-    showViewLocationModal.value = true
-  } catch (error) {
-    console.error('Error fetching Location data:', error)
-    setAlert('Failed to load location data for editing.', 'error')
-  }
-}
-
-const closeViewLocationModal = () => {
-  showViewLocationModal.value = false
-  viewingLocation.value = null
-}
-
-const editFromViewLocationModal = (location) => {
-  if (viewingLocation.value) {
-    closeViewLocationModal()
-    editLocation(location)
-  }
-}
-
-const confirmDeleteLocation = (location) => {
-  locationToDelete.value = location
-  showDeleteLocationModal.value = true
-}
-
-const closeDeleteLocationModal = () => {
-  showDeleteLocationModal.value = false
-  locationToDelete.value = null
-}
-
-const deleteLocation = async () => {
-  if (!locationToDelete.value) return
-  try {
-    const response = await locationService.deleteLocation(locationToDelete.value.id)
-
-    if (response.error) {
-      setAlert(response.error, 'error')
-    } else {
-      setAlert('Location deleted successfully!', 'success')
-      locations.value = locations.value.filter(u => u.id !== locationToDelete.value.id)
-    }
-  } catch (error) {
-    console.error('Delete error:', error)
-    setAlert('An error occurred while deleting the user.', 'error')
-  } finally {
-    closeDeleteLocationModal()
-    locationToDelete.value = null
-  }
-
-
-
-
-}
-
-// Handle logout function
-const logout = async () => {
-  try {
-    await userServices.logout()
-    isAuthenticated.value = false
-    currentUser.value = null
-    setAlert('Logout successful!', 'success')
-    // Optionally redirect to login page
-  } catch (error) {
-    console.error('Logout error:', error)
-    setAlert('An error occurred during logout. Please try again.', 'error')
-  }
-}
 
 // Cargo Tracking Dialog functions
 const openTrackingDialog = (pkg) => {
@@ -3572,7 +2769,805 @@ const handleNewCargoNextStopChange = () => {
   newCargo.value.next_stop_eta = calculateEstimatedArrival(newCargo.value.next_stop)
 }
 
+const getCargosByStatus = (status) => {
+  return packages.value.filter(pkg => {
+    const history = pkg.trackingHistory;
+    if (!Array.isArray(history)) return false;
 
+    const statusLower = status.toLowerCase();
+    return history.some(event =>
+      event.status && event.status.toLowerCase().includes(statusLower === 'delayed' ? 'delay' : statusLower)
+    );
+  }).length;
+};
+// Add comment function
+const addComment = (packageId) => {
+  if (!newComment.value.text.trim()) return
+
+  // Set the current timestamp
+  newComment.value.timestamp = new Date().toLocaleString()
+
+  // Find the package and add the comment
+  packages.value = packages.value.map(pkg => {
+    if (pkg.id === packageId) {
+      const comments = pkg.comments || []
+      return {
+        ...pkg,
+        comments: [...comments, { ...newComment.value }]
+      }
+    }
+    return pkg
+  })
+
+  // Reset the comment form
+  newComment.value.text = ''
+}
+
+
+//<!-- End of Cargo Management Function -->
+
+
+// <!-- Activity Management Functions  -->
+
+const getActivityIcon = (type) => {
+  switch (type) {
+    case 'login':
+      return LogOut
+    case 'package':
+      return ArchiveBoxIcon
+    case 'user':
+      return UsersIcon
+    case 'location':
+      return MapPinIcon
+    default:
+      return CogIcon
+  }
+}
+
+// Activity log state
+const activityLogs = ref([
+  {
+    id: 1,
+    type: 'login',
+    user: 'Admin User',
+    time: '2025-05-23 09:30 AM',
+    message: 'User logged in successfully',
+    details: 'IP Address: 192.168.1.1, Browser: Chrome 120.0.0'
+  },
+])
+const activitySearchTerm = ref('')
+const activityFilter = ref('all')
+
+// Recent activity for dashboard
+const recentActivity = computed(() => {
+  return activityLogs.value.slice(0, 5)
+})
+
+// Filtered activities based on search term and filter
+const filteredActivities = computed(() => {
+  let filtered = activityLogs.value
+
+  if (activitySearchTerm.value) {
+    filtered = filtered.filter(activity =>
+      activity.message.toLowerCase().includes(activitySearchTerm.value.toLowerCase()) ||
+      activity.user.toLowerCase().includes(activitySearchTerm.value.toLowerCase()) ||
+      (activity.details && activity.details.toLowerCase().includes(activitySearchTerm.value.toLowerCase()))
+    )
+  }
+
+  if (activityFilter.value !== 'all') {
+    filtered = filtered.filter(activity => activity.type === activityFilter.value)
+  }
+
+  return filtered
+})
+
+//<!-- End of Activity Management Function -->
+
+//<!-- LOCATION MANAGEMENT FUNCTIONS -->
+
+// Location management state
+const locations = ref([]);
+const locationSearchTerm = ref('')
+const showAddLocationModal = ref(false)
+const showEditLocationModal = ref(false)
+const showViewLocationModal = ref(false)
+const showDeleteLocationModal = ref(false)
+const locationToDelete = ref(null)
+const locationFormErrors = ref({})
+
+// New location form
+const newLocation = ref({
+  name: '',
+  type: '',
+  address: '',
+  city: '',
+  country: '',
+  coordinates: null,
+  status: 'active'
+})
+
+// Editing location
+const editingLocation = ref(null)
+const viewingLocation = ref(null)
+
+const fetchLocation = async () => {
+  try {
+    const responses = await locationService.getLocations();
+    locations.value = responses.data.locations || [];
+
+  } catch (error) {
+    console.error('Error fetching Locations:', error);
+  }
+};
+const filteredLocations = computed(() => {
+  if (!locationSearchTerm.value) return locations.value || []
+
+  return locations.value.filter(location =>
+    location.name.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
+    location.country.toLowerCase().includes(locationSearchTerm.value.toLowerCase()) ||
+    location.city.toLowerCase().includes(locationSearchTerm.value.toLowerCase())
+  )
+})
+
+const openAddLocationModal = () => {
+  showAddLocationModal.value = true
+  resetNewLocationForm()
+}
+
+const closeAddLocationModal = () => {
+  locationFormErrors.value = {}
+  resetNewLocationForm()
+  showAddLocationModal.value = false
+}
+
+const addNewLocation = async () => {
+  if (validateLocationForm()) {
+    isSubmitting.value = true
+
+    if (!newLocation.value.coordinates) {
+      newLocation.value.coordinates = null; // or a valid fallback JSON
+    }
+    const newLocationToAdd = {
+      name: newLocation.value.name,
+      type: newLocation.value.type,
+      address: newLocation.value.address,
+      city: newLocation.value.city,
+      country: newLocation.value.country,
+      coordinates: newLocation.value.coordinates,
+      status: newLocation.value.status
+    }
+    try {
+      const response = await locationService.addLocation(newLocationToAdd)
+      console.log('Response:', response)
+      if (response.data.success) {
+        setAlert('Location added successfully!', 'success')
+        closeAddLocationModal()
+      }
+      else {
+        setAlert('Failed to add new location.', 'error')
+        console.log(response.error)
+      }
+    } catch (error) {
+      setAlert('Error adding new location.', 'error')
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+}
+
+const validateLocationForm = () => {
+  locationFormErrors.value = {}
+  let isValid = true
+
+  if (!newLocation.value.name) {
+    locationFormErrors.value.name = 'Location name is required'
+    isValid = false
+  }
+
+
+  if (!newLocation.value.type) {
+    locationFormErrors.value.type = 'Location type is required'
+    isValid = false
+  }
+
+  if (!newLocation.value.address) {
+    locationFormErrors.value.address = 'Address is required'
+    isValid = false
+  }
+
+  if (!newLocation.value.city) {
+    locationFormErrors.value.city = 'City is required'
+    isValid = false
+  }
+
+  if (!newLocation.value.country) {
+    locationFormErrors.value.country = 'Country is required'
+    isValid = false
+  }
+
+  return isValid
+}
+
+const resetNewLocationForm = () => {
+  newLocation.value = {
+    name: '',
+    type: '',
+    address: '',
+    city: '',
+    country: '',
+    coordinates: '',
+    status: 'active'
+  }
+  locationFormErrors.value = {}
+}
+
+const editLocation = async (location) => {
+  try {
+
+    const response = await locationService.getLocationById(location.id)
+
+    if (!response || response.error) {
+      setAlert('Failed to fetch location details.', 'error')
+      return
+    }
+
+    // Populate editingLocation with fetched data
+    editingLocation.value = { ...response.data.location }
+    showEditLocationModal.value = true
+  } catch (error) {
+    console.error('Error fetching Location data:', error)
+    setAlert('Failed to load location data for editing.', 'error')
+  }
+}
+
+const closeEditLocationModal = () => {
+  showEditLocationModal.value = false
+  editingLocation.value = null
+}
+
+const updateLocation = async () => {
+  if (!editingLocation.value) return
+
+
+  try {
+    const updatedLocation = {
+      name: editingLocation.value.name,
+      type: editingLocation.value.type,
+      address: editingLocation.value.address,
+      city: editingLocation.value.city,
+      country: editingLocation.value.country,
+      coordinates: editingLocation.value.coordinates,
+      status: editingLocation.value.status
+    };
+
+    if (!updatedLocation.coordinates) {
+      updatedLocation.coordinates = null; // or a valid fallback JSON
+    }
+    const response = await locationService.updateLocation(editingLocation.value.id, updatedLocation);
+
+    if (response.error) {
+      setAlert(response.error, 'error');
+      return;
+    }
+
+    setAlert('Location updated successfully!', 'success')
+    closeEditLocationModal()
+    // Refresh the user list
+    await fetchLocation();
+
+
+
+
+  } catch (error) {
+    console.error('Error updating Location:', error);
+    setAlert('Failed to update Location. Please try again.', 'error');
+  }
+
+
+}
+
+const viewLocation = async (location) => {
+  try {
+
+    const response = await locationService.getLocationById(location.id)
+
+    if (!response || response.error) {
+      setAlert('Failed to fetch location details.', 'error')
+      return
+    }
+
+    // Populate editingLocation with fetched data
+    viewingLocation.value = { ...response.data.location }
+    showViewLocationModal.value = true
+  } catch (error) {
+    console.error('Error fetching Location data:', error)
+    setAlert('Failed to load location data for editing.', 'error')
+  }
+}
+
+const closeViewLocationModal = () => {
+  showViewLocationModal.value = false
+  viewingLocation.value = null
+}
+
+const editFromViewLocationModal = (location) => {
+  if (viewingLocation.value) {
+    closeViewLocationModal()
+    editLocation(location)
+  }
+}
+
+const confirmDeleteLocation = (location) => {
+  locationToDelete.value = location
+  showDeleteLocationModal.value = true
+}
+
+const closeDeleteLocationModal = () => {
+  showDeleteLocationModal.value = false
+  locationToDelete.value = null
+}
+
+const deleteLocation = async () => {
+  if (!locationToDelete.value) return
+  try {
+    const response = await locationService.deleteLocation(locationToDelete.value.id)
+
+    if (response.error) {
+      setAlert(response.error, 'error')
+    } else {
+      setAlert('Location deleted successfully!', 'success')
+      locations.value = locations.value.filter(u => u.id !== locationToDelete.value.id)
+    }
+  } catch (error) {
+    console.error('Delete error:', error)
+    setAlert('An error occurred while deleting the user.', 'error')
+  } finally {
+    closeDeleteLocationModal()
+    locationToDelete.value = null
+  }
+}
+
+// <!-- End of Location Management Function -->
+
+////<!-- User Management Function -->
+
+// User management state
+const users = ref([]);
+const showUserManagement = ref(false)
+const showUserFormModal = ref(false)
+const userSearchTerm = ref('');
+const showAddUserModal = ref(false)
+const showEditUserModal = ref(false)
+const showDeleteUserModal = ref(false)
+const userToDelete = ref(null)
+const userFormErrors = ref({})
+// New user form
+const newUser = ref({
+  fullname: '',
+  email: '',
+  username: '',
+  password: '',
+  confirmPassword: '',
+  roles: '',
+  status: 'active',
+  permissions: {
+    packages: false,
+    users: false,
+    reports: false
+  }
+})
+
+// Load users from the service
+const fetchUsers = async () => {
+  try {
+    const response = await userServices.getAllUsers();
+    users.value = response.data.data;
+
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
+};
+
+// Filtered users based on search term
+const filteredUsers = computed(() => {
+  if (!userSearchTerm.value) return users.value || []
+
+  return users.value.filter(user =>
+    (user.fullname || '').toLowerCase().includes(userSearchTerm.value.toLowerCase()) ||
+    (user.email || '').toLowerCase().includes(userSearchTerm.value.toLowerCase()) ||
+    (user.username || '').toLowerCase().includes(userSearchTerm.value.toLowerCase())
+  )
+})
+
+// Helper functions
+const getInitials = (fullname) => {
+  if (!fullname) return 'NA'
+  return fullname.split(' ').map(n => n[0]).join('').toUpperCase()
+}
+
+// Editing user
+const editingUser = ref({
+  fullname: '',
+  email: '',
+  username: '',
+  newPassword: '',
+  roles: 'viewer',
+  status: 'active',
+  permissions: []
+})
+
+
+const closeUserManagement = () => {
+  showUserManagement.value = false
+}
+
+
+const closeUserFormModal = () => {
+  showUserFormModal.value = false
+}
+
+const validateUserForm = () => {
+  userFormErrors.value = {}
+  let isValid = true
+
+  if (!newUser.value.fullname) {
+    userFormErrors.value.fullname = 'Name is required'
+    isValid = false
+  }
+
+  if (!newUser.value.username) {
+    userFormErrors.value.username = 'Username is required'
+    isValid = false
+  }
+  if (!newUser.value.email) {
+    userFormErrors.value.email = 'Email is required'
+    isValid = false
+  } else if (!/\S+@\S+\.\S+/.test(newUser.value.email)) {
+    userFormErrors.value.email = 'Email is invalid'
+    isValid = false
+  }
+
+
+  if (!newUser.value.password) {
+    userFormErrors.value.password = 'Password is required'
+    isValid = false
+  } else if (newUser.value.password.length < 6) {
+    userFormErrors.value.password = 'Password must be at least 6 characters'
+    isValid = false
+  }
+
+  if (!newUser.value.confirmPassword) {
+    userFormErrors.value.confirmPassword = 'Please confirm your password'
+    isValid = false
+  } else if (newUser.value.password !== newUser.value.confirmPassword) {
+    userFormErrors.value.confirmPassword = 'Passwords do not match'
+    isValid = false
+  }
+
+
+  return isValid
+}
+
+
+
+const resetPasswordUser = ref({
+  id: null,
+  username: '',
+  newPassword: '',
+  confirmNewPassword: ''
+})
+const resetPasswordErrors = ref({})
+const showResetPasswordModal = ref(false)
+
+const resetUserPassword = (user) => {
+  resetPasswordUser.value = {
+    id: user.id,
+    username: user.username,
+    newPassword: '',
+    confirmNewPassword: ''
+  }
+  resetPasswordErrors.value = {}
+  showResetPasswordModal.value = true
+}
+
+const closeResetPasswordModal = () => {
+  showResetPasswordModal.value = false
+}
+
+const validateResetPasswordForm = () => {
+  resetPasswordErrors.value = {}
+  let isValid = true
+
+  if (!resetPasswordUser.value.newPassword) {
+    resetPasswordErrors.value.newPassword = 'New password is required'
+    isValid = false
+  } else if (resetPasswordUser.value.newPassword.length < 6) {
+    resetPasswordErrors.value.newPassword = 'Password must be at least 6 characters'
+    isValid = false
+  }
+
+  if (!resetPasswordUser.value.confirmNewPassword) {
+    resetPasswordErrors.value.confirmNewPassword = 'Please confirm your password'
+    isValid = false
+  } else if (resetPasswordUser.value.newPassword !== resetPasswordUser.value.confirmNewPassword) {
+    resetPasswordErrors.value.confirmNewPassword = 'Passwords do not match'
+    isValid = false
+  }
+
+  return isValid
+}
+
+const saveNewPassword = () => {
+  if (!validateResetPasswordForm()) return
+
+
+  // Show success message
+  setAlert(`Password has been reset for ${resetPasswordUser.value.username}`)
+
+  closeResetPasswordModal()
+}
+
+// Call this function to show alert
+const setAlert = (message, type) => {
+  alertMessage.value = message
+  alertType.value = type
+  showAlert.value = true
+
+  // Optional: auto clear after 3 seconds
+  setTimeout(() => {
+    alertMessage.value = ''
+    alertType.value = ''
+  }, 3000)
+}
+
+const hideAlert = () => {
+  showAlert.value = false
+}
+
+
+const hasPermission = (perm) => {
+  return editingUser.value?.permissions?.includes(perm)
+}
+
+const togglePermission = (perm) => {
+  const perms = editingUser.value.permissions || []
+  if (perms.includes(perm)) {
+    editingUser.value.permissions = perms.filter(p => p !== perm)
+  } else {
+    editingUser.value.permissions = [...perms, perm]
+  }
+}
+
+
+const getUsersByRole = (role) => {
+  return users.value.filter(user => user.roles === role).length
+}
+
+
+// User management functions
+const openAddUserModal = () => {
+  showAddUserModal.value = true
+  resetNewUserForm()
+}
+
+const closeAddUserModal = () => {
+  showAddUserModal.value = false
+  resetNewUserForm()
+}
+
+
+const addNewUser = async () => {
+  if (validateUserForm()) {
+    isSubmitting.value = true
+    const newUserToAdd = {
+      fullname: newUser.value.fullname,
+      email: newUser.value.email,
+      username: newUser.value.username,
+      password: newUser.value.password,
+      confirmPassword: newUser.value.confirmPassword,
+      roles: newUser.value.roles,
+      status: newUser.value.status || 'active',
+      permissions: Object.entries(newUser.value.permissions)
+        .filter(([_, isChecked]) => isChecked)
+        .map(([permission]) => permission),
+      lastLogin: null,
+    }
+    try {
+      const response = await userServices.registerUser(newUserToAdd)
+      if (response.success) {
+        setAlert('User created successfully!', 'success')
+        closeUserFormModal()
+      } else {
+        setAlert('Failed to add new user.', 'error');
+      }
+    } catch (error) {
+      setAlert('Error adding new user.', 'error');
+      // Optionally show error feedback to user
+      const rawMessage = error.response?.data?.message || 'An error occurred.';
+      const userMessage = rawMessage.includes('profiles_email_key')
+        ? 'A user with this email already exists.'
+        : rawMessage.includes('profiles_username_key')
+          ? 'A user with this username already exists.'
+          : rawMessage.includes('duplicate key')
+            ? 'Duplicate entry. Please use different credentials.'
+            : rawMessage;
+
+      setAlert(userMessage, 'error');
+
+    } finally {
+      resetNewUserForm()
+      closeUserFormModal()
+      await fetchUsers()
+      // Reset isSubmitting state
+      isSubmitting.value = false
+    }
+  }
+}
+
+
+const resetNewUserForm = () => {
+  newUser.value = {
+    fullname: '',
+    email: '',
+    username: '',
+    password: '',
+    confirmPassword: '',
+    roles: '',
+    status: 'active',
+    permissions: {
+      packages: false,
+      users: false,
+      reports: false
+    }
+  }
+  userFormErrors.value = {}
+}
+
+const editUser = async (user) => {
+  try {
+
+    const response = await userServices.getUserById(user.id)
+
+    if (!response || response.error) {
+      setAlert('Failed to fetch user details.', 'error')
+      return
+    }
+
+    // Populate editingUser with fetched data
+    editingUser.value = { ...response.data.data, newPassword: '' }
+
+    // Populate editingUser with fetched data
+    editingUser.value = {
+      ...response.data.data,
+      permissions: response.data.data.permissions || [],
+      newPassword: ''
+    }
+
+    showEditUserModal.value = true
+  } catch (error) {
+    console.error('Error fetching user data:', error)
+    setAlert('Failed to load user data for editing.', 'error')
+  }
+}
+
+const closeEditUserModal = () => {
+  showEditUserModal.value = false
+  editingUser.value = null
+}
+
+const updateUser = async () => {
+  if (!editingUser.value) return;
+
+  try {
+    const updatedUser = {
+      id: editingUser.value.id,
+      fullname: editingUser.value.fullname,
+      email: editingUser.value.email,
+      roles: editingUser.value.roles,
+      status: editingUser.value.status,
+      permissions: editingUser.value.permissions,
+    };
+
+    if (editingUser.value.newPassword) {
+      updatedUser.password = editingUser.value.newPassword;
+    }
+
+    const response = await userServices.updateUser(editingUser.value.id, updatedUser);
+
+    if (response.error) {
+      setAlert(response.error, 'error');
+      return;
+    }
+
+    setAlert('User updated successfully.', 'success');
+    closeEditUserModal();
+    // Refresh the user list
+    await fetchUsers();
+
+
+
+
+  } catch (error) {
+    console.error('Error updating user:', error);
+    setAlert('Failed to update user. Please try again.', 'error');
+  }
+};
+
+
+const confirmDeleteUser = (user) => {
+  userToDelete.value = user
+  showDeleteUserModal.value = true
+}
+
+const closeDeleteUserModal = () => {
+  showDeleteUserModal.value = false
+  userToDelete.value = null
+}
+
+const deleteUser = async () => {
+  if (!userToDelete.value) return
+
+  try {
+    const response = await userServices.deleteUser(userToDelete.value.id)
+
+    if (response.error) {
+      setAlert(response.error, 'error')
+    } else {
+      setAlert('User deleted successfully.', 'success')
+      users.value = users.value.filter(u => u.id !== userToDelete.value.id)
+    }
+  } catch (error) {
+    console.error('Delete error:', error)
+    setAlert('An error occurred while deleting the user.', 'error')
+  } finally {
+    closeDeleteUserModal()
+    userToDelete.value = null
+  }
+}
+
+// Handle login function
+const handleLogin = async () => {
+  try {
+    isSubmitting.value = true
+    const userData = { username: username.value, password: password.value }
+    // Call the user service to perform login
+    const response = await userServices.login(userData)
+    if (response.data.success) {
+
+      isAuthenticated.value = true;
+      currentUser.value = response.data.data
+      setAlert('Login successful!', 'success')
+      // Optionally redirect to dashboard or home page
+      router.push('/admin')
+    } else {
+      isAuthenticated.value = false
+      loginError.value = response.error || 'Login failed. Please try again.'
+      console.log(response.error)
+      setAlert(loginError.value, 'error')
+    }
+  } catch (error) {
+    console.error('Login error:', error)
+    loginError.value = 'An error occurred during login. Please try again.'
+    setAlert(loginError.value, 'error')
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// Handle logout function
+const logout = async () => {
+  try {
+    await userServices.logout()
+    isAuthenticated.value = false
+    currentUser.value = null
+    setAlert('Logout successful!', 'success')
+    // Optionally redirect to login page
+  } catch (error) {
+    console.error('Logout error:', error)
+    setAlert('An error occurred during logout. Please try again.', 'error')
+  }
+}
 
 
 // Date formatting function
