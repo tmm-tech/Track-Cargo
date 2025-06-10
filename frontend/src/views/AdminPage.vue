@@ -22,7 +22,7 @@
       class="sidebar bg-[#1e2338] text-white h-screen flex flex-col transition-all duration-300 shadow-lg relative z-50 overflow-hidden"
       :class="{
         'w-16': sidebarCollapsed && !isMobileDevice,
-        'w-41': !sidebarCollapsed && !isMobileDevice,
+        'w-64': !sidebarCollapsed && !isMobileDevice,
         'fixed left-0 top-0 w-64 transform': isMobileDevice,
         'translate-x-0': isMobileDevice && showMobileMenu,
         '-translate-x-full': isMobileDevice && !showMobileMenu
@@ -260,7 +260,7 @@
         <div class="container mx-auto px-2 sm:px-4">
           <!-- Dashboard View (default) -->
           <div v-if="currentView === 'dashboard'" class="space-y-6 sm:space-y-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <div class="bg-white rounded-lg shadow p-3 sm:p-6 border-l-4 border-[#273272]">
                 <div class="flex items-center">
                   <div class="p-2 sm:p-3 rounded-full bg-[#273272]/10 mr-2 sm:mr-4">
@@ -526,28 +526,28 @@
                       <thead class="bg-gray-50">
                         <tr>
                           <th scope="col"
-                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Container #</th>
                           <th scope="col"
-                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Truck #</th>
                           <th scope="col"
-                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             BL #</th>
                           <th scope="col"
-                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Current Location</th>
                           <th scope="col"
-                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Next Stop</th>
                           <th scope="col"
-                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Next Stop ETA</th>
                           <th scope="col"
-                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Last Updated</th>
                           <th scope="col"
-                            class="px-5 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-4 sm:px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Actions</th>
                         </tr>
                       </thead>
@@ -556,30 +556,30 @@
                           <td colspan="8" class="text-center py-4 text-gray-500">No shipment found</td>
                         </tr>
                         <tr v-for="pkg in filteredCargos" :key="pkg.id" class="hover:bg-gray-50">
-                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
                             {{ pkg.container_number || 'N/A' }}
                           </td>
-                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.truck_number || 'N/A' }}
                           </td>
                     
-                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.bl_number || 'N/A' }}
                           </td>
-                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
                             :title="pkg.current_location">
                             {{ pkg.current_location || 'N/A' }}
                           </td>
-                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nex_stop">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nex_stop">
                             {{ pkg.next_stop || 'N/A' }}
                           </td>
-                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ formatDate(pkg.next_stop_eta)|| 'N/A' }}
                           </td>
-                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ formatDate(pkg.latest_timestamp) || 'N/A' }}
                           </td>
-                          <td class="px-7 py-5 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
+                          <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
                             <div class="flex justify-end gap-1">
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
@@ -3605,7 +3605,6 @@ onUnmounted(() => {
 
 
 <style scoped>
-
 .animate-spin {
   animation: spin 1s linear infinite;
 }
