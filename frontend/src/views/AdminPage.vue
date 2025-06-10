@@ -3590,6 +3590,8 @@ const formatDate = (dateString) => {
 
 // Event listeners
 onMounted(() => {
+  
+  isAuthenticated.value = true
   fetchUsers()
   fetchCargos()
   fetchLocation()
@@ -3627,22 +3629,20 @@ onUnmounted(() => {
 
 @media print {
   .print-content {
-    max-width: 800px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-    background: white;
-    padding: 20px;
-  }
-
-  .print-content img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  .qr-code img {
-    width: 100px;
-    height: 100px;
-  }
+  max-width: 800px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  background: white;
+  padding: 20px;
+}
+.print-content img {
+  max-width: 100%;
+  height: auto;
+}
+.qr-code img {
+  width: 100px;
+  height: 100px;
+}
 }
 
 .scrollbar-thin {
@@ -3660,4 +3660,5 @@ onUnmounted(() => {
     z-index: 50;
   }
 }
+
 </style>
