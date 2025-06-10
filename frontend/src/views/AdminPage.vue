@@ -526,28 +526,28 @@
                       <thead class="bg-gray-50">
                         <tr>
                           <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Container #</th>
                           <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Truck #</th>
                           <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             BL #</th>
                           <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Current Location</th>
                           <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Next Stop</th>
                           <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Next Stop ETA</th>
                           <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-5 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Last Updated</th>
                           <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="px-5 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Actions</th>
                         </tr>
                       </thead>
@@ -556,30 +556,30 @@
                           <td colspan="8" class="text-center py-4 text-gray-500">No shipment found</td>
                         </tr>
                         <tr v-for="pkg in filteredCargos" :key="pkg.id" class="hover:bg-gray-50">
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
+                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
                             {{ pkg.container_number || 'N/A' }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.truck_number || 'N/A' }}
                           </td>
                     
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.bl_number || 'N/A' }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
+                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
                             :title="pkg.current_location">
                             {{ pkg.current_location || 'N/A' }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nex_stop">
+                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nex_stop">
                             {{ pkg.next_stop || 'N/A' }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ formatDate(pkg.next_stop_eta)|| 'N/A' }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          <td class="px-7 py-5 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ formatDate(pkg.latest_timestamp) || 'N/A' }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
+                          <td class="px-7 py-5 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
                             <div class="flex justify-end gap-1">
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
@@ -3603,7 +3603,9 @@ onUnmounted(() => {
 
 </script>
 
+
 <style scoped>
+
 .animate-spin {
   animation: spin 1s linear infinite;
 }
@@ -3624,20 +3626,22 @@ onUnmounted(() => {
 
 @media print {
   .print-content {
-  max-width: 800px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
-  background: white;
-  padding: 20px;
-}
-.print-content img {
-  max-width: 100%;
-  height: auto;
-}
-.qr-code img {
-  width: 100px;
-  height: 100px;
-}
+    max-width: 800px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background: white;
+    padding: 20px;
+  }
+
+  .print-content img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .qr-code img {
+    width: 100px;
+    height: 100px;
+  }
 }
 
 .scrollbar-thin {
@@ -3655,5 +3659,4 @@ onUnmounted(() => {
     z-index: 50;
   }
 }
-
 </style>
