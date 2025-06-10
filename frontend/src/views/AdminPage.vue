@@ -22,7 +22,7 @@
       class="sidebar bg-[#1e2338] text-white h-screen flex flex-col transition-all duration-300 shadow-lg relative z-50 overflow-hidden"
       :class="{
         'w-16': sidebarCollapsed && !isMobileDevice,
-        'w-64': !sidebarCollapsed && !isMobileDevice,
+        'w-41': !sidebarCollapsed && !isMobileDevice,
         'fixed left-0 top-0 w-64 transform': isMobileDevice,
         'translate-x-0': isMobileDevice && showMobileMenu,
         '-translate-x-full': isMobileDevice && !showMobileMenu
@@ -493,8 +493,8 @@
           </div>
 
           <!-- Cargo Management View -->
-          <div v-if="currentView === 'packages'" class="space-y-6 sm:space-y-8">
-            <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-6 sm:mb-8">
+          <div v-if="currentView === 'packages'" class="space-y-8 sm:space-y-8">
+            <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8 sm:mb-8">
               <div
                 class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#273272] text-white p-4 sm:p-6 rounded-t-lg gap-4 sm:gap-0">
                 <div>
