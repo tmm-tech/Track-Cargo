@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(cors());
 // OR (for stricter production settings)
 app.use(cors({
-  origin: 'https://track-cargo.vercel.app',
+  origin: ['https://track-cargo.vercel.app', 'http://localhost:5173'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));

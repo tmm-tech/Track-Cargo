@@ -493,8 +493,8 @@
           </div>
 
           <!-- Cargo Management View -->
-          <div v-if="currentView === 'packages'" class="space-y-8 sm:space-y-8">
-            <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8 sm:mb-8">
+          <div v-if="currentView === 'packages'" class="space-y-6 sm:space-y-8">
+            <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-6 sm:mb-8">
               <div
                 class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#273272] text-white p-4 sm:p-6 rounded-t-lg gap-4 sm:gap-0">
                 <div>
@@ -1471,7 +1471,7 @@
                   </p>
                 </div>
 
-                <div>
+                 <div>
                   <div
                     class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
                     <button :class="[
@@ -1479,7 +1479,7 @@
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                       addCargoTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
                     ]" @click="addCargoTab = 'details'">
-                      Cargo Details
+                      Package Details
                     </button>
                     <button :class="[
                       'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
@@ -2583,6 +2583,7 @@ const closeAddModal = () => {
 
 const addNewCargo = async () => {
   if (validateForm()) {
+        isSubmitting.value = true
     const newCargoToAdd = {
       id: Date.now(),
       container_number: newCargo.value.container_number,
@@ -2617,6 +2618,9 @@ const addNewCargo = async () => {
     } catch (error) {
       console.error('Error adding new shipping:', error)
       setAlert('Failed to add new shipping.', 'error')
+    }
+    finally {
+      isSubmitting.value = false
     }
 
   }
@@ -3198,10 +3202,6 @@ const editingUser = ref({
 })
 
 
-const closeUserManagement = () => {
-  showUserManagement.value = false
-}
-
 
 const closeUserFormModal = () => {
   showUserFormModal.value = false
@@ -3398,6 +3398,7 @@ const addNewUser = async () => {
     } finally {
       resetNewUserForm()
       closeUserFormModal()
+      closeAddUserModal()
       await fetchUsers()
       // Reset isSubmitting state
       isSubmitting.value = false
