@@ -1496,22 +1496,22 @@
                       <div class="space-y-2">
                         <label for="containerNumber" class="text-sm font-medium">Container Number</label>
                         <input id="containerNumber" v-model="newCargo.container_number"
-                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.containerNumber ? 'border-red-500' : '']" />
-                        <p v-if="formErrors.containerNumber" class="text-red-500 text-sm">{{ formErrors.containerNumber
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.container_number ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.container_number" class="text-red-500 text-sm">{{ formErrors.container_number
                         }}
                         </p>
                       </div>
                       <div class="space-y-2">
                         <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
                         <input id="truckNumber" v-model="newCargo.truck_number"
-                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truckNumber ? 'border-red-500' : '']" />
-                        <p v-if="formErrors.truckNumber" class="text-red-500 text-sm">{{ formErrors.truckNumber }}</p>
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truck_number ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.truck_number" class="text-red-500 text-sm">{{ formErrors.truck_number }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="blNumber" class="text-sm font-medium">BL Number</label>
                         <input id="blNumber" v-model="newCargo.bl_number"
-                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.blNumber ? 'border-red-500' : '']" />
-                        <p v-if="formErrors.blNumber" class="text-red-500 text-sm">{{ formErrors.blNumber }}</p>
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.bl_number ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.bl_number" class="text-red-500 text-sm">{{ formErrors.bl_number }}</p>
                       </div>
                     </div>
 
@@ -1534,15 +1534,15 @@
                       <div class="space-y-2">
                         <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
                         <input id="shippedDate" type="date" v-model="newCargo.shipped_date"
-                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shippedDate ? 'border-red-500' : '']" />
-                        <p v-if="formErrors.shippedDate" class="text-red-500 text-sm">{{ formErrors.shippedDate }}</p>
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shipped_date ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.shipped_date" class="text-red-500 text-sm">{{ formErrors.shipped_date }}</p>
                       </div>
                       <div class="space-y-2">
                         <label for="estimatedDelivery" class="text-sm font-medium">Estimated Delivery</label>
                         <input id="estimatedDelivery" type="date" v-model="newCargo.estimated_delivery"
-                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.estimatedDelivery ? 'border-red-500' : '']" />
-                        <p v-if="formErrors.estimatedDelivery" class="text-red-500 text-sm">{{
-                          formErrors.estimatedDelivery
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.estimated_delivery ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.estimated_delivery" class="text-red-500 text-sm">{{
+                          formErrors.estimated_delivery
                         }}
                         </p>
                       </div>
@@ -1551,13 +1551,12 @@
                     <div class="space-y-2">
                       <label for="currentLocation" class="text-sm font-medium">Current Location</label>
                       <select id="currentLocation" v-model="newCargo.current_location"
-                        @change="handleNewCargoLocationChange"
-                        :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.currentLocation ? 'border-red-500' : '']">
+                        :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.current_location ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select location</option>
                         <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{ location.name }}
                         </option>
                       </select>
-                      <p v-if="formErrors.currentLocation" class="text-red-500 text-sm">{{ formErrors.currentLocation }}
+                      <p v-if="formErrors.current_location" class="text-red-500 text-sm">{{ formErrors.current_location }}
                       </p>
                     </div>
 
@@ -1565,12 +1564,12 @@
                       <div class="space-y-2">
                         <label for="nextStop" class="text-sm font-medium">Next Stop</label>
                         <select id="nextStop" v-model="newCargo.next_stop"
-                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.nextStop ? 'border-red-500' : '']">
+                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.next_stop ? 'border-red-500' : '']">
                           <option value="" disabled selected>Select Next Stop</option>
                           <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{ location.name }}
                           </option>
                         </select>
-                      <p v-if="formErrors.nextStop" class="text-red-500 text-sm">{{ formErrors.nextStop }}
+                      <p v-if="formErrors.next_stop" class="text-red-500 text-sm">{{ formErrors.next_stop }}
                       </p>
                       </div>
                       <div class="space-y-2">
@@ -1583,8 +1582,8 @@
                     <div class="space-y-2">
                       <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
                       <input id="finalDestination" v-model="newCargo.final_destination"
-                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.finalDestination ? 'border-red-500' : '']" />
-                      <p v-if="formErrors.finalDestination" class="text-red-500 text-sm">{{ formErrors.finalDestination
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.final_destination ? 'border-red-500' : '']" />
+                      <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{ formErrors.final_destination
                       }}
                       </p>
                     </div>
@@ -2638,7 +2637,7 @@ const validateForm = () => {
   }
 
   if (!newCargo.value.truck_number) {
-    formErrors.value.truckN_number = 'Truck number is required'
+    formErrors.value.truck_number = 'Truck number is required'
     isValid = false
   }
 
@@ -2667,7 +2666,7 @@ const validateForm = () => {
     isValid = false
   }
 
-  if (!newCargo.value.currentL_location) {
+  if (!newCargo.value.current_location) {
     formErrors.value.current_location = 'Current location is required'
     isValid = false
   }
