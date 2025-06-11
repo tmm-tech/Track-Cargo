@@ -1934,6 +1934,7 @@
             </div>
           </div>
         </div>
+      </div>
       </main>
 
       <!-- Reset Password Modal -->
