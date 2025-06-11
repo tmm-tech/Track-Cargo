@@ -1626,24 +1626,21 @@
                           <p v-if="formErrors.location" class="text-red-500 text-sm">{{ formErrors.location }}</p>
                         </div>
 
-                          <div class="space-y-2">
-                            <label for="timestamp" class="text-sm font-medium">Date & Time</label>
-                            <div class="relative">
-                              <input id="timestamp" type="datetime-local " v-model="newCargo.timestamp"
-                                :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.timestamp ? 'border-red-500' : '']" />
-                              <CalendarIcon
-                                class="absolute right-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" />
-                            </div>
-                            <p v-if="formErrors.timestamp" class="text-red-500 text-sm">{{ formErrors.timestamp }}</p>
-                          </div>
+                        <div class="space-y-2">
+                          <label for="timestamp" class="text-sm font-medium">Date & Time</label>
+                          <input id="timestamp" type="datetime-local" v-model="newCargo.timestamp"
+                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
 
-                          <div class="space-y-2">
-                            <label for="stopComment" class="text-sm font-medium">Comment</label>
-                            <textarea id="stopComment" placeholder="Enter comment for this stop"
-                              v-model="newCargo.comment" rows="2"
-                              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                            <p v-if="formErrors.comment" class="text-red-500 text-sm">{{ formErrors.comment }}</p>
-                          </div>
+                          <p v-if="formErrors.timestamp" class="text-red-500 text-sm">{{ formErrors.timestamp }}</p>
+                        </div>
+
+                        <div class="space-y-2">
+                          <label for="stopComment" class="text-sm font-medium">Comment</label>
+                          <textarea id="stopComment" placeholder="Enter comment for this stop"
+                            v-model="newCargo.comment" rows="2"
+                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                          <p v-if="formErrors.comment" class="text-red-500 text-sm">{{ formErrors.comment }}</p>
+                        </div>
 
                         <button @click="addTrackingStop"
                           class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] hover:bg-[#1e2759] text-white h-10 px-4 py-2">
@@ -1959,7 +1956,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2610,6 +2607,7 @@ const addNewCargo = async () => {
       recipient_name: newCargo.value.shipping_address.recipientName,
       type: newCargo.value.type,
       weight: newCargo.value.weight,
+      timestamp: newCargo.value.timestamp || new Date().toLocaleString(),
       status: newCargo.value.status || 'In Transit',
       cargo_description: newCargo.value.cargo_description || '',
       shipped_date: newCargo.value.shipped_date,
