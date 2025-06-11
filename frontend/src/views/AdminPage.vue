@@ -1626,7 +1626,6 @@
                           <p v-if="formErrors.location" class="text-red-500 text-sm">{{ formErrors.location }}</p>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4 mb-4">
                           <div class="space-y-2">
                             <label for="timestamp" class="text-sm font-medium">Date & Time</label>
                             <div class="relative">
@@ -1643,9 +1642,8 @@
                             <textarea id="stopComment" placeholder="Enter comment for this stop"
                               v-model="newCargo.comment" rows="2"
                               class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                            <p v-if="formErrors.comment" class="text-red-500 text-sm">{{ formErrors.comment }}</p>
                           </div>
-                          <p v-if="formErrors.comment" class="text-red-500 text-sm">{{ formErrors.comment }}</p>
-                        </div>
 
                         <button @click="addTrackingStop"
                           class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] hover:bg-[#1e2759] text-white h-10 px-4 py-2">
@@ -1961,7 +1959,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
