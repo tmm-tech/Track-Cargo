@@ -562,7 +562,7 @@
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.truck_number || 'N/A' }}
                           </td>
-                    
+
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.bl_number || 'N/A' }}
                           </td>
@@ -574,7 +574,7 @@
                             {{ pkg.next_stop || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ formatDate(pkg.next_stop_eta)|| 'N/A' }}
+                            {{ formatDate(pkg.next_stop_eta) || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ formatDate(pkg.latest_timestamp) || 'N/A' }}
@@ -642,12 +642,12 @@
                         <div class="flex justify-between">
                           <span class="text-gray-500">Current:</span>
                           <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.current_location ||
-                            'N/A'}}</span>
+                            'N/A' }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Next:</span>
                           <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A'
-                            }}</span>
+                          }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">ETA:</span>
@@ -657,7 +657,7 @@
                         <div class="flex justify-between">
                           <span class="text-gray-500">Updated:</span>
                           <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{
-                            formatDate(pkg.latest_timestamp) || 'N/A'}}</span>
+                            formatDate(pkg.latest_timestamp) || 'N/A' }}</span>
                         </div>
                       </div>
                     </div>
@@ -1471,7 +1471,7 @@
                   </p>
                 </div>
 
-                 <div>
+                <div>
                   <div
                     class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
                     <button :class="[
@@ -1497,7 +1497,8 @@
                         <label for="containerNumber" class="text-sm font-medium">Container Number</label>
                         <input id="containerNumber" v-model="newCargo.container_number"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.container_number ? 'border-red-500' : '']" />
-                        <p v-if="formErrors.container_number" class="text-red-500 text-sm">{{ formErrors.container_number
+                        <p v-if="formErrors.container_number" class="text-red-500 text-sm">{{
+                          formErrors.container_number
                         }}
                         </p>
                       </div>
@@ -1512,6 +1513,13 @@
                         <input id="blNumber" v-model="newCargo.bl_number"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.bl_number ? 'border-red-500' : '']" />
                         <p v-if="formErrors.bl_number" class="text-red-500 text-sm">{{ formErrors.bl_number }}</p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="recipient" class="text-sm font-medium">Recipient Name</label>
+                        <input id="recipient" v-model="newCargo.recipient_name"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.recipient_name ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.recipient_name" class="text-red-500 text-sm">{{ formErrors.recipient_name }}
+                        </p>
                       </div>
                     </div>
 
@@ -1553,10 +1561,12 @@
                       <select id="currentLocation" v-model="newCargo.current_location"
                         :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.current_location ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select location</option>
-                        <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{ location.name }}
+                        <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                          location.name }}
                         </option>
                       </select>
-                      <p v-if="formErrors.current_location" class="text-red-500 text-sm">{{ formErrors.current_location }}
+                      <p v-if="formErrors.current_location" class="text-red-500 text-sm">{{ formErrors.current_location
+                      }}
                       </p>
                     </div>
 
@@ -1566,11 +1576,12 @@
                         <select id="nextStop" v-model="newCargo.next_stop"
                           :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.next_stop ? 'border-red-500' : '']">
                           <option value="" disabled selected>Select Next Stop</option>
-                          <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{ location.name }}
+                          <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                            location.name }}
                           </option>
                         </select>
-                      <p v-if="formErrors.next_stop" class="text-red-500 text-sm">{{ formErrors.next_stop }}
-                      </p>
+                        <p v-if="formErrors.next_stop" class="text-red-500 text-sm">{{ formErrors.next_stop }}
+                        </p>
                       </div>
                       <div class="space-y-2">
                         <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
@@ -1583,7 +1594,8 @@
                       <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
                       <input id="finalDestination" v-model="newCargo.final_destination"
                         :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.final_destination ? 'border-red-500' : '']" />
-                      <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{ formErrors.final_destination
+                      <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{
+                        formErrors.final_destination
                       }}
                       </p>
                     </div>
@@ -1604,337 +1616,341 @@
                         </div>
                         <div class="space-y-2">
                           <label for="location" class="text-sm font-medium">Location</label>
-                         <select id="nextStop" v-model="newCargo.next_stop"
-                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.nextStop ? 'border-red-500' : '']">
-                          <option value="" disabled selected>Select Next Stop</option>
-                          <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{ location.name }}
-                          </option>
-                        </select>
-                           <p v-if="formErrors.status" class="text-red-500 text-sm">{{ formErrors.status }}</p>
-                      </div>
+                          <select id="nextStop" v-model="newCargo.next_stop"
+                            :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.nextStop ? 'border-red-500' : '']">
+                            <option value="" disabled selected>Select Next Stop</option>
+                            <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                              location.name }}
+                            </option>
+                          </select>
+                          <p v-if="formErrors.location" class="text-red-500 text-sm">{{ formErrors.location }}</p>
+                        </div>
 
-                      <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div class="space-y-2">
-                          <label for="timestamp" class="text-sm font-medium">Date & Time</label>
-                          <div class="relative">
-                            <input id="timestamp" type="datetime-local" v-model="newStop.timestamp"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.timestamp ? 'border-red-500' : '']" />
-                            <CalendarIcon class="absolute right-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" />
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                          <div class="space-y-2">
+                            <label for="timestamp" class="text-sm font-medium">Date & Time</label>
+                            <div class="relative">
+                              <input id="timestamp" type="datetime" v-model="newCargo.timestamp"
+                                :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.timestamp ? 'border-red-500' : '']" />
+                              <CalendarIcon
+                                class="absolute right-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" />
+                            </div>
+                            <p v-if="formErrors.timestamp" class="text-red-500 text-sm">{{ formErrors.timestamp }}</p>
                           </div>
-                          <p v-if="stopErrors.timestamp" class="text-red-500 text-sm">{{ stopErrors.timestamp }}</p>
+
+                          <div class="space-y-2">
+                            <label for="stopComment" class="text-sm font-medium">Comment</label>
+                            <textarea id="stopComment" placeholder="Enter comment for this stop"
+                              v-model="newCargo.comment" rows="2"
+                              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                          </div>
+                          <p v-if="formErrors.comment" class="text-red-500 text-sm">{{ formErrors.comment }}</p>
                         </div>
 
-                        <div class="space-y-2">
-                          <label for="stopComment" class="text-sm font-medium">Comment</label>
-                          <textarea id="stopComment" placeholder="Enter comment for this stop" v-model="newStop.comment"
-                            rows="2"
-                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                        <button @click="addTrackingStop"
+                          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] hover:bg-[#1e2759] text-white h-10 px-4 py-2">
+                          <PlusIcon class="h-4 w-4 mr-2" />
+                          Add Stop
+                        </button>
+                      </div>
+
+                      <div class="mt-6">
+                        <h3 class="font-medium text-lg mb-3">Tracking History</h3>
+                        <div v-if="trackingStops.length === 0" class="text-center py-8 bg-gray-50 rounded-md border">
+                          <p class="text-gray-500">No tracking stops added yet</p>
+                          <p class="text-sm text-gray-400 mt-1">Add stops to create the package's tracking history</p>
                         </div>
-                      </div>
-
-                      <button @click="addTrackingStop"
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] hover:bg-[#1e2759] text-white h-10 px-4 py-2">
-                        <PlusIcon class="h-4 w-4 mr-2" />
-                        Add Stop
-                      </button>
-                    </div>
-
-                    <div class="mt-6">
-                      <h3 class="font-medium text-lg mb-3">Tracking History</h3>
-                      <div v-if="trackingStops.length === 0" class="text-center py-8 bg-gray-50 rounded-md border">
-                        <p class="text-gray-500">No tracking stops added yet</p>
-                        <p class="text-sm text-gray-400 mt-1">Add stops to create the package's tracking history</p>
-                      </div>
-                      <div v-else class="space-y-4">
-                        <div v-for="(stop, index) in trackingStops" :key="index"
-                          class="flex items-start gap-4 bg-white p-4 rounded-md border">
-                          <div class="flex-1">
-                            <div class="flex justify-between">
-                              <div>
-                                <p class="font-medium">{{ stop.status }}</p>
-                                <p class="text-sm text-gray-500">{{ stop.location }}</p>
-                                <p class="text-sm text-gray-500">{{ formatDate(stop.timestamp) }}</p>
-                                <div v-if="stop.comment" class="mt-2 p-2 bg-gray-50 rounded-md">
-                                  <p class="text-sm font-medium text-gray-700">Comment:</p>
-                                  <p class="text-sm text-gray-600">{{ stop.comment }}</p>
+                        <div v-else class="space-y-4">
+                          <div v-for="(stop, index) in trackingStops" :key="index"
+                            class="flex items-start gap-4 bg-white p-4 rounded-md border">
+                            <div class="flex-1">
+                              <div class="flex justify-between">
+                                <div>
+                                  <p class="font-medium">{{ stop.status }}</p>
+                                  <p class="text-sm text-gray-500">{{ stop.location }}</p>
+                                  <p class="text-sm text-gray-500">{{ formatDate(stop.timestamp) }}</p>
+                                  <div v-if="stop.comment" class="mt-2 p-2 bg-gray-50 rounded-md">
+                                    <p class="text-sm font-medium text-gray-700">Comment:</p>
+                                    <p class="text-sm text-gray-600">{{ stop.comment }}</p>
+                                  </div>
                                 </div>
+                                <button @click="removeTrackingStop(index)"
+                                  class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded">
+                                  <TrashIcon class="h-4 w-4" />
+                                </button>
                               </div>
-                              <button @click="removeTrackingStop(index)"
-                                class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded">
-                                <TrashIcon class="h-4 w-4" />
-                              </button>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                  <button
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                    @click="closeAddModal">
-                    Cancel
-                  </button>
-                  <button
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                    @click="addNewCargo">
-                    Add Cargo
-                  </button>
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                      @click="closeAddModal">
+                      Cancel
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                      @click="addNewCargo">
+                      Add Cargo
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
 
 
-          <!-- Add User Modal -->
-          <div v-if="showAddUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-            @click="closeAddUserModal">
-            <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
-              <div class="p-6">
-                <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New User</h2>
-                  <p class="text-sm text-muted-foreground">Create a new user account with specific permissions.</p>
-                </div>
-
-                <form @submit.prevent="addNewUser" class="space-y-4 py-4">
-                  <div class="space-y-2">
-                    <label for="fullname" class="text-sm font-medium">Full Name</label>
-                    <input id="fullname" v-model="newUser.fullname"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.fullname ? 'border-red-500' : '']" />
-                    <p v-if="userFormErrors.fullname" class="text-red-500 text-sm">{{ userFormErrors.fullname }}</p>
+            <!-- Add User Modal -->
+            <div v-if="showAddUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              @click="closeAddUserModal">
+              <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
+                <div class="p-6">
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Add New User</h2>
+                    <p class="text-sm text-muted-foreground">Create a new user account with specific permissions.</p>
                   </div>
 
-                  <div class="space-y-2">
-                    <label for="email" class="text-sm font-medium">Email</label>
-                    <input id="email" type="email" v-model="newUser.email"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.email ? 'border-red-500' : '']" />
-                    <p v-if="userFormErrors.email" class="text-red-500 text-sm">{{ userFormErrors.email }}</p>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="username" class="text-sm font-medium">Username</label>
-                    <input id="username" v-model="newUser.username"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.username ? 'border-red-500' : '']" />
-                    <p v-if="userFormErrors.username" class="text-red-500 text-sm">{{ userFormErrors.username }}</p>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="password" class="text-sm font-medium">Password</label>
-                    <input id="password" type="password" v-model="newUser.password"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.password ? 'border-red-500' : '']" />
-                    <p v-if="userFormErrors.password" class="text-red-500 text-sm">{{ userFormErrors.password }}</p>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="confirmPassword" class="text-sm font-medium">Confirm Password</label>
-                    <input id="confirmPassword" type="password" v-model="newUser.confirmPassword"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.confirmPassword ? 'border-red-500' : '']" />
-                    <p v-if="userFormErrors.confirmPassword" class="text-red-500 text-sm">{{
-                      userFormErrors.confirmPassword }}</p>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="role" class="text-sm font-medium">Role</label>
-                    <select id="role" v-model="newUser.roles"
-                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.roles ? 'border-red-500' : '']">
-                      <option value="" disabled selected>Select role</option>
-                      <option value="admin">Admin</option>
-                      <option value="operator">Operator</option>
-                      <option value="viewer">Viewer</option>
-                    </select>
-                    <p v-if="userFormErrors.role" class="text-red-500 text-sm">{{ userFormErrors.roles }}</p>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label class="text-sm font-medium">Permissions</label>
+                  <form @submit.prevent="addNewUser" class="space-y-4 py-4">
                     <div class="space-y-2">
-                      <div class="flex items-center">
-                        <input id="perm-packages" type="checkbox" v-model="newUser.permissions.packages"
-                          class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                        <label for="perm-packages" class="ml-2 text-sm text-gray-700">Manage Shipments</label>
+                      <label for="fullname" class="text-sm font-medium">Full Name</label>
+                      <input id="fullname" v-model="newUser.fullname"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.fullname ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.fullname" class="text-red-500 text-sm">{{ userFormErrors.fullname }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="email" class="text-sm font-medium">Email</label>
+                      <input id="email" type="email" v-model="newUser.email"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.email ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.email" class="text-red-500 text-sm">{{ userFormErrors.email }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="username" class="text-sm font-medium">Username</label>
+                      <input id="username" v-model="newUser.username"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.username ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.username" class="text-red-500 text-sm">{{ userFormErrors.username }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="password" class="text-sm font-medium">Password</label>
+                      <input id="password" type="password" v-model="newUser.password"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.password ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.password" class="text-red-500 text-sm">{{ userFormErrors.password }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="confirmPassword" class="text-sm font-medium">Confirm Password</label>
+                      <input id="confirmPassword" type="password" v-model="newUser.confirmPassword"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.confirmPassword ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.confirmPassword" class="text-red-500 text-sm">{{
+                        userFormErrors.confirmPassword }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="role" class="text-sm font-medium">Role</label>
+                      <select id="role" v-model="newUser.roles"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.roles ? 'border-red-500' : '']">
+                        <option value="" disabled selected>Select role</option>
+                        <option value="admin">Admin</option>
+                        <option value="operator">Operator</option>
+                        <option value="viewer">Viewer</option>
+                      </select>
+                      <p v-if="userFormErrors.role" class="text-red-500 text-sm">{{ userFormErrors.roles }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Permissions</label>
+                      <div class="space-y-2">
+                        <div class="flex items-center">
+                          <input id="perm-packages" type="checkbox" v-model="newUser.permissions.packages"
+                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
+                          <label for="perm-packages" class="ml-2 text-sm text-gray-700">Manage Shipments</label>
+                        </div>
+                        <div class="flex items-center">
+                          <input id="perm-users" type="checkbox" v-model="newUser.permissions.users"
+                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
+                          <label for="perm-users" class="ml-2 text-sm text-gray-700">Manage Users</label>
+                        </div>
+                        <div class="flex items-center">
+                          <input id="perm-reports" type="checkbox" v-model="newUser.permissions.reports"
+                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
+                          <label for="perm-reports" class="ml-2 text-sm text-gray-700">View Reports</label>
+                        </div>
                       </div>
-                      <div class="flex items-center">
-                        <input id="perm-users" type="checkbox" v-model="newUser.permissions.users"
-                          class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                        <label for="perm-users" class="ml-2 text-sm text-gray-700">Manage Users</label>
+                    </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                      <button type="button"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                        @click="closeAddUserModal">
+                        Cancel
+                      </button>
+                      <button type="submit" :disabled="isSubmitting"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                        <span v-if="!isSubmitting">Add User</span>
+                        <span v-else class="flex items-center">
+                          <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                              fill="none" />
+                            <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Saving...
+                        </span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit User Modal -->
+            <div v-if="showEditUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              @click="closeEditUserModal">
+              <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
+                <div class="p-6">
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Edit User</h2>
+                    <p class="text-sm text-muted-foreground">Update user information and permissions.</p>
+                  </div>
+
+                  <form @submit.prevent="updateUser" class="space-y-4 py-4">
+                    <div class="space-y-2">
+                      <label for="edit-name" class="text-sm font-medium">Full Name</label>
+                      <input id="edit-name" v-model="editingUser.fullname"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-email" class="text-sm font-medium">Email</label>
+                      <input id="edit-email" type="email" v-model="editingUser.email"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-username" class="text-sm font-medium">Username</label>
+                      <input id="edit-username" v-model="editingUser.username" readonly
+                        class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      <p class="text-xs text-gray-500">Username cannot be changed</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-password" class="text-sm font-medium">New Password (leave blank to keep
+                        current)</label>
+                      <input id="edit-password" type="password" v-model="editingUser.newPassword"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-role" class="text-sm font-medium">Role</label>
+                      <select id="edit-role" v-model="editingUser.roles"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="admin">Admin</option>
+                        <option value="operator">Operator</option>
+                        <option value="viewer">Viewer</option>
+                      </select>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-status" class="text-sm font-medium">Status</label>
+                      <select id="edit-status" v-model="editingUser.status"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Permissions</label>
+                      <div class="space-y-2">
+                        <div class="flex items-center" v-for="perm in permissionOptions" :key="perm">
+                          <input type="checkbox" :id="'edit-perm-' + perm" :checked="hasPermission(perm)"
+                            @change="togglePermission(perm)"
+                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
+                          <label :for="'edit-perm-' + perm" class="ml-2 text-sm text-gray-700">
+                            {{ perm === 'packages' ? 'Manage Cargos' :
+                              perm === 'users' ? 'Manage Users' :
+                                perm === 'reports' ? 'View Reports' : perm }}
+                          </label>
+                        </div>
                       </div>
-                      <div class="flex items-center">
-                        <input id="perm-reports" type="checkbox" v-model="newUser.permissions.reports"
-                          class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                        <label for="perm-reports" class="ml-2 text-sm text-gray-700">View Reports</label>
+                    </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                      <button type="button"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                        @click="closeEditUserModal">
+                        Cancel
+                      </button>
+                      <button type="submit"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                        Update User
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete User Confirmation Modal -->
+            <div v-if="showDeleteUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+              <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+                <div class="p-6">
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
+                    <p class="text-sm text-muted-foreground">Are you sure you want to delete this user? This action
+                      cannot
+                      be undone.</p>
+                  </div>
+
+                  <div class="p-4 bg-red-50 rounded-md mb-4">
+                    <div class="flex">
+                      <div class="flex-shrink-0">
+                        <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+                      </div>
+                      <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                          <p>Deleting this user will remove all their access to the system and cannot be undone.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div v-if="userToDelete" class="py-4 border-t border-b">
+                    <div class="flex items-center">
+                      <div
+                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-[#273272] font-medium">
+                        {{ getInitials(userToDelete.name) }}
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ userToDelete.name }}</div>
+                        <div class="text-sm text-gray-500">{{ userToDelete.email }}</div>
                       </div>
                     </div>
                   </div>
 
                   <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                    <button type="button"
+                    <button
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                      @click="closeAddUserModal">
+                      @click="closeDeleteUserModal">
                       Cancel
                     </button>
-                    <button type="submit" :disabled="isSubmitting"
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                      <span v-if="!isSubmitting">Add User</span>
-                      <span v-else class="flex items-center">
-                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
-                            fill="none" />
-                          <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Saving...
-                      </span>
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
+                      @click="deleteUser">
+                      Delete User
                     </button>
                   </div>
-                </form>
-              </div>
-            </div>
-          </div>
-
-          <!-- Edit User Modal -->
-          <div v-if="showEditUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-            @click="closeEditUserModal">
-            <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
-              <div class="p-6">
-                <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Edit User</h2>
-                  <p class="text-sm text-muted-foreground">Update user information and permissions.</p>
-                </div>
-
-                <form @submit.prevent="updateUser" class="space-y-4 py-4">
-                  <div class="space-y-2">
-                    <label for="edit-name" class="text-sm font-medium">Full Name</label>
-                    <input id="edit-name" v-model="editingUser.fullname"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="edit-email" class="text-sm font-medium">Email</label>
-                    <input id="edit-email" type="email" v-model="editingUser.email"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="edit-username" class="text-sm font-medium">Username</label>
-                    <input id="edit-username" v-model="editingUser.username" readonly
-                      class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                    <p class="text-xs text-gray-500">Username cannot be changed</p>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="edit-password" class="text-sm font-medium">New Password (leave blank to keep
-                      current)</label>
-                    <input id="edit-password" type="password" v-model="editingUser.newPassword"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="edit-role" class="text-sm font-medium">Role</label>
-                    <select id="edit-role" v-model="editingUser.roles"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                      <option value="admin">Admin</option>
-                      <option value="operator">Operator</option>
-                      <option value="viewer">Viewer</option>
-                    </select>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label for="edit-status" class="text-sm font-medium">Status</label>
-                    <select id="edit-status" v-model="editingUser.status"
-                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
-
-                  <div class="space-y-2">
-                    <label class="text-sm font-medium">Permissions</label>
-                    <div class="space-y-2">
-                      <div class="flex items-center" v-for="perm in permissionOptions" :key="perm">
-                        <input type="checkbox" :id="'edit-perm-' + perm" :checked="hasPermission(perm)"
-                          @change="togglePermission(perm)"
-                          class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                        <label :for="'edit-perm-' + perm" class="ml-2 text-sm text-gray-700">
-                          {{ perm === 'packages' ? 'Manage Cargos' :
-                            perm === 'users' ? 'Manage Users' :
-                              perm === 'reports' ? 'View Reports' : perm }}
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                    <button type="button"
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                      @click="closeEditUserModal">
-                      Cancel
-                    </button>
-                    <button type="submit"
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                      Update User
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-
-          <!-- Delete User Confirmation Modal -->
-          <div v-if="showDeleteUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
-              <div class="p-6">
-                <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
-                  <p class="text-sm text-muted-foreground">Are you sure you want to delete this user? This action cannot
-                    be undone.</p>
-                </div>
-
-                <div class="p-4 bg-red-50 rounded-md mb-4">
-                  <div class="flex">
-                    <div class="flex-shrink-0">
-                      <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
-                    </div>
-                    <div class="ml-3">
-                      <h3 class="text-sm font-medium text-red-800">Warning</h3>
-                      <div class="mt-2 text-sm text-red-700">
-                        <p>Deleting this user will remove all their access to the system and cannot be undone.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div v-if="userToDelete" class="py-4 border-t border-b">
-                  <div class="flex items-center">
-                    <div
-                      class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-[#273272] font-medium">
-                      {{ getInitials(userToDelete.name) }}
-                    </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">{{ userToDelete.name }}</div>
-                      <div class="text-sm text-gray-500">{{ userToDelete.email }}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                  <button
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                    @click="closeDeleteUserModal">
-                    Cancel
-                  </button>
-                  <button
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
-                    @click="deleteUser">
-                    Delete User
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
       </main>
 
       <!-- Reset Password Modal -->
@@ -2200,7 +2216,9 @@ const newCargo = ref({
   truck_number: '',
   bl_number: '',
   cargo_type: '',
-  cargo_description: '',
+  status: '',
+  timestamp: '',
+  comments: [],
   current_location: '',
   next_stop: '',
   next_stop_eta: '',
@@ -2470,7 +2488,7 @@ const printCargoDetails = (pkg) => {
 const openEditCargoModal = (pkg) => {
   editingCargo.value = { ...pkg }
   editData.value = {
-   current_location: pkg.current_location,
+    current_location: pkg.current_location,
     next_stop: pkg.next_stop,
     next_stop_eta: pkg.next_stop_eta,
     shipping_address: { ...pkg.shipping_address }
@@ -2585,14 +2603,17 @@ const closeAddModal = () => {
 
 const addNewCargo = async () => {
   if (validateForm()) {
-        isSubmitting.value = true
+    isSubmitting.value = true
     const newCargoToAdd = {
       id: Date.now(),
       container_number: newCargo.value.container_number,
       truck_number: newCargo.value.truck_number,
       bl_number: newCargo.value.bl_number,
+      recipient_name: newCargo.value.shipping_address.recipientName,
       type: newCargo.value.type,
       weight: newCargo.value.weight,
+      status: newCargo.value.status || 'In Transit',
+      cargo_description: newCargo.value.cargo_description || '',
       shipped_date: newCargo.value.shipped_date,
       estimated_delivery: newCargo.value.estimated_delivery,
       current_location: newCargo.value.current_location,
@@ -2677,6 +2698,19 @@ const validateForm = () => {
     isValid = false
   }
 
+  if (!newCargo.value.recipientName) {
+    formErrors.value.recipientName = 'Recipient name is required'
+    isValid = false
+  }
+
+  if (!newCargo.value.comment) {
+    formErrors.value.comment = 'Comment is required'
+    isValid = false
+  }
+  if (!newCargo.value.timestamp) {
+    formErrors.value.timestamp = 'Timestamp is required'
+    isValid = false
+  }
   if (trackingStops.value.length === 0) {
     stopErrors.value.general = 'At least one tracking stop is required'
     isValid = false
@@ -3575,7 +3609,7 @@ const formatDate = (dateString) => {
 
 // Event listeners
 onMounted(() => {
-  
+
   isAuthenticated.value = true
   fetchUsers()
   fetchCargos()
