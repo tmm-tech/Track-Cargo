@@ -1565,7 +1565,6 @@
                       <div class="space-y-2">
                         <label for="nextStop" class="text-sm font-medium">Next Stop</label>
                         <select id="nextStop" v-model="newCargo.next_stop"
-                          @change="handleNewCargoNextStopChange"
                           :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.nextStop ? 'border-red-500' : '']">
                           <option value="" disabled selected>Select Next Stop</option>
                           <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{ location.name }}
@@ -1576,7 +1575,7 @@
                       </div>
                       <div class="space-y-2">
                         <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                        <input id="nextStopETA" type="date" v-model="newCargo.next_stop_eta" readonly
+                        <input id="nextStopETA" type="date" v-model="newCargo.next_stop_eta"
                           class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                       </div>
                     </div>
@@ -1602,14 +1601,17 @@
                           <label for="status" class="text-sm font-medium">Status</label>
                           <input id="status" placeholder="e.g., Cargo received, In transit" v-model="newCargo.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.status ? 'border-red-500' : '']" />
-                          <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
+                          <p v-if="formErrors.status" class="text-red-500 text-sm">{{ formErrors.status }}</p>
                         </div>
                         <div class="space-y-2">
                           <label for="location" class="text-sm font-medium">Location</label>
-                          <input id="location" placeholder="e.g., Nairobi Warehouse" v-model="newCargo.location"
-                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.location ? 'border-red-500' : '']" />
-                          <p v-if="stopErrors.location" class="text-red-500 text-sm">{{ stopErrors.location }}</p>
-                        </div>
+                         <select id="nextStop" v-model="newCargo.next_stop"
+                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.nextStop ? 'border-red-500' : '']">
+                          <option value="" disabled selected>Select Next Stop</option>
+                          <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{ location.name }}
+                          </option>
+                        </select>
+                           <p v-if="formErrors.status" class="text-red-500 text-sm">{{ formErrors.status }}</p>
                       </div>
 
                       <div class="grid grid-cols-2 gap-4 mb-4">
@@ -2759,19 +2761,6 @@ const resetTrackingStops = () => {
 }
 
 // Location change handlers
-const handleLocationChange = () => {
-  editData.value.next_stop = getNextStop(editData.value.current_location)
-  editData.value.next_stop_eta = calculateEstimatedArrival(editData.value.current_location)
-}
-
-const handleNewCargoLocationChange = () => {
-  newCargo.value.next_stop = getNextStop(newCargo.value.current_location)
-  newCargo.value.next_stop_eta = calculateEstimatedArrival(newCargo.value.current_location)
-}
-
-const handleNewCargoNextStopChange = () => {
-  newCargo.value.next_stop_eta = calculateEstimatedArrival(newCargo.value.next_stop)
-}
 
 const getCargosByStatus = (status) => {
   return packages.value.filter(pkg => {
