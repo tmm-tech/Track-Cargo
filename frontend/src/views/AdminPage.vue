@@ -1585,7 +1585,7 @@
                       </div>
                       <div class="space-y-2">
                         <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                        <input id="nextStopETA" type="date" v-model="newCargo.next_stop_eta"
+                        <input id="nextStopETA" type="datetime-local" v-model="newCargo.next_stop_eta"
                           class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                       </div>
                     </div>
@@ -1629,7 +1629,7 @@
                           <div class="space-y-2">
                             <label for="timestamp" class="text-sm font-medium">Date & Time</label>
                             <div class="relative">
-                              <input id="timestamp" type="datetime" v-model="newCargo.timestamp"
+                              <input id="timestamp" type="datetime-local " v-model="newCargo.timestamp"
                                 :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.timestamp ? 'border-red-500' : '']" />
                               <CalendarIcon
                                 class="absolute right-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" />
@@ -2711,6 +2711,7 @@ const validateForm = () => {
   }
   if (trackingStops.value.length === 0) {
     stopErrors.value.general = 'At least one tracking stop is required'
+    setAlert('At least one tracking stop is required', 'error')
     isValid = false
   } else {
     stopErrors.value.general = ''
