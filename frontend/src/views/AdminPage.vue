@@ -1612,7 +1612,7 @@
                           <label for="status" class="text-sm font-medium">Status</label>
                           <input id="status" placeholder="e.g., Cargo received, In transit" type="text" v-model="newStop.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.status ? 'border-red-500' : '']" />
-                          <p v-if="newStop.status" class="text-red-500 text-sm">{{ newStop.status }}</p>
+                          <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                         </div>
                         <div class="space-y-2">
                           <label for="location" class="text-sm font-medium">Location</label>
@@ -1623,7 +1623,7 @@
                               location.name }}
                             </option>
                           </select>
-                          <p v-if="newStop.location" class="text-red-500 text-sm">{{ newStop.location }}</p>
+                          <p v-if="stopErrors.location" class="text-red-500 text-sm">{{ stopErrors.location }}</p>
                         </div>
 
                         <div class="space-y-2">
@@ -1631,7 +1631,7 @@
                           <input id="timestamp" type="datetime-local" v-model="newStop.timestamp"
                             class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
 
-                          <p v-if="newStop.timestamp" class="text-red-500 text-sm">{{ newStop.timestamp }}</p>
+                          <p v-if="stopErrors.timestamp" class="text-red-500 text-sm">{{ stopErrors.timestamp }}</p>
                         </div>
 
                         <div class="space-y-2">
@@ -1639,7 +1639,7 @@
                           <textarea id="stopComment" placeholder="Enter comment for this stop"
                             v-model="newStop.comment" rows="2"
                             class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                          <p v-if="newStop.comment" class="text-red-500 text-sm">{{ newStop.comment }}</p>
+                          <p v-if="stopErrors.comment" class="text-red-500 text-sm">{{ stopErrors.comment }}</p>
                         </div>
 
                         <button @click="addTrackingStop"
