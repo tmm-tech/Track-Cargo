@@ -1610,7 +1610,7 @@
                       <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="space-y-2">
                           <label for="status" class="text-sm font-medium">Status</label>
-                          <input id="status" placeholder="e.g., Cargo received, In transit" v-model="newCargo.status"
+                          <input id="status" placeholder="e.g., Cargo received, In transit" type="text" v-model="newCargo.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.status ? 'border-red-500' : '']" />
                           <p v-if="formErrors.status" class="text-red-500 text-sm">{{ formErrors.status }}</p>
                         </div>
