@@ -1596,12 +1596,17 @@
 
                     <div class="space-y-2">
                       <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
-                      <input id="finalDestination" v-model="newCargo.final_destination"
-                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.final_destination ? 'border-red-500' : '']" />
-                      <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{
-                        formErrors.final_destination
-                      }}
-                      </p>
+                      <select id="finalDestination" v-model="newCargo.final_destination"
+                        :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.final_destination ? 'border-red-500' : '']">
+                        <option value="" disabled selected>Select Final Destination</option>
+                        <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                          location.name }}
+                        </option>
+                        </select>
+                        <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{
+                          formErrors.final_destination
+                          }}
+                        </p>
                     </div>
                   </div>
 
@@ -1626,7 +1631,7 @@
                         </div>
                         <div class="space-y-2">
                           <label for="location" class="text-sm font-medium">Location</label>
-                          <select id="nextStop" v-model="newStop.next_stop"
+                          <select id="nextStop" v-model="newCargo.next_stop" readonly
                             :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.nextStop ? 'border-red-500' : '']">
                             <option value="" disabled selected>Select Next Stop</option>
                             <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
@@ -1638,7 +1643,7 @@
 
                         <div class="space-y-2">
                           <label for="timestamp" class="text-sm font-medium">Date & Time</label>
-                          <input id="timestamp" type="datetime-local" v-model="newStop.timestamp"
+                          <input id="timestamp" type="datetime-local" v-model="newCargo.timestamp" readonly
                             class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
 
                           <p v-if="stopErrors.timestamp" class="text-red-500 text-sm">{{ stopErrors.timestamp }}</p>
@@ -1966,7 +1971,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2768,11 +2773,11 @@ const validateStopForm = () => {
     errors.status = 'Status is required'
   }
 
-  if (!newStop.value.next_stop || newStop.value.next_stop.trim() === '') {
+  if (!newCargo.value.next_stop || newCargo.value.next_stop.trim() === '') {
     errors.location = 'Next stop is required'
   }
 
-  if (!newStop.value.timestamp) {
+  if (!newCargo.value.timestamp) {
     errors.timestamp = 'Timestamp is required'
   }
 
