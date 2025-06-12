@@ -2603,6 +2603,8 @@ const closeAddModal = () => {
 }
 
 const addNewCargo = async () => {
+  console.log('Adding new cargo:', newCargo.value)
+  // Validate the form before submission
   if (validateForm()) {
     isSubmitting.value = true
     const newCargoToAdd = {
