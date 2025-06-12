@@ -1643,7 +1643,7 @@
 
                         <div class="space-y-2">
                           <label for="timestamp" class="text-sm font-medium">Date & Time</label>
-                          <input id="timestamp" type="datetime-local" v-model="newCargo.timestamp" readonly
+                          <input id="timestamp" type="datetime-local" v-model="newCargo.next_stop_eta" readonly
                             class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
 
                           <p v-if="stopErrors.timestamp" class="text-red-500 text-sm">{{ stopErrors.timestamp }}</p>
@@ -2226,8 +2226,6 @@ const newCargo = ref({
   truck_number: '',
   bl_number: '',
   cargo_type: '',
-  status: '',
-  timestamp: '',
   comments: [],
   current_location: '',
   next_stop: '',
@@ -2624,7 +2622,6 @@ const addNewCargo = async () => {
       recipient_name: newCargo.value.shipping_address.recipientName,
       type: newCargo.value.type,
       weight: newCargo.value.weight,
-      timestamp: newCargo.value.timestamp || new Date().toLocaleString(),
       status: newCargo.value.status || 'In Transit',
       cargo_description: newCargo.value.cargo_description || '',
       shipped_date: newCargo.value.shipped_date,
@@ -2777,7 +2774,7 @@ const validateStopForm = () => {
     errors.location = 'Next stop is required'
   }
 
-  if (!newCargo.value.timestamp) {
+  if (!newCargo.value.next_stop_eta) {
     errors.timestamp = 'Timestamp is required'
   }
 
