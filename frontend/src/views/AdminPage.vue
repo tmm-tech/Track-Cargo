@@ -2750,30 +2750,29 @@ const removeTrackingStop = (index) => {
 }
 
 const validateStopForm = () => {
-  stopErrors.value = {}
-  let isValid = true
+  const errors = {}
 
-  if (!F.value.status) {
-    stopErrors.value.status = 'Status is required'
-    isValid = false
+  if (!newStop.value.status || newStop.value.status.trim() === '') {
+    errors.status = 'Status is required'
   }
 
-  if (!newStop.value.location) {
-    stopErrors.value.location = 'Location is required'
-    isValid = false
+  if (!newStop.value.next_stop || newStop.value.next_stop.trim() === '') {
+    errors.location = 'Next stop is required'
   }
 
   if (!newStop.value.timestamp) {
-    stopErrors.value.timestamp = 'Date & Time is required'
-    isValid = false
-  }
-  if (!newStop.value.comment) {
-    stopErrors.value.comment = 'Comment is required'
-    isValid = false
+    errors.timestamp = 'Timestamp is required'
   }
 
-  return isValid
+  if (!newStop.value.comment || newStop.value.comment.trim() === '') {
+    errors.comment = 'Comment is required'
+  }
+
+  stopErrors.value = errors
+
+  return Object.keys(errors).length === 0
 }
+
 
 const resetNewStopForm = () => {
   newStop.value = {
