@@ -1610,36 +1610,36 @@
                       <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="space-y-2">
                           <label for="status" class="text-sm font-medium">Status</label>
-                          <input id="status" placeholder="e.g., Cargo received, In transit" type="text" v-model="newCargo.status"
+                          <input id="status" placeholder="e.g., Cargo received, In transit" type="text" v-model="newStop.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.status ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.status" class="text-red-500 text-sm">{{ formErrors.status }}</p>
+                          <p v-if="newStop.status" class="text-red-500 text-sm">{{ newStop.status }}</p>
                         </div>
                         <div class="space-y-2">
                           <label for="location" class="text-sm font-medium">Location</label>
-                          <select id="nextStop" v-model="newCargo.next_stop"
+                          <select id="nextStop" v-model="newStop.next_stop"
                             :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.nextStop ? 'border-red-500' : '']">
                             <option value="" disabled selected>Select Next Stop</option>
                             <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
                               location.name }}
                             </option>
                           </select>
-                          <p v-if="formErrors.location" class="text-red-500 text-sm">{{ formErrors.location }}</p>
+                          <p v-if="newStop.location" class="text-red-500 text-sm">{{ newStop.location }}</p>
                         </div>
 
                         <div class="space-y-2">
                           <label for="timestamp" class="text-sm font-medium">Date & Time</label>
-                          <input id="timestamp" type="datetime-local" v-model="newCargo.timestamp"
+                          <input id="timestamp" type="datetime-local" v-model="newStop.timestamp"
                             class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
 
-                          <p v-if="formErrors.timestamp" class="text-red-500 text-sm">{{ formErrors.timestamp }}</p>
+                          <p v-if="newStop.timestamp" class="text-red-500 text-sm">{{ newStop.timestamp }}</p>
                         </div>
 
                         <div class="space-y-2">
                           <label for="stopComment" class="text-sm font-medium">Comment</label>
                           <textarea id="stopComment" placeholder="Enter comment for this stop"
-                            v-model="newCargo.comment" rows="2"
+                            v-model="newStop.comment" rows="2"
                             class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                          <p v-if="formErrors.comment" class="text-red-500 text-sm">{{ formErrors.comment }}</p>
+                          <p v-if="newStop.comment" class="text-red-500 text-sm">{{ newStop.comment }}</p>
                         </div>
 
                         <button @click="addTrackingStop"
@@ -2699,14 +2699,7 @@ const validateForm = () => {
     isValid = false
   }
 
-  if (!newCargo.value.comment) {
-    formErrors.value.comment = 'Comment is required'
-    isValid = false
-  }
-  if (!newCargo.value.timestamp) {
-    formErrors.value.timestamp = 'Timestamp is required'
-    isValid = false
-  }
+  
   if (trackingStops.value.length === 0) {
     stopErrors.value.general = 'At least one tracking stop is required'
     setAlert('At least one tracking stop is required', 'error')
@@ -2759,7 +2752,7 @@ const validateStopForm = () => {
   stopErrors.value = {}
   let isValid = true
 
-  if (!newStop.value.status) {
+  if (!F.value.status) {
     stopErrors.value.status = 'Status is required'
     isValid = false
   }
@@ -2771,6 +2764,10 @@ const validateStopForm = () => {
 
   if (!newStop.value.timestamp) {
     stopErrors.value.timestamp = 'Date & Time is required'
+    isValid = false
+  }
+  if (!newStop.value.comment) {
+    stopErrors.value.comment = 'Comment is required'
     isValid = false
   }
 
