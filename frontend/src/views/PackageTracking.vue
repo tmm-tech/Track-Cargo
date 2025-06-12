@@ -21,17 +21,17 @@
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Container Number</div>
             <div :style="fieldValueStyle">
-              {{ pkg.containerNumber }}
+              {{ pkg.container_number }}
               <span :style="badgeStyle">Active</span>
             </div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Truck Number</div>
-            <div :style="fieldValueStyle">{{ pkg.truckNumber }}</div>
+            <div :style="fieldValueStyle">{{ pkg.truck_number }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">BL Number</div>
-            <div :style="fieldValueStyle">{{ pkg.blNumber }}</div>
+            <div :style="fieldValueStyle">{{ pkg.bl_number }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Package Type</div>
@@ -43,11 +43,11 @@
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Shipped Date</div>
-            <div :style="fieldValueStyle">{{ pkg.shippedDate }}</div>
+            <div :style="fieldValueStyle">{{ pkg.shipped_date }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Estimated Delivery</div>
-            <div :style="fieldValueStyle">{{ pkg.estimatedDelivery }}</div>
+            <div :style="fieldValueStyle">{{ pkg.estimated_delivery }}</div>
           </div>
         </div>
 
@@ -72,19 +72,19 @@
         <div :style="gridStyle">
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Current Location</div>
-            <div :style="fieldValueStyle">{{ pkg.currentLocation }}</div>
+            <div :style="fieldValueStyle">{{ pkg.current_location }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Next Stop</div>
-            <div :style="fieldValueStyle">{{ pkg.nextStop }}</div>
+            <div :style="fieldValueStyle">{{ pkg.next_stop }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Next Stop ETA</div>
-            <div :style="fieldValueStyle">{{ pkg.nextStopETA }}</div>
+            <div :style="fieldValueStyle">{{ pkg.next_stop_eta }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Final Destination</div>
-            <div :style="fieldValueStyle">{{ pkg.finalDestination }}</div>
+            <div :style="fieldValueStyle">{{ pkg.final_destination }}</div>
           </div>
         </div>
 
@@ -128,13 +128,13 @@
         Shipping Address
       </div>
       <div :style="sectionContentStyle">
-        <div v-if="pkg.shippingAddress" :style="shippingAddressStyle">
-          <div :style="{ fontWeight: 'bold' }">{{ pkg.shippingAddress.recipientName }}</div>
-          <div>{{ pkg.shippingAddress.streetAddress }}</div>
+        <div v-if="pkg.shipping_address" :style="shippingAddressStyle">
+          <div :style="{ fontWeight: 'bold' }">{{ pkg.shipping_address.recipientName }}</div>
+          <div>{{ pkg.shipping_address.streetAddress }}</div>
           <div>
-            {{ pkg.shippingAddress.city }}, {{ pkg.shippingAddress.state }} {{ pkg.shippingAddress.postalCode }}
+            {{ pkg.shipping_address.city }}, {{ pkg.shipping_address.state }} {{ pkg.shipping_address.postalCode }}
           </div>
-          <div>{{ pkg.shippingAddress.country }}</div>
+          <div>{{ pkg.shipping_address.country }}</div>
         </div>
         <div v-else>No shipping address information available</div>
       </div>
@@ -219,18 +219,18 @@ interface Comment {
 }
 
 interface Package {
-  containerNumber: string
-  truckNumber: string
-  blNumber: string
+  container_number: string
+  truck_number: string
+  bl_number: string
   type: string
   weight: string
-  shippedDate: string
-  estimatedDelivery: string
-  currentLocation: string
-  nextStop: string
-  nextStopETA: string
-  finalDestination: string
-  shippingAddress?: ShippingAddress
+  shipped_date: string
+  estimated_delivery: string
+  current_location: string
+  next_stop: string
+  next_stop_eta: string
+  final_destination: string
+  shipping_address?: ShippingAddress
   trackingHistory: TrackingEvent[]
   comment?: Comment[]
 }
@@ -528,12 +528,12 @@ const footerStyle = computed(() => ({
 
 // Lifecycle hooks
 onMounted(async () => {
-  const trackingUrl = `https://texmonlogistics.co.ke/track/${props.pkg.containerNumber}`
+  const trackingUrl = `https://texmonlogistics.co.ke/track/${props.pkg.container_number}`
   qrCodeUrl.value = await generateQRCode(trackingUrl)
 })
 
 // Watch for package changes
-watch(() => props.pkg.containerNumber, async (newContainerNumber) => {
+watch(() => props.pkg.container_number, async (newContainerNumber) => {
   const trackingUrl = `https://texmonlogistics.co.ke/track/${newContainerNumber}`
   qrCodeUrl.value = await generateQRCode(trackingUrl)
 })

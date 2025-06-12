@@ -1526,8 +1526,12 @@
                     <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label for="type" class="text-sm font-medium">Cargo Type</label>
-                        <input id="type" v-model="newCargo.type"
-                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.type ? 'border-red-500' : '']" />
+                        <select id="type" v-model="newCargo.type"
+                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.type ? 'border-red-500' : '']">
+                          <option value="" disabled selected>Select Cargo Type</option>
+                          <option value="fcl">FCL (Full Container Load)</option>
+                          <option value="lcl">LCL (Less than Container Load)</option>
+                        </select>
                         <p v-if="formErrors.type" class="text-red-500 text-sm">{{ formErrors.type }}</p>
                       </div>
                       <div class="space-y-2">
@@ -1610,7 +1614,7 @@
                       <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="space-y-2">
                           <label for="status" class="text-sm font-medium">Status</label>
-                         <select id="status" v-model="newStop.status"
+                          <select id="status" v-model="newStop.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
                             <option value="" disabled selected>Select Status</option>
                             <option value="in_transit">In Transit</option>
@@ -1642,8 +1646,8 @@
 
                         <div class="space-y-2">
                           <label for="stopComment" class="text-sm font-medium">Comment</label>
-                          <textarea id="stopComment" placeholder="Enter comment for this stop"
-                            v-model="newStop.comment" rows="2"
+                          <textarea id="stopComment" placeholder="Enter comment for this stop" v-model="newStop.comment"
+                            rows="2"
                             class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
                           <p v-if="stopErrors.comment" class="text-red-500 text-sm">{{ stopErrors.comment }}</p>
                         </div>
@@ -1962,7 +1966,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2707,7 +2711,7 @@ const validateForm = () => {
     isValid = false
   }
 
-  
+
   if (trackingStops.value.length === 0) {
     stopErrors.value.general = 'At least one tracking stop is required'
     setAlert('At least one tracking stop is required', 'error')
