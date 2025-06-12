@@ -1610,14 +1610,20 @@
                       <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="space-y-2">
                           <label for="status" class="text-sm font-medium">Status</label>
-                          <input id="status" placeholder="e.g., Cargo received, In transit" type="text" v-model="newStop.status"
-                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', stopErrors.status ? 'border-red-500' : '']" />
+                         <select id="status" v-model="newStop.status"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="in_transit">In Transit</option>
+                            <option value="pending">Pending</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="exception">Exception</option>
+                          </select>
                           <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                         </div>
                         <div class="space-y-2">
                           <label for="location" class="text-sm font-medium">Location</label>
                           <select id="nextStop" v-model="newStop.next_stop"
-                            :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.nextStop ? 'border-red-500' : '']">
+                            :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.nextStop ? 'border-red-500' : '']">
                             <option value="" disabled selected>Select Next Stop</option>
                             <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
                               location.name }}
