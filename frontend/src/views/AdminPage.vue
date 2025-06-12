@@ -1617,7 +1617,7 @@
                           <select id="status" v-model="newStop.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
                             <option value="" disabled selected>Select Status</option>
-                            <option value="in_transit">In Transit</option>
+                            <option value="in transit">In Transit</option>
                             <option value="pending">Pending</option>
                             <option value="delivered">Delivered</option>
                             <option value="exception">Exception</option>
@@ -2085,7 +2085,7 @@ import html2canvas from 'html2canvas';
 import ShippingProgress from '../components/ShippingProgress.vue';
 import userServices from '../Services/userServices.js';
 import locationService from '../Services/locationServices.js';
-import CargoServices from '../Services/ShippingServices.js';
+import ShippingServices from '../Services/ShippingServices.js';
 import Alert from '../components/ui/Alert.vue';
 
 
@@ -2241,7 +2241,7 @@ const newCargo = ref({
 // Load Cargo Details from the service
 const fetchCargos = async () => {
   try {
-    const response = await CargoServices.getPackages();
+    const response = await ShippingServices.getPackages();
     packages.value = response.data.data || [];
   } catch (error) {
     console.error('Error fetching Cargo:', error);
@@ -2508,7 +2508,7 @@ const closeEditModal = () => {
 
 const editCargo = async (pkg) => {
   try {
-    const response = await CargoServices.getPackageById(pkg.id)
+    const response = await ShippingServices.getPackageById(pkg.id)
     if (!response || response.error) {
       setAlert('Failed to fetch package details for editing.', 'error')
       return
@@ -2544,7 +2544,7 @@ const saveEditedCargo = async () => {
   editingCargo.value.lastUpdated = new Date().toLocaleDateString()
 
   try {
-    const response = await CargoServices.updatePackage(editingCargo.value.id, editingCargo.value)
+    const response = await ShippingServices.updatePackage(editingCargo.value.id, editingCargo.value)
     if (response.success) {
       setAlert('Cargo details updated successfully!', 'success')
       closeEditModal()
@@ -2561,7 +2561,7 @@ const saveEditedCargo = async () => {
 // View package functions
 const openViewCargoModal = async (pkg) => {
   try {
-    const response = await CargoServices.getPackageById(pkg.id)
+    const response = await ShippingServices.getPackageById(pkg.id)
     if (!response || response.error) {
       setAlert('Failed to fetch package details for viewing.', 'error')
       return
@@ -2635,7 +2635,7 @@ const addNewCargo = async () => {
     }
     try {
       // Simulate API call
-      const response = await CargoServices.addPackage(newCargoToAdd)
+      const response = await ShippingServices.addPackage(newCargoToAdd)
       if (response.success) {
         setAlert('Cargo added successfully!', 'success')
         resetNewCargoForm()
