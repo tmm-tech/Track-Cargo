@@ -2739,6 +2739,7 @@ const resetNewCargoForm = () => {
 // Tracking stops functions
 const addTrackingStop = () => {
   if (validateStopForm()) {
+    console.log('Adding new tracking stop:', newStop.value)
     trackingStops.value.push({ ...newStop.value })
     resetNewStopForm()
   }
