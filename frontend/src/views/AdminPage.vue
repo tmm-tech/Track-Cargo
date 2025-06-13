@@ -2248,6 +2248,8 @@ const fetchCargos = async () => {
 
     if (response.success) {
       packages.value = response.cargo || [];
+      console.log('Cargo data loaded successfully:', packages.value);
+      setAlert('Cargo data loaded successfully', 'success');
     } else {
       console.error('Failed to fetch cargo data:', response.message);
       setAlert(response.message, 'error');
