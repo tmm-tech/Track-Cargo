@@ -114,7 +114,7 @@ module.exports = {
       FROM 
         packages p
       LEFT JOIN LATERAL (
-        SELECT timestamp 
+        SELECT * 
         FROM tracking_events 
         WHERE package_id = p.id 
         ORDER BY timestamp DESC 
