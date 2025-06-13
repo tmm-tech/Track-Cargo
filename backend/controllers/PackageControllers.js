@@ -9,7 +9,7 @@ module.exports = {
       const newCargo = req.body;
 
       const tracking_number = 'PKG-' + uuidv4().split('-')[0].toUpperCase();
-      const created_at = new DateTimestamp().toISOString();
+      const created_at = new Date();
       const updated_at = created_at;
 
       // Add prefixes
