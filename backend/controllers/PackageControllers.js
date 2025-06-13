@@ -77,10 +77,10 @@ module.exports = {
     `;
       const trackingEventValues = [
         packageId,
-        tracking_history.length > 0 ? tracking_history[0].status : 'Created',
-        tracking_history.length > 0 ? tracking_history[0].location : current_location,
-        tracking_history.length > 0 ? tracking_history[0].timestamp : created_at,
-        tracking_history.length > 0 ? tracking_history[0].comment : 'Package created',
+        tracking_history[0]?.status || 'Created',
+        tracking_history[0]?.location || current_location || 'Unknown',
+        tracking_history[0]?.timestamp || created_at,
+        tracking_history[0]?.comment || 'Package created',
         updated_at
       ];
 
