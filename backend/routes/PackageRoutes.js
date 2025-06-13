@@ -1,7 +1,7 @@
 const express = require('express');
 const PackageRoutes = express.Router();
 const {createPackage, getAllPackages, getPackageById, updatePackage, deletePackage, trackPackageByTrackingNumber} = require('../controllers/PackageControllers');
-const authenticateToken = require('../middlewares/authMiddleware');
+
 
 // Create a new package (protected)
 PackageRoutes.post('/', createPackage);
