@@ -131,41 +131,37 @@ module.exports = {
     }
   },
 
-  // Get a package by ID
+  // Get a specific package by ID (not deleted)
   getPackageById: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const result = await query(`
-        SELECT *
+  try {
+    const { id } = req.params;
+
+    const result = await query(`
+      SELECT 
+        p.*,
+        COALESCE(json_agg(te ORDER BY te.timestamp) FILTER (WHERE te.id IS NOT NULL), '[]') AS tracking_history
       FROM 
-        packages
+        packages p
+      LEFT JOIN 
+        tracking_events te ON te.package_id = p.id
       WHERE 
-        id = $1 AND is_deleted = FALSE;
+        p.id = $1 AND p.is_deleted = FALSE
+      GROUP BY 
+        p.id;
     `, [id]);
 
-      if (result.rowCount === 0) {
-        return res.status(404).json({ error: 'Package not found' });
-      }
-      // Fetch the latest tracking event for the package
-      const trackingEventResult = await query(`
-        SELECT *
-      FROM  tracking_events
-      WHERE 
-        package_id = $1
-      ORDER BY timestamp  ASC
-      LIMIT 1;
-    `, [id]);
-      if (trackingEventResult.rowCount > 0) { 
-        result.rows[0].latest_tracking_event = trackingEventResult.rows[0];
-      }
-
-      res.json({ success: true, package: result.rows[0] });
-      
-    } catch (error) {
-      console.error('Error fetching package:', error.message);
-      res.status(500).json({ success: false, message: 'Internal server error' });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Package not found' });
     }
-  },
+
+    res.json({ success: true, package: result.rows[0] });
+
+  } catch (error) {
+    console.error('Error fetching package:', error.message);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+},
+
 
   // Update a package
   updatePackage: async (req, res) => {

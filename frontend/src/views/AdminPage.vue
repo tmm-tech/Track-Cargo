@@ -855,12 +855,14 @@
                   </div>
                 </div>
 
-                <!-- Comments Section in Edit Modal -->
                 <div class="mt-6 pt-6 border-t">
                   <h3 class="text-lg font-medium mb-4">Comments</h3>
                   <div v-if="editingCargo.comment && editingCargo.comment.length > 0" class="space-y-4 mb-6">
-                    <div v-for="(comment, index) in editingCargo.comment" :key="index"
-                      class="bg-gray-50 p-4 rounded-md">
+                    <div v-for="(comment, index) in [...editingCargo.comment].reverse()" <!-- reverse to show newest
+                      first -->
+                      :key="index"
+                      class="bg-gray-50 p-4 rounded-md"
+                      >
                       <div class="flex justify-between items-start">
                         <div>
                           <p class="font-medium">{{ comment.author }}</p>
@@ -886,6 +888,7 @@
                   </form>
                 </div>
 
+
                 <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
@@ -894,7 +897,7 @@
                   </button>
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                    @click="saveCargoChanges">
+                    @click="saveEditedCargo">
                     <DocumentCheckIcon class="h-4 w-4 mr-2" />
                     Update Cargo
                   </button>
@@ -2211,9 +2214,7 @@ const stopErrors = ref({})
 
 // Comments state
 const newComment = ref({
-  text: '',
-  author: 'Admin',
-  timestamp: ''
+  text: ''
 })
 
 const permissionOptions = ['packages', 'users', 'reports']
@@ -2932,22 +2933,22 @@ const getCargosByStatus = (status) => {
 
 // Add comment function
 const addComment = (packageId) => {
-  if (!newComment.value.text.trim()) return
+  if (!newComment.value.text.trim()) return;
 
-  // Set the current timestamp
-  newComment.value.timestamp = new Date().toLocaleString()
+  // Create the new comment
+  const comment = {
+    author: 'You', // Replace with actual user info
+    text: newComment.value.text.trim(),
+    timestamp: new Date().toISOString()
+  };
 
-  // Find the package and add the comment
-  packages.value = packages.value.map(pkg => {
-    if (pkg.id === packageId) {
-      const comments = pkg.comments || []
-      return {
-        ...pkg,
-        comments: [...comments, { ...newComment.value }]
-      }
-    }
-    return pkg
-  })
+  // Ensure comments array exists
+  if (!Array.isArray(editingCargo.comments)) {
+    editingCargo.comments = [];
+  }
+
+  // Add the comment to the editingCargo so it shows immediately
+  editingCargo.comments.push(comment);
 
   // Reset the comment form
   newComment.value.text = ''
