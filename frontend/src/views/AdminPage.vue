@@ -2231,14 +2231,7 @@ const editData = ref({
   currentLocation: '',
   nextStop: '',
   nextStopETA: '',
-  shipping_address: {
-    recipientName: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: '',
-  }
+  comment: [],
 })
 
 // View package state
@@ -2265,6 +2258,9 @@ const newCargo = ref({
     state: '',
     postalCode: '',
     country: '',
+    phone: '',
+    email: '',
+    specialInstructions: ''
   }
 })
 
