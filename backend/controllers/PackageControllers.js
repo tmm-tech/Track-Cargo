@@ -25,7 +25,6 @@ module.exports = {
         ? `BLN-${newCargo.bl_number}`
         : null;
 
-      const recipient_name = newCargo.shipping_address?.recipientName || null;
       const type = newCargo.type || 'Standard';
       const weight = newCargo.weight || null;
       const shipped_date = newCargo.shipped_date || null;
@@ -41,10 +40,9 @@ module.exports = {
         container_number, truck_number, bl_number, type, weight,
         shipped_date, estimated_delivery,
         current_location, next_stop, next_stop_eta,
-        final_destination, shipping_address,
-        tracking_number, created_at, updated_at
+        final_destination, shipping_address, created_at, updated_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
       RETURNING *;
     `;
 
@@ -52,7 +50,6 @@ module.exports = {
         container_number,
         truck_number,
         bl_number,
-        recipient_name,
         type,
         weight,
         shipped_date,
@@ -62,7 +59,6 @@ module.exports = {
         next_stop_eta,
         final_destination,
         shipping_address,
-        tracking_number,
         created_at,
         updated_at
       ];
