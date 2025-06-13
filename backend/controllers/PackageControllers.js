@@ -70,7 +70,7 @@ module.exports = {
 
       const result = await query(insertQuery, values);
 
-      res.status(201).json({
+      res.json({
         success: true,
         message: 'Package created successfully',
         package: result.rows[0],
@@ -104,7 +104,7 @@ module.exports = {
       ORDER BY 
         p.created_at DESC;
     `);
-      res.status(200).json({ success: true, cargo: result.rows });
+      res.json({ success: true, cargo: result.rows });
     } catch (error) {
       console.error('Error fetching packages:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
@@ -123,7 +123,7 @@ module.exports = {
         return res.status(404).json({ error: 'Package not found' });
       }
 
-      res.status(200).json(result.rows[0]);
+      res.json({ success: true, package: result.rows[0] });
     } catch (error) {
       console.error('Error fetching package:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
@@ -171,7 +171,7 @@ module.exports = {
         return res.status(404).json({ success: false, message: 'Package not found or deleted' });
       }
 
-      res.status(200).json({
+      res.json({
         message: 'Package updated successfully',
         package: result.rows[0]
       });
@@ -195,7 +195,7 @@ module.exports = {
         return res.status(404).json({ success: false, message: 'Package not found' });
       }
 
-      res.status(200).json({ success: false, message: 'Package deleted successfully' });
+      res.json({ success: true, message: 'Package deleted successfully' });
     } catch (error) {
       console.error('Error deleting package:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
@@ -216,7 +216,7 @@ module.exports = {
         return res.status(404).json({ success: false, message: 'Package not found' });
       }
 
-      res.status(200).json(result.rows[0]);
+      res.json({ success: true, package: result.rows[0] });
     } catch (error) {
       console.error('Error tracking package:', error.message);
       res.status(500).json({success: false, message: 'Internal server error' });
