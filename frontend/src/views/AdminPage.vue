@@ -1602,11 +1602,11 @@
                         <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
                           location.name }}
                         </option>
-                        </select>
-                        <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{
-                          formErrors.final_destination
-                          }}
-                        </p>
+                      </select>
+                      <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{
+                        formErrors.final_destination
+                      }}
+                      </p>
                     </div>
                   </div>
 
@@ -1971,7 +1971,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2611,18 +2611,16 @@ const closeAddModal = () => {
 
 const addNewCargo = async () => {
   // Validate the form before submission
-      isSubmitting.value = true
+
   if (validateForm()) {
+    isSubmitting.value = true
     const newCargoToAdd = {
-      id: Date.now(),
       container_number: newCargo.value.container_number,
       truck_number: newCargo.value.truck_number,
       bl_number: newCargo.value.bl_number,
       recipient_name: newCargo.value.shipping_address.recipientName,
       type: newCargo.value.type,
       weight: newCargo.value.weight,
-      status: newCargo.value.status || 'In Transit',
-      cargo_description: newCargo.value.cargo_description || '',
       shipped_date: newCargo.value.shipped_date,
       estimated_delivery: newCargo.value.estimated_delivery,
       current_location: newCargo.value.current_location,
@@ -2630,10 +2628,9 @@ const addNewCargo = async () => {
       next_stop_eta: newCargo.value.next_stop_eta,
       final_destination: newCargo.value.final_destination,
       shipping_address: { ...newCargo.value.shipping_address },
-      trackingHistory: trackingStops.value,
-      created_at: new Date().toLocaleDateString(),
-      last_updated: new Date().toLocaleDateString()
+      trackingHistory: trackingStops.value
     }
+    
     try {
       // Simulate API call
       const response = await ShippingServices.addPackage(newCargoToAdd)
@@ -2717,7 +2714,7 @@ const validateForm = () => {
     stopErrors.value.general = 'At least one tracking stop is required'
     setAlert('At least one tracking stop is required', 'error')
     isValid = false
-  } 
+  }
 
 
   return isValid
