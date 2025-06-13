@@ -1587,23 +1587,16 @@
                             formErrors.street_address }}</p>
                         </div>
                         <div class="space-y-2">
-                          <label for="city" class="text-sm font-medium">City</label>
+                          <label for="city" class="text-sm font-medium">City/Town</label>
                           <input id="city" v-model="newCargo.shipping_address.city"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.city ? 'border-red-500' : '']" />
                           <p v-if="formErrors.city" class="text-red-500 text-sm">{{ formErrors.city }}</p>
                         </div>
                         <div class="space-y-2">
-                          <label for="state" class="text-sm font-medium">State/Province</label>
+                          <label for="state" class="text-sm font-medium">County</label>
                           <input id="state" v-model="newCargo.shipping_address.state"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.state ? 'border-red-500' : '']" />
                           <p v-if="formErrors.state" class="text-red-500 text-sm">{{ formErrors.state }}</p>
-                        </div>
-                        <div class="space-y-2">
-                          <label for="postalCode" class="text-sm font-medium">Postal Code</label>
-                          <input id="postalCode" v-model="newCargo.shipping_address.postalCode"
-                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.postal_code ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.postal_code" class="text-red-500 text-sm">{{
-                            formErrors.postal_code }}</p>
                         </div>
                         <div class="space-y-2">
                           <label for="country" class="text-sm font-medium">Country</label>
@@ -1998,7 +1991,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2727,11 +2720,38 @@ const validateForm = () => {
     formErrors.value.final_destination = 'Final destination is required'
     isValid = false
   }
-
-  if (!newCargo.value.recipientName) {
+  if (newCargo.value.shipping_address.recipientName.trim() === '') {
     formErrors.value.recipientName = 'Recipient name is required'
     isValid = false
   }
+  if (newCargo.value.shipping_address.streetAddress.trim() === '') {
+    formErrors.value.streetAddress = 'Street address is required'
+    isValid = false
+  }
+  if (newCargo.value.shipping_address.city.trim() === '') {
+    formErrors.value.city = 'City/Town is required'
+    isValid = false
+  }
+  if (newCargo.value.shipping_address.state.trim() === '') {
+    formErrors.value.state = 'County is required'
+    isValid = false
+  }
+  if (newCargo.value.shipping_address.country.trim() === '') {
+    formErrors.value.country = 'Country is required'
+    isValid = false
+  }
+  if (newCargo.value.shipping_address.phone.trim() === '') {
+    formErrors.value.phone = 'Phone number is required'
+    isValid = false
+  }
+  if (newCargo.value.shipping_address.email.trim() === '') {
+    formErrors.value.email = 'Email address is required'
+    isValid = false
+  } else if (!/\S+@\S+\.\S+/.test(newCargo.value.shipping_address.email)) {
+    formErrors.value.email = 'Invalid email address'
+    isValid = false
+  }
+
 
 
   if (trackingStops.value.length === 0) {
@@ -2763,7 +2783,10 @@ const resetNewCargoForm = () => {
       city: '',
       state: '',
       postalCode: '',
-      country: ''
+      country: '',
+      phone: '',
+      email: '',
+      specialInstructions: ''
     }
   }
   formErrors.value = {}
