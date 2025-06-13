@@ -1480,13 +1480,6 @@
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.bl_number ? 'border-red-500' : '']" />
                         <p v-if="formErrors.bl_number" class="text-red-500 text-sm">{{ formErrors.bl_number }}</p>
                       </div>
-                      <div class="space-y-2">
-                        <label for="recipient" class="text-sm font-medium">Recipient Name</label>
-                        <input id="recipient" v-model="newCargo.recipient_name"
-                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.recipient_name ? 'border-red-500' : '']" />
-                        <p v-if="formErrors.recipient_name" class="text-red-500 text-sm">{{ formErrors.recipient_name }}
-                        </p>
-                      </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
