@@ -1320,7 +1320,7 @@
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
-                      <p class="text-lg">{{ viewingCargo.estimated_Delivery }}</p>
+                      <p class="text-lg">{{ viewingCargo.estimated_delivery }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Final Destination</p>

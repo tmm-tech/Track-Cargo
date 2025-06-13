@@ -10,7 +10,8 @@ module.exports = {
 
       const tracking_number = 'PKG-' + uuidv4().split('-')[0].toUpperCase();
       const created_at = new Date();
-      const updated_at = created_at;
+      // updated_at is set to current date and time package creation
+      const updated_at = new Date();
 
       // Add prefixes
       const container_number = newCargo.container_number
@@ -135,7 +136,23 @@ module.exports = {
     try {
       const { id } = req.params;
       const result = await query(`
-      SELECT * FROM packages WHERE id = $1 AND is_deleted = FALSE;
+        SELECT 
+        p.*, 
+        te.timestamp AS latest_timestamp 
+      FROM 
+        packages p
+      LEFT JOIN LATERAL (
+        SELECT timestamp 
+        FROM tracking_events 
+        WHERE package_id = p.id 
+        ORDER BY timestamp DESC 
+        LIMIT 1
+        ) te ON true
+      WHERE 
+        id = $1
+        p.is_deleted = FALSE
+      ORDER BY 
+        p.created_at DESC;
     `, [id]);
 
       if (result.rowCount === 0) {
