@@ -109,12 +109,11 @@ module.exports = {
       const result = await query(`
       SELECT 
         p.*, 
-        te.*,
         te.timestamp AS latest_timestamp 
       FROM 
         packages p
       LEFT JOIN LATERAL (
-        SELECT * 
+        SELECT timestamp 
         FROM tracking_events 
         WHERE package_id = p.id 
         ORDER BY timestamp DESC 
@@ -153,7 +152,7 @@ module.exports = {
       FROM  tracking_events
       WHERE 
         package_id = $1
-      ORDER BY timestamp DESC
+      ORDER BY timestamp  ASC
       LIMIT 1;
     `, [id]);
       if (trackingEventResult.rowCount > 0) { 
@@ -161,7 +160,7 @@ module.exports = {
       }
 
       res.json({ success: true, package: result.rows[0] });
-
+      
     } catch (error) {
       console.error('Error fetching package:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
