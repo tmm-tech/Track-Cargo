@@ -176,20 +176,42 @@ module.exports = {
       } = req.body; 
       const updated_at = new Date();
 
-      const result = await query(`
-      UPDATE tracking_events
-      SET status = $1, next_stop = $2, next_stop_eta = $3, current_location = $4, comment = $5, updated_at = $6
-      WHERE package_id = $7
-      RETURNING *;
-    `, [
-        status,
+     const updateQuery = `
+      UPDATE packages
+      SET
+        next_stop = $1,
+        next_stop_eta = $2,
+        current_location = $3
+      WHERE id = $4 AND is_deleted = FALSE
+      RETURNING *; 
+    `;
+      const values = [    
         next_stop,
         next_stop_eta,
         current_location,
-        comment,
-        updated_at,
         id
-      ]);
+      ];
+      const result = await query(updateQuery, values);
+
+      const trackingEventQuery = `
+      INSERT INTO tracking_events (
+        package_id, status, location, timestamp, comment, updated_at
+      )
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *; 
+    `;
+      const trackingEventValues = [ 
+        id,
+        status || 'Updated',  
+        current_location || 'Unknown',
+       updated_at,
+        comment || 'Package updated',
+        updated_at
+      ];
+      const trackingEventResult = await query(trackingEventQuery, trackingEventValues);
+      if (trackingEventResult.rowCount === 0) {   
+        return res.status(500).json({ success: false, message: 'Failed to create tracking event' });
+      }
 
       if (result.rowCount === 0) {
         return res.status(404).json({ success: false, message: 'Package not found or deleted' });
