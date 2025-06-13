@@ -136,30 +136,31 @@ module.exports = {
     try {
       const { id } = req.params;
       const result = await query(`
-        SELECT 
-        p.*, 
-        te.timestamp AS latest_timestamp 
+        SELECT *
       FROM 
-        packages p
-      LEFT JOIN LATERAL (
-        SELECT timestamp 
-        FROM tracking_events 
-        WHERE package_id = p.id 
-        ORDER BY timestamp DESC 
-        LIMIT 1
-        ) te ON true
+        packages
       WHERE 
-        id = $1
-        p.is_deleted = FALSE
-      ORDER BY 
-        p.created_at DESC;
+        id = $1 AND is_deleted = FALSE;
     `, [id]);
 
       if (result.rowCount === 0) {
         return res.status(404).json({ error: 'Package not found' });
       }
+      // Fetch the latest tracking event for the package
+      const trackingEventResult = await query(`
+        SELECT *
+      FROM  tracking_events
+      WHERE 
+        package_id = $1
+      ORDER BY timestamp DESC
+      LIMIT 1;
+    `, [id]);
+      if (trackingEventResult.rowCount > 0) { 
+        result.rows[0].latest_tracking_event = trackingEventResult.rows[0];
+      }
 
       res.json({ success: true, package: result.rows[0] });
+      
     } catch (error) {
       console.error('Error fetching package:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
