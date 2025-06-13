@@ -78,7 +78,7 @@ module.exports = {
       });
     } catch (error) {
       console.error('Error creating package:', error.message);
-      res.status(500).json({ success: false, error: 'Internal server error' });
+      res.status(500).json({ success: false, message: 'Internal server error' });
     }
   },
 
@@ -107,7 +107,7 @@ module.exports = {
       res.status(200).json({success: true, cargo: result.rows});
     } catch (error) {
       console.error('Error fetching packages:', error.message);
-      res.status(500).json({ success: false, error: 'Internal server error' });
+      res.status(500).json({ success: false, message: 'Internal server error' });
     }
   },
 
@@ -126,7 +126,7 @@ module.exports = {
       res.status(200).json(result.rows[0]);
     } catch (error) {
       console.error('Error fetching package:', error.message);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ success: false, message: 'Internal server error' });
     }
   },
 
@@ -168,7 +168,7 @@ module.exports = {
       ]);
 
       if (result.rowCount === 0) {
-        return res.status(404).json({ error: 'Package not found or deleted' });
+        return res.status(404).json({ success: false, message: 'Package not found or deleted' });
       }
 
       res.status(200).json({
@@ -177,7 +177,7 @@ module.exports = {
       });
     } catch (error) {
       console.error('Error updating package:', error.message);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ success: false, message: 'Internal server error' });
     }
   },
 
@@ -192,13 +192,13 @@ module.exports = {
     `, [id]);
 
       if (result.rowCount === 0) {
-        return res.status(404).json({ error: 'Package not found' });
+        return res.status(404).json({ success: false, message: 'Package not found' });
       }
 
-      res.status(200).json({ message: 'Package deleted successfully' });
+      res.status(200).json({ success: false, message: 'Package deleted successfully' });
     } catch (error) {
       console.error('Error deleting package:', error.message);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ success: false, message: 'Internal server error' });
     }
   },
 
@@ -213,13 +213,13 @@ module.exports = {
     `, [tracking_number]);
 
       if (result.rowCount === 0) {
-        return res.status(404).json({ error: 'Package not found' });
+        return res.status(404).json({ success: false, message: 'Package not found' });
       }
 
       res.status(200).json(result.rows[0]);
     } catch (error) {
       console.error('Error tracking package:', error.message);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({success: false, message: 'Internal server error' });
     }
   }
 };
