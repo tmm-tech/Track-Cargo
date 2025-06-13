@@ -9,7 +9,7 @@ module.exports = {
       const newCargo = req.body;
 
       const tracking_number = 'PKG-' + uuidv4().split('-')[0].toUpperCase();
-      const created_at = new Date();
+      const created_at = new DateTimestamp().toISOString();
       const updated_at = created_at;
 
       // Add prefixes
@@ -34,13 +34,14 @@ module.exports = {
       const next_stop_eta = newCargo.next_stop_eta || null;
       const final_destination = newCargo.final_destination || null;
       const shipping_address = JSON.stringify(newCargo.shipping_address || {});
+      const tracking_history = JSON.stringify(newCargo.tracking_history || []);
 
       const insertQuery = `
       INSERT INTO packages (
         container_number, truck_number, bl_number, type, weight,
         shipped_date, estimated_delivery,
         current_location, next_stop, next_stop_eta,
-        final_destination, shipping_address, created_at, updated_at
+        final_destination, shipping_address, created_at
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
       RETURNING *;
@@ -59,12 +60,35 @@ module.exports = {
         next_stop_eta,
         final_destination,
         shipping_address,
-        created_at,
+        created_at
+      ];
+      const result = await query(insertQuery, values);
+      if (result.rowCount === 0) {
+        return res.status(500).json({ success: false, message: 'Failed to create package' }); 
+      }
+      const packageId = result.rows[0].id;
+      // Add the first tracking event
+      const trackingEventQuery = `
+      INSERT INTO tracking_events (
+        package_id, status, location, timestamp, comment,updated_at
+      )
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *;
+    `;
+      const trackingEventValues = [
+        packageId,
+        tracking_history.length > 0 ? tracking_history[0].status : 'Created',
+        tracking_history.length > 0 ? tracking_history[0].location : current_location,
+        tracking_history.length > 0 ? tracking_history[0].timestamp : created_at,
+        tracking_history.length > 0 ? tracking_history[0].comment : 'Package created',
         updated_at
       ];
 
-      const result = await query(insertQuery, values);
-
+      const trackingEventResult = await query(trackingEventQuery, trackingEventValues);
+      if (trackingEventResult.rowCount === 0) {
+        return res.status(500).json({ success: false, message: 'Failed to create tracking event' });
+      }
+      
       res.json({
         success: true,
         message: 'Package created successfully',
