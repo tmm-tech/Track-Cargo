@@ -1316,15 +1316,15 @@
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Shipped Date</p>
-                      <p class="text-lg">{{ viewingCargo.shipped_date }}</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.shipped_date) }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
-                      <p class="text-lg">{{ viewingCargo.estimated_delivery }}</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.estimated_delivery) }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Final Destination</p>
-                      <p class="text-lg">{{ formatDate(viewingCargo.final_destination) }}</p>
+                      <p class="text-lg">{{ viewingCargo.final_destination }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Last Updated</p>
