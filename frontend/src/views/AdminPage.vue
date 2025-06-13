@@ -2245,6 +2245,11 @@ const newCargo = ref({
 const fetchCargos = async () => {
   try {
     const response = await ShippingServices.getPackages();
+    
+    if (response.status !== 200) {
+      throw new Error('Failed to fetch cargo data');
+    }
+    
     packages.value = response.data.data || [];
   } catch (error) {
     console.error('Error fetching Cargo:', error);
@@ -2630,7 +2635,7 @@ const addNewCargo = async () => {
       shipping_address: { ...newCargo.value.shipping_address },
       trackingHistory: trackingStops.value
     }
-    
+
     try {
       // Simulate API call
       const response = await ShippingServices.addPackage(newCargoToAdd)
