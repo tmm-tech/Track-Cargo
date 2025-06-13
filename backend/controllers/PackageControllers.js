@@ -104,7 +104,7 @@ module.exports = {
       ORDER BY 
         p.created_at DESC;
     `);
-      res.status(200).json({success: true, cargo: result.rows});
+      res.status(200).json({ success: true, cargo: result.rows });
     } catch (error) {
       console.error('Error fetching packages:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
