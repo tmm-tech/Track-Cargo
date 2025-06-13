@@ -280,7 +280,7 @@
                   </div>
                   <div>
                     <p class="text-xs sm:text-sm text-gray-500">In Transit</p>
-                    <p class="text-lg sm:text-2xl font-bold">{{ getCargosByStatus('transit') }}</p>
+                    <p class="text-lg sm:text-2xl font-bold">{{ getCargosByStatus('in transit') }}</p>
                   </div>
                 </div>
               </div>
@@ -2871,16 +2871,35 @@ const resetTrackingStops = () => {
 // Location change handlers
 
 const getCargosByStatus = (status) => {
+  const targetStatus = status.toLowerCase();
+
   return packages.value.filter(pkg => {
     const history = pkg.trackingHistory;
-    if (!Array.isArray(history)) return false;
+    if (!Array.isArray(history) || history.length === 0) return false;
 
-    const statusLower = status.toLowerCase();
-    return history.some(event =>
-      event.status && event.status.toLowerCase().includes(statusLower === 'delayed' ? 'delay' : statusLower)
-    );
+    // Find the latest tracking event by timestamp
+    const latestEvent = history.reduce((latest, current) => {
+      return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
+    });
+
+    const latestStatus = latestEvent?.status?.toLowerCase() || '';
+
+    if (targetStatus === 'delivered') {
+      return latestStatus.includes('delivered');
+    }
+
+    if (targetStatus === 'transit') {
+      return latestStatus.includes('transit') || latestStatus.includes('in-transit');
+    }
+
+    if (targetStatus === 'delayed') {
+      return latestStatus.includes('delay');
+    }
+
+    return false;
   }).length;
 };
+
 // Add comment function
 const addComment = (packageId) => {
   if (!newComment.value.text.trim()) return
