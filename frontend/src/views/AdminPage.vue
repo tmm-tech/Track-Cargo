@@ -2610,7 +2610,6 @@ const closeAddModal = () => {
 }
 
 const addNewCargo = async () => {
-  console.log('Adding new cargo:', newCargo.value)
   // Validate the form before submission
   if (validateForm()) {
     isSubmitting.value = true
@@ -2718,9 +2717,8 @@ const validateForm = () => {
     stopErrors.value.general = 'At least one tracking stop is required'
     setAlert('At least one tracking stop is required', 'error')
     isValid = false
-  } else {
-    stopErrors.value.general = ''
-  }
+  } 
+
 
   return isValid
 }
@@ -2753,7 +2751,6 @@ const resetNewCargoForm = () => {
 // Tracking stops functions
 const addTrackingStop = () => {
   if (validateStopForm()) {
-    console.log('Adding new tracking stop:', newStop.value)
     trackingStops.value.push({ ...newStop.value })
     resetNewStopForm()
   }
