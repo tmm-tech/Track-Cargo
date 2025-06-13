@@ -38,14 +38,13 @@ module.exports = {
 
       const insertQuery = `
       INSERT INTO packages (
-        container_number, truck_number, bl_number,
-        recipient_name, type, weight,
+        container_number, truck_number, bl_number, type, weight,
         shipped_date, estimated_delivery,
         current_location, next_stop, next_stop_eta,
         final_destination, shipping_address,
         tracking_number, created_at, updated_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING *;
     `;
 
