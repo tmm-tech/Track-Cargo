@@ -1640,7 +1640,27 @@
                             <option value="in transit">In Transit</option>
                             <option value="pending">Pending</option>
                             <option value="delivered">Delivered</option>
-                            <option value="exception">Exception</option>
+                            <option value="delayed">Delayed</option>
+                            <option value="processing">Processing</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="sorted">sorted</option>
+                            <option value="out for delivery">Out for Delivery</option>
+                            <option value="arrived at destination">Arrived at Destination</option>
+                            <option value="departed from origin">Departed from Origin</option>
+                            <option value="customs clearance">Customs Clearance</option>
+                            <option value="awaiting pickup">Awaiting Pickup</option>
+                            <option value="ready for pickup">Ready for Pickup</option>
+                            <option value="on hold">On Hold</option>
+                            <option value="returned to sender">Returned to Sender</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="lost">Lost</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="rescheduled">Rescheduled</option>
+                            <option value="delivered to agent">Delivered to Agent</option>
+                            <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
+                            `<option value="documentation requested">Docummentation Requested</option>
+                            <option value="awaiting final delivery">Awaiting Final Delivery</option>
+                            <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>`
                           </select>
                           <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                         </div>
