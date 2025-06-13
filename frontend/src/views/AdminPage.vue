@@ -2245,15 +2245,7 @@ const newCargo = ref({
 const fetchCargos = async () => {
   try {
     const response = await ShippingServices.getPackages();
-
-    if (response.success) {
-      packages.value = response.cargo || [];
-      console.log('Cargo data loaded successfully:', packages.value);
-      setAlert('Cargo data loaded successfully', 'success');
-    } else {
-      console.error('Failed to fetch cargo data:', response.message);
-      setAlert(response.message, 'error');
-    }
+    packages.value = response.data.cargo || [];
     
   } catch (error) {
     console.error('Error fetching Cargo:', error);
