@@ -2611,8 +2611,8 @@ const closeAddModal = () => {
 
 const addNewCargo = async () => {
   // Validate the form before submission
+      isSubmitting.value = true
   if (validateForm()) {
-    isSubmitting.value = true
     const newCargoToAdd = {
       id: Date.now(),
       container_number: newCargo.value.container_number,
@@ -2637,7 +2637,7 @@ const addNewCargo = async () => {
     try {
       // Simulate API call
       const response = await ShippingServices.addPackage(newCargoToAdd)
-      if (response.success) {
+      if (response.data.success) {
         setAlert('Cargo added successfully!', 'success')
         resetNewCargoForm()
         resetTrackingStops()

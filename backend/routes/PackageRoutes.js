@@ -9,7 +9,7 @@ const {
   validateBulkUpdate,
   validateExport,
 } = require("../middleware/packageValidation")
-const { rateLimiter, trackingRateLimiter } = require("../middleware/rateLimiter")
+const {  trackingRateLimiter } = require("../middleware/rateLimiter")
 const {requireRole } = require("../middleware/auth")
 const { logRequest } = require("../middleware/logging")
 
@@ -27,25 +27,22 @@ PackageRoute.get("/track/:tracking_number", trackingRateLimiter, trackPackageByT
 // Package CRUD operations
 PackageRoute.post(
   "/packages",
-  rateLimiter,
-  validatePackageCreation,
-  requireRole(["admin", "operator"]),
   createPackage,
 )
 
-PackageRoute.get("/packages", rateLimiter, getAllPackages)
+PackageRoute.get("/packages",  getAllPackages)
 
-PackageRoute.get("/packages/stats", requireRole(["admin", "manager"]), getPackageStats)
+PackageRoute.get("/packages/stats", getPackageStats)
 
 PackageRoute.get("/packages/search", validateSearch, searchPackages)
 
-PackageRoute.get("/packages/export", validateExport, requireRole(["admin", "manager"]), exportPackages)
+PackageRoute.get("/packages/export", validateExport,  exportPackages)
 
 PackageRoute.get("/packages/:id", getPackageById)
 
-PackageRoute.put("/packages/:id", validatePackageUpdate, requireRole(["admin", "operator"]), updatePackage)
+PackageRoute.put("/packages/:id", validatePackageUpdate, updatePackage)
 
-PackageRoute.delete("/packages/:id", requireRole(["admin"]), deletePackage)
+PackageRoute.delete("/packages/:id", deletePackage)
 
 // Tracking operations
 PackageRoute.post(

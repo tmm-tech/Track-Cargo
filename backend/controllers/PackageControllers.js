@@ -80,7 +80,7 @@ const PackageController = {
       const tracking_number = "PKG-" + uuidv4().split("-")[0].toUpperCase()
       const created_at = new Date()
       const updated_at = created_at
-
+      console.log("Starting transaction...")
       // Use transaction for package creation
       const result = await PackageController.withTransaction(async (client) => {
         // Insert package
@@ -131,6 +131,8 @@ const PackageController = {
 
         // Create initial tracking event
         try {
+          console.log("Inserting package...")
+
           await client.query(
             `
             INSERT INTO tracking_events (package_id, status, location, timestamp, comment, event_type)
@@ -151,7 +153,7 @@ const PackageController = {
 
         return newPackage
       })
-
+      console.log("Transaction completed.")
       return PackageController.sendResponse(res, 201, true, "Package created successfully", result, { tracking_number })
     } catch (error) {
       console.error("Error creating package:", error)
