@@ -171,34 +171,25 @@ module.exports = {
     try {
       const { id } = req.params;
       const {
-        sender_name,
-        receiver_name,
-        origin,
-        destination,
+        status,
+        next_stop,
+        next_stop_eta,
         current_location,
-        status
-      } = req.body;
-
+        comment
+      } = req.body; 
       const updated_at = new Date();
 
       const result = await query(`
-      UPDATE packages SET
-        sender_name = $1,
-        receiver_name = $2,
-        origin = $3,
-        destination = $4,
-        current_location = $5,
-        status = $6,
-        updated_at = $7
-      WHERE id = $8 AND is_deleted = FALSE
+      UPDATE tracking_events
+      SET status = $1, next_stop = $2, next_stop_eta = $3, current_location = $4, comment = $5, updated_at = $6
+      WHERE package_id = $7
       RETURNING *;
     `, [
-        sender_name,
-        receiver_name,
-        origin,
-        destination,
-        current_location,
         status,
+        next_stop,
+        next_stop_eta,
+        current_location,
+        comment,
         updated_at,
         id
       ]);
@@ -217,26 +208,7 @@ module.exports = {
     }
   },
 
-  // Soft delete a package
-  deletePackage: async (req, res) => {
-    try {
-      const { id } = req.params;
 
-      const result = await query(`
-      UPDATE packages SET is_deleted = TRUE, updated_at = NOW()
-      WHERE id = $1 RETURNING *;
-    `, [id]);
-
-      if (result.rowCount === 0) {
-        return res.status(404).json({ success: false, message: 'Package not found' });
-      }
-
-      res.json({ success: true, message: 'Package deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting package:', error.message);
-      res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-  },
 
   // Track package by tracking number
   trackPackageByTrackingNumber: async (req, res) => {
@@ -245,7 +217,7 @@ module.exports = {
 
       const result = await query(`
       SELECT * FROM packages
-      WHERE tracking_number = $1 AND is_deleted = FALSE;
+      WHERE truck_number = $1 || bl_number = $1 || container_number = $1 AND is_deleted = FALSE;
     `, [tracking_number]);
 
       if (result.rowCount === 0) {
