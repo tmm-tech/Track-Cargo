@@ -1324,11 +1324,11 @@
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Final Destination</p>
-                      <p class="text-lg">{{ viewingCargo.final_destination }}</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.final_destination) }}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Last Updated</p>
-                      <p class="text-lg">{{ viewingCargo.latest_timestamp }}</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.latest_timestamp) }}</p>
                     </div>
                   </div>
 
