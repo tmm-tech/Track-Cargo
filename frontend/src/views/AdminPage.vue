@@ -800,7 +800,38 @@
                           </option>
                         </select>
                       </div>
-
+                      <div class="space-y-2">
+                        <label for="status" class="text-sm font-medium">Status</label>
+                        <select id="status" v-model="newStop.status"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
+                          <option value="" disabled selected>Select Status</option>
+                          <option value="in transit">In Transit</option>
+                          <option value="pending">Pending</option>
+                          <option value="delivered">Delivered</option>
+                          <option value="delayed">Delayed</option>
+                          <option value="processing">Processing</option>
+                          <option value="cancelled">Cancelled</option>
+                          <option value="sorted">sorted</option>
+                          <option value="out for delivery">Out for Delivery</option>
+                          <option value="arrived at destination">Arrived at Destination</option>
+                          <option value="departed from origin">Departed from Origin</option>
+                          <option value="customs clearance">Customs Clearance</option>
+                          <option value="awaiting pickup">Awaiting Pickup</option>
+                          <option value="ready for pickup">Ready for Pickup</option>
+                          <option value="on hold">On Hold</option>
+                          <option value="returned to sender">Returned to Sender</option>
+                          <option value="damaged">Damaged</option>
+                          <option value="lost">Lost</option>
+                          <option value="rejected">Rejected</option>
+                          <option value="rescheduled">Rescheduled</option>
+                          <option value="delivered to agent">Delivered to Agent</option>
+                          <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
+                          `<option value="documentation requested">Docummentation Requested</option>
+                          <option value="awaiting final delivery">Awaiting Final Delivery</option>
+                          <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>`
+                        </select>
+                        <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
+                      </div>
                       <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
                           <label for="nextStop" class="text-sm font-medium">Next Stop</label>
@@ -2011,7 +2042,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2815,7 +2846,7 @@ const resetNewCargoForm = () => {
 // Tracking stops functions
 const addTrackingStop = () => {
   if (validateStopForm()) {
-    trackingStops.value.push({ 
+    trackingStops.value.push({
       status: newStop.value.status,
       location: newCargo.value.next_stop,
       timestamp: newCargo.value.next_stop_eta,
