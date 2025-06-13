@@ -27,8 +27,7 @@ PackageRoute.get("/track/:tracking_number", trackingRateLimiter, trackPackageByT
 // Package CRUD operations
 PackageRoute.post(
   "/packages",
-  validatePackageCreation,
-  createPackage,
+  createPackage
 )
 
 PackageRoute.get("/packages",  getAllPackages)
