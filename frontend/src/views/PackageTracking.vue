@@ -132,7 +132,7 @@
           <div :style="{ fontWeight: 'bold' }">{{ pkg.shipping_address.recipientName }}</div>
           <div>{{ pkg.shipping_address.streetAddress }}</div>
           <div>
-            {{ pkg.shipping_address.city }}, {{ pkg.shipping_address.state }} {{ pkg.shipping_address.postalCode }}
+            {{ pkg.shipping_address.city }}, {{ pkg.shipping_address.state }} {{ pkg.shipping_address.phone }} {{ pkg.shipping_address.email }}  {{ pkg.shipping_address.specialInstructions }}
           </div>
           <div>{{ pkg.shipping_address.country }}</div>
         </div>
@@ -208,8 +208,10 @@ interface ShippingAddress {
   streetAddress: string
   city: string
   state: string
-  postalCode: string
   country: string
+  phone: string
+  email: string,
+  specialInstructions: string
 }
 
 interface Comment {

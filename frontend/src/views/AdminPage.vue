@@ -2300,7 +2300,6 @@ const newCargo = ref({
     streetAddress: '',
     city: '',
     state: '',
-    postalCode: '',
     country: '',
     phone: '',
     email: '',
