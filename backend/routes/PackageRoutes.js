@@ -1,6 +1,6 @@
 const express = require('express');
 const PackageRoutes = express.Router();
-const {createPackage, getAllPackages, getPackageById, updatePackage, deletePackage, trackPackageByTrackingNumber} = require('../controllers/PackageControllers');
+const {createPackage, getAllPackages, getPackageById, updatePackage, trackPackageByTrackingNumber} = require('../controllers/PackageControllers');
 
 
 // Create a new package (protected)
@@ -15,8 +15,6 @@ PackageRoutes.get('/packages/:id', getPackageById);
 // Update a package by ID (protected)
 PackageRoutes.put('/packages/:id', updatePackage);
 
-// Soft delete a package by ID (protected)
-PackageRoutes.delete('/packages/:id', deletePackage);
 
 // Track a package by tracking number (public)
 PackageRoutes.get('/track/:tracking_number', trackPackageByTrackingNumber);
