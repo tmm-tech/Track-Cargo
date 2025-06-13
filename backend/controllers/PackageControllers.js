@@ -87,7 +87,22 @@ module.exports = {
   getAllPackages: async (req, res) => {
     try {
       const result = await query(`
-      SELECT * FROM packages WHERE is_deleted = FALSE ORDER BY created_at DESC;
+      SELECT 
+        p.*, 
+        te.timestamp AS latest_timestamp 
+      FROM 
+        packages p
+      LEFT JOIN LATERAL (
+        SELECT timestamp 
+        FROM tracking_events 
+        WHERE package_id = p.id 
+        ORDER BY timestamp DESC 
+        LIMIT 1
+        ) te ON true
+      WHERE 
+        p.is_deleted = FALSE
+      ORDER BY 
+        p.created_at DESC;
     `);
       res.status(200).json(result.rows);
     } catch (error) {
