@@ -2597,8 +2597,8 @@ const editCargo = async (pkg) => {
   }
 }
 const saveEditedCargo = async () => {
-  if (!editingCargo.value) return
 
+   isSubmitting.value =true
   // Validate the edited data
   if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta) {
     setAlert('Please fill in all required fields.', 'error')
