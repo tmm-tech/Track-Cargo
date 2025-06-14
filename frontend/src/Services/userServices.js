@@ -6,7 +6,17 @@ const API_BASE = 'https://track-cargo.onrender.com/users';
 export default {
     // Login user
     login(userData) {
-        return axios.post(`${API_BASE}/login`, userData);
+        return axios.post(
+            'https://track-cargo.onrender.com/users/login',
+            userData,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                withCredentials: true // This includes cookies
+            }
+        )
+
     },
 
     // Fetch all users
@@ -47,13 +57,5 @@ export default {
     logout(email) {
         return axios.post(`${API_BASE}/logout/${email}`);
     },
-
-    // Check authentication
-    checkAuth() {
-        return axios.get(`${API_BASE}/protected`, {
-            withCredentials: true 
-        });
-    },
-
 
 };

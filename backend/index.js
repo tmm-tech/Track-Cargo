@@ -25,8 +25,8 @@ app.set('trust proxy', 1); // Trust first proxy for secure cookies in production
 app.use(cors());
 // OR (for stricter production settings)
 app.use(cors({
-  origin: true,
-  methods: 'GET,POST,PUT,DELETE',
+  origin: ['https://track-cargo.vercel.app', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));

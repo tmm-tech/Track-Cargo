@@ -1402,9 +1402,8 @@
                     <h3 class="text-xl font-semibold">Comments</h3>
                   </div>
                   <div class="p-6">
-                    <div v-if="cargocomment.length  != 0" class="space-y-4 mb-6">
-                      <div v-for="(comments, index) in cargocomment" :key="index"
-                        class="bg-gray-50 p-4 rounded-md">
+                    <div v-if="cargocomment.length != 0" class="space-y-4 mb-6">
+                      <div v-for="(comments, index) in cargocomment" :key="index" class="bg-gray-50 p-4 rounded-md">
                         <div class="flex justify-between items-start">
                           <div>
                             <p class="font-medium">{{ comments.author }}</p>
@@ -1416,17 +1415,17 @@
                     </div>
                     <div v-else class="text-gray-500 mb-6">No comments yet</div>
 
-  
-                      <div class="space-y-2">
-                        <label for="commentText" class="text-sm font-medium">Add Comment</label>
-                        <textarea id="commentText" v-model="newComment.text" rows="3"
-                          placeholder="Enter your comment here..."
-                          class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                      </div>
-                      <button @click="addComment"
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                        Add Comment
-                      </button>
+
+                    <div class="space-y-2">
+                      <label for="commentText" class="text-sm font-medium">Add Comment</label>
+                      <textarea id="commentText" v-model="newComment.text" rows="3"
+                        placeholder="Enter your comment here..."
+                        class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                    </div>
+                    <button @click="addComment"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                      Add Comment
+                    </button>
                   </div>
                 </div>
 
@@ -2046,7 +2045,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2944,8 +2943,8 @@ const addComment = async () => {
       text: comment.value.text.trim(),
       timestamp: new Date().toLocaleString()
     })
-  // Clear comment input
-  newComment.value.text = '';
+    // Clear comment input
+    newComment.value.text = '';
   }
 };
 
@@ -3692,6 +3691,7 @@ const handleLogin = async () => {
 
       isAuthenticated.value = true;
       currentUser.value = response.data.data
+      localStorage.setItem('user', JSON.stringify(data.data));
       setAlert('Login successful!', 'success')
       // Optionally redirect to dashboard or home page
       router.push('/admin')
@@ -3739,12 +3739,32 @@ const formatDate = (dateString) => {
 
 
 // Event listeners
-onMounted(() => {
+onMounted(async () => {
+  try {
+    const response = await fetch('https://ketrb-backend.onrender.com/users/protected', {
+      method: 'GET',
+      credentials: 'include', // Include cookies
+    });
 
-  fetchUsers()
-  fetchCargos()
-  fetchLocation()
-  window.addEventListener('resize', checkMobileDevice)
+    if (response.ok) {
+      isAuthenticated.value = true;
+      fetchUsers()
+      fetchCargos()
+      fetchLocation()
+      window.addEventListener('resize', checkMobileDevice)
+    } else if (response.status === 404) {
+      console.log('User not found, redirecting to login.');
+      isAuthenticated.value = false;
+      router.push('/admin'); // Optional redirection
+    } else {
+      isAuthenticated.value = false;
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error);
+    isAuthenticated.value = false;
+  } finally {
+    loading.value = false;
+  }
 })
 
 
