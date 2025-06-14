@@ -157,18 +157,6 @@ module.exports = {
 
       packageData.tracking_history = trackingHistoryResult.rows;
 
-      // Fetch latest tracking event
-      const latestTrackingResult = await query(`
-      SELECT * FROM tracking_events
-      WHERE package_id = $1
-      ORDER BY timestamp DESC
-      LIMIT 1;
-    `, [id]);
-
-      if (latestTrackingResult.rowCount > 0) {
-        packageData.latest_tracking_event = latestTrackingResult.rows[0];
-      }
-
       res.json({ success: true, package: packageData });
 
     } catch (error) {
