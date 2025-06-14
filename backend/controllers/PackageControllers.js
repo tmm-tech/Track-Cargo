@@ -65,7 +65,7 @@ module.exports = {
       ];
       const result = await query(insertQuery, values);
       if (result.rowCount === 0) {
-        return res.status(500).json({ success: false, message: 'Failed to create package' });
+        return res.status(500).json({ success: false, message: 'Failed to create package' }); 
       }
       const packageId = result.rows[0].id;
       // Add the first tracking event
@@ -89,7 +89,7 @@ module.exports = {
       if (trackingEventResult.rowCount === 0) {
         return res.status(500).json({ success: false, message: 'Failed to create tracking event' });
       }
-
+      
       res.json({
         success: true,
         message: 'Package created successfully',
@@ -135,45 +135,37 @@ module.exports = {
   getPackageById: async (req, res) => {
     try {
       const { id } = req.params;
-
       const result = await query(`
-      SELECT 
-      p.*,
-      COALESCE(
-        json_agg(
-          json_build_object(
-            'id', te.id,
-            'package_id', te.package_id,
-            'status', te.status,
-            'location', te.location,
-            'timestamp', te.timestamp,
-            'comment', te.comment,
-            'updated_at', te.updated_at
-          ) ORDER BY te.timestamp
-        ) FILTER (WHERE te.id IS NOT NULL), '[]'
-      ) AS tracking_history
-    FROM 
-      packages p
-    LEFT JOIN 
-      tracking_events te ON te.package_id = p.id
-    WHERE 
-      p.id = $1 AND p.is_deleted = FALSE
-    GROUP BY 
-      p.id;
+        SELECT *
+      FROM 
+        packages
+      WHERE 
+        id = $1 AND is_deleted = FALSE;
     `, [id]);
 
       if (result.rowCount === 0) {
-        return res.status(404).json({ success: false, message: 'Package not found' });
+        return res.status(404).json({ error: 'Package not found' });
+      }
+      // Fetch the latest tracking event for the package
+      const trackingEventResult = await query(`
+        SELECT *
+      FROM  tracking_events
+      WHERE 
+        package_id = $1
+      ORDER BY timestamp  ASC
+      LIMIT 1;
+    `, [id]);
+      if (trackingEventResult.rowCount > 0) { 
+        result.rows[0].latest_tracking_event = trackingEventResult.rows[0];
       }
 
-      res.json({ success: true, package: result.rows[0] });
-
+      res.json({ success: true, package: result.rows[0]});
+      
     } catch (error) {
       console.error('Error fetching package:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
   },
-
 
   // Update a package
   updatePackage: async (req, res) => {
@@ -185,10 +177,10 @@ module.exports = {
         next_stop_eta,
         current_location,
         comment
-      } = req.body;
+      } = req.body; 
       const updated_at = new Date();
 
-      const updateQuery = `
+     const updateQuery = `
       UPDATE packages
       SET
         next_stop = $1,
@@ -197,7 +189,7 @@ module.exports = {
       WHERE id = $4 AND is_deleted = FALSE
       RETURNING *; 
     `;
-      const values = [
+      const values = [    
         next_stop,
         next_stop_eta,
         current_location,
@@ -212,16 +204,16 @@ module.exports = {
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *; 
     `;
-      const trackingEventValues = [
+      const trackingEventValues = [ 
         id,
-        status || 'Updated',
+        status || 'Updated',  
         current_location || 'Unknown',
-        updated_at,
+       updated_at,
         comment || 'Package updated',
         updated_at
       ];
       const trackingEventResult = await query(trackingEventQuery, trackingEventValues);
-      if (trackingEventResult.rowCount === 0) {
+      if (trackingEventResult.rowCount === 0) {   
         return res.status(500).json({ success: false, message: 'Failed to create tracking event' });
       }
 
@@ -258,7 +250,7 @@ module.exports = {
       res.json({ success: true, package: result.rows[0] });
     } catch (error) {
       console.error('Error tracking package:', error.message);
-      res.status(500).json({ success: false, message: 'Internal server error' });
+      res.status(500).json({success: false, message: 'Internal server error' });
     }
   }
 };
