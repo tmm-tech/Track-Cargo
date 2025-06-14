@@ -265,12 +265,10 @@ module.exports = {
     },
     // Example check for authentication in your routes (backend)
     checkAuth: (req, res) => {
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
+         const token = req.cookies ? req.cookies.token : null;
         if (token) {
             try {
                 const decodedToken = jwt.verify(token, process.env.SECRET);
-                console.log('Decoded Token:', decodedToken);
                 req.user = decodedToken; // Attach decoded token data to request if needed
                 res.status(200).json({ authenticated: true });
             } catch (error) {

@@ -790,67 +790,70 @@
                       </button>
                     </div>
                     <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
-                      <div class="space-y-2">
-                        <label for="currentLocation" class="text-sm font-medium">Current Location</label>
-                        <select id="currentLocation" v-model="editData.current_location" @change="handleLocationChange"
-                          class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                          <option value="" disabled>Select location</option>
-                          <option v-for="location in locations" :key="location.id" :value="location.name">
-                            {{ location.name }}
-                          </option>
-                        </select>
-                      </div>
-                      <div class="space-y-2">
-                        <label for="status" class="text-sm font-medium">Status</label>
-                        <select id="status" v-model="newStop.status"
-                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
-                          <option value="" disabled selected>Select Status</option>
-                          <option value="in transit">In Transit</option>
-                          <option value="pending">Pending</option>
-                          <option value="delivered">Delivered</option>
-                          <option value="delayed">Delayed</option>
-                          <option value="processing">Processing</option>
-                          <option value="cancelled">Cancelled</option>
-                          <option value="sorted">sorted</option>
-                          <option value="out for delivery">Out for Delivery</option>
-                          <option value="arrived at destination">Arrived at Destination</option>
-                          <option value="departed from origin">Departed from Origin</option>
-                          <option value="customs clearance">Customs Clearance</option>
-                          <option value="awaiting pickup">Awaiting Pickup</option>
-                          <option value="ready for pickup">Ready for Pickup</option>
-                          <option value="on hold">On Hold</option>
-                          <option value="returned to sender">Returned to Sender</option>
-                          <option value="damaged">Damaged</option>
-                          <option value="lost">Lost</option>
-                          <option value="rejected">Rejected</option>
-                          <option value="rescheduled">Rescheduled</option>
-                          <option value="delivered to agent">Delivered to Agent</option>
-                          <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
-                          `<option value="documentation requested">Docummentation Requested</option>
-                          <option value="awaiting final delivery">Awaiting Final Delivery</option>
-                          <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>`
-                        </select>
-                        <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
-                      </div>
-                      <div class="grid grid-cols-2 gap-4">
+                      <form @submit.prevent="saveEditedCargo" class="space-y-4 py-4">
                         <div class="space-y-2">
-                          <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                          <select id="nextStop" v-model="editData.next_stop"
+                          <label for="currentLocation" class="text-sm font-medium">Current Location</label>
+                          <select id="currentLocation" v-model="editData.current_location"
+                            @change="handleLocationChange"
                             class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                            <option value="" disabled>Select next stop</option>
+                            <option value="" disabled>Select location</option>
                             <option v-for="location in locations" :key="location.id" :value="location.name">
                               {{ location.name }}
                             </option>
                           </select>
-                          <p class="text-xs text-gray-500">Automatically determined based on current location</p>
                         </div>
                         <div class="space-y-2">
-                          <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                          <input id="nextStopETA" type="date" v-model="editData.next_stop_eta"
-                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                          <p class="text-xs text-gray-500">Estimated based on standard transit times</p>
+                          <label for="status" class="text-sm font-medium">Status</label>
+                          <select id="status" v-model="newStop.status"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="in transit">In Transit</option>
+                            <option value="pending">Pending</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="delayed">Delayed</option>
+                            <option value="processing">Processing</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="sorted">sorted</option>
+                            <option value="out for delivery">Out for Delivery</option>
+                            <option value="arrived at destination">Arrived at Destination</option>
+                            <option value="departed from origin">Departed from Origin</option>
+                            <option value="customs clearance">Customs Clearance</option>
+                            <option value="awaiting pickup">Awaiting Pickup</option>
+                            <option value="ready for pickup">Ready for Pickup</option>
+                            <option value="on hold">On Hold</option>
+                            <option value="returned to sender">Returned to Sender</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="lost">Lost</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="rescheduled">Rescheduled</option>
+                            <option value="delivered to agent">Delivered to Agent</option>
+                            <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
+                            `<option value="documentation requested">Docummentation Requested</option>
+                            <option value="awaiting final delivery">Awaiting Final Delivery</option>
+                            <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>`
+                          </select>
+                          <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                         </div>
-                      </div>
+                        <div class="grid grid-cols-2 gap-4">
+                          <div class="space-y-2">
+                            <label for="nextStop" class="text-sm font-medium">Next Stop</label>
+                            <select id="nextStop" v-model="editData.next_stop"
+                              class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                              <option value="" disabled>Select next stop</option>
+                              <option v-for="location in locations" :key="location.id" :value="location.name">
+                                {{ location.name }}
+                              </option>
+                            </select>
+                            <p class="text-xs text-gray-500">Automatically determined based on current location</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
+                            <input id="nextStopETA" type="date" v-model="editData.next_stop_eta"
+                              class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                            <p class="text-xs text-gray-500">Estimated based on standard transit times</p>
+                          </div>
+                        </div>
+                      </form>
                     </div>
                   </div>
                 </div>
@@ -858,11 +861,8 @@
                 <div class="mt-6 pt-6 border-t">
                   <h3 class="text-lg font-medium mb-4">Comments</h3>
                   <div v-if="editingCargo.comment && editingCargo.comment.length > 0" class="space-y-4 mb-6">
-                    <div v-for="(comment, index) in [...editingCargo.comment].reverse()" <!-- reverse to show newest
-                      first -->
-                      :key="index"
-                      class="bg-gray-50 p-4 rounded-md"
-                      >
+                    <div v-for="(comment, index) in [...editingCargo.comment].reverse()" :key="index"
+                      class="bg-gray-50 p-4 rounded-md">
                       <div class="flex justify-between items-start">
                         <div>
                           <p class="font-medium">{{ comment.author }}</p>
@@ -874,18 +874,16 @@
                   </div>
                   <div v-else class="text-gray-500 mb-6">No comments yet</div>
 
-                  <form @submit.prevent="addComment(editingCargo.id)" class="space-y-4">
-                    <div class="space-y-2">
-                      <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
-                      <textarea id="editCommentText" v-model="newComment.text" rows="3"
-                        placeholder="Enter your comment here..."
-                        class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                    </div>
-                    <button type="submit"
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                      Add Comment
-                    </button>
-                  </form>
+                  <div class="space-y-2">
+                    <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
+                    <textarea id="editCommentText" v-model="newComment.text" rows="3"
+                      placeholder="Enter your comment here..."
+                      class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                  </div>
+                  <button @click="addComment"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                    Add Comment
+                  </button>
                 </div>
 
 
@@ -895,11 +893,16 @@
                     @click="closeEditModal">
                     Cancel
                   </button>
-                  <button
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                    @click="saveEditedCargo">
-                    <DocumentCheckIcon class="h-4 w-4 mr-2" />
-                    Update Cargo
+                  <button type="submit" :disabled="isSubmitting"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                    <span v-if="!isSubmitting">Update Cargo</span>
+                    <span v-else class="flex items-center">
+                      <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none" />
+                        <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Updating...
+                    </span>
                   </button>
                 </div>
               </div>
@@ -1385,7 +1388,8 @@
                     </div>
                   </div>
                   <!-- Cargo Progress -->
-                  <ShippingProgress v-if="viewingCargo && viewingCargo.tracking_history"  :tracking_history="viewingCargo.tracking_history || []"
+                  <ShippingProgress v-if="viewingCargo && viewingCargo.tracking_history"
+                    :tracking_history="viewingCargo.tracking_history || []"
                     :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
                     :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
                     :estimated_delivery="viewingCargo.estimated_delivery" showComments />
@@ -1398,8 +1402,8 @@
                     <h3 class="text-xl font-semibold">Comments</h3>
                   </div>
                   <div class="p-6">
-                    <div v-if="viewingCargo && viewingCargo.tracking_history.length > 0" class="space-y-4 mb-6">
-                      <div v-for="(comments, index) in viewingCargo.comment" :key="index"
+                    <div v-if="cargocomment.length  != 0" class="space-y-4 mb-6">
+                      <div v-for="(comments, index) in cargocomment" :key="index"
                         class="bg-gray-50 p-4 rounded-md">
                         <div class="flex justify-between items-start">
                           <div>
@@ -1412,18 +1416,17 @@
                     </div>
                     <div v-else class="text-gray-500 mb-6">No comments yet</div>
 
-                    <form @submit.prevent="addComment(viewingCargo.id)" class="space-y-4">
+  
                       <div class="space-y-2">
                         <label for="commentText" class="text-sm font-medium">Add Comment</label>
                         <textarea id="commentText" v-model="newComment.text" rows="3"
                           placeholder="Enter your comment here..."
                           class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
                       </div>
-                      <button type="submit"
+                      <button @click="addComment"
                         class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
                         Add Comment
                       </button>
-                    </form>
                   </div>
                 </div>
 
@@ -2043,7 +2046,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2564,7 +2567,6 @@ const openEditCargoModal = (pkg) => {
     current_location: pkg.current_location,
     next_stop: pkg.next_stop,
     next_stop_eta: pkg.next_stop_eta,
-    shipping_address: { ...pkg.shipping_address }
   }
   showEditModal.value = true
 }
@@ -2597,7 +2599,7 @@ const editCargo = async (pkg) => {
 }
 const saveEditedCargo = async () => {
 
-   isSubmitting.value =true
+  isSubmitting.value = true
   // Validate the edited data
   if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta) {
     setAlert('Please fill in all required fields.', 'error')
@@ -2927,28 +2929,37 @@ const getCargosByStatus = (status) => {
   }).length;
 };
 
-// // Add comment function
-const addComment = async (packageId) => {
-  if (!newComment.value.text.trim()) return;
+const cargocomment = ref([])
+const comment = ref({
+  author: '',
+  text: '',
+  timestamp: new Date().toLocaleString()
+})
 
-  const comment = {
-    author: 'You',
-    text: newComment.value.text.trim(),
-    timestamp: new Date().toLocaleString()
-  };
-
-  // Ensure array exists
-  if (!Array.isArray(viewingCargo.tracking_history)) {
-    viewingCargo.tracking_history = [];
-  }
-
-  // Push to UI immediately
-  viewingCargo.tracking_history.push(comment);
-
- 
+// Add comment function
+const addComment = async () => {
+  if (validateComment()) {
+    cargocomment.value.push({
+      author: comment.author,
+      text: comment.value.text.trim(),
+      timestamp: new Date().toLocaleString()
+    })
+  // Clear comment input
   newComment.value.text = '';
+  }
 };
 
+// Validate Comment
+const validateComment = () => {
+  const text = newComment.value.text?.trim();
+  if (!text) {
+    return 'Comment cannot be empty.';
+  }
+  if (text.length < 3) {
+    return 'Comment must be at least 3 characters long.';
+  }
+  return null; // No errors
+};
 
 
 //<!-- End of Cargo Management Function -->
@@ -3730,7 +3741,6 @@ const formatDate = (dateString) => {
 // Event listeners
 onMounted(() => {
 
-  isAuthenticated.value = true
   fetchUsers()
   fetchCargos()
   fetchLocation()

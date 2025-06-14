@@ -10,21 +10,25 @@ const cookieParser = require('cookie-parser');
 
 
 const app = express(); 
+
+// Middleware to parse cookies
+app.use(cookieParser());
+
 // Middleware to handle errors globally
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!' });
 });
 app.set('trust proxy', 1); // Trust first proxy for secure cookies in production
-// Middleware to parse cookies
-app.use(cookieParser());
+
 // CORS configuration
 app.use(cors());
 // OR (for stricter production settings)
 app.use(cors({
-  origin: ['https://track-cargo.vercel.app', 'http://localhost:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  origin: true,
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Body parsing
@@ -55,7 +59,7 @@ app.use('/activity', ActivityRoutes);
 app.use('/location', LocationRoutes);
 
 app.get('/', (req, res) => {
-    res.json({ message: "Confirmed Connection to Texmon LOGISTICS" });
+    res.json({ message: "Confirmed Connection to Texmon Logistics" });
 });
 
 
