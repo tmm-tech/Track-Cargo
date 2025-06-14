@@ -3682,31 +3682,35 @@ const deleteUser = async () => {
 
 // Handle login function
 const handleLogin = async () => {
-  try {
-    isSubmitting.value = true
-    const userData = { username: username.value, password: password.value }
-    // Call the user service to perform login
-    const response = await userServices.login(userData)
-    if (response.data.success) {
+    try {
+    isSubmitting.value = true;
+    const userData = { username: username.value, password: password.value };
 
+    // Call the user service to perform login
+    const response = await userServices.login(userData);
+
+    if (response.data.success) {
       isAuthenticated.value = true;
-      currentUser.value = response.data.data
+      currentUser.value = response.data.data;
+
+      // ✅ Corrected line
       localStorage.setItem('user', JSON.stringify(response.data.data));
-      setAlert('Login successful!', 'success')
-      // Optionally redirect to dashboard or home page
-      router.push('/admin')
+
+      setAlert('Login successful!', 'success');
+
+      // Redirect to admin dashboard
+      router.push('/admin');
     } else {
-      isAuthenticated.value = false
-      loginError.value = response.error || 'Login failed. Please try again.'
-      console.log(response.error)
-      setAlert(loginError.value, 'error')
+      isAuthenticated.value = false;
+      loginError.value = response.data.error || 'Login failed. Please try again.';
+      setAlert(loginError.value, 'error');
     }
   } catch (error) {
-    console.error('Login error:', error)
-    loginError.value = 'An error occurred during login. Please try again.'
-    setAlert(loginError.value, 'error')
+    console.error('Login error:', error);
+    loginError.value = 'An error occurred during login. Please try again.';
+    setAlert(loginError.value, 'error');
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
 }
 
