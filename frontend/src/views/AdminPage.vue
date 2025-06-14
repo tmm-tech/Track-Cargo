@@ -1386,7 +1386,7 @@
                   </div>
                   <pre>{{ JSON.stringify(viewingCargo, null, 2) }}</pre>
                   <!-- Cargo Progress -->
-                  <ShippingProgress  :tracking_history="viewingCargo?.tracking_history || []"
+                  <ShippingProgress  :tracking_history="viewingCargo.tracking_history || []"
                     :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
                     :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
                     :estimated_delivery="viewingCargo.estimated_delivery" showComments />
