@@ -6,13 +6,6 @@
       <Alert v-if="showAlert" :message="alertMessage" :type="alertType" :show="showAlert" @close="hideAlert" />
     </div>
 
-    <!-- Loading Screen -->
-    <div v-if="isCheckingAuth" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
-      <div class="text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#273272] mx-auto mb-4"></div>
-        <p class="text-gray-600">Checking authentication...</p>
-      </div>
-    </div>
 
     <!-- Mobile Menu Overlay -->
     <div v-if="showMobileMenu && isAuthenticated" class="fixed inset-0 z-50 bg-black/50 md:hidden"
@@ -2045,7 +2038,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -3682,7 +3675,7 @@ const deleteUser = async () => {
 
 // Handle login function
 const handleLogin = async () => {
-   try {
+  try {
     isSubmitting.value = true;
     const userData = { username: username.value, password: password.value };
 
@@ -3740,6 +3733,12 @@ const formatDate = (dateString) => {
 
 // Event listeners
 onMounted(async () => {
+  const storedUser = localStorage.getItem('user');
+  if (!storedUser) {
+    // User not logged in, skip auth check
+   isAuthenticated.value = false;
+    return;
+  }
   try {
     const response = await fetch('https://ketrb-backend.onrender.com/users/protected', {
       method: 'GET',
