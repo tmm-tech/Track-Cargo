@@ -3,36 +3,34 @@ export interface ShippingAddress {
   streetAddress: string
   city: string
   state: string
-  postalCode: string
   country: string
+  phone: string
+  email: string
+  specialInstruction: string
 }
 
 export interface TrackingEvent {
   status: string
   location: string
   timestamp: string
-  notes?: string
+  comment?: string
 }
 
 export interface Package {
   id: string
-  trackingNumber: string
-  dispatchNumber: string
+  truck_number: string
+  container_number: string
+  bl_number: string
   type: string
   weight: string
-  shippedDate: string
-  estimatedDelivery: string
-  currentLocation: string
-  nextStop: string
-  nextStopETA: string
-  finalDestination: string
+  shipped_date: string
+  estimated_delivery: string
+  current_location: string
+  next_stop: string
+  next_stop_eta: string
+  final_destination: string
   lastUpdated: string
-  shippingAddress: ShippingAddress
-  trackingHistory: TrackingEvent[]
+  shipping_address: ShippingAddress
+  tracking_history: TrackingEvent[]
 }
 
-export interface LocationRoute {
-  location: string
-  nextStop: string
-  estimatedDays: number
-}

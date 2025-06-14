@@ -1378,17 +1378,16 @@
                         <p>{{ viewingCargo.shipping_address.streetAddress }}</p>
                         <p>
                           {{ viewingCargo.shipping_address.city }}, {{ viewingCargo.shipping_address.state }}
-                          {{ viewingCargo.shipping_address.postalCode }}
                         </p>
                         <p>{{ viewingCargo.shipping_address.country }}</p>
                       </div>
                       <p v-else class="text-gray-500">No shipping address information available</p>
                     </div>
                   </div>
-
+                  <pre>{{ JSON.stringify(viewingCargo, null, 2) }}</pre>
                   <!-- Cargo Progress -->
-                  <ShippingProgress :trackingHistory="viewingCargo.trackingHistory"
-                    :current_location="viewingCargo.current_location" :nextStop="viewingCargo.next_Stop"
+                  <ShippingProgress  :tracking_history="viewingCargo?.tracking_history || []"
+                    :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
                     :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
                     :estimated_delivery="viewingCargo.estimated_delivery" showComments />
                 </div>
@@ -2833,7 +2832,6 @@ const resetNewCargoForm = () => {
       streetAddress: '',
       city: '',
       state: '',
-      postalCode: '',
       country: '',
       phone: '',
       email: '',
@@ -2932,27 +2930,27 @@ const getCargosByStatus = (status) => {
 };
 
 // Add comment function
-const addComment = (packageId) => {
+const addComment = async (packageId) => {
   if (!newComment.value.text.trim()) return;
 
-  // Create the new comment
   const comment = {
-    author: 'You', // Replace with actual user info
+    author: 'You',
     text: newComment.value.text.trim(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toLocaleString()
   };
 
-  // Ensure comments array exists
-  if (!Array.isArray(editingCargo.comments)) {
-    editingCargo.comments = [];
+  // Ensure array exists
+  if (!Array.isArray(viewingCargo.comments)) {
+    viewingCargo.comments = [];
   }
 
-  // Add the comment to the editingCargo so it shows immediately
-  editingCargo.comments.push(comment);
+  // Push to UI immediately
+  viewingCargo.comments.push(comment);
 
-  // Reset the comment form
-  newComment.value.text = ''
-}
+ 
+  newComment.value.text = '';
+};
+
 
 
 //<!-- End of Cargo Management Function -->
