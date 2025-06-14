@@ -3691,7 +3691,7 @@ const handleLogin = async () => {
 
       isAuthenticated.value = true;
       currentUser.value = response.data.data
-      localStorage.setItem('user', JSON.stringify(data.data));
+      localStorage.setItem('user', JSON.stringify(response.data.data));
       setAlert('Login successful!', 'success')
       // Optionally redirect to dashboard or home page
       router.push('/admin')
