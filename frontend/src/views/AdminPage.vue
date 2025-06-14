@@ -1384,7 +1384,6 @@
                       <p v-else class="text-gray-500">No shipping address information available</p>
                     </div>
                   </div>
-                  <pre>{{ JSON.stringify(viewingCargo.latest_history, null, 2) }}</pre>
                   <!-- Cargo Progress -->
                   <ShippingProgress v-if="viewingCargo && viewingCargo.tracking_history"  :tracking_history="viewingCargo.tracking_history || []"
                     :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
