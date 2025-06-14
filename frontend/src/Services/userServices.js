@@ -9,7 +9,7 @@ export default {
         return await fetch(`${API_BASE}/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: userData,
+        body: JSON.stringify(userData),
         credentials: 'include' // Include cookies with the request
       });
     },

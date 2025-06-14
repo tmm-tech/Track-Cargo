@@ -5,31 +5,37 @@ const jwt = require('jsonwebtoken');
 const UserRoutes = require('./routes/UserRoutes');
 const PackageRoutes = require('./routes/PackageRoutes');
 const ActivityRoutes = require('./routes/ActivityRoutes');
-const LocationRoutes = require('./routes/LocationRoutes'); 
+const LocationRoutes = require('./routes/LocationRoutes');
 const cookieParser = require('cookie-parser');
 
 
-const app = express(); 
+const app = express();
 
 // Middleware to parse cookies
 app.use(cookieParser());
 
-// Middleware to handle errors globally
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
-});
-app.set('trust proxy', 1); // Trust first proxy for secure cookies in production
+const allowedOrigins = [
+    'https://track-cargo.vercel.app',
+    'http://localhost:5173'
+];
+
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
 
 // CORS configuration
-app.use(cors());
-// OR (for stricter production settings)
-app.use(cors({
-  origin: ['https://track-cargo.vercel.app', 'http://localhost:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors(corsOptions));
+
 
 // Body parsing
 app.use(express.json({ limit: '50mb' }));
