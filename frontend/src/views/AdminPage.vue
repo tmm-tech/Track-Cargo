@@ -2169,7 +2169,9 @@ const alertType = ref('');
 const isCheckingAuth = ref(false)
 
 // Authentication state
+const loading = ref(false)
 const isAuthenticated = ref(false)
+const currentUser = ref(null)
 const username = ref('')
 const password = ref('')
 const loginError = ref('')
@@ -2181,16 +2183,6 @@ const sidebarCollapsed = ref(false)
 
 // Current view state
 const currentView = ref('dashboard')
-
-// Current user
-const currentUser = ref({
-  id: 1,
-  fullname: 'Admin User',
-  email: 'admin@texmonlogistics.co.ke',
-  username: 'admin',
-  roles: 'Administrator',
-  initials: 'AU'
-})
 
 
 const formErrors = ref({})
@@ -3676,30 +3668,52 @@ const deleteUser = async () => {
 // Handle login function
 const handleLogin = async () => {
   try {
-    isSubmitting.value = true;
-    const userData = { username: username.value, password: password.value };
+    if (response.ok && data.success) {
+      // Store minimal user info locally (optional)
+      localStorage.setItem('user', JSON.stringify(data.data))
+      currentUser.value = data.data
+      isAuthenticated.value = true
+      setAlert('Login successful!', 'success')
 
-    const response = await userServices.login(userData);
+      // ✅ Now check if the token is valid
+      await verifyToken()
 
-    if (response.ok) {
-      const data = await response.json();
-      isAuthenticated.value = true;
-      currentUser.value = data.data;
-      localStorage.setItem('user', JSON.stringify(data.data));
-      setAlert('Login successful!', 'success');
-      router.push('/admin');
+      router.push('/admin')
     } else {
-      const errorData = await response.json();
-      loginError.value = errorData.error || 'Login failed.';
-      isAuthenticated.value = false;
-      setAlert(loginError.value, 'error');
+      setAlert(data.message || 'Login failed', 'error')
+      isAuthenticated.value = false
     }
   } catch (error) {
-    console.error('Login error:', error);
-    loginError.value = 'Network error. Please try again.';
-    setAlert(loginError.value, 'error');
+    console.error('Login error:', error)
+    setAlert('An error occurred during login', 'error')
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
+  }
+}
+
+const verifyToken = async () => {
+  loading.value = true
+  try {
+    const response = await fetch('https://track-cargo.onrender.com/users/protected', {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (response.ok) {
+      isAuthenticated.value = true
+      await fetchUsers()
+      await fetchCargos()
+      await fetchLocation()
+      window.addEventListener('resize', checkMobileDevice)
+    } else {
+      isAuthenticated.value = false
+      router.push('/login')
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error)
+    isAuthenticated.value = false
+  } finally {
+    loading.value = false
   }
 }
 
@@ -3733,36 +3747,9 @@ const formatDate = (dateString) => {
 
 // Event listeners
 onMounted(async () => {
-  const storedUser = localStorage.getItem('user');
-  if (!storedUser) {
-    // User not logged in, skip auth check
-   isAuthenticated.value = false;
-    return;
-  }
-  try {
-    const response = await fetch('https://ketrb-backend.onrender.com/users/protected', {
-      method: 'GET',
-      credentials: 'include', // Include cookies
-    });
-
-    if (response.ok) {
-      isAuthenticated.value = true;
-      fetchUsers()
-      fetchCargos()
-      fetchLocation()
-      window.addEventListener('resize', checkMobileDevice)
-    } else if (response.status === 404) {
-      console.log('User not found, redirecting to login.');
-      isAuthenticated.value = false;
-      router.push('/admin'); // Optional redirection
-    } else {
-      isAuthenticated.value = false;
-    }
-  } catch (error) {
-    console.error('Auth check failed:', error);
-    isAuthenticated.value = false;
-  } finally {
-    loading.value = false;
+  const storedUser = localStorage.getItem('user')
+  if (storedUser) {
+    await verifyToken()
   }
 })
 
