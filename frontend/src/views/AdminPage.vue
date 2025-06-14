@@ -1384,9 +1384,9 @@
                       <p v-else class="text-gray-500">No shipping address information available</p>
                     </div>
                   </div>
-                  <pre>{{ JSON.stringify(viewingCargo.shipping_address, null, 2) }}</pre>
+                  <pre>{{ JSON.stringify(viewingCargo.latest_history, null, 2) }}</pre>
                   <!-- Cargo Progress -->
-                  <ShippingProgress  :tracking_history="viewingCargo.tracking_history || []"
+                  <ShippingProgress v-if="viewingCargo && viewingCargo.tracking_history"  :tracking_history="viewingCargo.tracking_history || []"
                     :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
                     :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
                     :estimated_delivery="viewingCargo.estimated_delivery" showComments />
@@ -1399,16 +1399,16 @@
                     <h3 class="text-xl font-semibold">Comments</h3>
                   </div>
                   <div class="p-6">
-                    <div v-if="viewingCargo.comment && viewingCargo.comment.length > 0" class="space-y-4 mb-6">
-                      <div v-for="(comment, index) in viewingCargo.comment" :key="index"
+                    <div v-if="viewingCargo && viewingCargo.tracking_history.length > 0" class="space-y-4 mb-6">
+                      <div v-for="(comments, index) in viewingCargo.comment" :key="index"
                         class="bg-gray-50 p-4 rounded-md">
                         <div class="flex justify-between items-start">
                           <div>
-                            <p class="font-medium">{{ comment.author }}</p>
-                            <p class="text-sm text-gray-500">{{ comment.timestamp }}</p>
+                            <p class="font-medium">{{ comments.author }}</p>
+                            <p class="text-sm text-gray-500">{{ comments.timestamp }}</p>
                           </div>
                         </div>
-                        <p class="mt-2">{{ comment.text }}</p>
+                        <p class="mt-2">{{ comments.text }}</p>
                       </div>
                     </div>
                     <div v-else class="text-gray-500 mb-6">No comments yet</div>
@@ -1436,7 +1436,7 @@
                   </button>
                   <button
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 space-y-2 sm:space-y-0"
-                    @click="editFromViewModal">
+                    @click="editFromViewModal(viewingCargo)">
                     <PencilIcon class="h-4 w-4 mr-2" />
                     Edit Cargo
                   </button>
@@ -2290,7 +2290,6 @@ const newCargo = ref({
   truck_number: '',
   bl_number: '',
   cargo_type: '',
-  comments: [],
   current_location: '',
   next_stop: '',
   next_stop_eta: '',
@@ -2638,7 +2637,7 @@ const openViewCargoModal = async (pkg) => {
     }
 
     // Populate viewingCargo with fetched data
-    viewingCargo.value = { ...pkg }
+    viewingCargo.value = response.data.package
     showViewModal.value = true
   } catch (error) {
     console.error('Error fetching package data:', error)
@@ -2657,10 +2656,10 @@ const viewCargoDetails = (pkg) => {
   openViewCargoModal(pkg)
 }
 
-const editFromViewModal = () => {
+const editFromViewModal = (pkg) => {
   if (viewingCargo.value) {
     closeViewModal()
-    editCargo(viewingCargo.value)
+    editCargo(pkg)
   }
 }
 
@@ -2929,7 +2928,7 @@ const getCargosByStatus = (status) => {
   }).length;
 };
 
-// Add comment function
+// // Add comment function
 const addComment = async (packageId) => {
   if (!newComment.value.text.trim()) return;
 
@@ -2940,12 +2939,12 @@ const addComment = async (packageId) => {
   };
 
   // Ensure array exists
-  if (!Array.isArray(viewingCargo.comments)) {
-    viewingCargo.comments = [];
+  if (!Array.isArray(viewingCargo.tracking_history)) {
+    viewingCargo.tracking_history = [];
   }
 
   // Push to UI immediately
-  viewingCargo.comments.push(comment);
+  viewingCargo.tracking_history.push(comment);
 
  
   newComment.value.text = '';
