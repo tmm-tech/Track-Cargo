@@ -67,8 +67,8 @@
           <p class="font-medium text-[#273272]">{{ event.status }}</p>
           <p class="text-sm text-gray-500">{{ event.location }}</p>
           <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
-          <p v-if="event.comment" class="text-sm text-gray-400 mt-1">
-            {{ event.comment }}
+          <p v-if="event.comments?.text" class="text-sm text-gray-400 mt-1">
+            {{ event.comments.text }}
           </p>
         </div>
       </div>

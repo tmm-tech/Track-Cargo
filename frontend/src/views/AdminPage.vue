@@ -131,7 +131,7 @@
         <div v-if="!sidebarCollapsed || isMobileDevice" class="flex items-center p-3 mb-3 rounded-md bg-gray-800/30">
           <div
             class="h-9 w-9 rounded-full bg-[#273272] flex items-center justify-center text-white text-sm font-medium">
-            {{ currentUser.initials }}
+            {{ getInitials(currentUser.fullname) }}
           </div>
           <div class="ml-3 overflow-hidden">
             <p class="text-sm font-medium text-white truncate">{{ currentUser.fullname }}</p>
@@ -141,7 +141,7 @@
         <div v-else class="flex justify-center mb-3">
           <div
             class="h-9 w-9 rounded-full bg-[#273272] flex items-center justify-center text-white text-sm font-medium">
-            {{ currentUser.initials }}
+            {{ getInitials(currentUser.fullname) }}
           </div>
         </div>
 
@@ -247,7 +247,7 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none" />
                     <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Saving...
+                  Login...
                 </span>
               </button>
             </form>
@@ -793,7 +793,7 @@
                       <form @submit.prevent="saveEditedCargo" class="space-y-4 py-4">
                         <div class="space-y-2">
                           <label for="currentLocation" class="text-sm font-medium">Current Location</label>
-                          <select id="currentLocation" v-model="editData.current_location"
+                          <select id="currentLocation" v-model="editingCargo.current_location"
                             @change="handleLocationChange"
                             class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                             <option value="" disabled>Select location</option>
@@ -804,7 +804,7 @@
                         </div>
                         <div class="space-y-2">
                           <label for="status" class="text-sm font-medium">Status</label>
-                          <select id="status" v-model="newStop.status"
+                          <select id="status" v-model="editingCargo.tracking_history.status"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
                             <option value="" disabled selected>Select Status</option>
                             <option value="in transit">In Transit</option>
@@ -837,7 +837,7 @@
                         <div class="grid grid-cols-2 gap-4">
                           <div class="space-y-2">
                             <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                            <select id="nextStop" v-model="editData.next_stop"
+                            <select id="nextStop" v-model="editingCargo.next_stop"
                               class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                               <option value="" disabled>Select next stop</option>
                               <option v-for="location in locations" :key="location.id" :value="location.name">
@@ -848,9 +848,62 @@
                           </div>
                           <div class="space-y-2">
                             <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                            <input id="nextStopETA" type="date" v-model="editData.next_stop_eta"
+                            <input id="nextStopETA" type="datetime-local" v-model="editingCargo.next_stop_eta"
                               class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                             <p class="text-xs text-gray-500">Estimated based on standard transit times</p>
+                          </div>
+                        </div>
+                        <!-- Comments Section -->
+                        <div class="mt-6 pt-6 border-t">
+                          <h3 class="text-lg font-medium mb-4">Comments & Tracking History</h3>
+
+                          <!-- Display existing comments -->
+                          <div v-if="editingCargo.comments?.length > 0" class="space-y-4 mb-6 max-h-60 overflow-y-auto">
+                            <div v-for="comment in editingCargo.comments" :key="comment.id" :class="[
+                              'p-4 rounded-md border-l-4',
+                               'bg-gray-50 border-l-gray-400'
+                            ]">
+                              <div class="flex justify-between items-start">
+                                <div>
+                                  <p class="font-medium flex items-center gap-2">
+                                    {{ comment.author }}
+
+                                  </p>
+                                  <p class="text-sm text-gray-500">{{ formatDate(comment.timestamp) }}</p>
+                                </div>
+                              </div>
+                              <p class="mt-2">{{ comment.text }}</p>
+                            </div>
+                          </div>
+                          <div v-else
+                            class="text-gray-500 mb-6 p-4 text-center border-2 border-dashed border-gray-200 rounded-md">
+                            No comments or tracking history yet
+                          </div>
+
+                          <!-- Add new comment form -->
+                          <div class="space-y-4 border-t pt-4">
+                            <div class="space-y-2">
+                              <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
+                              <textarea id="editCommentText" v-model="newComment.text" rows="3"
+                                placeholder="Enter your comment here..."
+                                class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                            </div>
+
+                            <div class="flex gap-2">
+                              <button @click="addComment" :disabled="!newComment.text.trim() || isAddingComment"
+                                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span v-if="!isAddingComment">Add Comment</span>
+                                <span v-else class="flex items-center">
+                                  <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                                      fill="none" />
+                                    <path class="opacity-75" fill="white"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                  </svg>
+                                  Adding...
+                                </span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </form>
@@ -858,33 +911,7 @@
                   </div>
                 </div>
 
-                <div class="mt-6 pt-6 border-t">
-                  <h3 class="text-lg font-medium mb-4">Comments</h3>
-                  <div v-if="editingCargo.comment && editingCargo.comment.length > 0" class="space-y-4 mb-6">
-                    <div v-for="(comment, index) in [...editingCargo.comment].reverse()" :key="index"
-                      class="bg-gray-50 p-4 rounded-md">
-                      <div class="flex justify-between items-start">
-                        <div>
-                          <p class="font-medium">{{ comment.author }}</p>
-                          <p class="text-sm text-gray-500">{{ comment.timestamp }}</p>
-                        </div>
-                      </div>
-                      <p class="mt-2">{{ comment.text }}</p>
-                    </div>
-                  </div>
-                  <div v-else class="text-gray-500 mb-6">No comments yet</div>
 
-                  <div class="space-y-2">
-                    <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
-                    <textarea id="editCommentText" v-model="newComment.text" rows="3"
-                      placeholder="Enter your comment here..."
-                      class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                  </div>
-                  <button @click="addComment"
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                    Add Comment
-                  </button>
-                </div>
 
 
                 <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
@@ -2045,7 +2072,7 @@
             <div class="flex flex-col space-y-1.5 pb-4">
               <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
               <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-              }}</strong></p>
+                  }}</strong></p>
             </div>
 
             <form @submit.prevent="saveNewPassword">
@@ -2588,6 +2615,38 @@ const editCargo = async (pkg) => {
     setAlert('Failed to load package data for editing.', 'error')
   }
 }
+const cargocomment = ref([])
+const comment = ref({
+  author: '',
+  text: '',
+  timestamp: new Date().toLocaleString()
+})
+
+// Add comment function
+const addComment = async () => {
+  if (validateComment()) {
+    
+    cargocomment.value.push({
+      author: comment.author,
+      text: comment.value.text.trim(),
+      timestamp: new Date().toLocaleString()
+    })
+    // Clear comment input
+    newComment.value.text = '';
+  }
+};
+
+// Validate Comment
+const validateComment = () => {
+  const text = newComment.value.text?.trim();
+  if (!text) {
+    return 'Comment cannot be empty.';
+  }
+  if (text.length < 3) {
+    return 'Comment must be at least 3 characters long.';
+  }
+  return null; // No errors
+};
 const saveEditedCargo = async () => {
 
   isSubmitting.value = true
@@ -2596,6 +2655,11 @@ const saveEditedCargo = async () => {
     setAlert('Please fill in all required fields.', 'error')
     return
   }
+
+   if (!cargocomment.value.comment || cargocomment.value.comment.trim() === '') {
+    errors.comment = 'Comment is required'
+  }
+
 
   // Update the package data
   editingCargo.value.current_location = editData.value.current_location
@@ -2918,38 +2982,6 @@ const getCargosByStatus = (status) => {
 
     return false;
   }).length;
-};
-
-const cargocomment = ref([])
-const comment = ref({
-  author: '',
-  text: '',
-  timestamp: new Date().toLocaleString()
-})
-
-// Add comment function
-const addComment = async () => {
-  if (validateComment()) {
-    cargocomment.value.push({
-      author: comment.author,
-      text: comment.value.text.trim(),
-      timestamp: new Date().toLocaleString()
-    })
-    // Clear comment input
-    newComment.value.text = '';
-  }
-};
-
-// Validate Comment
-const validateComment = () => {
-  const text = newComment.value.text?.trim();
-  if (!text) {
-    return 'Comment cannot be empty.';
-  }
-  if (text.length < 3) {
-    return 'Comment must be at least 3 characters long.';
-  }
-  return null; // No errors
 };
 
 
@@ -3672,9 +3704,21 @@ const deleteUser = async () => {
   }
 }
 
-// Handle login function
+// Handle login function 
 const handleLogin = async () => {
   try {
+    isSubmitting.value = true
+    const userData = { username: username.value, password: password.value }
+
+    const response = await fetch('https://track-cargo.onrender.com/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+      credentials: 'include', // Important for session cookies
+    })
+
+    const data = await response.json()
+
     if (response.ok && data.success) {
       // Store minimal user info locally (optional)
       localStorage.setItem('user', JSON.stringify(data.data))
@@ -3698,6 +3742,8 @@ const handleLogin = async () => {
   }
 }
 
+
+
 const verifyToken = async () => {
   loading.value = true
   try {
@@ -3714,7 +3760,7 @@ const verifyToken = async () => {
       window.addEventListener('resize', checkMobileDevice)
     } else {
       isAuthenticated.value = false
-      router.push('/login')
+      router.push('/admin')
     }
   } catch (error) {
     console.error('Auth check failed:', error)
@@ -3738,6 +3784,18 @@ const logout = async () => {
   }
 }
 
+const latestTrackingStatus = computed(() => {
+  if (
+    editingCargo.value &&
+    Array.isArray(editingCargo.value.tracking_history) &&
+    editingCargo.value.tracking_history.length > 0
+  ) {
+    // Sort by timestamp descending
+    return [...editingCargo.value.tracking_history]
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0].status
+  }
+  return ''
+})
 
 // Date formatting function
 const formatDate = (dateString) => {
@@ -3757,6 +3815,7 @@ onMounted(async () => {
   const storedUser = localStorage.getItem('user')
   if (storedUser) {
     await verifyToken()
+    editingCargo.value.tracking_history.status = latestTrackingStatus.value
   }
 })
 
@@ -3816,6 +3875,23 @@ onUnmounted(() => {
 
 .scrollbar-thumb-gray-700 {
   scrollbar-color: #374151 transparent;
+}
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 /* Mobile-specific styles */

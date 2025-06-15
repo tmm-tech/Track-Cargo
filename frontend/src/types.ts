@@ -13,7 +13,9 @@ export interface TrackingEvent {
   status: string
   location: string
   timestamp: string
-  comment?: string
+  comments?: {
+    text?: string
+  }
 }
 
 export interface Package {
