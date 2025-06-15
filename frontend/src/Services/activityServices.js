@@ -16,14 +16,14 @@ export default {
   // Get all activities
   getActivities() {
 
-    return axios.get(API_URL);
+    return axios.get(API_BASE_URL);
 
   },
 
   // Get activity by ID (optional, if needed)
   getActivityById(activityId) {
 
-    return axios.get(`${API_URL}/${activityId}`);
+    return axios.get(`${API_BASE_URL}/${activityId}`);
 
 
   },

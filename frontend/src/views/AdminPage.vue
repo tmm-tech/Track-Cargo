@@ -2998,6 +2998,7 @@ const getActivityIcon = (type) => {
       return CogIcon
   }
 }
+const activityLogs = ref([])
  const fetchActivities = async () => {
    try {
     const responses = await activityServices.getActivities();
