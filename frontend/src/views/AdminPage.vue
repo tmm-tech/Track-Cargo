@@ -2193,6 +2193,7 @@ import userServices from '../Services/userServices.js';
 import locationService from '../Services/locationServices.js';
 import ShippingServices from '../Services/ShippingServices.js';
 import Alert from '../components/ui/Alert.vue';
+import activityServices from '../Services/activityServices.js'
 
 
 
@@ -2997,18 +2998,16 @@ const getActivityIcon = (type) => {
       return CogIcon
   }
 }
+ const fetchActivities = async () => {
+   try {
+    const responses = await activityServices.getActivities();
+    activityLogs.value = responses.data.activities || [];
 
-// Activity log state
-const activityLogs = ref([
-  {
-    id: 1,
-    type: 'login',
-    user: 'Admin User',
-    time: '2025-05-23 09:30 AM',
-    message: 'User logged in successfully',
-    details: 'IP Address: 192.168.1.1, Browser: Chrome 120.0.0'
-  },
-])
+  } catch (error) {
+    console.error('Error fetching Locations:', error);
+  }
+ }
+
 const activitySearchTerm = ref('')
 const activityFilter = ref('all')
 
@@ -3750,6 +3749,7 @@ const verifyToken = async () => {
       await fetchUsers()
       await fetchCargos()
       await fetchLocation()
+      await fetchActivities()
       window.addEventListener('resize', checkMobileDevice)
     } else {
       isAuthenticated.value = false
