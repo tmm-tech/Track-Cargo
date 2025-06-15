@@ -1,11 +1,26 @@
 const { query } = require('../config/sqlConfig');
 
+// Helper function to insert activity log
+const insertActivityLog = async (type, userId, message, details = {}) => {
+    try {
+        const activityQuery = `
+            INSERT INTO activity_logs (type, user_id, message, details)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *;
+        `;
+        const params = [type, userId, message, details];
+        await query(activityQuery, params);
+    } catch (error) {
+        console.error('Error inserting activity log:', error);
+        // Don't throw error to prevent breaking the main operation
+    }
+};
 
 module.exports = {
     // Add a new location
     addLocation: async (req, res) => {
-        const { name, type, address, city, country, coordinates, status} = req.body;
-
+        const { name, type, address, city, country, coordinates, status } = req.body;
+        const userId = req.user?.id || null; // Assuming user info is available in req.user
         try {
             const insertQuery = `
       INSERT INTO locations (name, type, address, city, country, coordinates, status)
@@ -14,7 +29,22 @@ module.exports = {
             const params = [name, type, address, city, country, coordinates, status || {}];
             const result = await query(insertQuery, params);
 
-            res.json({ success: true, location: result.rows[0] });
+            const newLocation = result.rows[0];
+            // Insert activity log
+            await insertActivityLog(
+                'location_created',
+                userId,
+                `New location "${name}" was created`,
+                {
+                    location_id: newLocation.id,
+                    location_name: name,
+                    location_type: type,
+                    city: city,
+                    country: country,
+                    action: 'CREATE'
+                }
+            );
+            res.json({ success: true, location: newLocation });
         } catch (error) {
             console.error('Error adding location:', error);
             res.status(500).json({ success: false, message: error.message });
@@ -54,6 +84,7 @@ module.exports = {
     updateLocation: async (req, res) => {
         const { id } = req.params;
         const { name, city, country, coordinates } = req.body;
+        const userId = req.user?.id || null; // Assuming user info is available in req.user
 
         try {
             const updateQuery = `
@@ -70,7 +101,30 @@ module.exports = {
                 return res.status(404).json({ success: false, message: 'Location not found' });
             }
 
-            res.json({ success: true, location: result.rows[0] });
+            const updatedLocation = result.rows[0];
+
+            // Determine what changed for activity log
+            const changes = {};
+            if (currentLocation.name !== name) changes.name = { from: currentLocation.name, to: name };
+            if (currentLocation.type !== type) changes.type = { from: currentLocation.type, to: type };
+            if (currentLocation.address !== address) changes.address = { from: currentLocation.address, to: address };
+            if (currentLocation.city !== city) changes.city = { from: currentLocation.city, to: city };
+            if (currentLocation.country !== country) changes.country = { from: currentLocation.country, to: country };
+
+            // Insert activity log
+            await insertActivityLog(
+                'location_updated',
+                userId,
+                `Location "${updatedLocation.name}" was updated`,
+                {
+                    location_id: id,
+                    location_name: updatedLocation.name,
+                    changes: changes,
+                    action: 'UPDATE'
+                }
+            );
+
+            res.json({ success: true, location: updatedLocation });
         } catch (error) {
             console.error('Error updating location:', error);
             res.status(500).json({ success: false, message: error.message });
@@ -80,7 +134,7 @@ module.exports = {
     // Delete location
     deleteLocation: async (req, res) => {
         const { id } = req.params;
-
+        const userId = req.user?.id || null; // Assuming user info is available in req.user
         try {
             const deleteQuery = `DELETE FROM locations WHERE id = $1 RETURNING *;`;
             const result = await query(deleteQuery, [id]);
@@ -88,6 +142,24 @@ module.exports = {
             if (result.rows.length === 0) {
                 return res.status(404).json({ success: false, message: 'Location not found' });
             }
+
+            const locationToDelete = locationResult.rows[0];
+
+            // Insert activity log
+            await insertActivityLog(
+                'location_deleted',
+                userId,
+                `Location "${locationToDelete.name}" was deleted`,
+                {
+                    location_id: id,
+                    location_name: locationToDelete.name,
+                    location_type: locationToDelete.type,
+                    city: locationToDelete.city,
+                    country: locationToDelete.country,
+                    action: 'DELETE',
+                    deleted_data: locationToDelete
+                }
+            );
 
             res.json({ success: true, message: 'Location deleted successfully' });
         } catch (error) {

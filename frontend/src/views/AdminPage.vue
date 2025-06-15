@@ -856,7 +856,7 @@
                         <!-- Comments Section -->
                         <div class="mt-6 pt-6 border-t">
                           <h3 class="text-lg font-medium mb-4">Comments & Tracking History</h3>
-
+                    
                           <!-- Display existing comments -->
                           <div v-if="editingCargo.comments?.length > 0" class="space-y-4 mb-6 max-h-60 overflow-y-auto">
                             <div v-for="comment in editingCargo.comments" :key="comment.id" :class="[
@@ -2579,15 +2579,7 @@ const printCargoDetails = (pkg) => {
 
 
 // Edit package functions
-const openEditCargoModal = (pkg) => {
-  editingCargo.value = { ...pkg }
-  editData.value = {
-    current_location: pkg.current_location,
-    next_stop: pkg.next_stop,
-    next_stop_eta: pkg.next_stop_eta,
-  }
-  showEditModal.value = true
-}
+
 
 const closeEditModal = () => {
   showEditModal.value = false
@@ -2603,6 +2595,7 @@ const editCargo = async (pkg) => {
     }
     // Populate editingCargo with fetched data
     editingCargo.value = { ...response.data.package }
+
     editData.value = {
       current_location: editingCargo.value.current_location,
       next_stop: editingCargo.value.next_stop,
@@ -3815,7 +3808,6 @@ onMounted(async () => {
   const storedUser = localStorage.getItem('user')
   if (storedUser) {
     await verifyToken()
-    editingCargo.value.tracking_history.status = latestTrackingStatus.value
   }
 })
 

@@ -4,6 +4,23 @@ const jwt = require('jsonwebtoken');
 const validateCreateUserSchema = require('../services/RegistrationValidation');
 const { createToken } = require('../services/jwtServices');
 
+
+// Helper function to insert activity log
+const insertActivityLog = async (type, userId, message, details = {}) => {
+    try {
+        const activityQuery = `
+            INSERT INTO activity_logs (type, user_id, message, details)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *;
+        `;
+        const params = [type, userId, message, details];
+        await query(activityQuery, params);
+    } catch (error) {
+        console.error('Error inserting activity log:', error);
+        // Don't throw error to prevent breaking the main operation
+    }
+};
+
 module.exports = {
     // Create a new user
     createUser: async (req, res) => {
@@ -32,10 +49,28 @@ module.exports = {
 
             const result = await query(insertUserQuery, params);
 
+            const newUser = result.rows[0];
+
+            // Insert activity log
+            await insertActivityLog(
+                'user_created',
+                creatorUserId,
+                `New user account created for ${value.fullname} (${value.username})`,
+                {
+                    created_user_id: newUser.id,
+                    username: value.username,
+                    email: value.email,
+                    fullname: value.fullname,
+                    roles: value.roles,
+                    status: value.status || 'active',
+                    action: 'CREATE'
+                }
+            );
+
             res.json({
                 success: true,
                 message: 'Registration successful',
-                userId: result.rows[0].id,
+                userId: newUser.id,
             });
         } catch (error) {
             console.error('Error registering user:', error);
@@ -116,6 +151,18 @@ module.exports = {
                         WHERE id = $1;
                     `;
                     await query(updateLastLoginQuery, [user.id]);
+                     // Insert activity log
+                    await insertActivityLog(
+                        'user_login',
+                        user.id,
+                        `User ${user.fullname} (${user.username}) logged in`,
+                        {
+                            username: user.username,
+                            email: user.email,
+                            login_time: new Date().toISOString(),
+                            action: 'LOGIN'
+                        }
+                    );
                     // Respond with user data
                     res.json({ success: true, data: user });
                 } else {
@@ -218,6 +265,18 @@ module.exports = {
             const result = await query(updateUserQuery, params);
 
             if (result.rowCount > 0) {
+                 // Insert activity log
+                await insertActivityLog(
+                    'user_updated',
+                    updaterUserId,
+                    `User ${updatedUser.fullname} (${updatedUser.username}) was updated`,
+                    {
+                        updated_user_id: id,
+                        username: updatedUser.username,
+                        changes: changes,
+                        action: 'UPDATE'
+                    }
+                );
 
                 res.json({ success: true, message: 'User updated successfully', data: result.rows[0] });
             } else {
@@ -253,6 +312,21 @@ module.exports = {
         `;
             const result = await query(deleteUserQuery, [id]);
             if (result.rowCount > 0) {
+                // Insert activity log
+                await insertActivityLog(
+                    'user_deleted',
+                    deleterUserId,
+                    `User ${userToDelete.fullname} (${userToDelete.username}) was permanently deleted`,
+                    {
+                        deleted_user_id: id,
+                        username: userToDelete.username,
+                        email: userToDelete.email,
+                        fullname: userToDelete.fullname,
+                        roles: userToDelete.roles,
+                        action: 'DELETE',
+                        deleted_data: userToDelete
+                    }
+                );
                 // Return success response
                 return res.json({ success: true, message: 'User deleted successfully', user: result.rows[0] });
             } else {
@@ -327,6 +401,20 @@ module.exports = {
             const result = await query(updateUserStatusQuery, [email]);
 
             if (result.rowCount > 0) {
+                 const user = result.rows[0];
+
+                // Insert activity log
+                await insertActivityLog(
+                    'user_logout',
+                    userId || user.id,
+                    `User ${user.fullname} (${user.username}) logged out`,
+                    {
+                        username: user.username,
+                        email: user.email,
+                        logout_time: new Date().toISOString(),
+                        action: 'LOGOUT'
+                    }
+                );
                 // Clear the token cookie
                 res.clearCookie('token');
                 res.json({ success: true, message: 'User logged out successfully' });
@@ -349,17 +437,18 @@ module.exports = {
             if (userResult.rows.length > 0) {
                 const user = userResult.rows[0];
 
-                // Notify admins of the password reset request
-                await query(
-                    'INSERT INTO notifications (notification_type, item_id, message, sender_id, target_role, is_read) VALUES ($1, $2, $3, $4, $5, $6)',
-                    [
-                        'password_reset_requested',
-                        user.id,
-                        `Password reset requested by ${user.fullname} (${user.email}).`,
-                        user.id,  // The user's ID who requested the reset
-                        'administrator',  // Notify all admins
-                        false  // Not read yet
-                    ]
+                // Insert activity log
+                await insertActivityLog(
+                    'password_reset_requested',
+                    user.id,
+                    `Password reset requested for ${user.fullname} (${user.email})`,
+                    {
+                        username: user.username,
+                        email: user.email,
+                        request_time: new Date().toISOString(),
+                        action: 'PASSWORD_RESET_REQUEST'
+                    }
+                
                 );
 
                 return res.json({ success: true, message: 'Password reset link has been sent to your email.' });

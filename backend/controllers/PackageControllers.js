@@ -1,6 +1,23 @@
 const { query } = require('../config/sqlConfig');
 const { v4: uuidv4 } = require('uuid');
 
+// Helper function to insert activity log
+const insertActivityLog = async (type, userId, message, details = {}) => {
+    try {
+        const activityQuery = `
+            INSERT INTO activity_logs (type, user_id, message, details)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *;
+        `;
+        const params = [type, userId, message, details];
+        await query(activityQuery, params);
+    } catch (error) {
+        console.error('Error inserting activity log:', error);
+        // Don't throw error to prevent breaking the main operation
+    }
+};
+
+
 module.exports = {
 
   // Create a new package
@@ -89,6 +106,25 @@ module.exports = {
       if (trackingEventResult.rowCount === 0) {
         return res.status(500).json({ success: false, message: 'Failed to create tracking event' });
       }
+
+       // Insert activity log
+      await insertActivityLog(
+        'package_created',
+        userId,
+        `New package created with tracking number ${tracking_number}`,
+        {
+          package_id: packageId,
+          tracking_number: tracking_number,
+          container_number: container_number,
+          truck_number: truck_number,
+          bl_number: bl_number,
+          type: type,
+          current_location: current_location,
+          final_destination: final_destination,
+          action: 'CREATE'
+        }
+      );
+
 
       res.json({
         success: true,
@@ -219,6 +255,25 @@ module.exports = {
       if (result.rowCount === 0) {
         return res.status(404).json({ success: false, message: 'Package not found or deleted' });
       }
+
+      // Insert activity log
+      await insertActivityLog(
+        'package_updated',
+        userId,
+        `Package ${currentPackage.container_number || currentPackage.truck_number || currentPackage.bl_number || id} was updated`,
+        {
+          package_id: id,
+          tracking_numbers: {
+            container_number: currentPackage.container_number,
+            truck_number: currentPackage.truck_number,
+            bl_number: currentPackage.bl_number
+          },
+          status: status,
+          changes: changes,
+          comment: comment,
+          action: 'UPDATE'
+        }
+      );
 
       res.json({
         message: 'Package updated successfully',
