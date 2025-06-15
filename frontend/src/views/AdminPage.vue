@@ -330,7 +330,7 @@
                         <div class="flex items-center mt-1">
                           <p class="text-xs text-gray-500">{{ activity.user }}</p>
                           <span class="mx-1 text-gray-500">•</span>
-                          <p class="text-xs text-gray-500">{{ activity.time }}</p>
+                          <p class="text-xs text-gray-500">{{ formatDate(activity.time) }}</p>
                         </div>
                       </div>
                     </div>
@@ -687,9 +687,9 @@
                   <select v-model="activityFilter"
                     class="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm">
                     <option value="all">All Activities</option>
-                    <option value="login">Login Events</option>
-                    <option value="package">Cargo Updates</option>
-                    <option value="user">User Management</option>
+                    <option value="package">Package Activities</option>
+                    <option value="location">Location Activities</option>
+                    <option value="user">User Activities</option>
                   </select>
                 </div>
 
@@ -699,10 +699,7 @@
                     <div class="mr-4">
                       <div :class="[
                         'h-10 w-10 rounded-full flex items-center justify-center',
-                        activity.type === 'login' ? 'bg-green-100 text-green-600' :
-                          activity.type === 'package' ? 'bg-blue-100 text-blue-600' :
-                            activity.type === 'user' ? 'bg-purple-100 text-purple-600' :
-                              'bg-gray-100 text-gray-600'
+                        getActivityColor(activity.type)
                       ]">
                         <component :is="getActivityIcon(activity.type)" class="h-5 w-5" />
                       </div>
@@ -714,22 +711,25 @@
                           <div class="flex items-center mt-1">
                             <p class="text-sm text-gray-500">{{ activity.user }}</p>
                             <span class="mx-1 text-gray-500">•</span>
-                            <p class="text-sm text-gray-500">{{ activity.time }}</p>
+                            <p class="text-sm text-gray-500">{{ formatDate(activity.time) }}</p>
                           </div>
                         </div>
                         <div :class="[
                           'px-2 py-1 text-xs font-semibold rounded-full',
-                          activity.type === 'login' ? 'bg-green-100 text-green-800' :
-                            activity.type === 'package' ? 'bg-blue-100 text-blue-800' :
-                              activity.type === 'user' ? 'bg-purple-100 text-purple-800' :
-                                'bg-gray-100 text-gray-800'
                         ]">
-                          {{ activity.type.charAt(0).toUpperCase() + activity.type.slice(1) }}
+                          {{ getActivityCategory(activity.type.charAt(0).toUpperCase() + activity.type.slice(1)) }}
                         </div>
                       </div>
                       <div v-if="activity.details" class="mt-2 p-3 bg-gray-50 rounded-md text-sm text-gray-600">
                         {{ activity.details }}
                       </div>
+                    </div>
+                    <!-- Activity Badge -->
+                    <div :class="[
+                      'px-2 py-1 text-xs font-semibold rounded-full ml-4',
+                      getActivityBadgeColor(activity.type)
+                    ]">
+                      {{ formatActivityType(activity.type) }}
                     </div>
                   </div>
                 </div>
@@ -856,12 +856,12 @@
                         <!-- Comments Section -->
                         <div class="mt-6 pt-6 border-t">
                           <h3 class="text-lg font-medium mb-4">Comments & Tracking History</h3>
-                    
+
                           <!-- Display existing comments -->
                           <div v-if="editingCargo.comments?.length > 0" class="space-y-4 mb-6 max-h-60 overflow-y-auto">
                             <div v-for="comment in editingCargo.comments" :key="comment.id" :class="[
                               'p-4 rounded-md border-l-4',
-                               'bg-gray-50 border-l-gray-400'
+                              'bg-gray-50 border-l-gray-400'
                             ]">
                               <div class="flex justify-between items-start">
                                 <div>
@@ -2184,7 +2184,7 @@ import {
   ExclamationTriangleIcon,
   ArchiveBoxIcon
 } from '@heroicons/vue/24/outline'
-import { LogOut } from 'lucide-vue-next'
+import { LogOut, LogIn } from 'lucide-vue-next'
 import PackageTracking from './PackageTracking.vue'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -2619,7 +2619,7 @@ const comment = ref({
 // Add comment function
 const addComment = async () => {
   if (validateComment()) {
-    
+
     cargocomment.value.push({
       author: comment.author,
       text: comment.value.text.trim(),
@@ -2650,7 +2650,7 @@ const saveEditedCargo = async () => {
     return
   }
 
-   if (!cargocomment.value.comment || cargocomment.value.comment.trim() === '') {
+  if (!cargocomment.value.comment || cargocomment.value.comment.trim() === '') {
     errors.comment = 'Comment is required'
   }
 
@@ -2986,28 +2986,136 @@ const getCargosByStatus = (status) => {
 
 const getActivityIcon = (type) => {
   switch (type) {
-    case 'login':
-      return LogOut
-    case 'package':
+    case 'user_login':
+      return LogIn
+    case 'user_created':
+      return User
+    case 'user_updated':
+      return Edit
+    case 'user_deleted':
+      return Trash
+    case 'package_created':
       return ArchiveBoxIcon
-    case 'user':
-      return UsersIcon
-    case 'location':
+    case 'package_updated':
+      return Edit
+    case 'location_created':
       return MapPinIcon
+    case 'location_updated':
+      return MapPinIcon
+    case 'location_deleted':
+      return Trash
     default:
       return CogIcon
   }
 }
+// Activity color mapping
+const getActivityColor = (type) => {
+  const colorMap = {
+    // Package Activities - Blue theme
+    'package_created': 'bg-blue-100 text-blue-600',
+    'package_updated': 'bg-blue-100 text-blue-600',
+    'package_delivered': 'bg-green-100 text-green-600',
+    'package_cancelled': 'bg-red-100 text-red-600',
+    'package_delayed': 'bg-yellow-100 text-yellow-600',
+    'package_shipped': 'bg-purple-100 text-purple-600',
+    'package_deleted': 'bg-red-100 text-red-600',
+    'package_restored': 'bg-green-100 text-green-600',
+    'package_held': 'bg-orange-100 text-orange-600',
+    'package_released': 'bg-green-100 text-green-600',
+
+    // Location Activities - Green theme
+    'location_created': 'bg-green-100 text-green-600',
+    'location_updated': 'bg-green-100 text-green-600',
+    'location_deleted': 'bg-red-100 text-red-600',
+    'location_activated': 'bg-green-100 text-green-600',
+    'location_deactivated': 'bg-gray-100 text-gray-600',
+    'location_maintenance_scheduled': 'bg-orange-100 text-orange-600',
+
+    // User Activities - Purple theme
+    'user_created': 'bg-purple-100 text-purple-600',
+    'user_updated': 'bg-purple-100 text-purple-600',
+    'user_login': 'bg-green-100 text-green-600',
+    'user_logout': 'bg-gray-100 text-gray-600',
+    'user_deleted': 'bg-red-100 text-red-600',
+    'user_login_failed': 'bg-red-100 text-red-600',
+    'user_activated': 'bg-green-100 text-green-600',
+    'user_deactivated': 'bg-gray-100 text-gray-600',
+    'user_locked': 'bg-red-100 text-red-600',
+    'user_unlocked': 'bg-green-100 text-green-600',
+
+    // System Activities - Orange theme
+    'system_backup_created': 'bg-orange-100 text-orange-600',
+    'system_error_occurred': 'bg-red-100 text-red-600',
+    'system_security_alert': 'bg-red-100 text-red-600',
+    'system_maintenance_started': 'bg-orange-100 text-orange-600',
+    'system_maintenance_completed': 'bg-green-100 text-green-600'
+  }
+
+  return colorMap[type] || 'bg-gray-100 text-gray-600'
+}
+
+// Badge color mapping
+const getActivityBadgeColor = (type) => {
+  const badgeColorMap = {
+    // Package Activities
+    'package_created': 'bg-blue-100 text-blue-800',
+    'package_delivered': 'bg-green-100 text-green-800',
+    'package_cancelled': 'bg-red-100 text-red-800',
+    'package_delayed': 'bg-yellow-100 text-yellow-800',
+    'package_shipped': 'bg-purple-100 text-purple-800',
+
+    // Location Activities
+    'location_created': 'bg-green-100 text-green-800',
+    'location_deleted': 'bg-red-100 text-red-800',
+    'location_activated': 'bg-green-100 text-green-800',
+    'location_deactivated': 'bg-gray-100 text-gray-800',
+
+    // User Activities
+    'user_login': 'bg-green-100 text-green-800',
+    'user_logout': 'bg-gray-100 text-gray-800',
+    'user_created': 'bg-purple-100 text-purple-800',
+    'user_deleted': 'bg-red-100 text-red-800',
+    'user_login_failed': 'bg-red-100 text-red-800',
+
+    // System Activities
+    'system_error_occurred': 'bg-red-100 text-red-800',
+    'system_security_alert': 'bg-red-100 text-red-800'
+  }
+
+  // Default colors based on category
+  if (type.startsWith('package_')) return badgeColorMap[type] || 'bg-blue-100 text-blue-800'
+  if (type.startsWith('location_')) return badgeColorMap[type] || 'bg-green-100 text-green-800'
+  if (type.startsWith('user_')) return badgeColorMap[type] || 'bg-purple-100 text-purple-800'
+  if (type.startsWith('system_')) return badgeColorMap[type] || 'bg-orange-100 text-orange-800'
+
+  return 'bg-gray-100 text-gray-800'
+}
+
+// Helper functions
+const getActivityCategory = (type) => {
+  if (type.startsWith('package_')) return 'Package'
+  if (type.startsWith('location_')) return 'Location'
+  if (type.startsWith('user_')) return 'User'
+  if (type.startsWith('system_')) return 'System'
+  return 'General'
+}
+
+const formatActivityType = (type) => {
+  return type.split('_').map(word =>
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' ')
+}
+
 const activityLogs = ref([])
- const fetchActivities = async () => {
-   try {
+const fetchActivities = async () => {
+  try {
     const responses = await activityServices.getActivities();
     activityLogs.value = responses.data.activities || [];
 
   } catch (error) {
     console.error('Error fetching Locations:', error);
   }
- }
+}
 
 const activitySearchTerm = ref('')
 const activityFilter = ref('all')
@@ -3024,13 +3132,25 @@ const filteredActivities = computed(() => {
   if (activitySearchTerm.value) {
     filtered = filtered.filter(activity =>
       activity.message.toLowerCase().includes(activitySearchTerm.value.toLowerCase()) ||
-      activity.user.toLowerCase().includes(activitySearchTerm.value.toLowerCase()) ||
+      activity.type.toLowerCase().includes(activitySearchTerm.value.toLowerCase()) ||
       (activity.details && activity.details.toLowerCase().includes(activitySearchTerm.value.toLowerCase()))
     )
   }
 
   if (activityFilter.value !== 'all') {
     filtered = filtered.filter(activity => activity.type === activityFilter.value)
+  }
+  if (activityFilter.value === 'package') {
+    filtered = filtered.filter(activity => activity.type.startsWith('package_'))
+  }
+  if (activityFilter.value === 'location') {
+    filtered = filtered.filter(activity => activity.type.startsWith('location_'))
+  }
+  if (activityFilter.value === 'user') {
+    filtered = filtered.filter(activity => activity.type.startsWith('user_'))
+  }
+  if (activityFilter.value === 'system') {
+    filtered = filtered.filter(activity => activity.type.startsWith('system_'))
   }
 
   return filtered
@@ -3869,6 +3989,7 @@ onUnmounted(() => {
 .scrollbar-thumb-gray-700 {
   scrollbar-color: #374151 transparent;
 }
+
 .overflow-y-auto::-webkit-scrollbar {
   width: 6px;
 }
@@ -3885,6 +4006,10 @@ onUnmounted(() => {
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+.transition-colors {
+  transition: background-color 0.2s ease-in-out;
 }
 
 /* Mobile-specific styles */
