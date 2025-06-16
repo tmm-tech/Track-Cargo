@@ -461,7 +461,7 @@
                             {{ user.status.charAt(0).toUpperCase() + user.status.slice(1) }}
                           </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.lastlogin || 'Never' }}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(user.lastlogin) || 'Never' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div class="flex justify-end gap-2">
@@ -797,7 +797,7 @@
                             @change="handleLocationChange"
                             class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                             <option value="" disabled>Select location</option>
-                            <option v-for="location in locations" :key="location.id" :value="location.name">
+                            <option v-for="location in activeLocations" :key="location.id" :value="location.name">
                               {{ location.name }}
                             </option>
                           </select>
@@ -840,7 +840,7 @@
                             <select id="nextStop" v-model="editingCargo.next_stop"
                               class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                               <option value="" disabled>Select next stop</option>
-                              <option v-for="location in locations" :key="location.id" :value="location.name">
+                              <option v-for="location in activeLocations" :key="location.id" :value="location.name">
                                 {{ location.name }}
                               </option>
                             </select>
@@ -3205,6 +3205,10 @@ const filteredLocations = computed(() => {
   )
 })
 
+const activeLocations = computed(() => {
+  return locations.value.filter(location => location.status === 'active');
+});
+
 const openAddLocationModal = () => {
   showAddLocationModal.value = true
   resetNewLocationForm()
@@ -3888,11 +3892,17 @@ const verifyToken = async () => {
 // Handle logout function
 const logout = async () => {
   try {
-    await userServices.logout()
+
+     const email = currentUser.value?.email;
+    if (!email) throw new Error("User email not found");
+
+    await userServices.logout(email)
     isAuthenticated.value = false
     currentUser.value = null
+         localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     setAlert('Logout successful!', 'success')
-    // Optionally redirect to login page
+
   } catch (error) {
     console.error('Logout error:', error)
     setAlert('An error occurred during logout. Please try again.', 'error')

@@ -83,7 +83,7 @@ module.exports = {
     // Update location
     updateLocation: async (req, res) => {
         const { id } = req.params;
-        const { name, city, country, coordinates, type} = req.body;
+        const { name, city, country, coordinates, type, address, status } = req.body;
         const userId = req.user?.id || null; // Assuming user info is available in req.user
 
         // First, get the current location data for comparison
@@ -98,12 +98,12 @@ module.exports = {
         try {
             const updateQuery = `
       UPDATE locations
-      SET name = $1, city = $2, country = $3, coordinates = $4, type = $5
-      WHERE id = $6
+      SET name = $1, city = $2, country = $3, coordinates = $4, type = $5, address = $6, status = $7
+      WHERE id = $8
       RETURNING *;
     `;
 
-            const params = [name, city, country, coordinates, type || {}, id];
+            const params = [name, city, country, coordinates, type, address, status || {}, id];
             const result = await query(updateQuery, params);
 
             if (result.rows.length === 0) {
@@ -119,6 +119,7 @@ module.exports = {
             if (currentLocation.address !== address) changes.address = { from: currentLocation.address, to: address };
             if (currentLocation.city !== city) changes.city = { from: currentLocation.city, to: city };
             if (currentLocation.country !== country) changes.country = { from: currentLocation.country, to: country };
+            if (currentLocation.status !== status) changes.status = { from: currentLocation.status, to: status };
 
             // Insert activity log
             await insertActivityLog(

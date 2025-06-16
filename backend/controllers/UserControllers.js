@@ -394,6 +394,7 @@ module.exports = {
     // User logout and token invalidation
     Logout: async (req, res) => {
         const { email } = req.params;
+        const userId = req.user?.id || null; // Assuming user info is available in req.user
         try {
             const updateUserStatusQuery = `
                  SELECT * FROM profile WHERE email = $1;
