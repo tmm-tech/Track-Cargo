@@ -3569,6 +3569,14 @@ const addNewUser = async () => {
     }
   }
 }
+const closeUserManagement = () => {
+  showUserManagement.value = false
+}
+
+
+const closeUserFormModal = () => {
+  showUserFormModal.value = false
+}
 
 const validateUserForm = () => {
   userFormErrors.value = {}
