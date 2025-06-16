@@ -461,7 +461,8 @@
                             {{ user.status.charAt(0).toUpperCase() + user.status.slice(1) }}
                           </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(user.lastlogin) || 'Never' }}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(user.lastlogin) ||
+                          'Never' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div class="flex justify-end gap-2">
@@ -1215,7 +1216,15 @@
                     </button>
                     <button type="submit"
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                      Update Location
+                      <span v-if="!isSubmitting">Update Location</span>
+                      <span v-else class="flex items-center">
+                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                            fill="none" />
+                          <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Updating...
+                      </span>
                     </button>
                   </div>
                 </form>
@@ -1921,7 +1930,7 @@
             </div>
 
             <!-- Edit User Modal -->
-            <div v-if="showEditUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            <div v-if="showEditUserModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
               @click="closeEditUserModal">
               <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
                 <div class="p-6">
@@ -2000,7 +2009,15 @@
                       </button>
                       <button type="submit"
                         class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                        Update User
+                        <span v-if="!isSubmitting">Update User</span>
+                        <span v-else class="flex items-center">
+                          <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                              fill="none" />
+                            <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Updating...
+                        </span>
                       </button>
                     </div>
                   </form>
@@ -3433,7 +3450,6 @@ const deleteLocation = async () => {
 
 // User management state
 const users = ref([]);
-const showUserManagement = ref(false)
 const showUserFormModal = ref(false)
 const userSearchTerm = ref('');
 const showAddUserModal = ref(false)
@@ -3457,6 +3473,8 @@ const newUser = ref({
   }
 })
 
+// Editing location
+const editingUser = ref(null)
 // Load users from the service
 const fetchUsers = async () => {
   try {
@@ -3485,21 +3503,62 @@ const getInitials = (fullname) => {
   return fullname.split(' ').map(n => n[0]).join('').toUpperCase()
 }
 
-// Editing user
-const editingUser = ref({
-  fullname: '',
-  email: '',
-  username: '',
-  newPassword: '',
-  roles: 'viewer',
-  status: 'active',
-  permissions: []
-})
+// User management functions
+const openAddUserModal = () => {
+  showAddUserModal.value = true
+  resetNewUserForm()
+}
 
+const closeAddUserModal = () => {
+  userFormErrors.value = {}
+  resetNewUserForm()
+  showAddUserModal.value = false
+}
 
+const addNewUser = async () => {
+  if (validateUserForm()) {
+    isSubmitting.value = true
 
-const closeUserFormModal = () => {
-  showUserFormModal.value = false
+    const newUserToAdd = {
+      fullname: newUser.value.fullname,
+      email: newUser.value.email,
+      username: newUser.value.username,
+      password: newUser.value.password,
+      confirmPassword: newUser.value.confirmPassword,
+      roles: newUser.value.roles,
+      status: newUser.value.status || 'active',
+      permissions: Object.entries(newUser.value.permissions)
+        .filter(([_, isChecked]) => isChecked)
+        .map(([permission]) => permission),
+      lastLogin: null,
+    }
+    try {
+      const response = await userServices.registerUser(newUserToAdd)
+      if (response.success) {
+        setAlert('User created successfully!', 'success')
+        closeUserFormModal()
+      } else {
+        setAlert('Failed to add new user.', 'error');
+      }
+    } catch (error) {
+      setAlert('Error adding new user.', 'error');
+      // Optionally show error feedback to user
+      const rawMessage = error.response?.data?.message || 'An error occurred.';
+      const userMessage = rawMessage.includes('profiles_email_key')
+        ? 'A user with this email already exists.'
+        : rawMessage.includes('profiles_username_key')
+          ? 'A user with this username already exists.'
+          : rawMessage.includes('duplicate key')
+            ? 'Duplicate entry. Please use different credentials.'
+            : rawMessage;
+
+      setAlert(userMessage, 'error');
+
+    } finally {
+      // Reset isSubmitting state
+      isSubmitting.value = false
+    }
+  }
 }
 
 const validateUserForm = () => {
@@ -3544,7 +3603,23 @@ const validateUserForm = () => {
   return isValid
 }
 
-
+const resetNewUserForm = () => {
+  newUser.value = {
+    fullname: '',
+    email: '',
+    username: '',
+    password: '',
+    confirmPassword: '',
+    roles: '',
+    status: 'active',
+    permissions: {
+      packages: false,
+      users: false,
+      reports: false
+    }
+  }
+  userFormErrors.value = {}
+}
 
 const resetPasswordUser = ref({
   id: null,
@@ -3640,100 +3715,21 @@ const getUsersByRole = (role) => {
 }
 
 
-// User management functions
-const openAddUserModal = () => {
-  showAddUserModal.value = true
-  resetNewUserForm()
-}
-
-const closeAddUserModal = () => {
-  showAddUserModal.value = false
-  resetNewUserForm()
-}
 
 
-const addNewUser = async () => {
-  if (validateUserForm()) {
-    isSubmitting.value = true
-    const newUserToAdd = {
-      fullname: newUser.value.fullname,
-      email: newUser.value.email,
-      username: newUser.value.username,
-      password: newUser.value.password,
-      confirmPassword: newUser.value.confirmPassword,
-      roles: newUser.value.roles,
-      status: newUser.value.status || 'active',
-      permissions: Object.entries(newUser.value.permissions)
-        .filter(([_, isChecked]) => isChecked)
-        .map(([permission]) => permission),
-      lastLogin: null,
-    }
-    try {
-      const response = await userServices.registerUser(newUserToAdd)
-      if (response.success) {
-        setAlert('User created successfully!', 'success')
-        closeUserFormModal()
-      } else {
-        setAlert('Failed to add new user.', 'error');
-      }
-    } catch (error) {
-      setAlert('Error adding new user.', 'error');
-      // Optionally show error feedback to user
-      const rawMessage = error.response?.data?.message || 'An error occurred.';
-      const userMessage = rawMessage.includes('profiles_email_key')
-        ? 'A user with this email already exists.'
-        : rawMessage.includes('profiles_username_key')
-          ? 'A user with this username already exists.'
-          : rawMessage.includes('duplicate key')
-            ? 'Duplicate entry. Please use different credentials.'
-            : rawMessage;
-
-      setAlert(userMessage, 'error');
-
-    } finally {
-      resetNewUserForm()
-      closeUserFormModal()
-      closeAddUserModal()
-      await fetchUsers()
-      // Reset isSubmitting state
-      isSubmitting.value = false
-    }
-  }
-}
-
-
-const resetNewUserForm = () => {
-  newUser.value = {
-    fullname: '',
-    email: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
-    roles: '',
-    status: 'active',
-    permissions: {
-      packages: false,
-      users: false,
-      reports: false
-    }
-  }
-  userFormErrors.value = {}
-}
 
 const editUser = async (user) => {
+  console.log('Edit button clicked', user)
   try {
 
     const response = await userServices.getUserById(user.id)
+    console.log('User data fetched:', response)
 
     if (!response || response.error) {
       setAlert('Failed to fetch user details.', 'error')
       return
     }
 
-    // Populate editingUser with fetched data
-    editingUser.value = { ...response.data.data, newPassword: '' }
-
-    // Populate editingUser with fetched data
     editingUser.value = {
       ...response.data.data,
       permissions: response.data.data.permissions || [],
@@ -3741,6 +3737,9 @@ const editUser = async (user) => {
     }
 
     showEditUserModal.value = true
+    console.log('Modal should now be visible')
+
+
   } catch (error) {
     console.error('Error fetching user data:', error)
     setAlert('Failed to load user data for editing.', 'error')
@@ -3893,13 +3892,13 @@ const verifyToken = async () => {
 const logout = async () => {
   try {
 
-     const email = currentUser.value?.email;
+    const email = currentUser.value?.email;
     if (!email) throw new Error("User email not found");
 
     await userServices.logout(email)
     isAuthenticated.value = false
     currentUser.value = null
-         localStorage.removeItem('token');
+    localStorage.removeItem('token');
     sessionStorage.removeItem('token');
     setAlert('Logout successful!', 'success')
 
