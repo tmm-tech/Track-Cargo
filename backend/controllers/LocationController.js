@@ -83,9 +83,9 @@ module.exports = {
     // Update location
     updateLocation: async (req, res) => {
         const { id } = req.params;
-        const { name, city, country, coordinates } = req.body;
+        const { name, city, country, coordinates, type} = req.body;
         const userId = req.user?.id || null; // Assuming user info is available in req.user
-        
+
         // First, get the current location data for comparison
         const currentLocationResult = await query(`SELECT * FROM locations WHERE id = $1;`, [id]);
 
@@ -98,8 +98,8 @@ module.exports = {
         try {
             const updateQuery = `
       UPDATE locations
-      SET name = $1, city = $2, country = $3, coordinates = $4
-      WHERE id = $5
+      SET name = $1, city = $2, country = $3, coordinates = $4, type = $5
+      WHERE id = $6
       RETURNING *;
     `;
 
