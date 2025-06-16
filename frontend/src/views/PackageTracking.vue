@@ -148,7 +148,7 @@
       </div>
       <div :style="sectionContentStyle">
         <div :style="trackingTimelineStyle">
-          <div v-for="(event, index) in pkg.trackingHistory" :key="index" :style="trackingItemStyle">
+          <div v-for="(event, index) in pkg.tracking_history" :key="index" :style="trackingItemStyle">
             <div :style="trackingStatusStyle">{{ event.status }}</div>
             <div :style="trackingLocationStyle">
               <span :style="{ marginRight: '5px' }">📍</span>
@@ -233,7 +233,7 @@ interface Package {
   next_stop_eta: string
   final_destination: string
   shipping_address?: ShippingAddress
-  trackingHistory: TrackingEvent[]
+  tracking_history: TrackingEvent[]
   comment?: Comment[]
 }
 
@@ -259,8 +259,8 @@ const generateQRCode = async (text: string): Promise<string> => {
 // Computed properties
 const calculateProgress = computed((): number => {
   const statuses = ['Shipped', 'In Transit', 'Out for Delivery', 'Delivered']
-  const currentIndex = props.pkg.trackingHistory.length > 0
-    ? Math.min(props.pkg.trackingHistory.length - 1, statuses.length - 1)
+  const currentIndex = props.pkg.tracking_history.length > 0
+    ? Math.min(props.pkg.tracking_history.length - 1, statuses.length - 1)
     : 0
   return (currentIndex / (statuses.length - 1)) * 100
 })
@@ -268,8 +268,8 @@ const calculateProgress = computed((): number => {
 const isCompleted = (status: string): boolean => {
   const statuses = ['Shipped', 'In Transit', 'Out for Delivery', 'Delivered']
   const statusIndex = statuses.indexOf(status)
-  const currentIndex = props.pkg.trackingHistory.length > 0
-    ? Math.min(props.pkg.trackingHistory.length - 1, statuses.length - 1)
+  const currentIndex = props.pkg.tracking_history.length > 0
+    ? Math.min(props.pkg.tracking_history.length - 1, statuses.length - 1)
     : 0
   return statusIndex <= currentIndex
 }

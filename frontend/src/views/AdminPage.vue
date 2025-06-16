@@ -2,7 +2,7 @@
   <div class="flex h-screen">
 
     <!-- Alert Component -->
-    <div v-if="alertMessage" :class="['alert', alertType]">
+    <div :class="['alert', alertType]">
       <Alert v-if="showAlert" :message="alertMessage" :type="alertType" :show="showAlert" @close="hideAlert" />
     </div>
 
@@ -14,8 +14,8 @@
     <div v-if="isAuthenticated"
       class="sidebar bg-[#1e2338] text-white h-screen flex flex-col transition-all duration-300 shadow-lg relative z-50 overflow-hidden"
       :class="{
-        'w-16': sidebarCollapsed && !isMobileDevice,
-        'w-41': !sidebarCollapsed && !isMobileDevice,
+        'w-16': sidebarCollapsed && !isMobileDevice && !isMediumScreen,
+        'w-41': (!sidebarCollapsed || isMediumScreen) && !isMobileDevice,
         'fixed left-0 top-0 w-64 transform': isMobileDevice,
         'translate-x-0': isMobileDevice && showMobileMenu,
         '-translate-x-full': isMobileDevice && !showMobileMenu
@@ -387,7 +387,8 @@
                 <button @click="openAddUserModal"
                   class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-4 py-2 rounded inline-flex items-center">
                   <PlusIcon class="h-4 w-4 mr-2" />
-                  Add User
+                  <span class="hidden sm:inline">Add User</span>
+                  <span class="sm:hidden">Add</span>
                 </button>
               </div>
               <div class="p-6">
@@ -1819,8 +1820,6 @@
               </div>
             </div>
 
-
-
             <!-- Add User Modal -->
             <div v-if="showAddUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
               @click="closeAddUserModal">
@@ -1930,7 +1929,7 @@
             </div>
 
             <!-- Edit User Modal -->
-            <div v-if="showEditUserModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
+            <div v-if="showEditUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
               @click="closeEditUserModal">
               <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
                 <div class="p-6">
@@ -2080,56 +2079,55 @@
             </div>
           </div>
         </div>
-      </main>
 
-      <!-- Reset Password Modal -->
-      <div v-if="showResetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-        @click="closeResetPasswordModal">
-        <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
-          <div class="p-6">
-            <div class="flex flex-col space-y-1.5 pb-4">
-              <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
-              <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+        <!-- Reset Password Modal -->
+        <div v-if="showResetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          @click="closeResetPasswordModal">
+          <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+            <div class="p-6">
+              <div class="flex flex-col space-y-1.5 pb-4">
+                <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
+                <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
+                }}</strong></p>
+              </div>
+
+              <form @submit.prevent="saveNewPassword">
+                <div class="space-y-4">
+                  <div class="space-y-2">
+                    <label for="newPassword" class="text-sm font-medium">New Password</label>
+                    <input id="newPassword" v-model="resetPasswordUser.newPassword" type="password"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      :class="{ 'border-red-500': resetPasswordErrors.newPassword }" placeholder="••••••••" />
+                    <p v-if="resetPasswordErrors.newPassword" class="text-red-500 text-xs mt-1">{{
+                      resetPasswordErrors.newPassword }}</p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="confirmNewPassword" class="text-sm font-medium">Confirm New Password</label>
+                    <input id="confirmNewPassword" v-model="resetPasswordUser.confirmNewPassword" type="password"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      :class="{ 'border-red-500': resetPasswordErrors.confirmNewPassword }" placeholder="••••••••" />
+                    <p v-if="resetPasswordErrors.confirmNewPassword" class="text-red-500 text-xs mt-1">{{
+                      resetPasswordErrors.confirmNewPassword }}</p>
+                  </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-6">
+                  <button type="button"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                    @click="closeResetPasswordModal">
+                    Cancel
+                  </button>
+                  <button type="submit" @click="resetPassword"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                    Reset Password
+                  </button>
+                </div>
+              </form>
             </div>
-
-            <form @submit.prevent="saveNewPassword">
-              <div class="space-y-4">
-                <div class="space-y-2">
-                  <label for="newPassword" class="text-sm font-medium">New Password</label>
-                  <input id="newPassword" v-model="resetPasswordUser.newPassword" type="password"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    :class="{ 'border-red-500': resetPasswordErrors.newPassword }" placeholder="••••••••" />
-                  <p v-if="resetPasswordErrors.newPassword" class="text-red-500 text-xs mt-1">{{
-                    resetPasswordErrors.newPassword }}</p>
-                </div>
-
-                <div class="space-y-2">
-                  <label for="confirmNewPassword" class="text-sm font-medium">Confirm New Password</label>
-                  <input id="confirmNewPassword" v-model="resetPasswordUser.confirmNewPassword" type="password"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    :class="{ 'border-red-500': resetPasswordErrors.confirmNewPassword }" placeholder="••••••••" />
-                  <p v-if="resetPasswordErrors.confirmNewPassword" class="text-red-500 text-xs mt-1">{{
-                    resetPasswordErrors.confirmNewPassword }}</p>
-                </div>
-              </div>
-
-              <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-6">
-                <button type="button"
-                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                  @click="closeResetPasswordModal">
-                  Cancel
-                </button>
-                <button type="submit" @click="resetPassword"
-                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                  Reset Password
-                </button>
-              </div>
-            </form>
           </div>
         </div>
-      </div>
-
+      </main>
       <!-- Cargo Tracking Dialog -->
       <div v-if="showTrackingDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
         @click="closeTrackingDialog">
@@ -2177,7 +2175,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   MagnifyingGlassIcon,
@@ -2258,17 +2256,15 @@ const newComment = ref({
 const permissionOptions = ['packages', 'users', 'reports']
 
 // Mobile state
-const isMobileDevice = ref(false)
+const isMobileDevice = ref(window.innerWidth < 768)
+const isMediumScreen = ref(false)
 const showMobileMenu = ref(false)
 
 
-// Mobile detection and handling
-const checkMobileDevice = () => {
-  isMobileDevice.value = window.innerWidth < 768
-  if (isMobileDevice.value) {
-    showMobileMenu.value = false
-    sidebarCollapsed.value = false // Reset sidebar state on mobile
-  }
+const checkScreenSize = () => {
+  const width = window.innerWidth
+  isMobileDevice.value = width < 768
+  isMediumScreen.value = width >= 768 && width <= 1280 // adjust max size as needed
 }
 
 const toggleMobileMenu = () => {
@@ -2370,9 +2366,22 @@ const filteredCargos = computed(() => {
 
 
 // Cargo Tracking Dialog functions
-const openTrackingDialog = (pkg) => {
-  selectedCargo.value = pkg
-  showTrackingDialog.value = true
+const openTrackingDialog = async (pkg) => {
+  try {
+    const response = await ShippingServices.getPackageById(pkg.id)
+    if (!response || response.error) {
+      setAlert('Failed to fetch package details for viewing.', 'error')
+      return
+    }
+
+    // Populate Cargo Tracking with fetched data
+    selectedCargo.value = response.data.package
+    showTrackingDialog.value = true
+  } catch (error) {
+    console.error('Error fetching package data:', error)
+    setAlert('Failed to load package data for viewing.', 'error')
+    return
+  }
 }
 
 const closeTrackingDialog = () => {
@@ -3719,25 +3728,27 @@ const getUsersByRole = (role) => {
 
 
 const editUser = async (user) => {
-  console.log('Edit button clicked', user)
   try {
 
     const response = await userServices.getUserById(user.id)
-    console.log('User data fetched:', response)
 
     if (!response || response.error) {
       setAlert('Failed to fetch user details.', 'error')
       return
     }
 
+     // Populate editingUser with fetched data
+    editingUser.value = { ...response.data.data, newPassword: '' }
+
+    // Populate editingUser with fetched data
     editingUser.value = {
       ...response.data.data,
       permissions: response.data.data.permissions || [],
       newPassword: ''
     }
-
+ 
     showEditUserModal.value = true
-    console.log('Modal should now be visible')
+    console.log('Modal should now be visible', editingUser.value)
 
 
   } catch (error) {
@@ -3875,7 +3886,8 @@ const verifyToken = async () => {
       await fetchCargos()
       await fetchLocation()
       await fetchActivities()
-      window.addEventListener('resize', checkMobileDevice)
+      await checkScreenSize()
+      window.addEventListener('resize', checkScreenSize)
     } else {
       isAuthenticated.value = false
       router.push('/admin')
@@ -3907,6 +3919,7 @@ const logout = async () => {
     setAlert('An error occurred during logout. Please try again.', 'error')
   }
 }
+
 
 const latestTrackingStatus = computed(() => {
   if (
@@ -3945,7 +3958,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
 
-  window.removeEventListener('resize', checkMobileDevice)
+  window.removeEventListener('resize', checkScreenSize)
 })
 
 
