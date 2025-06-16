@@ -85,6 +85,15 @@ module.exports = {
         const { id } = req.params;
         const { name, city, country, coordinates } = req.body;
         const userId = req.user?.id || null; // Assuming user info is available in req.user
+        
+        // First, get the current location data for comparison
+        const currentLocationResult = await query(`SELECT * FROM locations WHERE id = $1;`, [id]);
+
+        if (currentLocationResult.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Location not found' });
+        }
+
+        const currentLocation = currentLocationResult.rows[0];
 
         try {
             const updateQuery = `
