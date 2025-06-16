@@ -103,7 +103,7 @@ module.exports = {
       RETURNING *;
     `;
 
-            const params = [name, city, country, coordinates || {}, id];
+            const params = [name, city, country, coordinates, type || {}, id];
             const result = await query(updateQuery, params);
 
             if (result.rows.length === 0) {
