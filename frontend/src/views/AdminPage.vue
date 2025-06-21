@@ -543,15 +543,15 @@
                     </div>
 
                     <div class="space-y-2">
-                      <label for="role" class="text-sm font-medium">Role</label>
-                      <select id="role" v-model="newUser.roles"
+                      <label for="roles" class="text-sm font-medium">Role</label>
+                      <select id="roles" v-model="newUser.roles"
                         :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.roles ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select role</option>
                         <option value="admin">Admin</option>
                         <option value="operator">Operator</option>
                         <option value="viewer">Viewer</option>
                       </select>
-                      <p v-if="userFormErrors.role" class="text-red-500 text-sm">{{ userFormErrors.roles }}</p>
+                      <p v-if="userFormErrors.roles" class="text-red-500 text-sm">{{ userFormErrors.roles }}</p>
                     </div>
 
                     <div class="space-y-2">
@@ -2522,8 +2522,6 @@ const openAddUserModal = () => {
 }
 
 const closeAddUserModal = () => {
-  userFormErrors.value = {}
-  resetNewUserForm()
   showAddUserModal.value = false
 }
 
@@ -2548,8 +2546,8 @@ const addNewUser = async () => {
       const response = await userServices.registerUser(newUserToAdd)
       if (response.success) {
         setAlert('User created successfully!', 'success')
+        resetNewUserForm()
         closeAddUserModal()
-        await fetchUsers()
       } else {
         setAlert('Failed to add new user.', 'error');
       }
