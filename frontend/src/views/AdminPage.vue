@@ -492,7 +492,265 @@
               </div>
             </div>
           </div>
+                      <!-- Add User Modal -->
+            <div v-if="showAddUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              @click="closeAddUserModal">
+              <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
+                <div class="p-6">
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Add New User</h2>
+                    <p class="text-sm text-muted-foreground">Create a new user account with specific permissions.
+                    </p>
+                  </div>
 
+                  <form @submit.prevent="addNewUser" class="space-y-4 py-4">
+                    <div class="space-y-2">
+                      <label for="fullname" class="text-sm font-medium">Full Name</label>
+                      <input id="fullname" v-model="newUser.fullname"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.fullname ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.fullname" class="text-red-500 text-sm">{{ userFormErrors.fullname }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="email" class="text-sm font-medium">Email</label>
+                      <input id="email" type="email" v-model="newUser.email"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.email ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.email" class="text-red-500 text-sm">{{ userFormErrors.email }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="username" class="text-sm font-medium">Username</label>
+                      <input id="username" v-model="newUser.username"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.username ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.username" class="text-red-500 text-sm">{{ userFormErrors.username }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="password" class="text-sm font-medium">Password</label>
+                      <input id="password" type="password" v-model="newUser.password"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.password ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.password" class="text-red-500 text-sm">{{ userFormErrors.password }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="confirmPassword" class="text-sm font-medium">Confirm Password</label>
+                      <input id="confirmPassword" type="password" v-model="newUser.confirmPassword"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.confirmPassword ? 'border-red-500' : '']" />
+                      <p v-if="userFormErrors.confirmPassword" class="text-red-500 text-sm">{{
+                        userFormErrors.confirmPassword }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="role" class="text-sm font-medium">Role</label>
+                      <select id="role" v-model="newUser.roles"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.roles ? 'border-red-500' : '']">
+                        <option value="" disabled selected>Select role</option>
+                        <option value="admin">Admin</option>
+                        <option value="operator">Operator</option>
+                        <option value="viewer">Viewer</option>
+                      </select>
+                      <p v-if="userFormErrors.role" class="text-red-500 text-sm">{{ userFormErrors.roles }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Permissions</label>
+                      <div class="space-y-2">
+                        <div class="flex items-center">
+                          <input id="perm-packages" type="checkbox" v-model="newUser.permissions.packages"
+                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
+                          <label for="perm-packages" class="ml-2 text-sm text-gray-700">Manage Shipments</label>
+                        </div>
+                        <div class="flex items-center">
+                          <input id="perm-users" type="checkbox" v-model="newUser.permissions.users"
+                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
+                          <label for="perm-users" class="ml-2 text-sm text-gray-700">Manage Users</label>
+                        </div>
+                        <div class="flex items-center">
+                          <input id="perm-reports" type="checkbox" v-model="newUser.permissions.reports"
+                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
+                          <label for="perm-reports" class="ml-2 text-sm text-gray-700">View Reports</label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                      <button type="button"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                        @click="closeAddUserModal">
+                        Cancel
+                      </button>
+                      <button type="submit" :disabled="isSubmitting"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                        <span v-if="!isSubmitting">Add User</span>
+                        <span v-else class="flex items-center">
+                          <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                              fill="none" />
+                            <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Saving...
+                        </span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit User Modal -->
+            <div v-if="showEditUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              @click="closeEditUserModal">
+              <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
+                <div class="p-6">
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Edit User</h2>
+                    <p class="text-sm text-muted-foreground">Update user information and permissions.</p>
+                  </div>
+
+                  <form @submit.prevent="updateUser" class="space-y-4 py-4">
+                    <div class="space-y-2">
+                      <label for="edit-name" class="text-sm font-medium">Full Name</label>
+                      <input id="edit-name" v-model="editingUser.fullname"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-email" class="text-sm font-medium">Email</label>
+                      <input id="edit-email" type="email" v-model="editingUser.email"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-username" class="text-sm font-medium">Username</label>
+                      <input id="edit-username" v-model="editingUser.username" readonly
+                        class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      <p class="text-xs text-gray-500">Username cannot be changed</p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-password" class="text-sm font-medium">New Password (leave blank to keep
+                        current)</label>
+                      <input id="edit-password" type="password" v-model="editingUser.newPassword"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-role" class="text-sm font-medium">Role</label>
+                      <select id="edit-role" v-model="editingUser.roles"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="admin">Admin</option>
+                        <option value="operator">Operator</option>
+                        <option value="viewer">Viewer</option>
+                      </select>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="edit-status" class="text-sm font-medium">Status</label>
+                      <select id="edit-status" v-model="editingUser.status"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Permissions</label>
+                      <div class="space-y-2">
+                        <div class="flex items-center" v-for="perm in permissionOptions" :key="perm">
+                          <input type="checkbox" :id="'edit-perm-' + perm" :checked="hasPermission(perm)"
+                            @change="togglePermission(perm)"
+                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
+                          <label :for="'edit-perm-' + perm" class="ml-2 text-sm text-gray-700">
+                            {{ perm === 'packages' ? 'Manage Cargos' :
+                              perm === 'users' ? 'Manage Users' :
+                                perm === 'reports' ? 'View Reports' : perm }}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                      <button type="button"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                        @click="closeEditUserModal">
+                        Cancel
+                      </button>
+                      <button type="submit"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                        <span v-if="!isSubmitting">Update User</span>
+                        <span v-else class="flex items-center">
+                          <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                              fill="none" />
+                            <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Updating...
+                        </span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete User Confirmation Modal -->
+            <div v-if="showDeleteUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+              <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+                <div class="p-6">
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
+                    <p class="text-sm text-muted-foreground">Are you sure you want to delete this user? This action
+                      cannot
+                      be undone.</p>
+                  </div>
+
+                  <div class="p-4 bg-red-50 rounded-md mb-4">
+                    <div class="flex">
+                      <div class="flex-shrink-0">
+                        <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+                      </div>
+                      <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                          <p>Deleting this user will remove all their access to the system and cannot be undone.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div v-if="userToDelete" class="py-4 border-t border-b">
+                    <div class="flex items-center">
+                      <div
+                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-[#273272] font-medium">
+                        {{ getInitials(userToDelete.name) }}
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ userToDelete.name }}</div>
+                        <div class="text-sm text-gray-500">{{ userToDelete.email }}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                      @click="closeDeleteUserModal">
+                      Cancel
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
+                      @click="deleteUser">
+                      Delete User
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
           <!-- Cargo Management View -->
           <div v-if="currentView === 'packages'" class="space-y-6 sm:space-y-8">
             <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-6 sm:mb-8">
@@ -1819,265 +2077,6 @@
               </div>
             </div>
 
-            <!-- Add User Modal -->
-            <div v-if="showAddUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeAddUserModal">
-              <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
-                <div class="p-6">
-                  <div class="flex flex-col space-y-1.5 pb-4">
-                    <h2 class="text-lg font-semibold leading-none tracking-tight">Add New User</h2>
-                    <p class="text-sm text-muted-foreground">Create a new user account with specific permissions.
-                    </p>
-                  </div>
-
-                  <form @submit.prevent="addNewUser" class="space-y-4 py-4">
-                    <div class="space-y-2">
-                      <label for="fullname" class="text-sm font-medium">Full Name</label>
-                      <input id="fullname" v-model="newUser.fullname"
-                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.fullname ? 'border-red-500' : '']" />
-                      <p v-if="userFormErrors.fullname" class="text-red-500 text-sm">{{ userFormErrors.fullname }}
-                      </p>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="email" class="text-sm font-medium">Email</label>
-                      <input id="email" type="email" v-model="newUser.email"
-                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.email ? 'border-red-500' : '']" />
-                      <p v-if="userFormErrors.email" class="text-red-500 text-sm">{{ userFormErrors.email }}</p>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="username" class="text-sm font-medium">Username</label>
-                      <input id="username" v-model="newUser.username"
-                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.username ? 'border-red-500' : '']" />
-                      <p v-if="userFormErrors.username" class="text-red-500 text-sm">{{ userFormErrors.username }}
-                      </p>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="password" class="text-sm font-medium">Password</label>
-                      <input id="password" type="password" v-model="newUser.password"
-                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.password ? 'border-red-500' : '']" />
-                      <p v-if="userFormErrors.password" class="text-red-500 text-sm">{{ userFormErrors.password }}
-                      </p>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="confirmPassword" class="text-sm font-medium">Confirm Password</label>
-                      <input id="confirmPassword" type="password" v-model="newUser.confirmPassword"
-                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.confirmPassword ? 'border-red-500' : '']" />
-                      <p v-if="userFormErrors.confirmPassword" class="text-red-500 text-sm">{{
-                        userFormErrors.confirmPassword }}</p>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="role" class="text-sm font-medium">Role</label>
-                      <select id="role" v-model="newUser.roles"
-                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.roles ? 'border-red-500' : '']">
-                        <option value="" disabled selected>Select role</option>
-                        <option value="admin">Admin</option>
-                        <option value="operator">Operator</option>
-                        <option value="viewer">Viewer</option>
-                      </select>
-                      <p v-if="userFormErrors.role" class="text-red-500 text-sm">{{ userFormErrors.roles }}</p>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label class="text-sm font-medium">Permissions</label>
-                      <div class="space-y-2">
-                        <div class="flex items-center">
-                          <input id="perm-packages" type="checkbox" v-model="newUser.permissions.packages"
-                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                          <label for="perm-packages" class="ml-2 text-sm text-gray-700">Manage Shipments</label>
-                        </div>
-                        <div class="flex items-center">
-                          <input id="perm-users" type="checkbox" v-model="newUser.permissions.users"
-                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                          <label for="perm-users" class="ml-2 text-sm text-gray-700">Manage Users</label>
-                        </div>
-                        <div class="flex items-center">
-                          <input id="perm-reports" type="checkbox" v-model="newUser.permissions.reports"
-                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                          <label for="perm-reports" class="ml-2 text-sm text-gray-700">View Reports</label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                      <button type="button"
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                        @click="closeAddUserModal">
-                        Cancel
-                      </button>
-                      <button type="submit" :disabled="isSubmitting"
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                        <span v-if="!isSubmitting">Add User</span>
-                        <span v-else class="flex items-center">
-                          <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
-                              fill="none" />
-                            <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                          </svg>
-                          Saving...
-                        </span>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            <!-- Edit User Modal -->
-            <div v-if="showEditUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeEditUserModal">
-              <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
-                <div class="p-6">
-                  <div class="flex flex-col space-y-1.5 pb-4">
-                    <h2 class="text-lg font-semibold leading-none tracking-tight">Edit User</h2>
-                    <p class="text-sm text-muted-foreground">Update user information and permissions.</p>
-                  </div>
-
-                  <form @submit.prevent="updateUser" class="space-y-4 py-4">
-                    <div class="space-y-2">
-                      <label for="edit-name" class="text-sm font-medium">Full Name</label>
-                      <input id="edit-name" v-model="editingUser.fullname"
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="edit-email" class="text-sm font-medium">Email</label>
-                      <input id="edit-email" type="email" v-model="editingUser.email"
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="edit-username" class="text-sm font-medium">Username</label>
-                      <input id="edit-username" v-model="editingUser.username" readonly
-                        class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                      <p class="text-xs text-gray-500">Username cannot be changed</p>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="edit-password" class="text-sm font-medium">New Password (leave blank to keep
-                        current)</label>
-                      <input id="edit-password" type="password" v-model="editingUser.newPassword"
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="edit-role" class="text-sm font-medium">Role</label>
-                      <select id="edit-role" v-model="editingUser.roles"
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                        <option value="admin">Admin</option>
-                        <option value="operator">Operator</option>
-                        <option value="viewer">Viewer</option>
-                      </select>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="edit-status" class="text-sm font-medium">Status</label>
-                      <select id="edit-status" v-model="editingUser.status"
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                      </select>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label class="text-sm font-medium">Permissions</label>
-                      <div class="space-y-2">
-                        <div class="flex items-center" v-for="perm in permissionOptions" :key="perm">
-                          <input type="checkbox" :id="'edit-perm-' + perm" :checked="hasPermission(perm)"
-                            @change="togglePermission(perm)"
-                            class="h-4 w-4 rounded border-gray-300 text-[#273272] focus:ring-[#273272]" />
-                          <label :for="'edit-perm-' + perm" class="ml-2 text-sm text-gray-700">
-                            {{ perm === 'packages' ? 'Manage Cargos' :
-                              perm === 'users' ? 'Manage Users' :
-                                perm === 'reports' ? 'View Reports' : perm }}
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                      <button type="button"
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                        @click="closeEditUserModal">
-                        Cancel
-                      </button>
-                      <button type="submit"
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                        <span v-if="!isSubmitting">Update User</span>
-                        <span v-else class="flex items-center">
-                          <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
-                              fill="none" />
-                            <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                          </svg>
-                          Updating...
-                        </span>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            <!-- Delete User Confirmation Modal -->
-            <div v-if="showDeleteUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
-                <div class="p-6">
-                  <div class="flex flex-col space-y-1.5 pb-4">
-                    <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
-                    <p class="text-sm text-muted-foreground">Are you sure you want to delete this user? This action
-                      cannot
-                      be undone.</p>
-                  </div>
-
-                  <div class="p-4 bg-red-50 rounded-md mb-4">
-                    <div class="flex">
-                      <div class="flex-shrink-0">
-                        <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
-                      </div>
-                      <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800">Warning</h3>
-                        <div class="mt-2 text-sm text-red-700">
-                          <p>Deleting this user will remove all their access to the system and cannot be undone.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="userToDelete" class="py-4 border-t border-b">
-                    <div class="flex items-center">
-                      <div
-                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-[#273272] font-medium">
-                        {{ getInitials(userToDelete.name) }}
-                      </div>
-                      <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900">{{ userToDelete.name }}</div>
-                        <div class="text-sm text-gray-500">{{ userToDelete.email }}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                      @click="closeDeleteUserModal">
-                      Cancel
-                    </button>
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
-                      @click="deleteUser">
-                      Delete User
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- Reset Password Modal -->
         <div v-if="showResetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
