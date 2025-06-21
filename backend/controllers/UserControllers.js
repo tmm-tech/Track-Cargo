@@ -187,11 +187,14 @@ module.exports = {
 
             if (userResult.rows.length > 0) {
                 // Send the user data if found
-                delete userResult.password
+                // Remove passwords
+               const usersWithoutPasswords = userResult.rows.map(user => {
+                const { password, ...userWithoutPassword } = user;
+                return userWithoutPassword;
                 res.json({
                     success: true,
                     message: 'Users retrieved successfully',
-                    data: userResult.rows // Send all user data
+                    data: usersWithoutPasswords.rows // Send all user data
                 });
             } else {
                 // No users found, send a 404 response
@@ -221,8 +224,11 @@ module.exports = {
 
 
             if (userResult.rows.length > 0) {
-
-                res.json({ success: true, message: 'User retrieved successfully', data: userResult.rows[0] });
+                // Remove passwords
+               const userWithoutPassword = userResult.rows.map(user => {
+                const { password, ...userWithoutPassword } = user;
+                return userWithoutPassword;
+                res.json({ success: true, message: 'User retrieved successfully', data: userWithoutPassword.rows[0] });
 
 
             } else {
