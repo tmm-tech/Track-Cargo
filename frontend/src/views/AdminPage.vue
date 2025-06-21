@@ -1818,6 +1818,7 @@ const addNewCargo = async () => {
           window.location.reload()
         }, 1000)
     }
+  }
 }
 
 const validateForm = () => {
