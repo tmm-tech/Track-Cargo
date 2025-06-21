@@ -2931,7 +2931,7 @@ const formatDate = (dateString) => {
   if (!dateString) return null; // Handle null, undefined, or empty string
 
   const date = new Date(dateString);
-  if (isNaN(date)) return null; // Handle invalid date
+  if (isNaN(date)) return 'Never'; // Handle invalid date
 
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
