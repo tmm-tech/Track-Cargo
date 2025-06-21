@@ -14,8 +14,8 @@
     <div v-if="isAuthenticated"
       class="sidebar bg-[#1e2338] text-white h-screen flex flex-col transition-all duration-300 shadow-lg relative z-50 overflow-hidden"
       :class="{
-        'w-16': sidebarCollapsed && !isMobileDevice && !isMediumScreen,
-        'w-41': (!sidebarCollapsed || isMediumScreen) && !isMobileDevice,
+        'w-16': (sidebarCollapsed && !isMobileDevice) || isMediumScreen,
+        'w-64': !sidebarCollapsed && !isMobileDevice && !isMediumScreen,
         'fixed left-0 top-0 w-64 transform': isMobileDevice,
         'translate-x-0': isMobileDevice && showMobileMenu,
         '-translate-x-full': isMobileDevice && !showMobileMenu
@@ -42,8 +42,8 @@
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Dashboard' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
-                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
-                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'justify-center px-2 py-3': (shouldCollapseSidebar && !isMobileDevice),
+                'px-3 py-2.5': !shouldCollapseSidebar || isMobileDevice,
                 'bg-[#273272] text-white': currentView === 'dashboard'
               }" active-class="bg-[#273272] text-white">
               <HomeIcon
@@ -55,8 +55,8 @@
             <button @click="navigateToView('packages')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Cargos' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
-                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
-                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'justify-center px-2 py-3': (shouldCollapseSidebar && !isMobileDevice),
+                'px-3 py-2.5': !shouldCollapseSidebar || isMobileDevice,
                 'bg-[#273272] text-white': currentView === 'packages'
               }" active-class="bg-[#273272] text-white">
               <ArchiveBoxIcon
@@ -69,8 +69,8 @@
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Locations' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
-                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
-                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'justify-center px-2 py-3': (shouldCollapseSidebar && !isMobileDevice),
+                'px-3 py-2.5': !shouldCollapseSidebar || isMobileDevice,
                 'bg-[#273272] text-white': currentView === 'locations'
               }">
               <MapPinIcon
@@ -82,8 +82,8 @@
             <button @click="navigateToView('users')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Users' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
-                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
-                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'justify-center px-2 py-3': (shouldCollapseSidebar && !isMobileDevice),
+                'px-3 py-2.5': !shouldCollapseSidebar || isMobileDevice,
                 'bg-[#273272] text-white': currentView === 'users'
               }" active-class="bg-[#273272] text-white">
               <UsersIcon
@@ -102,8 +102,8 @@
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Activity Log' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
-                'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
-                'px-3 py-2.5': !sidebarCollapsed || isMobileDevice,
+                'justify-center px-2 py-3': (shouldCollapseSidebar && !isMobileDevice),
+                'px-3 py-2.5': !shouldCollapseSidebar || isMobileDevice,
                 'bg-[#273272] text-white': currentView === 'activity'
               }" active-class="bg-[#273272] text-white">
               <ClockIcon
@@ -116,7 +116,7 @@
       </div>
 
       <!-- Sidebar Toggle (Desktop only) -->
-      <div v-if="!isMobileDevice" :class="[
+      <div v-if="!isMobileDevice && !isMediumScreen" :class="[
         'p-2 transition-all duration-300',
         sidebarCollapsed ? 'flex justify-center' : 'flex justify-end'
       ]">
@@ -128,8 +128,8 @@
       </div>
 
       <!-- User Profile & Logout -->
-      <div class="border-t border-gray-700/50 pt-3 pb-3 px-3" :class="{ 'px-2': sidebarCollapsed && !isMobileDevice }">
-        <div v-if="!sidebarCollapsed || isMobileDevice" class="flex items-center p-3 mb-3 rounded-md bg-gray-800/30">
+      <div class="border-t border-gray-700/50 pt-3 pb-3 px-3" :class="{ 'px-2': (shouldCollapseSidebar && !isMobileDevice) }">
+        <div v-if="!shouldCollapseSidebar || isMobileDevice" class="flex items-center p-3 mb-3 rounded-md bg-gray-800/30">
           <div
             class="h-9 w-9 rounded-full bg-[#273272] flex items-center justify-center text-white text-sm font-medium">
             {{ getInitials(currentUser.fullname) }}
@@ -146,16 +146,16 @@
           </div>
         </div>
 
-        <button @click="logout" :title="(sidebarCollapsed && !isMobileDevice) ? 'Log Out' : ''"
+        <button @click="logout" :title="((shouldCollapseSidebar && !isMobileDevice)) ? 'Log Out' : ''"
           class="w-full flex items-center text-gray-300 hover:bg-red-600 hover:text-white rounded-md transition-colors group relative"
           :class="{
-            'justify-center px-2 py-3': sidebarCollapsed && !isMobileDevice,
-            'px-3 py-2.5': !sidebarCollapsed || isMobileDevice
+            'justify-center px-2 py-3': (shouldCollapseSidebar && !isMobileDevice),
+            'px-3 py-2.5': !shouldCollapseSidebar || isMobileDevice
           }">
           <LogOut
-            :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
+            :class="{ 'h-6 w-6': (shouldCollapseSidebar && !isMobileDevice), 'h-5 w-5': !shouldCollapseSidebar || isMobileDevice }"
             class="flex-shrink-0" />
-          <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 text-sm">Logout</span>
+          <span v-if="!shouldCollapseSidebar || isMobileDevice" class="ml-3 text-sm">Logout</span>
         </button>
       </div>
     </div>
@@ -479,7 +479,7 @@
                             </button>
                             <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-9 px-3"
-                              @click="confirmDeleteUser(user)">
+                              @click="confirmDeleteUserFn(user)">
                               <TrashIcon class="h-4 w-4" />
                             </button>
                           </div>
@@ -543,15 +543,15 @@
                     </div>
 
                     <div class="space-y-2">
-                      <label for="roles" class="text-sm font-medium">Role</label>
-                      <select id="roles" v-model="newUser.roles"
+                      <label for="role" class="text-sm font-medium">Role</label>
+                      <select id="role" v-model="newUser.roles"
                         :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', userFormErrors.roles ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select role</option>
                         <option value="admin">Admin</option>
                         <option value="operator">Operator</option>
                         <option value="viewer">Viewer</option>
                       </select>
-                      <p v-if="userFormErrors.roles" class="text-red-500 text-sm">{{ userFormErrors.roles }}</p>
+                      <p v-if="userFormErrors.role" class="text-red-500 text-sm">{{ userFormErrors.roles }}</p>
                     </div>
 
                     <div class="space-y-2">
@@ -609,7 +609,7 @@
                     <p class="text-sm text-muted-foreground">Update user information and permissions.</p>
                   </div>
 
-                  <form @submit.prevent="updateUser" class="space-y-4 py-4">
+                  <form @submit.prevent="updateUserFn" class="space-y-4 py-4">
                     <div class="space-y-2">
                       <label for="edit-name" class="text-sm font-medium">Full Name</label>
                       <input id="edit-name" v-model="editingUser.fullname"
@@ -741,7 +741,7 @@
                     </button>
                     <button
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
-                      @click="deleteUser">
+                      @click="deleteUserFn">
                       Delete User
                     </button>
                   </div>
@@ -1102,7 +1102,7 @@
                           <div class="flex justify-end gap-2">
                             <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
-                              @click="viewLocation(location)">
+                              @click="viewLocationFn(location)">
                               <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -1114,13 +1114,13 @@
                             </button>
                             <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
-                              @click="editLocation(location)">
+                              @click="editLocationFn(location)">
                               <PencilIcon class="h-4 w-4 mr-1" />
                               Edit
                             </button>
                             <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-9 px-3"
-                              @click="confirmDeleteLocation(location)">
+                              @click="confirmDeleteLocationFn(location)">
                               <TrashIcon class="h-4 w-4" />
                             </button>
                           </div>
@@ -1281,7 +1281,7 @@ const showMobileMenu = ref(false)
 const checkScreenSize = () => {
   const width = window.innerWidth
   isMobileDevice.value = width < 768
-  isMediumScreen.value = width >= 768 && width <= 1280 // adjust max size as needed
+  isMediumScreen.value = width >= 768 && width < 1200 // Changed from 1280 to 1200
 }
 
 const toggleMobileMenu = () => {
@@ -1300,6 +1300,12 @@ const navigateToView = (view) => {
 }
 
 const toggleSidebar = () => {
+  // Prevent sidebar expansion on medium screens to avoid scrollbar issues
+  if (isMediumScreen.value) {
+    sidebarCollapsed.value = true
+    return
+  }
+  
   if (!isMobileDevice.value) {
     sidebarCollapsed.value = !sidebarCollapsed.value
   }
@@ -2227,7 +2233,7 @@ const fetchLocation = async () => {
   } catch (error) {
     console.error('Error fetching Locations:', error);
   }
-};
+}
 
 const filteredLocations = computed(() => {
   if (!locationSearchTerm.value) return locations.value || []
@@ -2334,7 +2340,7 @@ const resetNewLocationForm = () => {
   locationFormErrors.value = {}
 }
 
-const editLocation = async (location) => {
+const editLocationFn = async (location) => {
   try {
 
     const response = await locationService.getLocationById(location.id)
@@ -2353,12 +2359,12 @@ const editLocation = async (location) => {
   }
 }
 
-const closeEditLocationModal = () => {
+const closeEditLocationModalFn = () => {
   showEditLocationModal.value = false
   editingLocation.value = null
 }
 
-const updateLocation = async () => {
+const updateLocationFn = async () => {
   if (!editingLocation.value) return
 
   try {
@@ -2383,7 +2389,7 @@ const updateLocation = async () => {
     }
 
     setAlert('Location updated successfully!', 'success')
-    closeEditLocationModal()
+    closeEditLocationModalFn()
     // Refresh the user list
     await fetchLocation();
 
@@ -2391,9 +2397,9 @@ const updateLocation = async () => {
     console.error('Error updating Location:', error);
     setAlert('Failed to update Location. Please try again.', 'error');
   }
-}
+};
 
-const viewLocation = async (location) => {
+const viewLocationFn = async (location) => {
   try {
 
     const response = await locationService.getLocationById(location.id)
@@ -2420,21 +2426,21 @@ const closeViewLocationModal = () => {
 const editFromViewLocationModal = (location) => {
   if (viewingLocation.value) {
     closeViewLocationModal()
-    editLocation(location)
+    editLocationFn(location)
   }
 }
 
-const confirmDeleteLocation = (location) => {
+const confirmDeleteLocationFn = (location) => {
   locationToDelete.value = location
   showDeleteLocationModal.value = true
 }
 
-const closeDeleteLocationModal = () => {
+const closeDeleteLocationModalFn = () => {
   showDeleteLocationModal.value = false
   locationToDelete.value = null
 }
 
-const deleteLocation = async () => {
+const deleteLocationFn = async () => {
   if (!locationToDelete.value) return
   try {
     const response = await locationService.deleteLocation(locationToDelete.value.id)
@@ -2449,7 +2455,7 @@ const deleteLocation = async () => {
     console.error('Delete error:', error)
     setAlert('An error occurred while deleting the user.', 'error')
   } finally {
-    closeDeleteLocationModal()
+    closeDeleteLocationModalFn()
     locationToDelete.value = null
   }
 }
@@ -2522,6 +2528,8 @@ const openAddUserModal = () => {
 }
 
 const closeAddUserModal = () => {
+  userFormErrors.value = {}
+  resetNewUserForm()
   showAddUserModal.value = false
 }
 
@@ -2546,8 +2554,8 @@ const addNewUser = async () => {
       const response = await userServices.registerUser(newUserToAdd)
       if (response.success) {
         setAlert('User created successfully!', 'success')
-        resetNewUserForm()
         closeAddUserModal()
+        await fetchUsers()
       } else {
         setAlert('Failed to add new user.', 'error');
       }
@@ -2754,7 +2762,7 @@ const closeEditUserModal = () => {
   editingUser.value = null
 }
 
-const updateUser = async () => {
+const updateUserFn = async () => {
   if (!editingUser.value) return;
 
   try {
@@ -2789,17 +2797,17 @@ const updateUser = async () => {
   }
 };
 
-const confirmDeleteUser = (user) => {
+const confirmDeleteUserFn = (user) => {
   userToDelete.value = user
   showDeleteUserModal.value = true
 }
 
-const closeDeleteUserModal = () => {
+const closeDeleteUserModalFn = () => {
   showDeleteUserModal.value = false
   userToDelete.value = null
 }
 
-const deleteUser = async () => {
+const deleteUserFn = async () => {
   if (!userToDelete.value) return
 
   try {
@@ -2815,7 +2823,7 @@ const deleteUser = async () => {
     console.error('Delete error:', error)
     setAlert('An error occurred while deleting the user.', 'error')
   } finally {
-    closeDeleteUserModal()
+    closeDeleteUserModalFn()
     userToDelete.value = null
   }
 }
@@ -2931,11 +2939,21 @@ const formatDate = (dateString) => {
   })
 }
 
+// Add this computed property before the existing computed properties
+const shouldCollapseSidebar = computed(() => {
+  return isMediumScreen.value || sidebarCollapsed.value
+})
+
 // Event listeners
 onMounted(async () => {
   const storedUser = localStorage.getItem('user')
   if (storedUser) {
     await verifyToken()
+  }
+  
+  // Force collapse sidebar on medium screens to prevent scrollbar
+  if (isMediumScreen.value) {
+    sidebarCollapsed.value = true
   }
 })
 
