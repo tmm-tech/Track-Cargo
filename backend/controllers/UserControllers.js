@@ -296,6 +296,7 @@ module.exports = {
     // Permanently delete user
     deleteUser: async (req, res) => {
         const { id } = req.params;
+        const userId = req.user?.id || null;
         try {
             // Query to get the user's email and full name before deleting
             const getUserQuery = `
@@ -321,7 +322,7 @@ module.exports = {
                 // Insert activity log
                 await insertActivityLog(
                     'user_deleted',
-                    deleterUserId,
+                    userId,
                     `User ${userToDelete.fullname} (${userToDelete.username}) was permanently deleted`,
                     {
                         deleted_user_id: id,
