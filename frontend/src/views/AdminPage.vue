@@ -460,8 +460,7 @@
                             {{ user.status.charAt(0).toUpperCase() + user.status.slice(1) }}
                           </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.lastlogin ||
-                          'Never' }}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(user.lastlogin)}}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div class="flex justify-end gap-2">
@@ -2929,15 +2928,19 @@ const latestTrackingStatus = computed(() => {
 
 // Date formatting function
 const formatDate = (dateString) => {
-  const date = new Date(dateString)
+  if (!dateString) return null; // Handle null, undefined, or empty string
+
+  const date = new Date(dateString);
+  if (isNaN(date)) return null; // Handle invalid date
+
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
-  })
-}
+  });
+};
 
 // Add this computed property before the existing computed properties
 const shouldCollapseSidebar = computed(() => {
