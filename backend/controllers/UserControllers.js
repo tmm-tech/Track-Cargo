@@ -31,8 +31,7 @@ module.exports = {
 
             const insertUserQuery = `
       INSERT INTO profile (fullname, username, email, password, roles, status, permissions, lastlogin)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
-    `;
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
 
             // Provide default values if not present
             const params = [
@@ -267,7 +266,7 @@ module.exports = {
                  // Insert activity log
                 await insertActivityLog(
                     'user_updated',
-                    updaterUserId,
+                    id,
                     `User ${updatedUser.fullname} (${updatedUser.username}) was updated`,
                     {
                         updated_user_id: id,
