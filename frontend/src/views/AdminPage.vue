@@ -387,8 +387,7 @@
                 <button @click="openAddUserModal"
                   class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-4 py-2 rounded inline-flex items-center">
                   <PlusIcon class="h-4 w-4 mr-2" />
-                  <span class="hidden sm:inline">Add User</span>
-                  <span class="sm:hidden">Add</span>
+                  Add User
                 </button>
               </div>
               <div class="p-6">
@@ -3015,6 +3014,8 @@ const getActivityIcon = (type) => {
   switch (type) {
     case 'user_login':
       return LogIn
+     case 'user_logout':
+      return LogOut
     case 'user_created':
       return User
     case 'user_updated':
@@ -3085,28 +3086,28 @@ const getActivityColor = (type) => {
 const getActivityBadgeColor = (type) => {
   const badgeColorMap = {
     // Package Activities
-    'package_created': 'bg-blue-100 text-blue-800',
+    'package_created': 'text-blue-800',
     'package_delivered': 'bg-green-100 text-green-800',
-    'package_cancelled': 'bg-red-100 text-red-800',
-    'package_delayed': 'bg-yellow-100 text-yellow-800',
-    'package_shipped': 'bg-purple-100 text-purple-800',
+    'package_cancelled': 'text-red-800',
+    'package_delayed': 'text-yellow-800',
+    'package_shipped': 'text-purple-800',
 
     // Location Activities
-    'location_created': 'bg-green-100 text-green-800',
-    'location_deleted': 'bg-red-100 text-red-800',
-    'location_activated': 'bg-green-100 text-green-800',
-    'location_deactivated': 'bg-gray-100 text-gray-800',
+    'location_created': 'text-green-800',
+    'location_deleted': 'text-red-800',
+    'location_activated': 'text-green-800',
+    'location_deactivated': 'text-gray-800',
 
     // User Activities
-    'user_login': 'bg-green-100 text-green-800',
-    'user_logout': 'bg-gray-100 text-gray-800',
-    'user_created': 'bg-purple-100 text-purple-800',
-    'user_deleted': 'bg-red-100 text-red-800',
-    'user_login_failed': 'bg-red-100 text-red-800',
+    'user_login': 'text-green-800',
+    'user_logout': 'text-gray-800',
+    'user_created': 'text-purple-800',
+    'user_deleted': 'text-red-800',
+    'user_login_failed': 'text-red-800',
 
     // System Activities
-    'system_error_occurred': 'bg-red-100 text-red-800',
-    'system_security_alert': 'bg-red-100 text-red-800'
+    'system_error_occurred': 'text-red-800',
+    'system_security_alert': 'text-red-800'
   }
 
   // Default colors based on category
