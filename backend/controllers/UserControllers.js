@@ -187,6 +187,7 @@ module.exports = {
 
             if (userResult.rows.length > 0) {
                 // Send the user data if found
+                delete userResult.password
                 res.json({
                     success: true,
                     message: 'Users retrieved successfully',
