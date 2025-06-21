@@ -1645,6 +1645,9 @@ const editCargo = async (pkg) => {
       shipping_address: { ...editingCargo.value.shipping_address }
     }
     showEditModal.value = true
+    setTimeout(() => {
+  window.location.reload()
+}, 1000)
   } catch (error) {
     console.error('Error fetching package data:', error)
     setAlert('Failed to load package data for editing.', 'error')
@@ -1709,6 +1712,9 @@ const saveEditedCargo = async () => {
     if (response.success) {
       setAlert('Cargo details updated successfully!', 'success')
       closeEditModal()
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     } else {
       setAlert('Failed to update shipping details.', 'error')
       console.error(response.error)
@@ -1808,9 +1814,10 @@ const addNewCargo = async () => {
     }
     finally {
       isSubmitting.value = false
+      setTimeout(() => {
+          window.location.reload()
+        }, 1000)
     }
-
-  }
 }
 
 const validateForm = () => {
@@ -2290,6 +2297,9 @@ const addNewLocation = async () => {
       setAlert('Error adding new location.', 'error')
     } finally {
       isSubmitting.value = false
+      setTimeout(() => {
+          window.location.reload()
+        }, 1000)
     }
   }
 }
@@ -2395,6 +2405,10 @@ const updateLocationFn = async () => {
   } catch (error) {
     console.error('Error updating Location:', error);
     setAlert('Failed to update Location. Please try again.', 'error');
+  } finally {
+        setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 };
 
@@ -2456,6 +2470,9 @@ const deleteLocationFn = async () => {
   } finally {
     closeDeleteLocationModalFn()
     locationToDelete.value = null
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 }
 
@@ -2575,6 +2592,9 @@ const addNewUser = async () => {
     } finally {
       // Reset isSubmitting state
       isSubmitting.value = false
+      setTimeout(() => {
+          window.location.reload()
+        }, 1000)
     }
   }
 }
@@ -2793,6 +2813,10 @@ const updateUserFn = async () => {
   } catch (error) {
     console.error('Error updating user:', error);
     setAlert('Failed to update user. Please try again.', 'error');
+  } finally{
+    setTimeout(() => {
+          window.location.reload()
+    }, 1000)
   }
 };
 
@@ -2824,6 +2848,9 @@ const deleteUserFn = async () => {
   } finally {
     closeDeleteUserModalFn()
     userToDelete.value = null
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 }
 
@@ -2849,7 +2876,7 @@ const handleLogin = async () => {
       isAuthenticated.value = true
       setAlert('Login successful!', 'success')
 
-      // ✅ Now check if the token is valid
+      // Now check if the token is valid
       await verifyToken()
 
       router.push('/admin')
@@ -2947,18 +2974,32 @@ const shouldCollapseSidebar = computed(() => {
   return isMediumScreen.value || sidebarCollapsed.value
 })
 
-// Event listeners
 onMounted(async () => {
-  const storedUser = localStorage.getItem('user')
-  if (storedUser) {
-    await verifyToken()
+  const storedUser = localStorage.getItem('user');
+
+  if (!storedUser) {
+    // No user data — redirect immediately
+    router.push('/admin');
+    return;
   }
-  
-  // Force collapse sidebar on medium screens to prevent scrollbar
+
+  try {
+    // Try verifying token
+    await verifyToken();
+  } catch (error) {
+    console.warn('Token invalid or session expired:', error);
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    isAuthenticated.value = false;
+    router.push('/login');
+    return;
+  }
+
+  // Collapse sidebar if screen is medium-sized
   if (isMediumScreen.value) {
-    sidebarCollapsed.value = true
+    sidebarCollapsed.value = true;
   }
-})
+});
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkScreenSize)
