@@ -15,7 +15,7 @@
       class="sidebar bg-[#1e2338] text-white h-screen flex flex-col transition-all duration-300 shadow-lg relative z-50 overflow-hidden"
       :class="{
         'w-16': (sidebarCollapsed && !isMobileDevice) || isMediumScreen,
-        'w-64': !sidebarCollapsed && !isMobileDevice && !isMediumScreen,
+        'w-40': !sidebarCollapsed && !isMobileDevice && !isMediumScreen,
         'fixed left-0 top-0 w-64 transform': isMobileDevice,
         'translate-x-0': isMobileDevice && showMobileMenu,
         '-translate-x-full': isMobileDevice && !showMobileMenu
@@ -132,17 +132,17 @@
         <div v-if="!shouldCollapseSidebar || isMobileDevice" class="flex items-center p-3 mb-3 rounded-md bg-gray-800/30">
           <div
             class="h-9 w-9 rounded-full bg-[#273272] flex items-center justify-center text-white text-sm font-medium">
-            {{ getInitials(currentUser.fullname) }}
+            {{ getInitials(currentUser.fullname || 'User') }}
           </div>
           <div class="ml-3 overflow-hidden">
-            <p class="text-sm font-medium text-white truncate">{{ currentUser.fullname }}</p>
-            <p class="text-xs text-gray-400">{{ currentUser.roles }}</p>
+            <p class="text-sm font-medium text-white truncate">{{ currentUser.fullname || 'User'}}</p>
+            <p class="text-xs text-gray-400">{{ currentUser.roles || 'Role not defined'}}</p>
           </div>
         </div>
         <div v-else class="flex justify-center mb-3">
           <div
             class="h-9 w-9 rounded-full bg-[#273272] flex items-center justify-center text-white text-sm font-medium">
-            {{ getInitials(currentUser.fullname) }}
+            {{ getInitials(currentUser.fullname || 'User') }}
           </div>
         </div>
 
