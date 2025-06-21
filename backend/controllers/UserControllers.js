@@ -43,7 +43,7 @@ module.exports = {
                 value.roles,
                 value.status || 'active',
                 JSON.stringify(value.permissions || []),  // Store permissions as JSON string
-                value.lastLogin || null,
+                null,
             ];
 
             const result = await query(insertUserQuery, params);
