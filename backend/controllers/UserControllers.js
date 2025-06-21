@@ -25,6 +25,7 @@ module.exports = {
     // Create a new user
     createUser: async (req, res) => {
         const details = req.body;
+        const userId = req.user?.id || null;
         try {
             let value = await validateCreateUserSchema(details);
             let hashed_pwd = await bcrypt.hash(value.password, 8);
@@ -52,7 +53,7 @@ module.exports = {
             // Insert activity log
             await insertActivityLog(
                 'user_created',
-                creatorUserId,
+                userId,
                 `New user account created for ${value.fullname} (${value.username})`,
                 {
                     created_user_id: newUser.id,
