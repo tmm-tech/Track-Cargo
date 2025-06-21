@@ -1,5 +1,51 @@
 <template>
   <div class="flex h-screen">
+    <!-- Stylish Loading Component -->
+    <div v-if="loading || isCheckingAuth" class="fixed inset-0 bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col justify-center items-center z-50">
+      <!-- Modern Spinner with Logo -->
+      <div class="text-center">
+        <!-- Logo/Brand -->
+        <div class="mb-8">
+          <div class="w-20 h-20 mx-auto bg-gradient-to-br from-[#273272] via-[#1e2759] to-[#273272] rounded-3xl flex items-center justify-center mb-6 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+            <img src="https://www.texmonlogistics.co.ke/assets/images/texmon-logo.png" alt="Texmon Logistics Logo"
+              class="w-12 h-12 rounded object-contain" />
+          </div>
+          <h2 class="text-3xl font-bold bg-gradient-to-r from-[#273272] to-[#1e2759] bg-clip-text text-transparent mb-2">
+            Texmon Logistics
+          </h2>
+          <p class="text-gray-600 text-lg">Admin Portal</p>
+        </div>
+        
+        <!-- Animated Spinner -->
+        <div class="relative mb-6">
+          <div class="w-16 h-16 border-4 border-gray-200 border-t-[#273272] rounded-full animate-spin mx-auto"></div>
+          <div class="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-[#ffb600] rounded-full animate-spin mx-auto" style="animation-delay: 0.15s; animation-duration: 1.5s;"></div>
+        </div>
+        
+        <!-- Loading Text Animation -->
+        <div class="space-y-4">
+          <div class="flex justify-center items-center space-x-1">
+            <span class="text-gray-600 text-lg">{{ loadingMessages[currentMessageIndex] }}</span>
+            <div class="flex space-x-1 ml-2">
+              <div class="w-1.5 h-1.5 bg-[#273272] rounded-full animate-ping"></div>
+              <div class="w-1.5 h-1.5 bg-[#273272] rounded-full animate-ping" style="animation-delay: 0.2s;"></div>
+              <div class="w-1.5 h-1.5 bg-[#273272] rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
+            </div>
+          </div>
+          
+          <div class="text-sm text-gray-500 animate-pulse">
+            Preparing your dashboard experience...
+          </div>
+        </div>
+      </div>
+      
+      <!-- Floating Background Elements -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-[#273272] opacity-5 rounded-full animate-float"></div>
+        <div class="absolute top-3/4 right-1/4 w-24 h-24 bg-[#ffb600] opacity-10 rounded-full animate-float-delayed"></div>
+        <div class="absolute top-1/2 left-3/4 w-16 h-16 bg-[#273272] opacity-5 rounded-full animate-float-slow"></div>
+      </div>
+    </div>
 
     <!-- Alert Component -->
     <div :class="['alert', alertType]">
@@ -132,17 +178,17 @@
         <div v-if="!shouldCollapseSidebar || isMobileDevice" class="flex items-center p-3 mb-3 rounded-md bg-gray-800/30">
           <div
             class="h-9 w-9 rounded-full bg-[#273272] flex items-center justify-center text-white text-sm font-medium">
-            {{ getInitials(currentUser.fullname || 'User') }}
+            {{ getInitials(currentUser?.fullname || 'User') }}
           </div>
           <div class="ml-3 overflow-hidden">
-            <p class="text-sm font-medium text-white truncate">{{ currentUser.fullname || 'User'}}</p>
-            <p class="text-xs text-gray-400">{{ currentUser.roles || 'Role not defined'}}</p>
+            <p class="text-sm font-medium text-white truncate">{{ currentUser?.fullname || 'User'}}</p>
+            <p class="text-xs text-gray-400">{{ currentUser?.roles || 'Role not defined'}}</p>
           </div>
         </div>
         <div v-else class="flex justify-center mb-3">
           <div
             class="h-9 w-9 rounded-full bg-[#273272] flex items-center justify-center text-white text-sm font-medium">
-            {{ getInitials(currentUser.fullname || 'User') }}
+            {{ getInitials(currentUser?.fullname || 'User') }}
           </div>
         </div>
 
@@ -186,7 +232,7 @@
                   <span class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500"></span>
                   <div
                     class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-[#273272] font-medium">
-                    {{ currentUser.initials }}
+                    {{ getInitials(currentUser?.fullname || 'User') }}
                   </div>
                 </div>
               </div>
@@ -213,7 +259,7 @@
       </div>
 
       <!-- Login Form -->
-      <main v-if="!isAuthenticated" class="flex-1 bg-gray-50 flex items-center justify-center p-4">
+      <main v-if="!isAuthenticated && !loading && !isCheckingAuth" class="flex-1 bg-gray-50 flex items-center justify-center p-4">
         <div class="rounded-lg border bg-white shadow-lg overflow-hidden w-full max-w-md">
           <div class="bg-[#273272] text-white p-6 rounded-t-lg">
             <h2 class="text-2xl font-semibold">Admin Login</h2>
@@ -234,8 +280,8 @@
                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   required />
               </div>
-              <button type="submit"
-                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] h-10 px-4 py-2 w-full">
+              <button type="submit" :disabled="isSubmitting"
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] h-10 px-4 py-2 w-full disabled:opacity-50">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd"
                     d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
@@ -256,7 +302,7 @@
       </main>
 
       <!-- Admin Dashboard -->
-      <main v-else class="flex-1 bg-gray-50 py-8 overflow-auto">
+      <main v-else-if="isAuthenticated" class="flex-1 bg-gray-50 py-8 overflow-auto">
         <div class="container mx-auto px-2 sm:px-4">
           <!-- Dashboard View (default) -->
           <div v-if="currentView === 'dashboard'" class="space-y-6 sm:space-y-8">
@@ -1236,7 +1282,7 @@ const router = useRouter()
 const showAlert = ref(false);
 const alertMessage = ref('');
 const alertType = ref('');
-const isCheckingAuth = ref(false)
+const isCheckingAuth = ref(true)
 
 // Authentication state
 const loading = ref(false)
@@ -1246,6 +1292,19 @@ const username = ref('')
 const password = ref('')
 const loginError = ref('')
 const isSubmitting = ref(false)
+
+// Loading animation state
+const loadingMessages = ref([
+  'Initializing admin portal...',
+  'Loading user data...',
+  'Setting up workspace...',
+  'Preparing dashboard...',
+  'Verifying permissions...',
+  'Almost ready...'
+])
+
+const currentMessageIndex = ref(0)
+let messageInterval = null
 
 // Sidebar state
 const sidebarCollapsed = ref(false)
@@ -1645,9 +1704,6 @@ const editCargo = async (pkg) => {
       shipping_address: { ...editingCargo.value.shipping_address }
     }
     showEditModal.value = true
-    setTimeout(() => {
-  window.location.reload()
-}, 1000)
   } catch (error) {
     console.error('Error fetching package data:', error)
     setAlert('Failed to load package data for editing.', 'error')
@@ -1712,9 +1768,7 @@ const saveEditedCargo = async () => {
     if (response.success) {
       setAlert('Cargo details updated successfully!', 'success')
       closeEditModal()
-      setTimeout(() => {
-        window.location.reload()
-      }, 1000)
+      await fetchCargos()
     } else {
       setAlert('Failed to update shipping details.', 'error')
       console.error(response.error)
@@ -1803,6 +1857,7 @@ const addNewCargo = async () => {
         resetNewCargoForm()
         resetTrackingStops()
         closeAddModal()
+        await fetchCargos()
       } else {
         setAlert('Failed to add new shipping.', 'error')
         console.error(response.error)
@@ -1814,9 +1869,6 @@ const addNewCargo = async () => {
     }
     finally {
       isSubmitting.value = false
-      setTimeout(() => {
-          window.location.reload()
-        }, 1000)
     }
   }
 }
@@ -2289,6 +2341,7 @@ const addNewLocation = async () => {
       if (response.data.success) {
         setAlert('Location added successfully!', 'success')
         closeAddLocationModal()
+        await fetchLocation()
       }
       else {
         setAlert('Failed to add new location.', 'error')
@@ -2298,9 +2351,6 @@ const addNewLocation = async () => {
       setAlert('Error adding new location.', 'error')
     } finally {
       isSubmitting.value = false
-      setTimeout(() => {
-          window.location.reload()
-        }, 1000)
     }
   }
 }
@@ -2406,10 +2456,6 @@ const updateLocationFn = async () => {
   } catch (error) {
     console.error('Error updating Location:', error);
     setAlert('Failed to update Location. Please try again.', 'error');
-  } finally {
-        setTimeout(() => {
-      window.location.reload()
-    }, 1000)
   }
 };
 
@@ -2471,9 +2517,6 @@ const deleteLocationFn = async () => {
   } finally {
     closeDeleteLocationModalFn()
     locationToDelete.value = null
-    setTimeout(() => {
-      window.location.reload()
-    }, 1000)
   }
 }
 
@@ -2593,9 +2636,6 @@ const addNewUser = async () => {
     } finally {
       // Reset isSubmitting state
       isSubmitting.value = false
-      setTimeout(() => {
-          window.location.reload()
-        }, 1000)
     }
   }
 }
@@ -2814,10 +2854,6 @@ const updateUserFn = async () => {
   } catch (error) {
     console.error('Error updating user:', error);
     setAlert('Failed to update user. Please try again.', 'error');
-  } finally{
-    setTimeout(() => {
-          window.location.reload()
-    }, 1000)
   }
 };
 
@@ -2826,7 +2862,7 @@ const confirmDeleteUserFn = (user) => {
   showDeleteUserModal.value = true
 }
 
-const closeDeleteUserModalFn = () => {
+const closeDeleteUserModal = () => {
   showDeleteUserModal.value = false
   userToDelete.value = null
 }
@@ -2847,11 +2883,8 @@ const deleteUserFn = async () => {
     console.error('Delete error:', error)
     setAlert('An error occurred while deleting the user.', 'error')
   } finally {
-    closeDeleteUserModalFn()
+    closeDeleteUserModal()
     userToDelete.value = null
-    setTimeout(() => {
-      window.location.reload()
-    }, 1000)
   }
 }
 
@@ -2859,6 +2892,7 @@ const deleteUserFn = async () => {
 const handleLogin = async () => {
   try {
     isSubmitting.value = true
+    loginError.value = ''
     const userData = { username: username.value, password: password.value }
 
     const response = await fetch('https://track-cargo.onrender.com/users/login', {
@@ -2883,11 +2917,13 @@ const handleLogin = async () => {
       router.push('/admin')
     } else {
       setAlert(data.message || 'Login failed', 'error')
+      loginError.value = data.message || 'Login failed'
       isAuthenticated.value = false
     }
   } catch (error) {
     console.error('Login error:', error)
     setAlert('An error occurred during login', 'error')
+    loginError.value = 'An error occurred during login'
   } finally {
     isSubmitting.value = false
   }
@@ -2902,39 +2938,58 @@ const verifyToken = async () => {
     })
 
     if (response.ok) {
+      const data = await response.json()
+      currentUser.value = data.user || JSON.parse(localStorage.getItem('user') || '{}')
       isAuthenticated.value = true
-      await fetchUsers()
-      await fetchCargos()
-      await fetchLocation()
-      await fetchActivities()
-      await checkScreenSize()
-      window.addEventListener('resize', checkScreenSize)
+      
+      // Load all data after successful authentication
+      await Promise.all([
+        fetchUsers(),
+        fetchCargos(),
+        fetchLocation(),
+        fetchActivities()
+      ])
     } else {
+      // Token expired or invalid
+      localStorage.removeItem('user')
+      sessionStorage.removeItem('token')
       isAuthenticated.value = false
-      router.push('/admin')
+      currentUser.value = null
+      
+      if (response.status === 401) {
+        setAlert('Session expired. Please login again.', 'error')
+      }
     }
   } catch (error) {
     console.error('Auth check failed:', error)
+    localStorage.removeItem('user')
+    sessionStorage.removeItem('token')
     isAuthenticated.value = false
+    currentUser.value = null
   } finally {
     loading.value = false
+    isCheckingAuth.value = false
   }
 }
 
 // Handle logout function
 const logout = async () => {
   try {
-
     const email = currentUser.value?.email;
     if (!email) throw new Error("User email not found");
 
     await userServices.logout(email)
+    
+    // Clear all authentication data
     isAuthenticated.value = false
     currentUser.value = null
-    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     sessionStorage.removeItem('token');
+    
     setAlert('Logout successful!', 'success')
-
+    
+    // Redirect to login
+    router.push('/admin')
   } catch (error) {
     console.error('Logout error:', error)
     setAlert('An error occurred during logout. Please try again.', 'error')
@@ -2975,35 +3030,68 @@ const shouldCollapseSidebar = computed(() => {
   return isMediumScreen.value || sidebarCollapsed.value
 })
 
+// Loading message rotation
+const startLoadingMessageRotation = () => {
+  messageInterval = setInterval(() => {
+    currentMessageIndex.value = (currentMessageIndex.value + 1) % loadingMessages.value.length
+  }, 1500)
+}
+
+const stopLoadingMessageRotation = () => {
+  if (messageInterval) {
+    clearInterval(messageInterval)
+    messageInterval = null
+  }
+}
+
 onMounted(async () => {
-  const storedUser = localStorage.getItem('user');
+  isCheckingAuth.value = true
+  loading.value = true
+  
+  // Start loading animation
+  startLoadingMessageRotation()
+  
+  // Check screen size
+  checkScreenSize()
+  window.addEventListener('resize', checkScreenSize)
+  
+  // Collapse sidebar if screen is medium-sized
+  if (isMediumScreen.value) {
+    sidebarCollapsed.value = true
+  }
+
+  const storedUser = localStorage.getItem('user')
 
   if (!storedUser) {
     // No user data — redirect immediately
-    router.push('/admin');
-    return;
+    isCheckingAuth.value = false
+    loading.value = false
+    stopLoadingMessageRotation()
+    return
   }
 
   try {
+    // Parse stored user data
+    currentUser.value = JSON.parse(storedUser)
+    
     // Try verifying token
-    await verifyToken();
+    await verifyToken()
   } catch (error) {
-    console.warn('Token invalid or session expired:', error);
-    localStorage.removeItem('user');
-    sessionStorage.removeItem('token');
-    isAuthenticated.value = false;
-    router.push('/login');
-    return;
+    console.warn('Token invalid or session expired:', error)
+    localStorage.removeItem('user')
+    sessionStorage.removeItem('token')
+    isAuthenticated.value = false
+    currentUser.value = null
+  } finally {
+    isCheckingAuth.value = false
+    loading.value = false
+    stopLoadingMessageRotation()
   }
-
-  // Collapse sidebar if screen is medium-sized
-  if (isMediumScreen.value) {
-    sidebarCollapsed.value = true;
-  }
-});
+})
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkScreenSize)
+  stopLoadingMessageRotation()
 })
 
 </script>
@@ -3021,6 +3109,34 @@ onUnmounted(() => {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Loading animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(-180deg); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(90deg); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 8s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 10s ease-in-out infinite;
 }
 
 .sidebar {
