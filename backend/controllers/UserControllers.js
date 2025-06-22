@@ -178,74 +178,63 @@ module.exports = {
 
     // Get all Users
     getAllUser: async (req, res) => {
-        try {
-            // SQL query to get all users where isdeleted is TRUE
-            const getUserQuery = `
-                SELECT * FROM profile;
-            `;
-            const userResult = await query(getUserQuery); // Execute the query
+    try {
+        const getUserQuery = `SELECT * FROM profile;`;
+        const userResult = await query(getUserQuery);
 
-            if (userResult.rows.length > 0) {
-                // Send the user data if found
-                // Remove passwords
-               const usersWithoutPasswords = userResult.rows.map(user => {
+        if (userResult.rows.length > 0) {
+            // Remove passwords
+            const usersWithoutPasswords = userResult.rows.map(user => {
                 const { password, ...userWithoutPassword } = user;
                 return userWithoutPassword;
-                res.json({
-                    success: true,
-                    message: 'Users retrieved successfully',
-                    data: usersWithoutPasswords.rows // Send all user data
-                });
             });
-                                                                 
-        }
-        else {
-                // No users found, send a 404 response
-                res.status(404).json({
-                    success: false,
-                    message: 'No users found'
-                });
-            }
-        } catch (error) {
-            // Log the error and send a 500 response
-            console.error('Error getting users:', error);
-            res.status(500).json({
+
+            res.json({
+                success: true,
+                message: 'Users retrieved successfully',
+                data: usersWithoutPasswords
+            });
+        } else {
+            res.status(404).json({
                 success: false,
-                message: `Get User Details Error: ${error.message}`
+                message: 'No users found'
             });
         }
-    },
+    } catch (error) {
+        console.error('Error getting users:', error);
+        res.status(500).json({
+            success: false,
+            message: `Get User Details Error: ${error.message}`
+        });
+    }
+},
+
 
 
     getAUser: async (req, res) => {
-        const { id } = req.params;
-        try {
-            const getUserQuery = `
-                SELECT * FROM profile WHERE id = $1;
-            `;
-            const userResult = await query(getUserQuery, [id]);
+    const { id } = req.params;
+    try {
+        const getUserQuery = `SELECT * FROM profile WHERE id = $1;`;
+        const userResult = await query(getUserQuery, [id]);
 
-
-            if (userResult.rows.length > 0) {
-                // Remove passwords
-               const userWithoutPassword = userResult.rows.map(user => {
-                const { password, ...userWithoutPassword } = user;
-                return userWithoutPassword;
-                res.json({ success: true, message: 'User retrieved successfully', data: userWithoutPassword.rows[0] });
-
-
+        if (userResult.rows.length > 0) {
+            const { password, ...userWithoutPassword } = userResult.rows[0];
+            res.json({
+                success: true,
+                message: 'User retrieved successfully',
+                data: userWithoutPassword
             });
-                
-            } else {
-                res.status(404).json({ success: false, message: 'User not found' });
-
-            }
-        } catch (error) {
-            console.error('Error getting user:', error);
-            res.status(500).json({ success: false, message: `Get User Details Error: ${error.message}` });
-
+        } else {
+            res.status(404).json({ success: false, message: 'User not found' });
         }
-    },
+    } catch (error) {
+        console.error('Error getting user:', error);
+        res.status(500).json({
+            success: false,
+            message: `Get User Details Error: ${error.message}`
+        });
+    }
+},
 
     // Update user details
     updateUser: async (req, res) => {
