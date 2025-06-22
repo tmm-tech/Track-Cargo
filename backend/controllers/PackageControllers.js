@@ -292,8 +292,8 @@ module.exports = {
     try {
       const { tracking_number } = req.params;
 
-     const result = await query(`
-       SELECT 
+    const result = await query(`
+      SELECT 
         p.*, 
         te.timestamp AS latest_timestamp 
       FROM 
@@ -304,9 +304,12 @@ module.exports = {
         WHERE package_id = p.id 
         ORDER BY timestamp DESC 
         LIMIT 1
-        ) te ON true
+      ) te ON true
       WHERE 
-        p.is_deleted = FALSE
+        (p.container_number = $1 OR 
+         p.truck_number = $1 OR 
+         p.bl_number = $1)
+        AND p.is_deleted = FALSE
       ORDER BY 
         p.created_at DESC;
 `, [tracking_number]);
