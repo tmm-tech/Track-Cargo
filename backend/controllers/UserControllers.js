@@ -275,6 +275,7 @@ module.exports = {
             const result = await query(updateUserQuery, params);
 
             if (result.rowCount > 0) {
+                const updatedUser = result.rows[0];
                  // Insert activity log
                 await insertActivityLog(
                     'user_updated',
