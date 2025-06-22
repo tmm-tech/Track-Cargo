@@ -128,14 +128,14 @@
           <!-- Package Details Card -->
           <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
-              <h2 class="text-xl font-semibold">Package Details</h2>
-              <p class="text-gray-200">Package Number: {{ trackingNumber }}</p>
+              <h2 class="text-xl font-semibold">Cargo Details</h2>
+              <p class="text-gray-200">Cargo Number: {{ trackingNumber }}</p>
             </div>
             <div class="p-6">
               <div class="grid gap-6 md:grid-cols-2">
                 <div>
-                  <h3 class="font-medium text-gray-500">Package Type</h3>
-                  <p class="text-lg">{{ packageData.type }}</p>
+                  <h3 class="font-medium text-gray-500">Cargo Type</h3>
+                  <p class="text-lg capitalize">{{ packageData.type }}</p>
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Weight</h3>
@@ -143,11 +143,11 @@
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Shipped Date</h3>
-                  <p class="text-lg">{{ packageData.shippedDate }}</p>
+                  <p class="text-lg">{{ packageData.shipped_date }}</p>
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Estimated Delivery</h3>
-                  <p class="text-lg">{{ packageData.estimatedDelivery }}</p>
+                  <p class="text-lg">{{ packageData.estimated_delivery}}</p>
                 </div>
               </div>
             </div>
@@ -171,8 +171,8 @@
                 </div>
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Current Location</h3>
-                  <p class="text-xl font-bold text-[#273272]">{{ packageData.currentLocation }}</p>
-                  <p class="text-gray-500">Updated: {{ packageData.lastUpdated }}</p>
+                  <p class="text-xl font-bold text-[#273272]">{{ packageData.current_location }}</p>
+                  <p class="text-gray-500">Updated: {{ packageData.latest_timestamp }}</p>
                   <div class="flex items-center mt-2">
                     <span :class="[
                       'px-2 py-1 text-xs font-medium rounded-full capitalize',
@@ -196,8 +196,8 @@
                 </div>
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Next Stop</h3>
-                  <p class="text-xl font-bold text-[#273272]">{{ packageData.nextStop }}</p>
-                  <p class="text-gray-500">Estimated arrival: {{ packageData.nextStopETA }}</p>
+                  <p class="text-xl font-bold text-[#273272]">{{ packageData.next_stop }}</p>
+                  <p class="text-gray-500">Estimated arrival: {{ packageData.next_stop_eta }}</p>
                   <div class="flex items-center mt-2">
                     <span
                       class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
@@ -219,8 +219,8 @@
                 </div>
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Final Destination</h3>
-                  <p class="text-xl font-bold text-[#273272]">{{ packageData.finalDestination }}</p>
-                  <p class="text-gray-500">Estimated delivery: {{ packageData.estimatedDelivery }}</p>
+                  <p class="text-xl font-bold text-[#273272]">{{ packageData.final_destination }}</p>
+                  <p class="text-gray-500">Estimated delivery: {{ packageData.estimated_delivery }}</p>
                   <div class="flex items-center mt-2">
                     <span
                       class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
@@ -258,7 +258,7 @@
                     <p class="mt-2 text-sm font-medium">Shipped</p>
                     <transition name="fade">
                       <div v-if="currentStep >= 1" class="mt-1 text-xs text-gray-500">
-                        {{ formatDate(packageData.shippedDate) }}
+                        {{ formatDate(packageData.shipped_date) }}
                       </div>
                     </transition>
                   </div>
