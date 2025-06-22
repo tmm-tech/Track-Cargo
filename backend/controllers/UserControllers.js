@@ -196,9 +196,10 @@ module.exports = {
                     message: 'Users retrieved successfully',
                     data: usersWithoutPasswords.rows // Send all user data
                 });
-            }
+            });
                                                                  
-        }else {
+        }
+        else {
                 // No users found, send a 404 response
                 res.status(404).json({
                     success: false,
