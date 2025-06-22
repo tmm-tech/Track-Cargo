@@ -292,10 +292,14 @@ module.exports = {
     try {
       const { tracking_number } = req.params;
 
-      const result = await query(`
+     const result = await query(`
       SELECT * FROM packages
-      WHERE truck_number = $1 || bl_number = $1 || container_number = $1 AND is_deleted = FALSE;
-    `, [tracking_number]);
+      WHERE (
+        truck_number = $1 OR 
+        bl_number = $1 OR 
+        container_number = $1
+      ) AND is_deleted = FALSE;
+`, [tracking_number]);
 
       if (result.rowCount === 0) {
         return res.status(404).json({ success: false, message: 'Package not found' });
