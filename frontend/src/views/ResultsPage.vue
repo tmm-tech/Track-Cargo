@@ -477,7 +477,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { MapPinIcon, TruckIcon, CheckCircleIcon, ArchiveBoxIcon } from '@heroicons/vue/24/outline'
-import { mockPackages } from '../data/mock-data'
+import ShippingServices from '../Services/ShippingServices.js';
 
 const route = useRoute()
 const trackingNumber = computed(() => route.query.number || '')
@@ -589,23 +589,26 @@ watch(() => packageData.value, () => {
   }
 }, { immediate: false })
 
-onMounted(() => {
-  let foundPackage = null; // Initialize foundPackage
+onMounted(async () => {
+  loading.value = true
+  error.value = null
+  packageData.value = null
 
-  // Simulate API call with a timeout
-  setTimeout(() => {
-    loading.value = false
+  try {
+    // Call your backend service to track the package
+    const response = await ShippingServices.trackPackage(trackingNumber.value)
 
-    foundPackage = mockPackages.find(
-      (pkg) => pkg.containerNumber === trackingNumber.value || pkg.truckNumber === trackingNumber.value || pkg.blNumber === trackingNumber.value
-    )
-
-    if (foundPackage) {
-      packageData.value = foundPackage
+    if (response.success && response.data) {
+      packageData.value = response.data
     } else {
-      error.value = 'No package found with the provided information'
+      error.value = response.message || 'No package found with the provided information'
     }
-  }, 1000)
+  } catch (err) {
+    console.error('Error tracking package:', err)
+    error.value = 'An error occurred while fetching package data'
+  } finally {
+    loading.value = false
+  }
 })
 
 // Add these after the other computed properties in the script section
