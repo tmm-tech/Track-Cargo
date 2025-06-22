@@ -261,8 +261,7 @@ import CardContent from '../components/ui/CardContent.vue';
 import Button from '../components/ui/Button.vue';
 import Input from '../components/ui/Input.vue';
 import Label from '../components/ui/Label.vue';
-import { mockPackages } from '../data/mock-data';
-
+import ShippingServices from '../services/ShippingServices';
 export default {
   name: 'TrackPage',
   components: {
@@ -317,23 +316,18 @@ export default {
       isSubmitting.value = true;
 
       try {
-        // Simulate API call with a timeout
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Check if package exists in mock data
-        const foundPackage = mockPackages.find(
-          pkg => pkg.containerNumber === trackingNumber.value || pkg.truckNumber === trackingNumber.value || pkg.blNumber === trackingNumber.value
-        );
-
-        if (foundPackage) {
-          // Save to recent searches
-          saveRecentSearch(trackingNumber.value);
-
-          // Navigate to results page with tracking number
-          router.push(`/track/results?number=${trackingNumber.value}`);
-        } else {
-          error.value = 'No package found with the provided information';
-        }
+           // Make the real API call to fetch tracking info
+          const response = await ShippingServices.trackPackage(trackingNumber.value);
+      
+          if (response.data && response.data.success && response.data.data) {
+            // Save to recent searches
+            saveRecentSearch(trackingNumber.value);
+      
+            // Navigate to results page with tracking number
+            router.push(`/track/results?number=${trackingNumber.value}`);
+          } else {
+            error.value = 'No package found with the provided information';
+          }
       } catch (err) {
         error.value = 'An error occurred while tracking your package. Please try again.';
         console.error('Tracking error:', err);
