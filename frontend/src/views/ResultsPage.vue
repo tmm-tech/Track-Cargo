@@ -544,20 +544,21 @@ const determineShippingStep = () => {
   // Always at least at step 1 (Shipped) if we have package data
   let step = 1
 
-  // Check for "In Transit" status
-  if (history.some(event => event.status.toLowerCase().includes('in transit'))) {
-    step = 2
-  }
+ // Check for "In Transit" status
+if (history.some(event => (event.status || '').toLowerCase().includes('in transit'))) {
+  step = 2;
+}
 
-  // Check for "Out for Delivery" status
-  if (history.some(event => event.status.toLowerCase().includes('out for delivery'))) {
-    step = 3
-  }
+// Check for "Out for Delivery" status
+if (history.some(event => (event.status || '').toLowerCase().includes('out for delivery'))) {
+  step = 3;
+}
 
-  // Check for "Delivered" status
-  if (history.some(event => event.status.toLowerCase().includes('delivered'))) {
-    step = 4
-  }
+// Check for "Delivered" status
+if (history.some(event => (event.status || '').toLowerCase().includes('delivered'))) {
+  step = 4;
+}
+
 
   return step
 }
