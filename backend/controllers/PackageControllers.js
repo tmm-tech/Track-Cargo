@@ -289,10 +289,11 @@ module.exports = {
 
   // Track package by tracking number
   trackPackageByTrackingNumber: async (req, res) => {
-    try {
-      const { tracking_number } = req.params;
+  try {
+    const { tracking_number } = req.params;
 
-    const result = await query(`
+    // 1. Get package
+    const packageResult = await query(`
       SELECT 
         p.*, 
         te.timestamp AS latest_timestamp 
@@ -312,16 +313,29 @@ module.exports = {
         AND p.is_deleted = FALSE
       ORDER BY 
         p.created_at DESC;
-`, [tracking_number]);
+    `, [tracking_number]);
 
-      if (result.rowCount === 0) {
-        return res.status(404).json({ success: false, message: 'Package not found' });
-      }
-
-      res.json({ success: true, package: result.rows[0] });
-    } catch (error) {
-      console.error('Error tracking package:', error.message);
-      res.status(500).json({ success: false, message: 'Internal server error' });
+    if (packageResult.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Package not found' });
     }
+
+    const foundPackage = packageResult.rows[0];
+
+    // 2. Get tracking history for the found package
+    const historyResult = await query(`
+      SELECT * FROM tracking_events 
+      WHERE package_id = $1
+      ORDER BY timestamp ASC;
+    `, [foundPackage.id]);
+
+    foundPackage.tracking_history = historyResult.rows;
+
+    // 3. Send full response
+    res.json({ success: true, data: foundPackage });
+  } catch (error) {
+    console.error('Error tracking package:', error.message);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
+}
+
 };
