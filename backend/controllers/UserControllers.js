@@ -249,6 +249,7 @@ module.exports = {
     updateUser: async (req, res) => {
         const { fullname, email, roles, password } = req.body;
         const { id } = req.params;
+        const userId = req.user?.id || null;
 
         try {
             // Build the query and parameters
@@ -277,7 +278,7 @@ module.exports = {
                  // Insert activity log
                 await insertActivityLog(
                     'user_updated',
-                    id,
+                    userId,
                     `User ${updatedUser.fullname} (${updatedUser.username}) was updated`,
                     {
                         updated_user_id: id,
