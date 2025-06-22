@@ -293,12 +293,22 @@ module.exports = {
       const { tracking_number } = req.params;
 
      const result = await query(`
-      SELECT * FROM packages
-      WHERE (
-        truck_number = $1 OR 
-        bl_number = $1 OR 
-        container_number = $1
-      ) AND is_deleted = FALSE;
+       SELECT 
+        p.*, 
+        te.timestamp AS latest_timestamp 
+      FROM 
+        packages p
+      LEFT JOIN LATERAL (
+        SELECT timestamp 
+        FROM tracking_events 
+        WHERE package_id = p.id 
+        ORDER BY timestamp DESC 
+        LIMIT 1
+        ) te ON true
+      WHERE 
+        p.is_deleted = FALSE
+      ORDER BY 
+        p.created_at DESC;
 `, [tracking_number]);
 
       if (result.rowCount === 0) {
