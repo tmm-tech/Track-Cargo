@@ -234,6 +234,8 @@ module.exports = {
                 res.json({ success: true, message: 'User retrieved successfully', data: userWithoutPassword.rows[0] });
 
 
+            });
+                
             } else {
                 res.status(404).json({ success: false, message: 'User not found' });
 
