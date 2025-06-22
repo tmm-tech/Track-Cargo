@@ -261,7 +261,7 @@ import CardContent from '../components/ui/CardContent.vue';
 import Button from '../components/ui/Button.vue';
 import Input from '../components/ui/Input.vue';
 import Label from '../components/ui/Label.vue';
-import ShippingServices from '../services/ShippingServices';
+import ShippingServices from '../Services/ShippingServices.js';
 export default {
   name: 'TrackPage',
   components: {
