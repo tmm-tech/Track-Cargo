@@ -598,8 +598,8 @@ onMounted(async () => {
     // Call your backend service to track the package
     const response = await ShippingServices.trackPackage(trackingNumber.value)
 
-    if (response.success && response.data) {
-      packageData.value = response.data
+    if (response.data.success && response.data.package) {
+      packageData.value = response.data.package
     } else {
       error.value = response.message || 'No package found with the provided information'
     }
