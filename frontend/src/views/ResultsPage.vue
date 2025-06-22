@@ -135,7 +135,7 @@
               <div class="grid gap-6 md:grid-cols-2">
                 <div>
                   <h3 class="font-medium text-gray-500">Cargo Type</h3>
-                  <p class="text-lg capitalize">{{ packageData.type }}</p>
+                  <p class="text-lg uppercase">{{ packageData.type }}</p>
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Weight</h3>
@@ -143,11 +143,11 @@
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Shipped Date</h3>
-                  <p class="text-lg">{{ packageData.shipped_date }}</p>
+                  <p class="text-lg">{{ formatDate(packageData.shipped_date) }}</p>
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Estimated Delivery</h3>
-                  <p class="text-lg">{{ packageData.estimated_delivery}}</p>
+                  <p class="text-lg">{{ formatDate(packageData.estimated_delivery)}}</p>
                 </div>
               </div>
             </div>
@@ -172,7 +172,7 @@
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Current Location</h3>
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.current_location }}</p>
-                  <p class="text-gray-500">Updated: {{ packageData.latest_timestamp }}</p>
+                  <p class="text-gray-500">Updated: {{ formatDate(packageData.latest_timestamp) }}</p>
                   <div class="flex items-center mt-2">
                     <span :class="[
                       'px-2 py-1 text-xs font-medium rounded-full capitalize',
@@ -197,7 +197,7 @@
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Next Stop</h3>
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.next_stop }}</p>
-                  <p class="text-gray-500">Estimated arrival: {{ packageData.next_stop_eta }}</p>
+                  <p class="text-gray-500">Estimated arrival: {{ formatDate(packageData.next_stop_eta) }}</p>
                   <div class="flex items-center mt-2">
                     <span
                       class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
@@ -220,7 +220,7 @@
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Final Destination</h3>
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.final_destination }}</p>
-                  <p class="text-gray-500">Estimated delivery: {{ packageData.estimated_delivery }}</p>
+                  <p class="text-gray-500">Estimated delivery: {{ formatDate(packageData.estimated_delivery) }}</p>
                   <div class="flex items-center mt-2">
                     <span
                       class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
