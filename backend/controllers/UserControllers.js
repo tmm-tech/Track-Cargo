@@ -267,6 +267,12 @@ module.exports = {
 
             if (result.rowCount > 0) {
                 const updatedUser = result.rows[0];
+                const changes = {};
+
+                if (fullname && fullname !== updatedUser.fullname) changes.fullname = fullname;
+                if (email && email !== updatedUser.email) changes.email = email;
+                if (roles && roles !== updatedUser.roles) changes.roles = roles;
+                if (password) changes.password = '********'; // Don’t log actual password
                  // Insert activity log
                 await insertActivityLog(
                     'user_updated',
@@ -315,6 +321,7 @@ module.exports = {
         `;
             const result = await query(deleteUserQuery, [id]);
             if (result.rowCount > 0) {
+                 const userToDelete = result.rows[0];
                 // Insert activity log
                 await insertActivityLog(
                     'user_deleted',
