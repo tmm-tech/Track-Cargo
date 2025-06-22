@@ -327,10 +327,10 @@
             </div>
             <div class="p-6">
               <div class="space-y-6">
-                <div v-for="(event, index) in packageData.trackingHistory" :key="index" class="flex gap-4">
+                <div v-for="(event, index) in packageData.tracking_history" :key="index" class="flex gap-4">
                   <div class="relative flex flex-col items-center">
                     <div :class="`w-4 h-4 rounded-full ${index === 0 ? 'bg-[#ffb600]' : 'bg-gray-300'}`"></div>
-                    <div v-if="index < packageData.trackingHistory.length - 1"
+                    <div v-if="index < packageData.tracking_history.length - 1"
                       class="w-0.5 h-full bg-gray-200 absolute top-4"></div>
                   </div>
                   <div class="flex-1 pb-6">
@@ -512,24 +512,24 @@ const formatDate = (dateString) => {
 
 // Get dates for each shipping stage from tracking history
 const getInTransitDate = () => {
-  if (!packageData.value?.trackingHistory) return 'N/A'
-  const inTransitEvent = packageData.value.trackingHistory.find(
+  if (!packageData.value?.tracking_history) return 'N/A'
+  const inTransitEvent = packageData.value.tracking_history.find(
     event => event.status.toLowerCase().includes('in transit')
   )
   return inTransitEvent ? inTransitEvent.timestamp.split(' ')[0] : 'N/A'
 }
 
 const getOutForDeliveryDate = () => {
-  if (!packageData.value?.trackingHistory) return 'N/A'
-  const outForDeliveryEvent = packageData.value.trackingHistory.find(
+  if (!packageData.value?.tracking_history) return 'N/A'
+  const outForDeliveryEvent = packageData.value.tracking_history.find(
     event => event.status.toLowerCase().includes('out for delivery')
   )
   return outForDeliveryEvent ? outForDeliveryEvent.timestamp.split(' ')[0] : 'N/A'
 }
 
 const getDeliveredDate = () => {
-  if (!packageData.value?.trackingHistory) return null
-  const deliveredEvent = packageData.value.trackingHistory.find(
+  if (!packageData.value?.tracking_history) return null
+  const deliveredEvent = packageData.value.tracking_history.find(
     event => event.status.toLowerCase().includes('delivered')
   )
   return deliveredEvent ? deliveredEvent.timestamp.split(' ')[0] : null
@@ -539,7 +539,7 @@ const getDeliveredDate = () => {
 const determineShippingStep = () => {
   if (!packageData.value) return 0
 
-  const history = packageData.value.trackingHistory
+  const history = packageData.value.tracking_history
 
   // Always at least at step 1 (Shipped) if we have package data
   let step = 1
@@ -633,19 +633,19 @@ const isFinalDestination = computed(() => {
 
 const isDelivered = computed(() => {
   if (!packageData.value) return false
-  return packageData.value.trackingHistory.some(
+  return packageData.value.tracking_history.some(
     event => event.status.toLowerCase().includes('delivered')
   )
 })
 
 // Get the current status based on tracking history
 const getCurrentLocationStatus = () => {
-  if (!packageData.value?.trackingHistory || packageData.value.trackingHistory.length === 0) {
+  if (!packageData.value?.tracking_history || packageData.value.tracking_history.length === 0) {
     return 'Processing'
   }
 
   // Get the most recent status from tracking history
-  const latestEvent = packageData.value.trackingHistory[0]
+  const latestEvent = packageData.value.tracking_history[0]
   return latestEvent.status
 }
 
