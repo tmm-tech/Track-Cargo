@@ -2202,11 +2202,12 @@
                   </div>
                 </div>
               </div>
-           </div>
-          </div>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
+    </div>
+  </main>
 
       <!-- Footer -->
       <footer class="bg-[#1a1a1a] text-white py-4">
