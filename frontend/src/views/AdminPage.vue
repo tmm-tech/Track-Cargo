@@ -1477,38 +1477,7 @@
                 </div>
             </div>
 
-             <!-- Cargo Tracking Dialog -->
-            <div v-if="showTrackingDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
-              @click="closeTrackingDialog">
-              <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden" @click.stop>
-                <!-- Dialog Header -->
-                <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-[#273272] text-white">
-                  <div class="flex-1 min-w-0">
-                    <h2 class="text-lg sm:text-xl font-semibold truncate">Cargo Tracking Details</h2>
-                    <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedCargo?.container_number
-                    }}</p>
-                  </div>
-                  <div class="flex items-center gap-2 sm:gap-3 ml-4">
-                    <!-- Action Buttons -->
-                    <button @click="handlePrint"
-                      class="px-2 sm:px-4 py-2 bg-[#ffb600] text-[#273272] rounded-md hover:bg-[#e6a500] transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                      <PrinterIcon class="w-4 h-4" />
-                      <span class="hidden sm:inline">{{ isMobileDevice ? 'Download PDF' : 'Print' }}</span>
-                    </button>
-                    <button @click="closeTrackingDialog" class="text-white/70 hover:text-white transition-colors p-1">
-                      <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Dialog Content -->
-                <div class="overflow-y-auto max-h-[calc(95vh-120px)]" id="tracking-content">
-                  <PackageTracking v-if="selectedCargo" :pkg="selectedCargo" class="print-content" />
-                </div>
-              </div>
-            </div>
+          
             
               <!-- Edit Cargo Modal -->
             <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
