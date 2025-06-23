@@ -113,9 +113,17 @@
                 </div>
 
                 <Button type="submit"
-                  class="w-full bg-yellow-500 hover:bg-yellow-500 text-primary font-semibold py-2 rounded-md transition-colors duration-300">
-                  Track
-                </Button>
+                class="w-full bg-yellow-500 hover:bg-yellow-500 text-primary font-semibold py-2 rounded-md transition-colors duration-300 flex justify-center items-center"
+                :disabled="isSubmitting">
+                <span v-if="!isSubmitting">Track</span>
+                <span v-else class="flex items-center">
+                  <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none" />
+                    <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Tracking...
+                </span>
+              </Button>
               </form>
             </CardContent>
           </Card>
