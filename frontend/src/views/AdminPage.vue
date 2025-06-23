@@ -1094,9 +1094,8 @@
                     </button>
                   </div>
                 </div>
+               </div>
               </div>
-              </div>
-            </div>
              <!-- Add Cargo Modal -->
              <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
               @click="closeAddModal">
