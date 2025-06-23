@@ -1029,11 +1029,13 @@
                     </div>
                     <!-- Activity Badge -->
                     <div :class="[
-                      'px-2 py-1 text-xs font-semibold rounded-full ml-4',
-                      getActivityBadgeColor(activity.type)
-                    ]">
-                      {{ formatActivityType(activity.type) }}
-                    </div>
+                    'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold shadow-sm transition-colors duration-200',
+  getActivityBadgeColor(activity.type)
+]">
+  <component :is="getBadgeIcon(activity.type)" class="w-3.5 h-3.5" />
+  {{ formatActivityType(activity.type) }}
+</div>
+
                   </div>
                 </div>
 
@@ -1954,7 +1956,7 @@ const validateForm = () => {
   }
 
   if (trackingStops.value.length === 0) {
-    stopErrors.value.general = 'At least one tracking stop is required'
+    stopErrors.value. = 'At least one tracking stop is required'
     setAlert('At least one tracking stop is required', 'error')
     isValid = false
   }
@@ -2157,28 +2159,28 @@ const getActivityColor = (type) => {
 const getActivityBadgeColor = (type) => {
   const badgeColorMap = {
     // Package Activities
-    'package_created': 'text-blue-800',
+    'package_created': 'bg-blue-100 text-blue-800',
     'package_delivered': 'bg-green-100 text-green-800',
-    'package_cancelled': 'text-red-800',
-    'package_delayed': 'text-yellow-800',
-    'package_shipped': 'text-purple-800',
+    'package_cancelled': 'bg-red-100 text-red-800',
+    'package_delayed': 'bg-yellow-100 text-yellow-800',
+    'package_shipped': 'bg-purple-100 text-purple-800',
 
     // Location Activities
-    'location_created': 'text-green-800',
-    'location_deleted': 'text-red-800',
-    'location_activated': 'text-green-800',
-    'location_deactivated': 'text-gray-800',
+    'location_created': 'bg-green-100 text-green-800',
+    'location_deleted': 'bg-red-100 text-red-800',
+    'location_activated': 'bg-green-100 text-green-800',
+    'location_deactivated': 'bg-gray-100 text-gray-800',
 
     // User Activities
-    'user_login': 'text-green-800',
-    'user_logout': 'text-gray-800',
-    'user_created': 'text-purple-800',
-    'user_deleted': 'text-red-800',
-    'user_login_failed': 'text-red-800',
+    'user_login': 'bg-green-100 text-green-800',
+    'user_logout': 'bg-gray-100 text-gray-800',
+    'user_created': 'bg-purple-100 text-purple-800',
+    'user_deleted': 'bg-red-100 text-red-800',
+    'user_login_failed': 'bg-red-100 text-red-800',
 
     // System Activities
-    'system_error_occurred': 'text-red-800',
-    'system_security_alert': 'text-red-800'
+    'system_error_occurred': 'bg-red-100 text-red-800',
+    'system_security_alert': 'bg-red-100 text-red-800'
   }
 
   // Default colors based on category
@@ -2196,7 +2198,7 @@ const getActivityCategory = (type) => {
   if (type.startsWith('location_')) return 'Location'
   if (type.startsWith('user_')) return 'User'
   if (type.startsWith('system_')) return 'System'
-  return 'General'
+  return ''
 }
 
 const formatActivityType = (type) => {
