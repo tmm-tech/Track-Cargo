@@ -2120,55 +2120,8 @@
               </div>
           </div>
 
-                      <!-- Reset Password Modal -->
-            <div v-if="showResetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeResetPasswordModal">
-              <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
-              <div class="p-6">
-                <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
-                  <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
-                </div>
-
-                <form @submit.prevent="saveNewPassword">
-                  <div class="space-y-4">
-                    <div class="space-y-2">
-                      <label for="newPassword" class="text-sm font-medium">New Password</label>
-                      <input id="newPassword" v-model="resetPasswordUser.newPassword" type="password"
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        :class="{ 'border-red-500': resetPasswordErrors.newPassword }" placeholder="••••••••" />
-                      <p v-if="resetPasswordErrors.newPassword" class="text-red-500 text-xs mt-1">{{
-                        resetPasswordErrors.newPassword }}</p>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="confirmNewPassword" class="text-sm font-medium">Confirm New Password</label>
-                      <input id="confirmNewPassword" v-model="resetPasswordUser.confirmNewPassword" type="password"
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        :class="{ 'border-red-500': resetPasswordErrors.confirmNewPassword }" placeholder="••••••••" />
-                      <p v-if="resetPasswordErrors.confirmNewPassword" class="text-red-500 text-xs mt-1">{{
-                        resetPasswordErrors.confirmNewPassword }}</p>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-6">
-                    <button type="button"
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                      @click="closeResetPasswordModal">
-                      Cancel
-                    </button>
-                    <button type="submit" @click="resetPassword"
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                      Reset Password
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
         </div>
-      </main>
+    </main>
 
       <!-- Footer -->
       <footer class="bg-[#1a1a1a] text-white py-4">
