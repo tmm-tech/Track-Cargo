@@ -524,7 +524,7 @@
                             </button>
                             <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-9 px-3"
-                              @click="confirmDeleteUserFn(user)">
+                              @click="confirmDeleteUser(user)">
                               <TrashIcon class="h-4 w-4" />
                             </button>
                           </div>
@@ -702,7 +702,7 @@
                     <p class="text-sm text-muted-foreground">Update user information and permissions.</p>
                   </div>
 
-                  <form @submit.prevent="updateUserFn" class="space-y-4 py-4">
+                  <form @submit.prevent="updateUser" class="space-y-4 py-4">
                     <div class="space-y-2">
                       <label for="edit-name" class="text-sm font-medium">Full Name</label>
                       <input id="edit-name" v-model="editingUser.fullname"
@@ -835,7 +835,7 @@
                     </button>
                     <button
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
-                      @click="deleteUserFn">
+                      @click="deleteUser">
                       Delete User
                     </button>
                   </div>
@@ -1871,7 +1871,7 @@
                           <div class="flex justify-end gap-2">
                             <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
-                              @click="viewLocationFn(location)">
+                              @click="viewLocation(location)">
                               <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -1883,13 +1883,13 @@
                             </button>
                             <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
-                              @click="editLocationFn(location)">
+                              @click="editLocation(location)">
                               <PencilIcon class="h-4 w-4 mr-1" />
                               Edit
                             </button>
                             <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-9 px-3"
-                              @click="confirmDeleteLocationFn(location)">
+                              @click="confirmDeleteLocation(location)">
                               <TrashIcon class="h-4 w-4" />
                             </button>
                           </div>
@@ -3379,7 +3379,7 @@ const resetNewLocationForm = () => {
   locationFormErrors.value = {}
 }
 
-const editLocationFn = async (location) => {
+const editLocation = async (location) => {
   try {
 
     const response = await locationService.getLocationById(location.id)
@@ -3398,12 +3398,12 @@ const editLocationFn = async (location) => {
   }
 }
 
-const closeEditLocationModalFn = () => {
+const closeEditLocationModal = () => {
   showEditLocationModal.value = false
   editingLocation.value = null
 }
 
-const updateLocationFn = async () => {
+const updateLocation = async () => {
   if (!editingLocation.value) return
 
   try {
@@ -3428,7 +3428,7 @@ const updateLocationFn = async () => {
     }
 
     setAlert('Location updated successfully!', 'success')
-    closeEditLocationModalFn()
+    closeEditLocationModal()
     // Refresh the user list
     await fetchLocation();
 
@@ -3438,7 +3438,7 @@ const updateLocationFn = async () => {
   }
 };
 
-const viewLocationFn = async (location) => {
+const viewLocation = async (location) => {
   try {
 
     const response = await locationService.getLocationById(location.id)
@@ -3465,21 +3465,21 @@ const closeViewLocationModal = () => {
 const editFromViewLocationModal = (location) => {
   if (viewingLocation.value) {
     closeViewLocationModal()
-    editLocationFn(location)
+    editLocation(location)
   }
 }
 
-const confirmDeleteLocationFn = (location) => {
+const confirmDeleteLocation = (location) => {
   locationToDelete.value = location
   showDeleteLocationModal.value = true
 }
 
-const closeDeleteLocationModalFn = () => {
+const closeDeleteLocationModal = () => {
   showDeleteLocationModal.value = false
   locationToDelete.value = null
 }
 
-const deleteLocationFn = async () => {
+const deleteLocation = async () => {
   if (!locationToDelete.value) return
   try {
     const response = await locationService.deleteLocation(locationToDelete.value.id)
@@ -3494,7 +3494,7 @@ const deleteLocationFn = async () => {
     console.error('Delete error:', error)
     setAlert('An error occurred while deleting the user.', 'error')
   } finally {
-    closeDeleteLocationModalFn()
+    closeDeleteLocationModal()
     locationToDelete.value = null
   }
 }
@@ -3801,7 +3801,7 @@ const closeEditUserModal = () => {
   editingUser.value = null
 }
 
-const updateUserFn = async () => {
+const updateUser = async () => {
   if (!editingUser.value) return;
 
   try {
@@ -3836,7 +3836,7 @@ const updateUserFn = async () => {
   }
 };
 
-const confirmDeleteUserFn = (user) => {
+const confirmDeleteUser = (user) => {
   userToDelete.value = user
   showDeleteUserModal.value = true
 }
@@ -3846,7 +3846,7 @@ const closeDeleteUserModal = () => {
   userToDelete.value = null
 }
 
-const deleteUserFn = async () => {
+const deleteUser = async () => {
   if (!userToDelete.value) return
 
   try {
