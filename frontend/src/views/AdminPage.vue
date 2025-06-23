@@ -1028,11 +1028,15 @@
                       </div>
                     </div>
                     <!-- Activity Badge -->
-                    <div :class="[
-                    'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold shadow-sm transition-colors duration-200',
+<div :class="[
+  'inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-semibold shadow-sm transition-colors duration-200',
   getActivityBadgeColor(activity.type)
 ]">
-  <component v-if="getActivityIcon(activity.type)" :is="getActivityIcon(activity.type)"  class="w-4 h-4 mr-1"/>
+  <component
+    v-if="getActivityIcon(activity.type)"
+    :is="getActivityIcon(activity.type)"
+    class="w-4 h-4 mr-1"
+  />
   {{ formatActivityType(activity.type) }}
 </div>
 
