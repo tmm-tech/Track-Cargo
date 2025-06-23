@@ -1956,9 +1956,9 @@ const validateForm = () => {
   }
 
   if (trackingStops.value.length === 0) {
-    stopErrors.value. = 'At least one tracking stop is required'
-    setAlert('At least one tracking stop is required', 'error')
-    isValid = false
+      stopErrors.value = 'At least one tracking stop is required'
+      setAlert('At least one tracking stop is required', 'error')
+     isValid = false
   }
 
   return isValid
