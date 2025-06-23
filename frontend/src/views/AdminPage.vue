@@ -1032,7 +1032,7 @@
                     'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold shadow-sm transition-colors duration-200',
   getActivityBadgeColor(activity.type)
 ]">
-  <component :is="getBadgeIcon(activity.type)" class="w-3.5 h-3.5" />
+  <component v-if="getActivityIcon(activity.type)" :is="getActivityIcon(activity.type)"  class="w-4 h-4 mr-1"/>
   {{ formatActivityType(activity.type) }}
 </div>
 
