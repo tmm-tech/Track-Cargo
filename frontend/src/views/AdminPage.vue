@@ -1095,10 +1095,10 @@
                   </div>
                 </div>
               </div>
+              </div>
             </div>
-            
              <!-- Add Cargo Modal -->
-            <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+             <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
               @click="closeAddModal">
               <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
                 <div class="p-6">
@@ -1425,7 +1425,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+            </div>
             
               <!-- Edit Cargo Modal -->
             <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
@@ -1586,10 +1586,6 @@
                       </div>
                     </div>
                   </div>
-
-
-
-
                   <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
                     <button
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
