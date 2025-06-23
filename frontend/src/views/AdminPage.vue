@@ -2091,7 +2091,7 @@ const getActivityIcon = (type) => {
     case 'user_updated':
       return Edit
     case 'user_deleted':
-      return Trash
+      return TrashIcon
     case 'package_created':
       return ArchiveBoxIcon
     case 'package_updated':
@@ -2101,7 +2101,7 @@ const getActivityIcon = (type) => {
     case 'location_updated':
       return MapPinIcon
     case 'location_deleted':
-      return Trash
+      return TrashIcon
     default:
       return CogIcon
   }
