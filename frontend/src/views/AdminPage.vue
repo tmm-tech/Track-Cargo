@@ -1016,7 +1016,648 @@
                 </div>
               </div>
             </div>
-            <<<<<
+
+                      <!-- View Cargo Modal -->
+          <div v-if="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeViewModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Cargo Details</h2>
+                  <p class="text-sm text-muted-foreground" v-if="viewingCargo">
+                    Container Number: {{ viewingCargo.container_number }} | Truck Number: {{
+                      viewingCargo.truck_number
+                    }}
+                    |
+                    BL Number: {{ viewingCargo.bl_number }}
+                  </p>
+                </div>
+
+                <div v-if="viewingCargo" class="space-y-6">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Cargo Type</p>
+                      <p class="text-lg">{{ viewingCargo.type.toUpperCase() }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Weight</p>
+                      <p class="text-lg">{{ viewingCargo.weight }} kg</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Shipped Date</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.shipped_date) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.estimated_delivery) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Final Destination</p>
+                      <p class="text-lg">{{ viewingCargo.final_destination }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Last Updated</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.latest_timestamp) }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Cargo Address Card -->
+                  <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
+                    <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
+                      <MapPinIcon class="h-5 w-5 mr-2" />
+                      <h3 class="text-xl font-semibold">Cargo Address</h3>
+                    </div>
+                    <div class="p-6">
+                      <div v-if="viewingCargo.shipping_address" class="space-y-1">
+                        <p class="font-medium">{{ viewingCargo.shipping_address.recipientName }}</p>
+                        <p>{{ viewingCargo.shipping_address.streetAddress }}</p>
+                        <p>
+                          {{ viewingCargo.shipping_address.city }}, {{ viewingCargo.shipping_address.state }}
+                        </p>
+                        <p>{{ viewingCargo.shipping_address.country }}</p>
+                      </div>
+                      <p v-else class="text-gray-500">No shipping address information available</p>
+                    </div>
+                  </div>
+                  <!-- Cargo Progress -->
+                  <ShippingProgress v-if="viewingCargo && viewingCargo.tracking_history"
+                    :tracking_history="viewingCargo.tracking_history || []"
+                    :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
+                    :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
+                    :estimated_delivery="viewingCargo.estimated_delivery" showComments />
+                </div>
+
+                <!-- Comments Section -->
+                <div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
+                  <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
+                    <ChatBubbleLeftRightIcon class="h-5 w-5 mr-2" />
+                    <h3 class="text-xl font-semibold">Comments</h3>
+                  </div>
+                  <div class="p-6">
+                    <div v-if="cargocomment.length != 0" class="space-y-4 mb-6">
+                      <div v-for="(comments, index) in cargocomment" :key="index" class="bg-gray-50 p-4 rounded-md">
+                        <div class="flex justify-between items-start">
+                          <div>
+                            <p class="font-medium">{{ comments.author }}</p>
+                            <p class="text-sm text-gray-500">{{ comments.timestamp }}</p>
+                          </div>
+                        </div>
+                        <p class="mt-2">{{ comments.text }}</p>
+                      </div>
+                    </div>
+                    <div v-else class="text-gray-500 mb-6">No comments yet</div>
+
+
+                    <div class="space-y-2">
+                      <label for="commentText" class="text-sm font-medium">Add Comment</label>
+                      <textarea id="commentText" v-model="newComment.text" rows="3"
+                        placeholder="Enter your comment here..."
+                        class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                    </div>
+                    <button @click="addComment"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                      Add Comment
+                    </button>
+                  </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 space-y-2 sm:space-y-0"
+                    @click="closeViewModal">
+                    Close
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 space-y-2 sm:space-y-0"
+                    @click="editFromViewModal(viewingCargo)">
+                    <PencilIcon class="h-4 w-4 mr-2" />
+                    Edit Cargo
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 space-y-2 sm:space-y-0"
+                    @click="openTrackingDialog(pkg)">
+                    <PrinterIcon class="h-4 w-4 mr-2" />
+                    Print Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+            
+             <!-- Add Cargo Modal -->
+          <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeAddModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Cargo</h2>
+                  <p class="text-sm text-muted-foreground">Enter the details for the new package and its tracking
+                    history.
+                  </p>
+                </div>
+
+                <div>
+                  <div
+                    class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
+                    <button :class="[
+                      'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      addCargoTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addCargoTab = 'details'">
+                      Package Details
+                    </button>
+                    <button :class="[
+                      'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      addCargoTab === 'address' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addCargoTab = 'address'">
+                      Shipping Address
+                    </button>
+                    <button :class="[
+                      'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      addCargoTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addCargoTab = 'stops'">
+                      Tracking Stops
+                    </button>
+                  </div>
+
+
+                  <div v-if="addCargoTab === 'details'" class="space-y-4 mt-4">
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="space-y-2">
+                        <label for="containerNumber" class="text-sm font-medium">Container Number</label>
+                        <input id="containerNumber" v-model="newCargo.container_number"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.container_number ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.container_number" class="text-red-500 text-sm">{{
+                          formErrors.container_number
+                        }}
+                        </p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
+                        <input id="truckNumber" v-model="newCargo.truck_number"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truck_number ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.truck_number" class="text-red-500 text-sm">{{ formErrors.truck_number }}</p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="blNumber" class="text-sm font-medium">BL Number</label>
+                        <input id="blNumber" v-model="newCargo.bl_number"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.bl_number ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.bl_number" class="text-red-500 text-sm">{{ formErrors.bl_number }}</p>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="space-y-2">
+                        <label for="type" class="text-sm font-medium">Cargo Type</label>
+                        <select id="type" v-model="newCargo.type"
+                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.type ? 'border-red-500' : '']">
+                          <option value="" disabled selected>Select Cargo Type</option>
+                          <option value="fcl">FCL (Full Container Load)</option>
+                          <option value="lcl">LCL (Less than Container Load)</option>
+                        </select>
+                        <p v-if="formErrors.type" class="text-red-500 text-sm">{{ formErrors.type }}</p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="weight" class="text-sm font-medium">Weight (kg)</label>
+                        <input id="weight" v-model="newCargo.weight"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.weight ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.weight" class="text-red-500 text-sm">{{ formErrors.weight }}</p>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="space-y-2">
+                        <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
+                        <input id="shippedDate" type="date" v-model="newCargo.shipped_date"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shipped_date ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.shipped_date" class="text-red-500 text-sm">{{ formErrors.shipped_date }}</p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="estimatedDelivery" class="text-sm font-medium">Estimated Delivery</label>
+                        <input id="estimatedDelivery" type="date" v-model="newCargo.estimated_delivery"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.estimated_delivery ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.estimated_delivery" class="text-red-500 text-sm">{{
+                          formErrors.estimated_delivery
+                        }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="currentLocation" class="text-sm font-medium">Current Location</label>
+                      <select id="currentLocation" v-model="newCargo.current_location"
+                        :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.current_location ? 'border-red-500' : '']">
+                        <option value="" disabled selected>Select location</option>
+                        <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                          location.name }}
+                        </option>
+                      </select>
+                      <p v-if="formErrors.current_location" class="text-red-500 text-sm">{{ formErrors.current_location
+                      }}
+                      </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="space-y-2">
+                        <label for="nextStop" class="text-sm font-medium">Next Stop</label>
+                        <select id="nextStop" v-model="newCargo.next_stop"
+                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.next_stop ? 'border-red-500' : '']">
+                          <option value="" disabled selected>Select Next Stop</option>
+                          <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                            location.name }}
+                          </option>
+                        </select>
+                        <p v-if="formErrors.next_stop" class="text-red-500 text-sm">{{ formErrors.next_stop }}
+                        </p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
+                        <input id="nextStopETA" type="datetime-local" v-model="newCargo.next_stop_eta"
+                          class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
+                      <select id="finalDestination" v-model="newCargo.final_destination"
+                        :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.final_destination ? 'border-red-500' : '']">
+                        <option value="" disabled selected>Select Final Destination</option>
+                        <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                          location.name }}
+                        </option>
+                      </select>
+                      <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{
+                        formErrors.final_destination
+                      }}
+                      </p>
+                    </div>
+                  </div>
+                  <div v-if="addCargoTab === 'address'" class="space-y-4 mt-4">
+                    <div class="space-y-2">
+                      <label for="shippingAddress" class="text-sm font-medium">Shipping Address</label>
+                      <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="space-y-2">
+                          <label for="recipientName" class="text-sm font-medium">Recipient Name</label>
+                          <input id="recipientName" v-model="newCargo.shipping_address.recipientName"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.recipient_name ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.recipient_name" class="text-red-500 text-sm">{{
+                            formErrors.recipient_name }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="streetAddress" class="text-sm font-medium">Street Address</label>
+                          <input id="streetAddress" v-model="newCargo.shipping_address.streetAddress"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.street_address ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.street_address" class="text-red-500 text-sm">{{
+                            formErrors.street_address }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="city" class="text-sm font-medium">City/Town</label>
+                          <input id="city" v-model="newCargo.shipping_address.city"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.city ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.city" class="text-red-500 text-sm">{{ formErrors.city }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="state" class="text-sm font-medium">County</label>
+                          <input id="state" v-model="newCargo.shipping_address.state"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.state ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.state" class="text-red-500 text-sm">{{ formErrors.state }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="country" class="text-sm font-medium">Country</label>
+                          <input id="country" v-model="newCargo.shipping_address.country"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.country ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.country" class="text-red-500 text-sm">{{ formErrors.country }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="phone" class="text-sm font-medium">Phone Number</label>
+                          <input id="phone" v-model="newCargo.shipping_address.phone"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.phone ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.phone" class="text-red-500 text-sm">{{ formErrors.phone }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="email" class="text-sm font-medium">Email</label>
+                          <input id="email" type="email" v-model="newCargo.shipping_address.email"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.email ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.email" class="text-red-500 text-sm">{{ formErrors.email }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="specialInstructions" class="text-sm font-medium">Special Instructions</label>
+                          <textarea id="specialInstructions" v-model="newCargo.shipping_address.special_instructions"
+                            rows="2"
+                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="addCargoTab === 'stops'" class="space-y-4 mt-4">
+                    <div v-if="stopErrors.general" class="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">{{
+                      stopErrors.general }}</div>
+
+                    <div class="bg-gray-50 p-4 rounded-md border">
+                      <h3 class="font-medium text-lg mb-3">Add Tracking Stop</h3>
+                      <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="space-y-2">
+                          <label for="status" class="text-sm font-medium">Status</label>
+                          <select id="status" v-model="newStop.status"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="in transit">In Transit</option>
+                            <option value="pending">Pending</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="delayed">Delayed</option>
+                            <option value="processing">Processing</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="sorted">sorted</option>
+                            <option value="out for delivery">Out for Delivery</option>
+                            <option value="arrived at destination">Arrived at Destination</option>
+                            <option value="departed from origin">Departed from Origin</option>
+                            <option value="customs clearance">Customs Clearance</option>
+                            <option value="awaiting pickup">Awaiting Pickup</option>
+                            <option value="ready for pickup">Ready for Pickup</option>
+                            <option value="on hold">On Hold</option>
+                            <option value="returned to sender">Returned to Sender</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="lost">Lost</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="rescheduled">Rescheduled</option>
+                            <option value="delivered to agent">Delivered to Agent</option>
+                            <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
+                            `<option value="documentation requested">Docummentation Requested</option>
+                            <option value="awaiting final delivery">Awaiting Final Delivery</option>
+                            <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>`
+                          </select>
+                          <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="location" class="text-sm font-medium">Location</label>
+                          <select id="nextStop" v-model="newCargo.next_stop" readonly
+                            :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.nextStop ? 'border-red-500' : '']">
+                            <option value="" disabled selected>Select Next Stop</option>
+                            <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                              location.name }}
+                            </option>
+                          </select>
+                          <p v-if="stopErrors.location" class="text-red-500 text-sm">{{ stopErrors.location }}</p>
+                        </div>
+
+                        <div class="space-y-2">
+                          <label for="timestamp" class="text-sm font-medium">Date & Time</label>
+                          <input id="timestamp" type="datetime-local" v-model="newCargo.next_stop_eta" readonly
+                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+
+                          <p v-if="stopErrors.timestamp" class="text-red-500 text-sm">{{ stopErrors.timestamp }}</p>
+                        </div>
+
+                        <div class="space-y-2">
+                          <label for="stopComment" class="text-sm font-medium">Comment</label>
+                          <textarea id="stopComment" placeholder="Enter comment for this stop" v-model="newStop.comment"
+                            rows="2"
+                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                          <p v-if="stopErrors.comment" class="text-red-500 text-sm">{{ stopErrors.comment }}</p>
+                        </div>
+
+                        <button @click="addTrackingStop"
+                          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] hover:bg-[#1e2759] text-white h-10 px-4 py-2">
+                          <PlusIcon class="h-4 w-4 mr-2" />
+                          Add Stop
+                        </button>
+                      </div>
+
+                      <div class="mt-6">
+                        <h3 class="font-medium text-lg mb-3">Tracking History</h3>
+                        <div v-if="trackingStops.length === 0" class="text-center py-8 bg-gray-50 rounded-md border">
+                          <p class="text-gray-500">No tracking stops added yet</p>
+                          <p class="text-sm text-gray-400 mt-1">Add stops to create the package's tracking history
+                          </p>
+                        </div>
+                        <div v-else class="space-y-4">
+                          <div v-for="(stop, index) in trackingStops" :key="index"
+                            class="flex items-start gap-4 bg-white p-4 rounded-md border">
+                            <div class="flex-1">
+                              <div class="flex justify-between">
+                                <div>
+                                  <p class="font-medium">{{ stop.status }}</p>
+                                  <p class="text-sm text-gray-500">{{ stop.location }}</p>
+                                  <p class="text-sm text-gray-500">{{ formatDate(stop.timestamp) }}</p>
+                                  <div v-if="stop.comment" class="mt-2 p-2 bg-gray-50 rounded-md">
+                                    <p class="text-sm font-medium text-gray-700">Comment:</p>
+                                    <p class="text-sm text-gray-600">{{ stop.comment }}</p>
+                                  </div>
+                                </div>
+                                <button @click="removeTrackingStop(index)"
+                                  class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded">
+                                  <TrashIcon class="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                      @click="closeAddModal">
+                      Cancel
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                      @click="addNewCargo">
+                      Add Cargo
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+             <!-- Edit Cargo Modal -->
+          <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeEditModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Update Cargo Information</h2>
+                  <p class="text-sm text-muted-foreground">Update the package location and shipping address information.
+                  </p>
+                </div>
+
+                <div v-if="editingCargo" class="space-y-4 py-4">
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Container Number</p>
+                      <p>{{ editingCargo.container_number }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Truck Number</p>
+                      <p>{{ editingCargo.truck_number }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">BL Number</p>
+                      <p>{{ editingCargo.bl_number }}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div
+                      class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
+                      <button :class="[
+                        'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                        activeEditTab === 'location' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                      ]" @click="activeEditTab = 'location'">
+                        Location
+                      </button>
+                    </div>
+                    <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
+                      <form @submit.prevent="saveEditedCargo" class="space-y-4 py-4">
+                        <div class="space-y-2">
+                          <label for="currentLocation" class="text-sm font-medium">Current Location</label>
+                          <select id="currentLocation" v-model="editingCargo.current_location"
+                            @change="handleLocationChange"
+                            class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                            <option value="" disabled>Select location</option>
+                            <option v-for="location in activeLocations" :key="location.id" :value="location.name">
+                              {{ location.name }}
+                            </option>
+                          </select>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="status" class="text-sm font-medium">Status</label>
+                          <select id="status" v-model="editingCargo.tracking_history.status"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="in transit">In Transit</option>
+                            <option value="pending">Pending</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="delayed">Delayed</option>
+                            <option value="processing">Processing</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="sorted">sorted</option>
+                            <option value="out for delivery">Out for Delivery</option>
+                            <option value="arrived at destination">Arrived at Destination</option>
+                            <option value="departed from origin">Departed from Origin</option>
+                            <option value="customs clearance">Customs Clearance</option>
+                            <option value="awaiting pickup">Awaiting Pickup</option>
+                            <option value="ready for pickup">Ready for Pickup</option>
+                            <option value="on hold">On Hold</option>
+                            <option value="returned to sender">Returned to Sender</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="lost">Lost</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="rescheduled">Rescheduled</option>
+                            <option value="delivered to agent">Delivered to Agent</option>
+                            <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
+                            `<option value="documentation requested">Docummentation Requested</option>
+                            <option value="awaiting final delivery">Awaiting Final Delivery</option>
+                            <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>`
+                          </select>
+                          <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                          <div class="space-y-2">
+                            <label for="nextStop" class="text-sm font-medium">Next Stop</label>
+                            <select id="nextStop" v-model="editingCargo.next_stop"
+                              class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                              <option value="" disabled>Select next stop</option>
+                              <option v-for="location in activeLocations" :key="location.id" :value="location.name">
+                                {{ location.name }}
+                              </option>
+                            </select>
+                            <p class="text-xs text-gray-500">Automatically determined based on current location</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
+                            <input id="nextStopETA" type="datetime-local" v-model="editingCargo.next_stop_eta"
+                              class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                            <p class="text-xs text-gray-500">Estimated based on standard transit times</p>
+                          </div>
+                        </div>
+                        <!-- Comments Section -->
+                        <div class="mt-6 pt-6 border-t">
+                          <h3 class="text-lg font-medium mb-4">Comments & Tracking History</h3>
+
+                          <!-- Display existing comments -->
+                          <div v-if="editingCargo.comments?.length > 0" class="space-y-4 mb-6 max-h-60 overflow-y-auto">
+                            <div v-for="comment in editingCargo.comments" :key="comment.id" :class="[
+                              'p-4 rounded-md border-l-4',
+                              'bg-gray-50 border-l-gray-400'
+                            ]">
+                              <div class="flex justify-between items-start">
+                                <div>
+                                  <p class="font-medium flex items-center gap-2">
+                                    {{ comment.author }}
+
+                                  </p>
+                                  <p class="text-sm text-gray-500">{{ formatDate(comment.timestamp) }}</p>
+                                </div>
+                              </div>
+                              <p class="mt-2">{{ comment.text }}</p>
+                            </div>
+                          </div>
+                          <div v-else
+                            class="text-gray-500 mb-6 p-4 text-center border-2 border-dashed border-gray-200 rounded-md">
+                            No comments or tracking history yet
+                          </div>
+
+                          <!-- Add new comment form -->
+                          <div class="space-y-4 border-t pt-4">
+                            <div class="space-y-2">
+                              <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
+                              <textarea id="editCommentText" v-model="newComment.text" rows="3"
+                                placeholder="Enter your comment here..."
+                                class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                            </div>
+
+                            <div class="flex gap-2">
+                              <button @click="addComment" :disabled="!newComment.text.trim() || isAddingComment"
+                                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span v-if="!isAddingComment">Add Comment</span>
+                                <span v-else class="flex items-center">
+                                  <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                                      fill="none" />
+                                    <path class="opacity-75" fill="white"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                  </svg>
+                                  Adding...
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                    @click="closeEditModal">
+                    Cancel
+                  </button>
+                  <button type="submit" :disabled="isSubmitting"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                    <span v-if="!isSubmitting">Update Cargo</span>
+                    <span v-else class="flex items-center">
+                      <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none" />
+                        <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Updating...
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+           </div>
           </div>
 
           <!-- Activity Log View -->
@@ -1227,6 +1868,309 @@
                 </div>
               </div>
             </div>
+              <!-- Add Location Modal -->
+          <div v-if="showAddLocationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeAddLocationModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Location</h2>
+                  <p class="text-sm text-muted-foreground">Create a new shipping location or transit point.</p>
+                </div>
+
+                <form @submit.prevent="addNewLocation" class="space-y-4 py-4">
+                  <div class="space-y-2">
+                    <label for="location-name" class="text-sm font-medium">Location Name</label>
+                    <input id="location-name" v-model="newLocation.name"
+                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.name ? 'border-red-500' : '']" />
+                    <p v-if="locationFormErrors.name" class="text-red-500 text-sm">{{ locationFormErrors.name }}</p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="location-type" class="text-sm font-medium">Type</label>
+                    <select id="location-type" v-model="newLocation.type"
+                      :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.type ? 'border-red-500' : '']">
+                      <option value="" disabled selected>Select type</option>
+                      <option value="warehouse">Warehouse</option>
+                      <option value="port">Port</option>
+                      <option value="transit">Transit Point</option>
+                      <option value="destination">Destination</option>
+                    </select>
+                    <p v-if="locationFormErrors.type" class="text-red-500 text-sm">{{ locationFormErrors.type }}</p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="location-address" class="text-sm font-medium">Address</label>
+                    <textarea id="location-address" v-model="newLocation.address" rows="3"
+                      :class="['flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.address ? 'border-red-500' : '']"></textarea>
+                    <p v-if="locationFormErrors.address" class="text-red-500 text-sm">{{ locationFormErrors.address }}
+                    </p>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label for="location-city" class="text-sm font-medium">City</label>
+                      <input id="location-city" v-model="newLocation.city"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.city ? 'border-red-500' : '']" />
+                      <p v-if="locationFormErrors.city" class="text-red-500 text-sm">{{ locationFormErrors.city }}</p>
+                    </div>
+                    <div class="space-y-2">
+                      <label for="location-country" class="text-sm font-medium">Country</label>
+                      <input id="location-country" v-model="newLocation.country"
+                        :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.country ? 'border-red-500' : '']" />
+                      <p v-if="locationFormErrors.country" class="text-red-500 text-sm">{{ locationFormErrors.country }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="location-coordinates" class="text-sm font-medium">Coordinates (Optional)</label>
+                    <input id="location-coordinates" v-model="newLocation.coordinates"
+                      placeholder="e.g., -1.2921, 36.8219"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                  </div>
+
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button type="button"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                      @click="closeAddLocationModal">
+                      Cancel
+                    </button>
+                    <button type="submit" :disabled="isSubmitting"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                      <span v-if="!isSubmitting">Add Location</span>
+                      <span v-else class="flex items-center">
+                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                            fill="none" />
+                          <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Saving...
+                      </span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edit Location Modal -->
+          <div v-if="showEditLocationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeEditLocationModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Edit Location</h2>
+                  <p class="text-sm text-muted-foreground">Update location information.</p>
+                </div>
+
+                <form @submit.prevent="updateLocation" class="space-y-4 py-4">
+                  <div class="space-y-2">
+                    <label for="edit-location-name" class="text-sm font-medium">Location Name</label>
+                    <input id="edit-location-name" v-model="editingLocation.name"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="edit-location-type" class="text-sm font-medium">Type</label>
+                    <select id="edit-location-type" v-model="editingLocation.type"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                      <option value="warehouse">Warehouse</option>
+                      <option value="port">Port</option>
+                      <option value="transit">Transit Point</option>
+                      <option value="destination">Destination</option>
+                    </select>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="edit-location-address" class="text-sm font-medium">Address</label>
+                    <textarea id="edit-location-address" v-model="editingLocation.address" rows="3"
+                      class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label for="edit-location-city" class="text-sm font-medium">City</label>
+                      <input id="edit-location-city" v-model="editingLocation.city"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+                    <div class="space-y-2">
+                      <label for="edit-location-country" class="text-sm font-medium">Country</label>
+                      <input id="edit-location-country" v-model="editingLocation.country"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    </div>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="edit-location-coordinates" class="text-sm font-medium">Coordinates</label>
+                    <input id="edit-location-coordinates" v-model="editingLocation.coordinates"
+                      placeholder="No coordinates set"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                  </div>
+
+                  <div class="space-y-2">
+                    <label for="edit-location-status" class="text-sm font-medium">Status</label>
+                    <select id="edit-location-status" v-model="editingLocation.status"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button type="button"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                      @click="closeEditLocationModal">
+                      Cancel
+                    </button>
+                    <button type="submit"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                      <span v-if="!isSubmitting">Update Location</span>
+                      <span v-else class="flex items-center">
+                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                            fill="none" />
+                          <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Updating...
+                      </span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- View Location Modal -->
+          <div v-if="showViewLocationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeViewLocationModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-lg w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Location Details</h2>
+                  <p class="text-sm text-muted-foreground" v-if="viewingLocation">
+                    {{ viewingLocation.name }}
+                  </p>
+                </div>
+
+                <div v-if="viewingLocation" class="space-y-6">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Location Name</p>
+                      <p class="text-lg">{{ viewingLocation.name }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Type</p>
+                      <span :class="[
+                        'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        viewingLocation.type === 'warehouse' ? 'bg-blue-100 text-blue-800' :
+                          viewingLocation.type === 'port' ? 'bg-green-100 text-green-800' :
+                            viewingLocation.type === 'transit' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                      ]">
+                        {{ viewingLocation.type.charAt(0).toUpperCase() + viewingLocation.type.slice(1) }}
+                      </span>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Status</p>
+                      <span :class="[
+                        'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        viewingLocation.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      ]">
+                        {{ viewingLocation.status.charAt(0).toUpperCase() + viewingLocation.status.slice(1) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-sm font-medium text-gray-500 mb-2">Address</p>
+                    <div class="bg-gray-50 p-3 rounded-md">
+                      <p>{{ viewingLocation.address }}</p>
+                      <p class="text-sm text-gray-600 mt-1">{{ viewingLocation.city }}, {{ viewingLocation.country }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div v-if="viewingLocation.coordinates">
+                    <p class="text-sm font-medium text-gray-500 mb-2">Coordinates</p>
+                    <p class="font-mono text-sm bg-gray-50 p-2 rounded">{{ viewingLocation.coordinates }}</p>
+                  </div>
+
+                  <div>
+                    <p class="text-sm font-medium text-gray-500 mb-2">Created</p>
+                    <p class="text-sm">{{ formatDate(viewingLocation.created_at) }}</p>
+                  </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                    @click="closeViewLocationModal">
+                    Close
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                    @click="editFromViewLocationModal(viewingLocation)">
+                    <PencilIcon class="h-4 w-4 mr-2" />
+                    Edit Location
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete Location Confirmation Modal -->
+          <div v-if="showDeleteLocationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
+                  <p class="text-sm text-muted-foreground">Are you sure you want to delete this location? This action
+                    cannot be undone.</p>
+                </div>
+
+                <div class="p-4 bg-red-50 rounded-md mb-4">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                      <div class="mt-2 text-sm text-red-700">
+                        <p>Deleting this location may affect existing shipment and tracking history.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="locationToDelete" class="py-4 border-t border-b">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
+                      <MapPinIcon class="h-5 w-5 text-[#273272]" />
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">{{ locationToDelete.name }}</div>
+                      <div class="text-sm text-gray-500">{{ locationToDelete.city }}, {{
+                        locationToDelete.country }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                    @click="closeDeleteLocationModal">
+                    Cancel
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
+                    @click="deleteLocation">
+                    Delete Location
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
           </div>
         </div>
       </main>
