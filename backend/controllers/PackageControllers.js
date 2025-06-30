@@ -204,7 +204,9 @@ module.exports = {
           };
         })
       );
-      packageData.tracking_history = trackingHistoryWithUser.rows;
+      packageData.tracking_history = trackingHistoryWithUser;
+      // Get the latest tracking event timestamp
+      
 
       res.json({ success: true, package: packageData });
 
