@@ -3,18 +3,18 @@ const { v4: uuidv4 } = require('uuid');
 
 // Helper function to insert activity log
 const insertActivityLog = async (type, userId, message, details = {}) => {
-    try {
-        const activityQuery = `
+  try {
+    const activityQuery = `
             INSERT INTO activity_logs (type, user_id, message, details)
             VALUES ($1, $2, $3, $4)
             RETURNING *;
         `;
-        const params = [type, userId, message, details];
-        await query(activityQuery, params);
-    } catch (error) {
-        console.error('Error inserting activity log:', error);
-        // Don't throw error to prevent breaking the main operation
-    }
+    const params = [type, userId, message, details];
+    await query(activityQuery, params);
+  } catch (error) {
+    console.error('Error inserting activity log:', error);
+    // Don't throw error to prevent breaking the main operation
+  }
 };
 
 
@@ -107,7 +107,7 @@ module.exports = {
         return res.status(500).json({ success: false, message: 'Failed to create tracking event' });
       }
 
-       // Insert activity log
+      // Insert activity log
       await insertActivityLog(
         'package_created',
         userId,
@@ -191,22 +191,37 @@ module.exports = {
       ORDER BY timestamp ASC;
     `, [id]);
 
-    //Get Fullname of the user who added comment in tracking history
-      const trackingHistoryWithUser = await Promise.all(  
-        trackingHistoryResult.rows.map(async (event) => {
-          const userResult = await query(`
-          SELECT fullname FROM profile
-          WHERE id = $1;
-        `, [event.author]);
-          return {
-            ...event,
-            user_fullname: userResult.rowCount > 0 ? userResult.rows[0].fullname : 'Unknown User'
-          };
-        })
-      );
+      const authorIds = [
+        ...new Set(
+          trackingHistoryResult.rows
+            .map(e => e.comment?.author) // get author
+            .filter(Boolean)            // remove null/undefined
+        )
+      ];
+
+      // Step 2: Fetch all user fullnames in one batch
+      let authorsMap = {};
+      if (authorIds.length > 0) {
+        const userResult = await query(
+          `SELECT id, fullname FROM profile WHERE id = ANY($1::uuid[])`,
+          [authorIds]
+        );
+        authorsMap = Object.fromEntries(userResult.rows.map(user => [user.id, user.fullname]));
+      }
+
+      // Step 3: Map fullnames into tracking history
+      const trackingHistoryWithUser = trackingHistoryResult.rows.map(event => {
+        const authorId = event.comment?.author;
+        const fullname = authorId ? authorsMap[authorId] || 'Unknown User' : 'No Comment';
+
+        return {
+          ...event,
+          user_fullname: fullname
+        };
+      });
+
       packageData.tracking_history = trackingHistoryWithUser;
-      // Get the latest tracking event timestamp
-      
+
 
       res.json({ success: true, package: packageData });
 
@@ -304,11 +319,11 @@ module.exports = {
 
   // Track package by tracking number
   trackPackageByTrackingNumber: async (req, res) => {
-  try {
-    const { tracking_number } = req.params;
+    try {
+      const { tracking_number } = req.params;
 
-    // 1. Get package
-    const packageResult = await query(`
+      // 1. Get package
+      const packageResult = await query(`
       SELECT 
         p.*, 
         te.timestamp AS latest_timestamp 
@@ -330,27 +345,27 @@ module.exports = {
         p.created_at DESC;
     `, [tracking_number]);
 
-    if (packageResult.rowCount === 0) {
-      return res.status(404).json({ success: false, message: 'Package not found' });
-    }
+      if (packageResult.rowCount === 0) {
+        return res.status(404).json({ success: false, message: 'Package not found' });
+      }
 
-    const foundPackage = packageResult.rows[0];
+      const foundPackage = packageResult.rows[0];
 
-    // 2. Get tracking history for the found package
-    const historyResult = await query(`
+      // 2. Get tracking history for the found package
+      const historyResult = await query(`
       SELECT * FROM tracking_events 
       WHERE package_id = $1
       ORDER BY timestamp ASC;
     `, [foundPackage.id]);
 
-    foundPackage.tracking_history = historyResult.rows;
+      foundPackage.tracking_history = historyResult.rows;
 
-    // 3. Send full response
-    res.json({ success: true, data: foundPackage });
-  } catch (error) {
-    console.error('Error tracking package:', error.message);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+      // 3. Send full response
+      res.json({ success: true, data: foundPackage });
+    } catch (error) {
+      console.error('Error tracking package:', error.message);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
   }
-}
 
 };
