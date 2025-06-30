@@ -191,7 +191,20 @@ module.exports = {
       ORDER BY timestamp ASC;
     `, [id]);
 
-      packageData.tracking_history = trackingHistoryResult.rows;
+    //Get Fullname of the user who added comment in tracking history
+      const trackingHistoryWithUser = await Promise.all(  
+        trackingHistoryResult.rows.map(async (event) => {
+          const userResult = await query(`
+          SELECT fullname FROM users
+          WHERE id = $1;
+        `, [event.user_id]);
+          return {
+            ...event,
+            user_fullname: userResult.rowCount > 0 ? userResult.rows[0].fullname : 'Unknown User'
+          };
+        })
+      );
+      packageData.tracking_history = trackingHistoryWithUser.rows;
 
       res.json({ success: true, package: packageData });
 

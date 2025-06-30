@@ -860,21 +860,22 @@
                           <h3 class="text-lg font-medium mb-4">Comments & Tracking History</h3>
 
                           <!-- Display existing comments -->
-                          <div v-if="editingCargo.comments?.length > 0" class="space-y-4 mb-6 max-h-60 overflow-y-auto">
-                            <div v-for="comment in editingCargo.comments" :key="comment.id" :class="[
-                              'p-4 rounded-md border-l-4',
-                              'bg-gray-50 border-l-gray-400'
-                            ]">
+                          <div v-if="editingCargo.tracking_history?.length > 0"
+                            class="space-y-4 mb-6 max-h-60 overflow-y-auto">
+                            <div v-for="entry in editingCargo.tracking_history" :key="entry.id"
+                             :class="[
+                                'p-4 rounded-md border-l-4',
+                                'bg-gray-50 border-l-gray-400'
+                              ]">
                               <div class="flex justify-between items-start">
                                 <div>
                                   <p class="font-medium flex items-center gap-2">
-                                    {{ comment.author }}
-
+                                    {{ entry.comment.author || 'Unknown' }}
                                   </p>
-                                  <p class="text-sm text-gray-500">{{ formatDate(comment.timestamp) }}</p>
+                                  <p class="text-sm text-gray-500">{{ formatDate(entry.comment.timestamp) }}</p>
                                 </div>
                               </div>
-                              <p class="mt-2">{{ comment.text }}</p>
+                              <p class="mt-2">{{ entry.comment.text || 'No comment' }}</p>
                             </div>
                           </div>
                           <div v-else
@@ -892,7 +893,7 @@
                             </div>
 
                             <div class="flex gap-2">
-                              <button @click="addComment" :disabled="!newComment.text.trim() || isAddingComment"
+                              <button @click="addComments" :disabled="!newComment.text.trim() || isAddingComment"
                                 class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <span v-if="!isAddingComment">Add Comment</span>
                                 <span v-else class="flex items-center">
@@ -2088,7 +2089,7 @@
               <div class="flex flex-col space-y-1.5 pb-4">
                 <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
                 <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                }}</strong></p>
+                    }}</strong></p>
               </div>
 
               <form @submit.prevent="saveNewPassword">
@@ -2128,6 +2129,7 @@
           </div>
         </div>
       </main>
+
       <!-- Cargo Tracking Dialog -->
       <div v-if="showTrackingDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
         @click="closeTrackingDialog">
@@ -2657,6 +2659,21 @@ const addComment = async () => {
   }
 };
 
+
+// Add comment function
+const addComments = async () => {
+  if (validateComment()) {
+
+    cargocomment.value.push({
+      author: comment.author,
+      text: comment.value.text.trim(),
+      timestamp: new Date().toLocaleString()
+    })
+    // Clear comment input
+    newComment.value.text = '';
+  }
+};
+
 // Validate Comment
 const validateComment = () => {
   const text = newComment.value.text?.trim();
@@ -2668,17 +2685,14 @@ const validateComment = () => {
   }
   return null; // No errors
 };
+
 const saveEditedCargo = async () => {
 
   isSubmitting.value = true
   // Validate the edited data
-  if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta) {
+  if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta || !cargocomment.value.comment || !editData.value.shipping_address.recipientName || !editData.value.shipping_address.streetAddress) {
     setAlert('Please fill in all required fields.', 'error')
     return
-  }
-
-  if (!cargocomment.value.comment || cargocomment.value.comment.trim() === '') {
-    errors.comment = 'Comment is required'
   }
 
 
@@ -3745,16 +3759,15 @@ const editUser = async (user) => {
       return
     }
 
-     // Populate editingUser with fetched data
+    // Populate editingUser with fetched data
     editingUser.value = { ...response.data.data, newPassword: '' }
-
     // Populate editingUser with fetched data
     editingUser.value = {
       ...response.data.data,
       permissions: response.data.data.permissions || [],
       newPassword: ''
     }
- 
+
     showEditUserModal.value = true
     console.log('Modal should now be visible', editingUser.value)
 
