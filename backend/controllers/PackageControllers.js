@@ -195,9 +195,9 @@ module.exports = {
       const trackingHistoryWithUser = await Promise.all(  
         trackingHistoryResult.rows.map(async (event) => {
           const userResult = await query(`
-          SELECT fullname FROM users
+          SELECT fullname FROM profile
           WHERE id = $1;
-        `, [event.user_id]);
+        `, [event.author]);
           return {
             ...event,
             user_fullname: userResult.rowCount > 0 ? userResult.rows[0].fullname : 'Unknown User'
