@@ -1186,7 +1186,7 @@
                 <div class="p-6">
                   <div class="flex flex-col space-y-1.5 pb-4">
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Cargo</h2>
-                    <p class="text-sm text-muted-foreground">Enter the details for the new package and its tracking
+                    <p class="text-sm text-muted-foreground">Enter the details for the new cargo and its tracking
                       history.
                     </p>
                   </div>
@@ -1199,7 +1199,7 @@
                         'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                         addCargoTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
                       ]" @click="addCargoTab = 'details'">
-                        Package Details
+                        Cargo Details
                       </button>
                       <button :class="[
                         'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
