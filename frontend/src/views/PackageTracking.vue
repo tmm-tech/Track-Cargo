@@ -7,14 +7,14 @@
           :style="logoImageStyle" />
         <div :style="{ fontSize: '20px', fontWeight: 'bold' }">Texmon Logistics</div>
       </div>
-      <div :style="{ fontSize: '18px' }">Package Tracking Details</div>
+      <div :style="{ fontSize: '18px' }">Cargo Tracking Details</div>
     </div>
 
-    <!-- Package Information Section -->
+    <!-- Cargo Information Section -->
     <div :style="sectionStyle">
       <div :style="sectionHeaderStyle">
         <span :style="{ marginRight: '10px', fontSize: '20px' }">📦</span>
-        Package Information
+        Cargo Information
       </div>
       <div :style="sectionContentStyle">
         <div :style="gridStyle">
@@ -34,7 +34,7 @@
             <div :style="fieldValueStyle">{{ pkg.bl_number }}</div>
           </div>
           <div :style="fieldStyle">
-            <div :style="fieldLabelStyle">Package Type</div>
+            <div :style="fieldLabelStyle">Cargo Type</div>
             <div :style="fieldValueStyle">{{ pkg.type }}</div>
           </div>
           <div :style="fieldStyle">

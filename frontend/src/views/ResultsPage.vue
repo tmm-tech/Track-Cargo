@@ -128,14 +128,14 @@
           <!-- Package Details Card -->
           <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
-              <h2 class="text-xl font-semibold">Package Details</h2>
-              <p class="text-gray-200">Package Number: {{ trackingNumber }}</p>
+              <h2 class="text-xl font-semibold">Cargo Details</h2>
+              <p class="text-gray-200">Cargo Number: {{ trackingNumber }}</p>
             </div>
             <div class="p-6">
               <div class="grid gap-6 md:grid-cols-2">
                 <div>
-                  <h3 class="font-medium text-gray-500">Package Type</h3>
-                  <p class="text-lg">{{ packageData.type }}</p>
+                  <h3 class="font-medium text-gray-500">Cargo Type</h3>
+                  <p class="text-lg uppercase">{{ packageData.type }}</p>
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Weight</h3>
@@ -143,11 +143,11 @@
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Shipped Date</h3>
-                  <p class="text-lg">{{ packageData.shippedDate }}</p>
+                  <p class="text-lg">{{ formatDate(packageData.shipped_date) }}</p>
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Estimated Delivery</h3>
-                  <p class="text-lg">{{ packageData.estimatedDelivery }}</p>
+                  <p class="text-lg">{{ formatDate(packageData.estimated_delivery)}}</p>
                 </div>
               </div>
             </div>
@@ -171,8 +171,8 @@
                 </div>
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Current Location</h3>
-                  <p class="text-xl font-bold text-[#273272]">{{ packageData.currentLocation }}</p>
-                  <p class="text-gray-500">Updated: {{ packageData.lastUpdated }}</p>
+                  <p class="text-xl font-bold text-[#273272]">{{ packageData.current_location }}</p>
+                  <p class="text-gray-500">Updated: {{ formatDate(packageData.latest_timestamp) }}</p>
                   <div class="flex items-center mt-2">
                     <span :class="[
                       'px-2 py-1 text-xs font-medium rounded-full capitalize',
@@ -196,8 +196,8 @@
                 </div>
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Next Stop</h3>
-                  <p class="text-xl font-bold text-[#273272]">{{ packageData.nextStop }}</p>
-                  <p class="text-gray-500">Estimated arrival: {{ packageData.nextStopETA }}</p>
+                  <p class="text-xl font-bold text-[#273272]">{{ packageData.next_stop }}</p>
+                  <p class="text-gray-500">Estimated arrival: {{ formatDate(packageData.next_stop_eta) }}</p>
                   <div class="flex items-center mt-2">
                     <span
                       class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
@@ -219,8 +219,8 @@
                 </div>
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-500 text-lg">Final Destination</h3>
-                  <p class="text-xl font-bold text-[#273272]">{{ packageData.finalDestination }}</p>
-                  <p class="text-gray-500">Estimated delivery: {{ packageData.estimatedDelivery }}</p>
+                  <p class="text-xl font-bold text-[#273272]">{{ packageData.final_destination }}</p>
+                  <p class="text-gray-500">Estimated delivery: {{ formatDate(packageData.estimated_delivery) }}</p>
                   <div class="flex items-center mt-2">
                     <span
                       class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
@@ -258,7 +258,7 @@
                     <p class="mt-2 text-sm font-medium">Shipped</p>
                     <transition name="fade">
                       <div v-if="currentStep >= 1" class="mt-1 text-xs text-gray-500">
-                        {{ formatDate(packageData.shippedDate) }}
+                        {{ formatDate(packageData.shipped_date) }}
                       </div>
                     </transition>
                   </div>
@@ -327,10 +327,10 @@
             </div>
             <div class="p-6">
               <div class="space-y-6">
-                <div v-for="(event, index) in packageData.trackingHistory" :key="index" class="flex gap-4">
+                <div v-for="(event, index) in packageData.tracking_history" :key="index" class="flex gap-4">
                   <div class="relative flex flex-col items-center">
                     <div :class="`w-4 h-4 rounded-full ${index === 0 ? 'bg-[#ffb600]' : 'bg-gray-300'}`"></div>
-                    <div v-if="index < packageData.trackingHistory.length - 1"
+                    <div v-if="index < packageData.tracking_history.length - 1"
                       class="w-0.5 h-full bg-gray-200 absolute top-4"></div>
                   </div>
                   <div class="flex-1 pb-6">
@@ -477,7 +477,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { MapPinIcon, TruckIcon, CheckCircleIcon, ArchiveBoxIcon } from '@heroicons/vue/24/outline'
-import { mockPackages } from '../data/mock-data'
+import ShippingServices from '../Services/ShippingServices.js';
 
 const route = useRoute()
 const trackingNumber = computed(() => route.query.number || '')
@@ -512,24 +512,24 @@ const formatDate = (dateString) => {
 
 // Get dates for each shipping stage from tracking history
 const getInTransitDate = () => {
-  if (!packageData.value?.trackingHistory) return 'N/A'
-  const inTransitEvent = packageData.value.trackingHistory.find(
+  if (!packageData.value?.tracking_history) return 'N/A'
+  const inTransitEvent = packageData.value.tracking_history.find(
     event => event.status.toLowerCase().includes('in transit')
   )
   return inTransitEvent ? inTransitEvent.timestamp.split(' ')[0] : 'N/A'
 }
 
 const getOutForDeliveryDate = () => {
-  if (!packageData.value?.trackingHistory) return 'N/A'
-  const outForDeliveryEvent = packageData.value.trackingHistory.find(
+  if (!packageData.value?.tracking_history) return 'N/A'
+  const outForDeliveryEvent = packageData.value.tracking_history.find(
     event => event.status.toLowerCase().includes('out for delivery')
   )
   return outForDeliveryEvent ? outForDeliveryEvent.timestamp.split(' ')[0] : 'N/A'
 }
 
 const getDeliveredDate = () => {
-  if (!packageData.value?.trackingHistory) return null
-  const deliveredEvent = packageData.value.trackingHistory.find(
+  if (!packageData.value?.tracking_history) return null
+  const deliveredEvent = packageData.value.tracking_history.find(
     event => event.status.toLowerCase().includes('delivered')
   )
   return deliveredEvent ? deliveredEvent.timestamp.split(' ')[0] : null
@@ -539,25 +539,26 @@ const getDeliveredDate = () => {
 const determineShippingStep = () => {
   if (!packageData.value) return 0
 
-  const history = packageData.value.trackingHistory
+  const history = packageData.value.tracking_history
 
   // Always at least at step 1 (Shipped) if we have package data
   let step = 1
 
-  // Check for "In Transit" status
-  if (history.some(event => event.status.toLowerCase().includes('in transit'))) {
-    step = 2
-  }
+ // Check for "In Transit" status
+if (history.some(event => (event.status || '').toLowerCase().includes('in transit'))) {
+  step = 2;
+}
 
-  // Check for "Out for Delivery" status
-  if (history.some(event => event.status.toLowerCase().includes('out for delivery'))) {
-    step = 3
-  }
+// Check for "Out for Delivery" status
+if (history.some(event => (event.status || '').toLowerCase().includes('out for delivery'))) {
+  step = 3;
+}
 
-  // Check for "Delivered" status
-  if (history.some(event => event.status.toLowerCase().includes('delivered'))) {
-    step = 4
-  }
+// Check for "Delivered" status
+if (history.some(event => (event.status || '').toLowerCase().includes('delivered'))) {
+  step = 4;
+}
+
 
   return step
 }
@@ -589,23 +590,26 @@ watch(() => packageData.value, () => {
   }
 }, { immediate: false })
 
-onMounted(() => {
-  let foundPackage = null; // Initialize foundPackage
+onMounted(async () => {
+  loading.value = true
+  error.value = null
+  packageData.value = null
 
-  // Simulate API call with a timeout
-  setTimeout(() => {
-    loading.value = false
+  try {
+    // Call your backend service to track the package
+    const response = await ShippingServices.trackPackage(trackingNumber.value)
 
-    foundPackage = mockPackages.find(
-      (pkg) => pkg.containerNumber === trackingNumber.value || pkg.truckNumber === trackingNumber.value || pkg.blNumber === trackingNumber.value
-    )
-
-    if (foundPackage) {
-      packageData.value = foundPackage
+    if (response.data.success && response.data.data) {
+      packageData.value = response.data.data
     } else {
-      error.value = 'No package found with the provided information'
+      error.value = response.message || 'No package found with the provided information'
     }
-  }, 1000)
+  } catch (err) {
+    console.error('Error tracking package:', err)
+    error.value = 'An error occurred while fetching package data'
+  } finally {
+    loading.value = false
+  }
 })
 
 // Add these after the other computed properties in the script section
@@ -629,19 +633,19 @@ const isFinalDestination = computed(() => {
 
 const isDelivered = computed(() => {
   if (!packageData.value) return false
-  return packageData.value.trackingHistory.some(
+  return packageData.value.tracking_history.some(
     event => event.status.toLowerCase().includes('delivered')
   )
 })
 
 // Get the current status based on tracking history
 const getCurrentLocationStatus = () => {
-  if (!packageData.value?.trackingHistory || packageData.value.trackingHistory.length === 0) {
+  if (!packageData.value?.tracking_history || packageData.value.tracking_history.length === 0) {
     return 'Processing'
   }
 
   // Get the most recent status from tracking history
-  const latestEvent = packageData.value.trackingHistory[0]
+  const latestEvent = packageData.value.tracking_history[0]
   return latestEvent.status
 }
 

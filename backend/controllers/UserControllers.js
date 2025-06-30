@@ -25,15 +25,14 @@ module.exports = {
     // Create a new user
     createUser: async (req, res) => {
         const details = req.body;
+        const userId = req.user?.id || null;
         try {
             let value = await validateCreateUserSchema(details);
             let hashed_pwd = await bcrypt.hash(value.password, 8);
 
             const insertUserQuery = `
       INSERT INTO profile (fullname, username, email, password, roles, status, permissions, lastlogin)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING id;
-    `;
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
 
             // Provide default values if not present
             const params = [
@@ -44,7 +43,7 @@ module.exports = {
                 value.roles,
                 value.status || 'active',
                 JSON.stringify(value.permissions || []),  // Store permissions as JSON string
-                value.lastLogin || null,
+                null,
             ];
 
             const result = await query(insertUserQuery, params);
@@ -54,7 +53,7 @@ module.exports = {
             // Insert activity log
             await insertActivityLog(
                 'user_created',
-                creatorUserId,
+                userId,
                 `New user account created for ${value.fullname} (${value.username})`,
                 {
                     created_user_id: newUser.id,
@@ -179,67 +178,69 @@ module.exports = {
 
     // Get all Users
     getAllUser: async (req, res) => {
-        try {
-            // SQL query to get all users where isdeleted is TRUE
-            const getUserQuery = `
-                SELECT * FROM profile;
-            `;
-            const userResult = await query(getUserQuery); // Execute the query
+    try {
+        const getUserQuery = `SELECT * FROM profile;`;
+        const userResult = await query(getUserQuery);
 
-            if (userResult.rows.length > 0) {
-                // Send the user data if found
-                res.json({
-                    success: true,
-                    message: 'Users retrieved successfully',
-                    data: userResult.rows // Send all user data
-                });
-            } else {
-                // No users found, send a 404 response
-                res.status(404).json({
-                    success: false,
-                    message: 'No users found'
-                });
-            }
-        } catch (error) {
-            // Log the error and send a 500 response
-            console.error('Error getting users:', error);
-            res.status(500).json({
+        if (userResult.rows.length > 0) {
+            // Remove passwords
+            const usersWithoutPasswords = userResult.rows.map(user => {
+                const { password, ...userWithoutPassword } = user;
+                return userWithoutPassword;
+            });
+
+            res.json({
+                success: true,
+                message: 'Users retrieved successfully',
+                data: usersWithoutPasswords
+            });
+        } else {
+            res.status(404).json({
                 success: false,
-                message: `Get User Details Error: ${error.message}`
+                message: 'No users found'
             });
         }
-    },
+    } catch (error) {
+        console.error('Error getting users:', error);
+        res.status(500).json({
+            success: false,
+            message: `Get User Details Error: ${error.message}`
+        });
+    }
+},
+
 
 
     getAUser: async (req, res) => {
-        const { id } = req.params;
-        try {
-            const getUserQuery = `
-                SELECT * FROM profile WHERE id = $1;
-            `;
-            const userResult = await query(getUserQuery, [id]);
+    const { id } = req.params;
+    try {
+        const getUserQuery = `SELECT * FROM profile WHERE id = $1;`;
+        const userResult = await query(getUserQuery, [id]);
 
-
-            if (userResult.rows.length > 0) {
-
-                res.json({ success: true, message: 'User retrieved successfully', data: userResult.rows[0] });
-
-
-            } else {
-                res.status(404).json({ success: false, message: 'User not found' });
-
-            }
-        } catch (error) {
-            console.error('Error getting user:', error);
-            res.status(500).json({ success: false, message: `Get User Details Error: ${error.message}` });
-
+        if (userResult.rows.length > 0) {
+            const { password, ...userWithoutPassword } = userResult.rows[0];
+            res.json({
+                success: true,
+                message: 'User retrieved successfully',
+                data: userWithoutPassword
+            });
+        } else {
+            res.status(404).json({ success: false, message: 'User not found' });
         }
-    },
+    } catch (error) {
+        console.error('Error getting user:', error);
+        res.status(500).json({
+            success: false,
+            message: `Get User Details Error: ${error.message}`
+        });
+    }
+},
 
     // Update user details
     updateUser: async (req, res) => {
         const { fullname, email, roles, password } = req.body;
         const { id } = req.params;
+        const userId = req.user?.id || null;
 
         try {
             // Build the query and parameters
@@ -265,10 +266,17 @@ module.exports = {
             const result = await query(updateUserQuery, params);
 
             if (result.rowCount > 0) {
+                const updatedUser = result.rows[0];
+                const changes = {};
+
+                if (fullname && fullname !== updatedUser.fullname) changes.fullname = fullname;
+                if (email && email !== updatedUser.email) changes.email = email;
+                if (roles && roles !== updatedUser.roles) changes.roles = roles;
+                if (password) changes.password = '********'; // Don’t log actual password
                  // Insert activity log
                 await insertActivityLog(
                     'user_updated',
-                    updaterUserId,
+                    userId,
                     `User ${updatedUser.fullname} (${updatedUser.username}) was updated`,
                     {
                         updated_user_id: id,
@@ -290,6 +298,7 @@ module.exports = {
     // Permanently delete user
     deleteUser: async (req, res) => {
         const { id } = req.params;
+        const userId = req.user?.id || null;
         try {
             // Query to get the user's email and full name before deleting
             const getUserQuery = `
@@ -312,10 +321,11 @@ module.exports = {
         `;
             const result = await query(deleteUserQuery, [id]);
             if (result.rowCount > 0) {
+                 const userToDelete = result.rows[0];
                 // Insert activity log
                 await insertActivityLog(
                     'user_deleted',
-                    deleterUserId,
+                    userId,
                     `User ${userToDelete.fullname} (${userToDelete.username}) was permanently deleted`,
                     {
                         deleted_user_id: id,
