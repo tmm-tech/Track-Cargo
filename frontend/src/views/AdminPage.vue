@@ -1625,7 +1625,7 @@
                                 <div class="flex justify-between items-start">
                                   <div>
                                     <p class="font-medium flex items-center gap-2">
-                                      {{ entry.comment.user_fullname || 'Unknown' }}
+                                      {{ entry.user_fullname || 'Unknown' }}
                                     </p>
                                     <p class="text-sm text-gray-500">{{ formatDate(entry.comment.timestamp) }}</p>
                                   </div>
@@ -2725,13 +2725,9 @@ const saveEditedCargo = async () => {
 
   isSubmitting.value = true
   // Validate the edited data
-  if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta) {
+  if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta || !editData.value.comment) {
     setAlert('Please fill in all required fields.', 'error')
     return
-  }
-
-  if (!cargocomment.value.comment || cargocomment.value.comment.trim() === '') {
-    errors.comment = 'Comment is required'
   }
 
   // Update the package data
