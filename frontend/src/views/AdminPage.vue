@@ -1,27 +1,32 @@
 <template>
   <div class="flex h-screen">
     <!-- Stylish Loading Component -->
-    <div v-if="loading || isCheckingAuth" class="fixed inset-0 bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col justify-center items-center z-50">
+    <div v-if="loading || isCheckingAuth"
+      class="fixed inset-0 bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col justify-center items-center z-50">
       <!-- Modern Spinner with Logo -->
       <div class="text-center">
         <!-- Logo/Brand -->
         <div class="mb-8">
-          <div class="w-20 h-20 mx-auto bg-gradient-to-br from-[#273272] via-[#1e2759] to-[#273272] rounded-3xl flex items-center justify-center mb-6 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+          <div
+            class="w-20 h-20 mx-auto bg-gradient-to-br from-[#273272] via-[#1e2759] to-[#273272] rounded-3xl flex items-center justify-center mb-6 shadow-2xl transform hover:scale-105 transition-transform duration-300">
             <img src="https://www.texmonlogistics.co.ke/assets/images/texmon-logo.png" alt="Texmon Logistics Logo"
               class="w-12 h-12 rounded object-contain" />
           </div>
-          <h2 class="text-3xl font-bold bg-gradient-to-r from-[#273272] to-[#1e2759] bg-clip-text text-transparent mb-2">
+          <h2
+            class="text-3xl font-bold bg-gradient-to-r from-[#273272] to-[#1e2759] bg-clip-text text-transparent mb-2">
             Texmon Logistics
           </h2>
           <p class="text-gray-600 text-lg">Admin Portal</p>
         </div>
-        
+
         <!-- Animated Spinner -->
         <div class="relative mb-6">
           <div class="w-16 h-16 border-4 border-gray-200 border-t-[#273272] rounded-full animate-spin mx-auto"></div>
-          <div class="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-[#ffb600] rounded-full animate-spin mx-auto" style="animation-delay: 0.15s; animation-duration: 1.5s;"></div>
+          <div
+            class="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-[#ffb600] rounded-full animate-spin mx-auto"
+            style="animation-delay: 0.15s; animation-duration: 1.5s;"></div>
         </div>
-        
+
         <!-- Loading Text Animation -->
         <div class="space-y-4">
           <div class="flex justify-center items-center space-x-1">
@@ -32,17 +37,18 @@
               <div class="w-1.5 h-1.5 bg-[#273272] rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
             </div>
           </div>
-          
+
           <div class="text-sm text-gray-500 animate-pulse">
             Preparing your dashboard experience...
           </div>
         </div>
       </div>
-      
+
       <!-- Floating Background Elements -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none">
         <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-[#273272] opacity-5 rounded-full animate-float"></div>
-        <div class="absolute top-3/4 right-1/4 w-24 h-24 bg-[#ffb600] opacity-10 rounded-full animate-float-delayed"></div>
+        <div class="absolute top-3/4 right-1/4 w-24 h-24 bg-[#ffb600] opacity-10 rounded-full animate-float-delayed">
+        </div>
         <div class="absolute top-1/2 left-3/4 w-16 h-16 bg-[#273272] opacity-5 rounded-full animate-float-slow"></div>
       </div>
     </div>
@@ -55,7 +61,7 @@
     <!-- Mobile Menu Overlay -->
     <div v-if="showMobileMenu && isAuthenticated" class="fixed inset-0 z-50 bg-black/50 md:hidden"
       @click="closeMobileMenu"></div>
-    
+
     <!-- Sidebar Navigation -->
     <div v-if="isAuthenticated"
       class="sidebar bg-[#1e2338] text-white h-screen flex flex-col transition-all duration-300 shadow-lg relative z-50 overflow-hidden"
@@ -110,7 +116,7 @@
                 class="flex-shrink-0" />
               <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Cargo</span>
             </button>
-            
+
             <button @click="navigateToView('locations')"
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Locations' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
@@ -124,7 +130,7 @@
                 class="flex-shrink-0" />
               <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Locations</span>
             </button>
-            
+
             <button @click="navigateToView('users')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Users' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
@@ -174,15 +180,17 @@
       </div>
 
       <!-- User Profile & Logout -->
-      <div class="border-t border-gray-700/50 pt-3 pb-3 px-3" :class="{ 'px-2': (shouldCollapseSidebar && !isMobileDevice) }">
-        <div v-if="!shouldCollapseSidebar || isMobileDevice" class="flex items-center p-3 mb-3 rounded-md bg-gray-800/30">
+      <div class="border-t border-gray-700/50 pt-3 pb-3 px-3"
+        :class="{ 'px-2': (shouldCollapseSidebar && !isMobileDevice) }">
+        <div v-if="!shouldCollapseSidebar || isMobileDevice"
+          class="flex items-center p-3 mb-3 rounded-md bg-gray-800/30">
           <div
             class="h-9 w-9 rounded-full bg-[#273272] flex items-center justify-center text-white text-sm font-medium">
             {{ getInitials(currentUser?.fullname || 'User') }}
           </div>
           <div class="ml-3 overflow-hidden">
-            <p class="text-sm font-medium text-white truncate">{{ currentUser?.fullname || 'User'}}</p>
-            <p class="text-xs text-gray-400">{{ currentUser?.roles || 'Role not defined'}}</p>
+            <p class="text-sm font-medium text-white truncate">{{ currentUser?.fullname || 'User' }}</p>
+            <p class="text-xs text-gray-400">{{ currentUser?.roles || 'Role not defined' }}</p>
           </div>
         </div>
         <div v-else class="flex justify-center mb-3">
@@ -259,7 +267,8 @@
       </div>
 
       <!-- Login Form -->
-      <main v-if="!isAuthenticated && !loading && !isCheckingAuth" class="flex-1 bg-gray-50 flex items-center justify-center p-4">
+      <main v-if="!isAuthenticated && !loading && !isCheckingAuth"
+        class="flex-1 bg-gray-50 flex items-center justify-center p-4">
         <div class="rounded-lg border bg-white shadow-lg overflow-hidden w-full max-w-md">
           <div class="bg-[#273272] text-white p-6 rounded-t-lg">
             <h2 class="text-2xl font-semibold">Admin Login</h2>
@@ -482,7 +491,7 @@
                               {{ getInitials(user.fullname || 'User') }}
                             </div>
                             <div class="ml-4">
-                              <div class="text-sm font-medium text-gray-900">{{ user.fullname  || 'User'}}</div>
+                              <div class="text-sm font-medium text-gray-900">{{ user.fullname || 'User' }}</div>
                               <div class="text-sm text-gray-500">{{ user.username }}</div>
                             </div>
                           </div>
@@ -506,7 +515,8 @@
                             {{ user.status.charAt(0).toUpperCase() + user.status.slice(1) }}
                           </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(user.lastlogin) || 'Never'}}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(user.lastlogin) ||
+                          'Never' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div class="flex justify-end gap-2">
@@ -536,53 +546,55 @@
               </div>
             </div>
 
-             <!-- Reset Password Modal -->
+            <!-- Reset Password Modal -->
             <div v-if="showResetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-             @click="closeResetPasswordModal">
-            <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
-              <div class="p-6">
-                <div class="flex flex-col space-y-1.5 pb-4">
-                  <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
-                  <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{ resetPasswordUser.username
-                  }}</strong></p>
+              @click="closeResetPasswordModal">
+              <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+                <div class="p-6">
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
+                    <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{
+                      resetPasswordUser.username
+                    }}</strong></p>
+                  </div>
+
+                  <form @submit.prevent="saveNewPassword">
+                    <div class="space-y-4">
+                      <div class="space-y-2">
+                        <label for="newPassword" class="text-sm font-medium">New Password</label>
+                        <input id="newPassword" v-model="resetPasswordUser.newPassword" type="password"
+                          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          :class="{ 'border-red-500': resetPasswordErrors.newPassword }" placeholder="••••••••" />
+                        <p v-if="resetPasswordErrors.newPassword" class="text-red-500 text-xs mt-1">{{
+                          resetPasswordErrors.newPassword }}</p>
+                      </div>
+
+                      <div class="space-y-2">
+                        <label for="confirmNewPassword" class="text-sm font-medium">Confirm New Password</label>
+                        <input id="confirmNewPassword" v-model="resetPasswordUser.confirmNewPassword" type="password"
+                          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          :class="{ 'border-red-500': resetPasswordErrors.confirmNewPassword }"
+                          placeholder="••••••••" />
+                        <p v-if="resetPasswordErrors.confirmNewPassword" class="text-red-500 text-xs mt-1">{{
+                          resetPasswordErrors.confirmNewPassword }}</p>
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-6">
+                      <button type="button"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                        @click="closeResetPasswordModal">
+                        Cancel
+                      </button>
+                      <button type="submit" @click="resetPassword"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                        Reset Password
+                      </button>
+                    </div>
+                  </form>
                 </div>
-
-                <form @submit.prevent="saveNewPassword">
-                  <div class="space-y-4">
-                    <div class="space-y-2">
-                      <label for="newPassword" class="text-sm font-medium">New Password</label>
-                      <input id="newPassword" v-model="resetPasswordUser.newPassword" type="password"
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        :class="{ 'border-red-500': resetPasswordErrors.newPassword }" placeholder="••••••••" />
-                      <p v-if="resetPasswordErrors.newPassword" class="text-red-500 text-xs mt-1">{{
-                        resetPasswordErrors.newPassword }}</p>
-                    </div>
-
-                    <div class="space-y-2">
-                      <label for="confirmNewPassword" class="text-sm font-medium">Confirm New Password</label>
-                      <input id="confirmNewPassword" v-model="resetPasswordUser.confirmNewPassword" type="password"
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        :class="{ 'border-red-500': resetPasswordErrors.confirmNewPassword }" placeholder="••••••••" />
-                      <p v-if="resetPasswordErrors.confirmNewPassword" class="text-red-500 text-xs mt-1">{{
-                        resetPasswordErrors.confirmNewPassword }}</p>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-6">
-                    <button type="button"
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                      @click="closeResetPasswordModal">
-                      Cancel
-                    </button>
-                    <button type="submit" @click="resetPassword"
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                      Reset Password
-                    </button>
-                  </div>
-                </form>
               </div>
             </div>
-          </div>
 
             <!-- Add User Modal -->
             <div v-if="showAddUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
@@ -1122,7 +1134,8 @@
                     </div>
                   </div>
 
-                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
+                  <div
+                    class="flex flex-col-reverse sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
                     <button
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 space-y-2 sm:space-y-0"
                       @click="closeViewModal">
@@ -1147,14 +1160,17 @@
 
 
             <!-- Cargo Tracking Dialog -->
-            <div v-if="showTrackingDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
+            <div v-if="showTrackingDialog"
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
               @click="closeTrackingDialog">
               <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden" @click.stop>
                 <!-- Dialog Header -->
-                <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-[#273272] text-white">
+                <div
+                  class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-[#273272] text-white">
                   <div class="flex-1 min-w-0">
                     <h2 class="text-lg sm:text-xl font-semibold truncate">Cargo Tracking Details</h2>
-                    <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{ selectedCargo?.container_number
+                    <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{
+                      selectedCargo?.container_number
                     }}</p>
                   </div>
                   <div class="flex items-center gap-2 sm:gap-3 ml-4">
@@ -1166,7 +1182,8 @@
                     </button>
                     <button @click="closeTrackingDialog" class="text-white/70 hover:text-white transition-colors p-1">
                       <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
                       </svg>
                     </button>
                   </div>
@@ -1179,7 +1196,7 @@
               </div>
             </div>
 
-             <!-- Add Cargo Modal -->
+            <!-- Add Cargo Modal -->
             <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
               @click="closeAddModal">
               <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
@@ -1233,7 +1250,8 @@
                           <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
                           <input id="truckNumber" v-model="newCargo.truck_number"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truck_number ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.truck_number" class="text-red-500 text-sm">{{ formErrors.truck_number }}</p>
+                          <p v-if="formErrors.truck_number" class="text-red-500 text-sm">{{ formErrors.truck_number }}
+                          </p>
                         </div>
                         <div class="space-y-2">
                           <label for="blNumber" class="text-sm font-medium">BL Number</label>
@@ -1267,7 +1285,8 @@
                           <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
                           <input id="shippedDate" type="date" v-model="newCargo.shipped_date"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shipped_date ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.shipped_date" class="text-red-500 text-sm">{{ formErrors.shipped_date }}</p>
+                          <p v-if="formErrors.shipped_date" class="text-red-500 text-sm">{{ formErrors.shipped_date }}
+                          </p>
                         </div>
                         <div class="space-y-2">
                           <label for="estimatedDelivery" class="text-sm font-medium">Estimated Delivery</label>
@@ -1289,7 +1308,8 @@
                             location.name }}
                           </option>
                         </select>
-                        <p v-if="formErrors.current_location" class="text-red-500 text-sm">{{ formErrors.current_location
+                        <p v-if="formErrors.current_location" class="text-red-500 text-sm">{{
+                          formErrors.current_location
                         }}
                         </p>
                       </div>
@@ -1419,7 +1439,7 @@
                               <option value="rescheduled">Rescheduled</option>
                               <option value="delivered to agent">Delivered to Agent</option>
                               <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
-                              `<option value="documentation requested">Docummentation Requested</option>
+                              `<option value="documentation requested">Documentation Requested</option>
                               <option value="awaiting final delivery">Awaiting Final Delivery</option>
                               <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>`
                             </select>
@@ -1430,8 +1450,9 @@
                             <select id="nextStop" v-model="newCargo.next_stop" readonly
                               :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.nextStop ? 'border-red-500' : '']">
                               <option value="" disabled selected>Select Next Stop</option>
-                              <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
-                                location.name }}
+                              <option v-for="location in filteredLocations" :key="location.name" :value="location.name">
+                                {{
+                                  location.name }}
                               </option>
                             </select>
                             <p v-if="stopErrors.location" class="text-red-500 text-sm">{{ stopErrors.location }}</p>
@@ -1447,8 +1468,8 @@
 
                           <div class="space-y-2">
                             <label for="stopComment" class="text-sm font-medium">Comment</label>
-                            <textarea id="stopComment" placeholder="Enter comment for this stop" v-model="newStop.comment"
-                              rows="2"
+                            <textarea id="stopComment" placeholder="Enter comment for this stop"
+                              v-model="newStop.comment" rows="2"
                               class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
                             <p v-if="stopErrors.comment" class="text-red-500 text-sm">{{ stopErrors.comment }}</p>
                           </div>
@@ -1508,53 +1529,51 @@
                   </div>
                 </div>
               </div>
-           </div>
-            
-              <!-- Edit Cargo Modal -->
+            </div>
+
+            <!-- Edit Cargo Modal -->
             <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
               @click="closeEditModal">
               <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
                 <div class="p-6">
                   <div class="flex flex-col space-y-1.5 pb-4">
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Update Cargo Information</h2>
-                    <p class="text-sm text-muted-foreground">Update the package location and shipping address information.
+                    <p class="text-sm text-muted-foreground">Update the package location and shipping address
+                      information.
                     </p>
                   </div>
-              <form @submit.prevent="saveEditedCargo" class="space-y-4 py-4">
-                  <div v-if="editingCargo" class="space-y-4 py-4">
-                    <div class="flex justify-between items-center">
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Container Number</p>
-                        <input id="container_number" type="text" v-model="editingCargo.container_number"
-                                class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                        <p>{{ editingCargo.container_number }}</p>
+                  <form @submit.prevent="saveEditedCargo" class="space-y-4 py-4">
+                    <div v-if="editingCargo" class="space-y-4 py-4">
+                      <div class="flex justify-between items-center gap-4">
+                        <div class="flex-1">
+                          <p class="text-sm font-medium text-gray-500">Container Number</p>
+                          <input id="container_number" type="text" v-model="editingCargo.container_number"
+                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                        </div>
+                        <div class="flex-1">
+                          <p class="text-sm font-medium text-gray-500">Truck Number</p>
+                          <input id="truck_number" type="text" v-model="editingCargo.truck_number"
+                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                        </div>
+                        <div class="flex-1">
+                          <p class="text-sm font-medium text-gray-500">BL Number</p>
+                          <input id="bl_number" type="text" v-model="editingCargo.bl_number"
+                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                        </div>
                       </div>
                       <div>
-                        <p class="text-sm font-medium text-gray-500">Truck Number</p>
-                        <input id="truck_number" type="text" v-model="editingCargo.truck_number"
-                                class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                        <p>{{ editingCargo.truck_number }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">BL Number</p>
-                        <input id="bl_number" type="text" v-model="editingCargo.bl_number"
-                                class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                      </div>
-                    </div>
+                        <div
+                          class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
+                          <button :class="[
+                            'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                            activeEditTab === 'location' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                          ]" @click="activeEditTab = 'location'">
+                            Location
+                          </button>
+                        </div>
+                        <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
 
-                    <div>
-                      <div
-                        class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
-                        <button :class="[
-                          'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
-                          'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                          activeEditTab === 'location' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                        ]" @click="activeEditTab = 'location'">
-                          Location
-                        </button>
-                      </div>
-                      <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
-                       
                           <div class="space-y-2">
                             <label for="currentLocation" class="text-sm font-medium">Current Location</label>
                             <select id="currentLocation" v-model="editingCargo.current_location"
@@ -1568,16 +1587,16 @@
                           </div>
                           <div class="space-y-2">
                             <label for="status" class="text-sm font-medium">Status</label>
-                            <select id="status" v-model="editingCargo.tracking_history.status"
+                            <select id="status" v-model="newTrackingStatus"
                               :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
-                              <option value="" disabled selected>Select Status</option>
+                              <option value="" disabled>Select Status</option>
                               <option value="in transit">In Transit</option>
                               <option value="pending">Pending</option>
                               <option value="delivered">Delivered</option>
                               <option value="delayed">Delayed</option>
                               <option value="processing">Processing</option>
                               <option value="cancelled">Cancelled</option>
-                              <option value="sorted">sorted</option>
+                              <option value="sorted">Sorted</option>
                               <option value="out for delivery">Out for Delivery</option>
                               <option value="arrived at destination">Arrived at Destination</option>
                               <option value="departed from origin">Departed from Origin</option>
@@ -1592,9 +1611,9 @@
                               <option value="rescheduled">Rescheduled</option>
                               <option value="delivered to agent">Delivered to Agent</option>
                               <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
-                              `<option value="documentation requested">Docummentation Requested</option>
+                              <option value="documentation requested">Documentation Requested</option>
                               <option value="awaiting final delivery">Awaiting Final Delivery</option>
-                              <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>`
+                              <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>
                             </select>
                             <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                           </div>
@@ -1621,8 +1640,22 @@
                           <div class="mt-6 pt-6 border-t">
                             <h3 class="text-lg font-medium mb-4">Comments & Tracking History</h3>
 
+                            <!-- Display latest tracking -->
+                            <div v-if="latestTrackingEvent" class="relative text-sm text-gray-500 mt-2">
+                              Latest:
+                              <strong class="capitalize">{{ latestTrackingEvent.status }}</strong> —
+                              {{ formatDate(latestTrackingEvent.timestamp) }}
+
+                              <!-- Delete Button -->
+                              <button @click="deleteTrackingEntry(latestTrackingEvent.id)"
+                                class="text-red-500 hover:text-red-700 absolute top-0 right-0" title="Delete Comment">
+                                🗑️
+                              </button>
+                            </div>
+
                             <!-- Display existing comments -->
-                            <div v-if="editingCargo.tracking_history?.length > 0" class="space-y-4 mb-6 max-h-60 overflow-y-auto">
+                            <div v-if="editingCargo.tracking_history?.length > 0"
+                              class="space-y-4 mb-6 max-h-60 overflow-y-auto">
                               <div v-for="entry in editingCargo.tracking_history" :key="entry.id" :class="[
                                 'p-4 rounded-md border-l-4',
                                 'bg-gray-50 border-l-gray-400'
@@ -1634,8 +1667,9 @@
                                     </p>
                                     <p class="text-sm text-gray-500">{{ formatDate(entry.comment.timestamp) }}</p>
                                   </div>
+
                                 </div>
-                                <p class="mt-2">{{entry.comment.text || 'No comment'}}</p>
+                                <p class="mt-2">{{ entry.comment.text || 'No comment' }}</p>
                               </div>
                             </div>
                             <div v-else
@@ -1668,30 +1702,31 @@
                                 </button>
                               </div>
                             </div>
-                          </div> 
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>   
-              </form>
-                
-                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                      @click="closeEditModal">
-                      Cancel
-                    </button>
-                    <button type="submit" :disabled="isSubmitting"
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                      <span v-if="!isSubmitting">Update Cargo</span>
-                      <span v-else class="flex items-center">
-                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none" />
-                          <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Updating...
-                      </span>
-                    </button>
-                  </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                      <button
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                        @click="closeEditModal">
+                        Cancel
+                      </button>
+                      <button type="submit" :disabled="isSubmitting"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                        <span v-if="!isSubmitting">Update Cargo</span>
+                        <span v-else class="flex items-center">
+                          <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                              fill="none" />
+                            <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Updating...
+                        </span>
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -1755,12 +1790,10 @@
                       </div>
                     </div>
                     <!-- Activity Badge -->
-                    <div :class="['inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-semibold shadow-sm transition-colors duration-200', getActivityBadgeColor(activity.type)]">
-                      <component
-                        v-if="getActivityIcon(activity.type)"
-                        :is="getActivityIcon(activity.type)"
-                        class="w-4 h-4 mr-1"
-                      />
+                    <div
+                      :class="['inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-semibold shadow-sm transition-colors duration-200', getActivityBadgeColor(activity.type)]">
+                      <component v-if="getActivityIcon(activity.type)" :is="getActivityIcon(activity.type)"
+                        class="w-4 h-4 mr-1" />
                       {{ formatActivityType(activity.type) }}
                     </div>
                   </div>
@@ -1905,7 +1938,7 @@
                 </div>
               </div>
             </div>
-              <!-- Add Location Modal -->
+            <!-- Add Location Modal -->
             <div v-if="showAddLocationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
               @click="closeAddLocationModal">
               <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-auto" @click.stop>
@@ -1955,7 +1988,8 @@
                         <label for="location-country" class="text-sm font-medium">Country</label>
                         <input id="location-country" v-model="newLocation.country"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.country ? 'border-red-500' : '']" />
-                        <p v-if="locationFormErrors.country" class="text-red-500 text-sm">{{ locationFormErrors.country }}
+                        <p v-if="locationFormErrors.country" class="text-red-500 text-sm">{{ locationFormErrors.country
+                        }}
                         </p>
                       </div>
                     </div>
@@ -2182,7 +2216,8 @@
 
                   <div v-if="locationToDelete" class="py-4 border-t border-b">
                     <div class="flex items-center">
-                      <div class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
+                      <div
+                        class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
                         <MapPinIcon class="h-5 w-5 text-[#273272]" />
                       </div>
                       <div class="ml-4">
@@ -2210,7 +2245,7 @@
             </div>
           </div>
         </div>
-     </main>
+      </main>
 
       <!-- Footer -->
       <footer class="bg-[#1a1a1a] text-white py-4">
@@ -2309,9 +2344,13 @@ const newStop = ref({
 const stopErrors = ref({})
 
 // Comments state
-const newComment = ref({
-  text: ''
-})
+const newComment = ref({ text: '' });
+const newTrackingStatus = ref('');
+
+const latestTrackingEvent = computed(() => {
+  const history = editingCargo.value?.tracking_history || [];
+  return [...history].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0] || null;
+});
 
 const permissionOptions = ['packages', 'users', 'reports']
 
@@ -2347,7 +2386,7 @@ const toggleSidebar = () => {
     sidebarCollapsed.value = true
     return
   }
-  
+
   if (!isMobileDevice.value) {
     sidebarCollapsed.value = !sidebarCollapsed.value
   }
@@ -2695,93 +2734,156 @@ const editCargo = async (pkg) => {
 }
 
 const cargocomment = ref([])
-const comment = ref({
-  author: '',
-  text: '',
-  timestamp: new Date().toLocaleString()
-})
-const storedUser = JSON.parse(localStorage.getItem('user')) || {};
-const fullName = storedUser.fullname || 'Unknown';
+const isAddingComment = ref(false);
+
+const deleteTrackingEntry = (idToDelete) => {
+  editingCargo.value.tracking_history = editingCargo.value.tracking_history.filter(
+    (entry) => entry.id !== idToDelete
+  );
+  setAlert('Latest tracking entry deleted.', 'success');
+};
+
 
 // Add comment function
 const addComment = async () => {
-  if (validateComment()) {
-
- const storedUser = JSON.parse(localStorage.getItem('user')) || {};
-const userId = storedUser.id;
-const userFullname = storedUser.fullname || 'Unknown';
-
-const newTrackingEntry = {
-  id: crypto.randomUUID(),
-  package_id: editingCargo.value.id,
-  status: editData.value.status || 'In Transit',
-  location: editData.value.current_location,
-  timestamp: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  comment: {
-    id: crypto.randomUUID(),
-    text: newComment.value.text.trim(),
-    author: userId,
-    timestamp: new Date().toISOString()
-  },
-  user_fullname: userFullname
-};
-
-// Add to tracking history array
-editingCargo.value.tracking_history = [
-  ...(editingCargo.value.tracking_history || []),
-  newTrackingEntry
-];
-    // Clear comment input
-    newComment.value.text = '';
+  const error = validateComment();
+  if (error) {
+    setAlert(error, 'error');
+    return;
   }
+
+  isAddingComment.value = true;
+
+  const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+  const userId = storedUser.id || 'anonymous';
+  const userFullname = storedUser.fullname || 'Unknown';
+
+  const newTrackingEntry = {
+    id: crypto.randomUUID(),
+    package_id: editingCargo.value.id,
+    status: newTrackingStatus.value || editingCargo.value.status || 'In Transit',
+    location: editingCargo.value.current_location,
+    timestamp: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    comment: {
+      id: crypto.randomUUID(),
+      text: newComment.value.text.trim(),
+      author: userId,
+      timestamp: new Date().toISOString()
+    },
+    user_fullname: userFullname
+  };
+
+  // Push to tracking history
+  editingCargo.value.tracking_history = [
+    ...(editingCargo.value.tracking_history || []),
+    newTrackingEntry
+  ];
+
+  // Update cargo-level status
+  editingCargo.value.status = newTrackingEntry.status;
+
+  // Reset comment
+  newComment.value.text = '';
+  isAddingComment.value = false;
+  setAlert('Comment added to tracking history.', 'success');
 };
 
 // Validate Comment
 const validateComment = () => {
   const text = newComment.value.text?.trim();
-  if (!text) {
-    return 'Comment cannot be empty.';
-  }
-  if (text.length < 3) {
-    return 'Comment must be at least 3 characters long.';
-  }
-  return null; // No errors
+  if (!text) return 'Comment cannot be empty.';
+  if (text.length < 3) return 'Comment must be at least 3 characters long.';
+  return null;
 };
 
 const saveEditedCargo = async () => {
+  isSubmitting.value = true;
+  const cargo = { ...editingCargo.value }; // Shallow clone to avoid mutation issues
 
-  isSubmitting.value = true
-  // Validate the edited data
-  if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta) {
-  setAlert('Please fill in all required fields.', 'error')
-  isSubmitting.value = false
-  return
-}
+  if (!cargo.current_location || !cargo.next_stop || !cargo.next_stop_eta) {
+    setAlert('Please fill in all required fields.', 'error');
+    isSubmitting.value = false;
+    return;
+  }
 
+  // Use latest status if provided
+  if (newTrackingStatus.value) {
+    cargo.status = newTrackingStatus.value;
+  }
 
-  // Update the package data
-  editingCargo.value.current_location = editData.value.current_location
-  editingCargo.value.next_stop = editData.value.next_stop
-  editingCargo.value.next_stop_eta = editData.value.next_stop_eta
-  editingCargo.value.shipping_address = { ...editData.value.shipping_address }
-  editingCargo.value.lastUpdated = new Date().toISOString()
+  cargo.lastUpdated = new Date().toISOString();
 
   try {
-    const response = await ShippingServices.updatePackage(editingCargo.value.id, JSON.parse(JSON.stringify(editingCargo.value)))
+
+    // Validate shipping address
+    const shippingAddress = {
+      recipientName: editingCargo.value.shipping_address.recipientName.trim(),
+      streetAddress: editingCargo.value.shipping_address.streetAddress.trim(),
+      city: editingCargo.value.shipping_address.city.trim(),
+      state: editingCargo.value.shipping_address.state.trim(),
+      country: editingCargo.value.shipping_address.country.trim(),
+      phone: editingCargo.value.shipping_address.phone.trim(),
+      email: editingCargo.value.shipping_address.email.trim(),
+      specialInstructions: editingCargo.value.shipping_address.specialInstructions.trim()
+    };
+    if (!shippingAddress.recipientName || !shippingAddress.streetAddress || !shippingAddress.city ||
+      !shippingAddress.state || !shippingAddress.country) {
+      setAlert('Shipping address is incomplete.', 'error');
+      isSubmitting.value = false;
+      return;
+    }
+    // Validate tracking history
+    const trackingHistory = editingCargo.value.tracking_history.map(entry => {
+      return {
+        ...entry,
+        timestamp: entry.timestamp || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+    });
+    if (trackingHistory.length === 0) {
+      setAlert('Tracking history cannot be empty.', 'error');
+      isSubmitting.value = false;
+      return;
+    }
+
+    // Prepare payload
+    const payload = {
+      container_number: cargo.container_number,
+      truck_number: cargo.truck_number,
+      bl_number: cargo.bl_number,
+      type: cargo.type,
+      weight: cargo.weight,
+      shipped_date: cargo.shipped_date,
+      estimated_delivery: cargo.estimated_delivery,
+      current_location: cargo.current_location,
+      next_stop: cargo.next_stop,
+      next_stop_eta: cargo.next_stop_eta,
+      final_destination: cargo.final_destination,
+      shipping_address: shippingAddress,
+      tracking_history: trackingHistory,
+      status: cargo.status
+    };
+
+
+    const response = await ShippingServices.updatePackage(cargo.id, payload);
+
     if (response.success) {
-      setAlert('Cargo details updated successfully!', 'success')
-      closeEditModal()
-      await fetchCargos()
+      setAlert('Cargo details updated successfully!', 'success');
+      closeEditModal();
+      await fetchCargos();
     } else {
-      setAlert('Failed to update shipping details.', 'error')
-      console.error(response.error)
+      setAlert('Failed to update cargo.', 'error');
     }
   } catch (error) {
-    console.error('Error updating shipping details:', error)
-    setAlert('Failed to update shipping details.', 'error')
+    console.error('Update error:', error);
+    setAlert('Server error occurred.', 'error');
+  } finally {
+    isSubmitting.value = false;
   }
-}
+};
+
+
 
 // View package functions
 const openViewCargoModal = async (pkg) => {
@@ -2958,9 +3060,9 @@ const validateForm = () => {
   }
 
   if (trackingStops.value.length === 0) {
-      stopErrors.value = 'At least one tracking stop is required'
-      setAlert('At least one tracking stop is required', 'error')
-     isValid = false
+    stopErrors.value = 'At least one tracking stop is required'
+    setAlert('At least one tracking stop is required', 'error')
+    isValid = false
   }
 
   return isValid
@@ -3088,7 +3190,7 @@ const getActivityIcon = (type) => {
   switch (type) {
     case 'user_login':
       return LogIn
-     case 'user_logout':
+    case 'user_logout':
       return LogOut
     case 'user_created':
       return User
@@ -3802,7 +3904,7 @@ const editUser = async (user) => {
       return
     }
 
-     // Populate editingUser with fetched data
+    // Populate editingUser with fetched data
     editingUser.value = { ...response.data.data, newPassword: '' }
 
     // Populate editingUser with fetched data
@@ -3811,7 +3913,7 @@ const editUser = async (user) => {
       permissions: response.data.data.permissions || [],
       newPassword: ''
     }
- 
+
     showEditUserModal.value = true
     console.log('Modal should now be visible', editingUser.value)
 
@@ -3945,7 +4047,7 @@ const verifyToken = async () => {
       const data = await response.json()
       currentUser.value = data.user || JSON.parse(localStorage.getItem('user') || '{}')
       isAuthenticated.value = true
-      
+
       // Load all data after successful authentication
       await Promise.all([
         fetchUsers(),
@@ -3959,7 +4061,7 @@ const verifyToken = async () => {
       sessionStorage.removeItem('token')
       isAuthenticated.value = false
       currentUser.value = null
-      
+
       if (response.status === 401) {
         setAlert('Session expired. Please login again.', 'error')
       }
@@ -3983,15 +4085,15 @@ const logout = async () => {
     if (!email) throw new Error("User email not found");
 
     await userServices.logout(email)
-    
+
     // Clear all authentication data
     isAuthenticated.value = false
     currentUser.value = null
     localStorage.removeItem('user');
     sessionStorage.removeItem('token');
-    
+
     setAlert('Logout successful!', 'success')
-    
+
     // Redirect to login
     router.push('/admin')
   } catch (error) {
@@ -4051,14 +4153,14 @@ const stopLoadingMessageRotation = () => {
 onMounted(async () => {
   isCheckingAuth.value = true
   loading.value = true
-  
+
   // Start loading animation
   startLoadingMessageRotation()
-  
+
   // Check screen size
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
-  
+
   // Collapse sidebar if screen is medium-sized
   if (isMediumScreen.value) {
     sidebarCollapsed.value = true
@@ -4077,7 +4179,7 @@ onMounted(async () => {
   try {
     // Parse stored user data
     currentUser.value = JSON.parse(storedUser)
-    
+
     // Try verifying token
     await verifyToken()
   } catch (error) {
@@ -4117,18 +4219,39 @@ onUnmounted(() => {
 
 /* Loading animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(180deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
 }
 
 @keyframes float-delayed {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(-180deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-15px) rotate(-180deg);
+  }
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(90deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(90deg);
+  }
 }
 
 .animate-float {

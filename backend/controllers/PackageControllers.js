@@ -234,86 +234,130 @@ module.exports = {
 
   // Update a package
   updatePackage: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const {
-        status,
-        next_stop,
-        next_stop_eta,
-        current_location,
-        comment
-      } = req.body;
-      const updated_at = new Date();
+  try {
+    const { id } = req.params;
+    const {
+      container_number,
+      truck_number,
+      bl_number,
+      type,
+      weight,
+      shipped_date,
+      estimated_delivery,
+      current_location,
+      next_stop,
+      next_stop_eta,
+      final_destination,
+      shipping_address,
+      tracking_history,
+      status,
+      userId 
+    } = req.body;
 
-      const updateQuery = `
+    const updated_at = new Date();
+
+    // 1. Update package table
+    const updateQuery = `
       UPDATE packages
       SET
-        next_stop = $1,
-        next_stop_eta = $2,
-        current_location = $3
-      WHERE id = $4 AND is_deleted = FALSE
-      RETURNING *; 
+        container_number = $1,
+        truck_number = $2,
+        bl_number = $3,
+        type = $4,
+        weight = $5,
+        shipped_date = $6,
+        estimated_delivery = $7,
+        current_location = $8,
+        next_stop = $9,
+        next_stop_eta = $10,
+        final_destination = $11,
+        shipping_address = $12,
+        tracking_history = $13,
+        status = $14,
+        updated_at = $15
+      WHERE id = $16 AND is_deleted = FALSE
+      RETURNING *;
     `;
-      const values = [
-        next_stop,
-        next_stop_eta,
-        current_location,
-        id
-      ];
-      const result = await query(updateQuery, values);
 
+    const values = [
+      container_number,
+      truck_number,
+      bl_number,
+      type,
+      weight,
+      shipped_date,
+      estimated_delivery,
+      current_location,
+      next_stop,
+      next_stop_eta,
+      final_destination,
+      JSON.stringify(shipping_address),     // Store as JSON
+      JSON.stringify(tracking_history),     // Store as JSON
+      status,
+      updated_at,
+      id
+    ];
+
+    const result = await query(updateQuery, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Package not found or deleted' });
+    }
+
+    const updatedPackage = result.rows[0];
+
+    // 2. Add latest tracking history (optional - usually already in tracking_history)
+    const latestEvent = tracking_history?.[tracking_history.length - 1];
+    if (latestEvent) {
       const trackingEventQuery = `
-      INSERT INTO tracking_events (
-        package_id, status, location, timestamp, comment, updated_at
-      )
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *; 
-    `;
+        INSERT INTO tracking_events (
+          package_id, status, location, timestamp, comment, updated_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *;
+      `;
+
       const trackingEventValues = [
         id,
-        status || 'Updated',
-        current_location || 'Unknown',
-        updated_at,
-        comment || 'Package updated',
+        latestEvent.status || status || 'updated',
+        latestEvent.location || current_location || 'unknown',
+        latestEvent.timestamp || updated_at,
+        JSON.stringify(latestEvent.comment || { text: 'Package updated' }),
         updated_at
       ];
-      const trackingEventResult = await query(trackingEventQuery, trackingEventValues);
-      if (trackingEventResult.rowCount === 0) {
-        return res.status(500).json({ success: false, message: 'Failed to create tracking event' });
-      }
 
-      if (result.rowCount === 0) {
-        return res.status(404).json({ success: false, message: 'Package not found or deleted' });
-      }
-
-      // Insert activity log
-      await insertActivityLog(
-        'package_updated',
-        userId,
-        `Package ${currentPackage.container_number || currentPackage.truck_number || currentPackage.bl_number || id} was updated`,
-        {
-          package_id: id,
-          tracking_numbers: {
-            container_number: currentPackage.container_number,
-            truck_number: currentPackage.truck_number,
-            bl_number: currentPackage.bl_number
-          },
-          status: status,
-          changes: changes,
-          comment: comment,
-          action: 'UPDATE'
-        }
-      );
-
-      res.json({
-        message: 'Package updated successfully',
-        package: result.rows[0]
-      });
-    } catch (error) {
-      console.error('Error updating package:', error.message);
-      res.status(500).json({ success: false, message: 'Internal server error' });
+      await query(trackingEventQuery, trackingEventValues);
     }
-  },
+
+    // 3. Optional: log activity
+    await insertActivityLog(
+      'package_updated',
+      userId,
+      `Package ${container_number || truck_number || bl_number || id} was updated`,
+      {
+        package_id: id,
+        tracking_numbers: {
+          container_number,
+          truck_number,
+          bl_number
+        },
+        status,
+        action: 'UPDATE'
+      }
+    );
+
+    res.json({
+      success: true,
+      message: 'Package updated successfully',
+      package: updatedPackage
+    });
+
+  } catch (error) {
+    console.error('Error updating package:', error.message);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+},
+
 
 
 
