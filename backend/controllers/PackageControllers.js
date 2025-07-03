@@ -273,7 +273,7 @@ module.exports = {
         next_stop_eta = $10,
         final_destination = $11,
         shipping_address = $12,
-        status = $13,
+        status = $13
       WHERE id = $14 AND is_deleted = FALSE
       RETURNING *;
     `;
