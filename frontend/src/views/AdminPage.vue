@@ -2707,19 +2707,31 @@ const fullName = storedUser.fullname || 'Unknown';
 const addComment = async () => {
   if (validateComment()) {
 
-   editingCargo.value.tracking_history = [
-  ...(editingCargo.value.tracking_history || []),
-  {
-    user_fullname: fullName || 'Unknown',
-    comment: {
-      text: newComment.value.text.trim(),
-      timestamp: new Date().toLocaleString(),
-      user_id: storedUser.id
-    }
-  }
-]
-newComment.value.text = ''
+ const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+const userId = storedUser.id;
+const userFullname = storedUser.fullname || 'Unknown';
 
+const newTrackingEntry = {
+  id: crypto.randomUUID(),
+  package_id: editingCargo.value.id,
+  status: editData.value.status || 'In Transit',
+  location: editData.value.current_location,
+  timestamp: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  comment: {
+    id: crypto.randomUUID(),
+    text: newComment.value.text.trim(),
+    author: userId,
+    timestamp: new Date().toISOString()
+  },
+  user_fullname: userFullname
+};
+
+// Add to tracking history array
+editingCargo.value.tracking_history = [
+  ...(editingCargo.value.tracking_history || []),
+  newTrackingEntry
+];
     // Clear comment input
     newComment.value.text = '';
   }
@@ -2753,10 +2765,10 @@ const saveEditedCargo = async () => {
   editingCargo.value.next_stop = editData.value.next_stop
   editingCargo.value.next_stop_eta = editData.value.next_stop_eta
   editingCargo.value.shipping_address = { ...editData.value.shipping_address }
-  editingCargo.value.lastUpdated = new Date().toLocaleDateString()
+  editingCargo.value.lastUpdated = new Date().toISOString()
 
   try {
-    const response = await ShippingServices.updatePackage(editingCargo.value.id, editingCargo.value)
+    const response = await ShippingServices.updatePackage(editingCargo.value.id, JSON.parse(JSON.stringify(editingCargo.value)))
     if (response.success) {
       setAlert('Cargo details updated successfully!', 'success')
       closeEditModal()
