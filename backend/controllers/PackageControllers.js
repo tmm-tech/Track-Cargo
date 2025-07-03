@@ -272,10 +272,9 @@ module.exports = {
         next_stop_eta = $10,
         final_destination = $11,
         shipping_address = $12,
-        tracking_history = $13,
-        status = $14,
-        updated_at = $15
-      WHERE id = $16 AND is_deleted = FALSE
+        status = $13,
+        updated_at = $14
+      WHERE id = $15 AND is_deleted = FALSE
       RETURNING *;
     `;
 
@@ -292,7 +291,6 @@ module.exports = {
       next_stop_eta,
       final_destination,
       JSON.stringify(shipping_address),     // Store as JSON
-      JSON.stringify(tracking_history),     // Store as JSON
       status,
       updated_at,
       id
