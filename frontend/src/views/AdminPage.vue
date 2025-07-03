@@ -1671,8 +1671,9 @@
                           </div> 
                       </div>
                     </div>
-                  </form>
-                  </div>
+                  </div>   
+              </form>
+                
                   <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
                     <button
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
