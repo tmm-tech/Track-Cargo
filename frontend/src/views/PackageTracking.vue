@@ -35,7 +35,7 @@
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Cargo Type</div>
-            <div :style="fieldValueStyle">{{ pkg.type }}</div>
+            <div :style="fieldValueStyle" class="uppercase">{{ pkg.type }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Weight</div>
@@ -149,34 +149,19 @@
       <div :style="sectionContentStyle">
         <div :style="trackingTimelineStyle">
           <div v-for="(event, index) in pkg.tracking_history" :key="index" :style="trackingItemStyle">
-            <div :style="trackingStatusStyle">{{ event.status }}</div>
+            <div :style="trackingStatusStyle" class="capitalize">{{ event.status }}</div>
             <div :style="trackingLocationStyle">
               <span :style="{ marginRight: '5px' }">📍</span>
               {{ event.location }}
             </div>
             <div :style="trackingTimeStyle">
               <span :style="{ marginRight: '5px' }">🕒</span>
-              {{ event.timestamp }}
+              {{ formatDate(event.timestamp) }}
             </div>
             <div v-if="event.comment" :style="trackingCommentStyle">
-              <strong>Comment:</strong> {{ event.comment }}
+              <strong>Comment:</strong> {{ event.comment.text }}
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Comments Section -->
-    <div v-if="pkg.comment && pkg.comment.length > 0" :style="sectionStyle">
-      <div :style="sectionHeaderStyle">
-        <span :style="{ marginRight: '10px', fontSize: '20px' }">💬</span>
-        Comments
-      </div>
-      <div :style="sectionContentStyle">
-        <div v-for="(comment, index) in pkg.comment" :key="index" :style="commentStyle">
-          <div :style="commentAuthorStyle">{{ comment.author }}</div>
-          <div :style="commentTimeStyle">{{ comment.timestamp }}</div>
-          <div :style="commentTextStyle">{{ comment.text }}</div>
         </div>
       </div>
     </div>
@@ -200,7 +185,9 @@ interface TrackingEvent {
   status: string
   location: string
   timestamp: string
-  comment?: string
+  comment?: {
+    text?: string
+  }
 }
 
 interface ShippingAddress {
@@ -212,12 +199,6 @@ interface ShippingAddress {
   phone: string
   email: string,
   specialInstructions: string
-}
-
-interface Comment {
-  author: string
-  timestamp: string
-  text: string
 }
 
 interface Package {
@@ -234,8 +215,25 @@ interface Package {
   final_destination: string
   shipping_address?: ShippingAddress
   tracking_history: TrackingEvent[]
-  comment?: Comment[]
+  comment?: {
+    text?: string
+  }
 }
+// Date formatting function
+const formatDate = (dateString) => {
+  if (!dateString) return null; // Handle null, undefined, or empty string
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Never'; // Handle invalid date
+
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
 
 // Props
 const props = defineProps<{
