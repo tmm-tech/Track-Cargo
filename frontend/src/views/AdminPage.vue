@@ -2936,6 +2936,8 @@ const closeAddModal = () => {
 const addNewCargo = async () => {
   // Validate the form before submission
 
+  const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+  const userId = storedUser.id || 'anonymous';
   if (validateForm()) {
     isSubmitting.value = true
     const newCargoToAdd = {
@@ -2946,6 +2948,7 @@ const addNewCargo = async () => {
       type: newCargo.value.type,
       weight: newCargo.value.weight,
       shipped_date: newCargo.value.shipped_date,
+      owner: userId,
       estimated_delivery: newCargo.value.estimated_delivery,
       current_location: newCargo.value.current_location,
       next_stop: newCargo.value.next_stop,
@@ -3079,6 +3082,7 @@ const resetNewCargoForm = () => {
     estimated_delivery: '',
     current_location: '',
     next_stop: '',
+    owner: '',
     next_stop_eta: '',
     final_destination: '',
     shipping_address: {
