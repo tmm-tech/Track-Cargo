@@ -273,8 +273,7 @@ module.exports = {
         final_destination = $11,
         shipping_address = $12,
         status = $13,
-        updated_at = $14
-      WHERE id = $15 AND is_deleted = FALSE
+      WHERE id = $14 AND is_deleted = FALSE
       RETURNING *;
     `;
 
@@ -292,7 +291,6 @@ module.exports = {
       final_destination,
       JSON.stringify(shipping_address),     // Store as JSON
       status,
-      updated_at,
       id
     ];
 
