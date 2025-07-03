@@ -13,7 +13,7 @@ export interface TrackingEvent {
   status: string
   location: string
   timestamp: string
-  comments?: {
+  comment?: {
     text?: string
   }
 }
