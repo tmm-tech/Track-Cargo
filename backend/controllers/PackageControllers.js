@@ -57,7 +57,7 @@ module.exports = {
       const insertQuery = `
       INSERT INTO packages (
         container_number, truck_number, bl_number, type, weight,
-        shipped_date, estimated_delivery,
+        shipped_date, estimated_delivery, owner,
         current_location, next_stop, next_stop_eta,
         final_destination, shipping_address, created_at
       )
@@ -73,6 +73,7 @@ module.exports = {
         weight,
         shipped_date,
         estimated_delivery,
+        owner,
         current_location,
         next_stop,
         next_stop_eta,
