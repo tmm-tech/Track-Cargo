@@ -1520,20 +1520,25 @@
                     <p class="text-sm text-muted-foreground">Update the package location and shipping address information.
                     </p>
                   </div>
-
+              <form @submit.prevent="saveEditedCargo" class="space-y-4 py-4">
                   <div v-if="editingCargo" class="space-y-4 py-4">
                     <div class="flex justify-between items-center">
                       <div>
                         <p class="text-sm font-medium text-gray-500">Container Number</p>
+                        <input id="container_number" type="text" v-model="editingCargo.container_number"
+                                class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         <p>{{ editingCargo.container_number }}</p>
                       </div>
                       <div>
                         <p class="text-sm font-medium text-gray-500">Truck Number</p>
+                        <input id="truck_number" type="text" v-model="editingCargo.truck_number"
+                                class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         <p>{{ editingCargo.truck_number }}</p>
                       </div>
                       <div>
                         <p class="text-sm font-medium text-gray-500">BL Number</p>
-                        <p>{{ editingCargo.bl_number }}</p>
+                        <input id="bl_number" type="text" v-model="editingCargo.bl_number"
+                                class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                       </div>
                     </div>
 
@@ -1549,7 +1554,7 @@
                         </button>
                       </div>
                       <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
-                        <form @submit.prevent="saveEditedCargo" class="space-y-4 py-4">
+                       
                           <div class="space-y-2">
                             <label for="currentLocation" class="text-sm font-medium">Current Location</label>
                             <select id="currentLocation" v-model="editingCargo.current_location"
@@ -1663,10 +1668,10 @@
                                 </button>
                               </div>
                             </div>
-                          </div>
-                        </form>
+                          </div> 
                       </div>
                     </div>
+                  </form>
                   </div>
                   <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
                     <button
@@ -2694,16 +2699,26 @@ const comment = ref({
   text: '',
   timestamp: new Date().toLocaleString()
 })
+const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+const fullName = storedUser.fullname || 'Unknown';
 
 // Add comment function
 const addComment = async () => {
   if (validateComment()) {
 
-    cargocomment.value.push({
-      author: comment.author,
-      text: comment.value.text.trim(),
-      timestamp: new Date().toLocaleString()
-    })
+   editingCargo.value.tracking_history = [
+  ...(editingCargo.value.tracking_history || []),
+  {
+    user_fullname: fullName || 'Unknown',
+    comment: {
+      text: newComment.value.text.trim(),
+      timestamp: new Date().toLocaleString(),
+      user_id: storedUser.id
+    }
+  }
+]
+newComment.value.text = ''
+
     // Clear comment input
     newComment.value.text = '';
   }
@@ -2725,10 +2740,12 @@ const saveEditedCargo = async () => {
 
   isSubmitting.value = true
   // Validate the edited data
-  if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta || !editData.value.comment) {
-    setAlert('Please fill in all required fields.', 'error')
-    return
-  }
+  if (!editData.value.current_location || !editData.value.next_stop || !editData.value.next_stop_eta) {
+  setAlert('Please fill in all required fields.', 'error')
+  isSubmitting.value = false
+  return
+}
+
 
   // Update the package data
   editingCargo.value.current_location = editData.value.current_location
