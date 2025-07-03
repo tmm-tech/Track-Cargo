@@ -2868,12 +2868,13 @@ const saveEditedCargo = async () => {
 
     const response = await ShippingServices.updatePackage(cargo.id, payload);
 
-    if (response.success) {
+    if (response.data.success) {
       setAlert('Cargo details updated successfully!', 'success');
       closeEditModal();
       await fetchCargos();
     } else {
       setAlert('Failed to update cargo.', 'error');
+      closeEditModal();
     }
   } catch (error) {
     console.error('Update error:', error);

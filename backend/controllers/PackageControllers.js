@@ -29,6 +29,7 @@ module.exports = {
       const created_at = new Date();
       // updated_at is set to current date and time package creation
       const updated_at = new Date();
+       const userId = req.user?.id || null;
 
       // Add prefixes
       const container_number = newCargo.container_number
@@ -237,6 +238,7 @@ module.exports = {
   updatePackage: async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id || null;
     const {
       container_number,
       truck_number,
@@ -251,8 +253,7 @@ module.exports = {
       final_destination,
       shipping_address,
       tracking_history,
-      status,
-      userId 
+      status 
     } = req.body;
 
     const updated_at = new Date();
