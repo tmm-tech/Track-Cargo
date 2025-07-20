@@ -65,16 +65,16 @@
               </svg>
             </button>
             <div :class="['md:flex flex-col md:flex-row', { 'hidden': !mobileMenuOpen }]">
-              <router-link to="/" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Home
-              </router-link>
-              <a href="#" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              </a>
+              <a href="https://www.texmonlogistics.co.ke/about-us" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 About Us
               </a>
-              <a href="#" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/services" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Services
               </a>
-              <a href="#" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/contact" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Contact Us
               </a>
             </div>

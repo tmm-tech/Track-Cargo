@@ -1,7 +1,7 @@
 // services/packageService.js
 import axios from 'axios';
 
-const API_URL = 'https://track-cargo.onrender.com/package';
+const API_URL = 'https://backend-track3-3.onrender.com/package';
 
 export default {
   // Create a new package
