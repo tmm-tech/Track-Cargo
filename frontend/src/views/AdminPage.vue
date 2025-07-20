@@ -279,7 +279,7 @@
               <div v-if="loginError" class="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">{{ loginError }}</div>
               <div class="space-y-2">
                 <label for="username" class="text-sm font-medium">Username</label>
-                <input id="username" placeholder="Enter your username" v-model="username"
+                <input id="username" placeholder="Enter your username" v-model="username" autocomplete="username"
                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   required />
               </div>
