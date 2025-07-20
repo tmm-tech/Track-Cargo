@@ -16,7 +16,7 @@ const router = createRouter({
       component: ResultsPage
     },
     {
-      path: '/admin',
+      path: '/track/admin',
       name: 'admin',
       component: AdminPage
     }
