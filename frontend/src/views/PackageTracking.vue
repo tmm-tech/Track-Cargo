@@ -176,7 +176,6 @@
 </template>
 
 <script setup lang="ts">
-import { ja } from 'date-fns/locale'
 import { AlignCenter } from 'lucide-vue-next'
 import { ref, computed, onMounted, watch } from 'vue'
 
@@ -219,21 +218,7 @@ interface Package {
     text?: string
   }
 }
-// Date formatting function
-const formatDate = (dateString) => {
-  if (!dateString) return null; // Handle null, undefined, or empty string
 
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return 'Never'; // Handle invalid date
-
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-};
 
 // Props
 const props = defineProps<{
@@ -525,6 +510,12 @@ const footerStyle = computed(() => ({
   fontSize: '12px',
   color: '#666',
 }))
+
+// Format date utility
+const formatDate = (timestamp: string): string => {
+  const date = new Date(timestamp)
+  return isNaN(date.getTime()) ? timestamp : date.toLocaleString()
+}
 
 // Lifecycle hooks
 onMounted(async () => {

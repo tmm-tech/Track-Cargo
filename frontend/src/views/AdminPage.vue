@@ -4038,7 +4038,7 @@ const handleLogin = async () => {
       // Now check if the token is valid
       await verifyToken()
 
-      router.push('/admin')
+      router.push('/track/admin')
     } else {
       setAlert(data.message || 'Login failed', 'error')
       loginError.value = data.message || 'Login failed'
@@ -4056,7 +4056,7 @@ const handleLogin = async () => {
 const verifyToken = async () => {
   loading.value = true
   try {
-    const response = await fetch('https://backend-track3-3.onrender.com/users/protected', {
+    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/protected', {
       method: 'GET',
       credentials: 'include'
     })
@@ -4113,7 +4113,7 @@ const logout = async () => {
     setAlert('Logout successful!', 'success')
 
     // Redirect to login
-    router.push('/admin')
+    router.push('/track/admin')
   } catch (error) {
     console.error('Logout error:', error)
     setAlert('An error occurred during logout. Please try again.', 'error')

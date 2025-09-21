@@ -85,7 +85,6 @@
               Track Cargo
             </router-link>
           </div>
-
         </div>
       </div>
     </nav>
@@ -332,7 +331,7 @@ export default {
             saveRecentSearch(trackingNumber.value);
       
             // Navigate to results page with tracking number
-            router.push(`/track/results?number=${trackingNumber.value}`);
+            router.push(`/track/track/results?number=${trackingNumber.value}`);
           } else {
             error.value = 'No package found with the provided information';
           }
