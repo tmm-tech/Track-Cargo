@@ -1,7 +1,7 @@
 // src/services/userServices.js
 import axios from 'axios';
 
-const API_BASE = 'https://backend-track3-3.onrender.com/users';
+const API_BASE = 'https://www.texmonlogistics.co.ke/backend/users';
 
 export default {
     // Login user

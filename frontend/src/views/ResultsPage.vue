@@ -68,22 +68,22 @@
               </svg>
             </button>
             <div :class="['md:flex flex-col md:flex-row', mobileMenuOpen ? 'flex' : 'hidden']">
-              <router-link to="/" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <router-link to="https://www.texmonlogistics.co.ke/" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Home
               </router-link>
-              <a href="#" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/about-us" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 About Us
               </a>
-              <a href="#" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/services" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Services
               </a>
-              <a href="#" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/contact" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Contact Us
               </a>
             </div>
           </div>
           <div class="hidden md:flex items-center space-x-6">
-            <router-link to="/"
+            <router-link to="https://www.texmonlogistics.co.ke/track"
               class="px-4 py-2 bg-transparent text-white border border-white rounded-md hover:bg-red-600 hover:border-red-600 hover:text-white transition-colors duration-300 inline-block">
               Track Cargo
             </router-link>
@@ -107,12 +107,12 @@
           <div class="bg-[#273272] text-white p-6 rounded-t-lg">
             <h2 class="text-2xl font-semibold">Package Not Found</h2>
             <p class="text-gray-200">
-              We couldn't find any package with the provided information.
+              We couldn't find any cargo with the provided information.
             </p>
           </div>
           <div class="p-6">
             <p class="mb-6 text-gray-600">Please check your tracking or dispatch number and try again.</p>
-            <router-link to="/">
+            <router-link to="/track">
               <button
                 class="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-4 py-2 rounded inline-flex items-center justify-center">
                 Try Again
@@ -276,7 +276,7 @@
                     <p class="mt-2 text-sm font-medium">In Transit</p>
                     <transition name="fade">
                       <div v-if="currentStep >= 2" class="mt-1 text-xs text-gray-500">
-                        {{ getInTransitDate() }}
+                        {{ formatDate(getInTransitDate()) }}
                       </div>
                     </transition>
                   </div>
@@ -294,7 +294,7 @@
                     <p class="mt-2 text-sm font-medium">Out for Delivery</p>
                     <transition name="fade">
                       <div v-if="currentStep >= 3" class="mt-1 text-xs text-gray-500">
-                        {{ getOutForDeliveryDate() }}
+                        {{ formatDate(getOutForDeliveryDate()) }}
                       </div>
                     </transition>
                   </div>
@@ -312,7 +312,7 @@
                     <p class="mt-2 text-sm font-medium">Delivered</p>
                     <transition name="fade">
                       <div v-if="currentStep >= 4" class="mt-1 text-xs text-gray-500">
-                        {{ getDeliveredDate() || 'Pending' }}
+                        {{ formatDate(getDeliveredDate()) || 'Pending' }}
                       </div>
                     </transition>
                   </div>
@@ -334,10 +334,22 @@
                       class="w-0.5 h-full bg-gray-200 absolute top-4"></div>
                   </div>
                   <div class="flex-1 pb-6">
-                    <p class="font-medium text-[#273272]">{{ event.status }}</p>
+                    <p class="font-medium text-[#273272]">{{ capitalizeWords(event.status) }}</p>
                     <p class="text-sm text-gray-500">{{ event.location }}</p>
                     <p class="text-sm text-gray-500">{{ event.timestamp }}</p>
-                    <p v-if="event.comment" class="text-sm text-gray-400 mt-1">{{ event.comment }}</p>
+
+                    <!-- Display comments if present and is an array -->
+                    <div v-if="Array.isArray(event.comment) && event.comment.length" class="space-y-4 mt-3">
+                      <div v-for="(comments, idx) in event.comment" :key="idx" class="bg-gray-50 border border-gray-200 p-4 rounded-md shadow-sm">
+                        <div class="flex justify-between items-center mb-1">
+                          <span class="font-semibold text-[#273272]">{{ comments.author }}</span>
+                          <span class="text-xs text-gray-400">{{ comments.timestamp }}</span>
+                        </div>
+                        <p class="text-gray-700 text-sm">{{ comments.text }}</p>
+                      </div>
+                    </div>
+                    <!-- If comment is a string, show as before -->
+                    <p v-else-if="event.comment" class="text-sm text-gray-400 mt-1">{{ event.comment }}</p>
                   </div>
                 </div>
               </div>
@@ -599,14 +611,14 @@ onMounted(async () => {
     // Call your backend service to track the package
     const response = await ShippingServices.trackPackage(trackingNumber.value)
 
-    if (response.data.success && response.data.data) {
+    if (response.data.success && response.ok) {
       packageData.value = response.data.data
     } else {
-      error.value = response.message || 'No package found with the provided information'
+      error.value = response.message || 'No cargo found with the provided information'
     }
   } catch (err) {
-    console.error('Error tracking package:', err)
-    error.value = 'An error occurred while fetching package data'
+    console.error('Error tracking cargo:', err)
+    error.value = 'An error occurred while fetching cargo data'
   } finally {
     loading.value = false
   }
@@ -666,6 +678,12 @@ const getStatusClass = (status) => {
   } else {
     return 'bg-gray-100 text-gray-700 border border-gray-300'
   }
+}
+
+// Capitalize each word in a string
+const capitalizeWords = (str) => {
+  if (!str) return ''
+  return str.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
 }
 
 </script>

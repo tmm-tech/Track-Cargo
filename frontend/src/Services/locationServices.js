@@ -1,7 +1,7 @@
 // services/locationService.js
 import axios from 'axios';
 
-const API_URL = 'https://backend-track3-3.onrender.com/location'; // Update to match your backend
+const API_URL = 'https://www.texmonlogistics.co.ke/backend/location'; // Update to match your backend
 
 // Create a new location
 export default {

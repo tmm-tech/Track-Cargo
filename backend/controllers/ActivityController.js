@@ -1,4 +1,5 @@
 const { query } = require('../config/sqlConfig');
+const timestamp = new Date().toISOString();
 
 // Add a new activity log
 const addActivity = async (req, res) => {
@@ -6,12 +7,12 @@ const addActivity = async (req, res) => {
 
   try {
     const insertQuery = `
-      INSERT INTO activity_logs (type, user_id, message, details)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO activity_logs (type, user_id, time message, details, time)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *;
     `;
 
-    const params = [type, user_id, message, details || {}];
+    const params = [type, user_id, message, details, timestamp || {}];
     const result = await query(insertQuery, params);
 
     res.json({ success: true, activity: result.rows[0] });

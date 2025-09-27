@@ -68,13 +68,16 @@
               <a href="https://www.texmonlogistics.co.ke/" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Home
               </a>
-              <a href="https://www.texmonlogistics.co.ke/about-us" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/about-us"
+                class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 About Us
               </a>
-              <a href="https://www.texmonlogistics.co.ke/services" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/services"
+                class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Services
               </a>
-              <a href="https://www.texmonlogistics.co.ke/contact" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/contact"
+                class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Contact Us
               </a>
             </div>
@@ -96,7 +99,7 @@
             <CardHeader class="bg-[#273272] text-white rounded-t-xl">
               <CardTitle class="text-2xl">Track Your Cargo</CardTitle>
               <CardDescription class="text-gray-200">
-                Enter your tracking information to see the current status of your package
+                Enter your tracking information to see the current status of your cargo
               </CardDescription>
             </CardHeader>
             <CardContent class="pt-6">
@@ -112,17 +115,17 @@
                 </div>
 
                 <Button type="submit"
-                class="w-full bg-yellow-500 hover:bg-yellow-500 text-primary font-semibold py-2 rounded-md transition-colors duration-300 flex justify-center items-center"
-                :disabled="isSubmitting">
-                <span v-if="!isSubmitting">Track</span>
-                <span v-else class="flex items-center">
-                  <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none" />
-                    <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Tracking...
-                </span>
-              </Button>
+                  class="w-full bg-yellow-500 hover:bg-yellow-500 text-primary font-semibold py-2 rounded-md transition-colors duration-300 flex justify-center items-center"
+                  :disabled="isSubmitting">
+                  <span v-if="!isSubmitting">Track</span>
+                  <span v-else class="flex items-center">
+                    <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none" />
+                      <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Tracking...
+                  </span>
+                </Button>
               </form>
             </CardContent>
           </Card>
@@ -323,20 +326,29 @@ export default {
       isSubmitting.value = true;
 
       try {
-           // Make the real API call to fetch tracking info
-          const response = await ShippingServices.trackPackage(trackingNumber.value);
-           console.log(response);
-          if (response.data && response.data.success && response.data.data) {
-            // Save to recent searches
-            saveRecentSearch(trackingNumber.value);
-      
-            // Navigate to results page with tracking number
-            router.push(`/track/track/results?number=${trackingNumber.value}`);
-          } else {
-            error.value = 'No package found with the provided information';
-          }
+        // Make the real API call to fetch tracking info
+        const response = await ShippingServices.trackPackage(trackingNumber.value);
+        if (response.success && response.data) {
+          // Save to recent searches
+          saveRecentSearch(trackingNumber.value);
+
+          // Navigate to results page with tracking number
+          router.push(`/track/results?number=${trackingNumber.value}`);
+        } else {
+          error.value = 'No cargo found with the provided information';
+        }
       } catch (err) {
-        error.value = 'An error occurred while tracking your package. Please try again.';
+        if (err.response?.data?.message === 'Package not found') {
+          router.push({
+            path: '/track/results',
+            query: {
+              number: trackingNumber.value,
+              error: 'Package not found or does not exist'
+            }
+          });
+        } else {
+          error.value = 'Tracking failed. Please try again later.';
+        }
         console.error('Tracking error:', err);
       } finally {
         isSubmitting.value = false;

@@ -43,11 +43,11 @@
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Shipped Date</div>
-            <div :style="fieldValueStyle">{{ pkg.shipped_date }}</div>
+            <div :style="fieldValueStyle">{{ formatDate(pkg.shipped_date) }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Estimated Delivery</div>
-            <div :style="fieldValueStyle">{{ pkg.estimated_delivery }}</div>
+            <div :style="fieldValueStyle">{{ formatDate(pkg.estimated_delivery) }}</div>
           </div>
         </div>
 
@@ -76,11 +76,11 @@
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Next Stop</div>
-            <div :style="fieldValueStyle">{{ pkg.next_stop }}</div>
+            <div :style="fieldValueStyle">{{ formatDate(pkg.next_stop) }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Next Stop ETA</div>
-            <div :style="fieldValueStyle">{{ pkg.next_stop_eta }}</div>
+            <div :style="fieldValueStyle">{{formatDate(pkg.next_stop_eta) }}</div>
           </div>
           <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Final Destination</div>

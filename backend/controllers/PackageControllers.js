@@ -1,15 +1,16 @@
 const { query } = require('../config/sqlConfig');
-const { v4: uuidv4 } = require('uuid');
+const timestamp = new Date().toISOString();
+const crypto = require("crypto");
 
 // Helper function to insert activity log
 const insertActivityLog = async (type, userId, message, details = {}) => {
   try {
     const activityQuery = `
-            INSERT INTO activity_logs (type, user_id, message, details)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO activity_logs (type, user_id, message, details, time)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *;
         `;
-    const params = [type, userId, message, details];
+    const params = [type, userId, message, details, timestamp];
     await query(activityQuery, params);
   } catch (error) {
     console.error('Error inserting activity log:', error);
@@ -24,26 +25,15 @@ module.exports = {
   createPackage: async (req, res) => {
     try {
       const newCargo = req.body;
-
-      const tracking_number = 'PKG-' + uuidv4().split('-')[0].toUpperCase();
       const created_at = new Date();
       // updated_at is set to current date and time package creation
       const updated_at = new Date();
-       const userId = req.user?.id || null;
+      const userId = req.user?.id || null;
 
       // Add prefixes
-      const container_number = newCargo.container_number
-        ? `CRG-${newCargo.container_number}`
-        : null;
-
-      const truck_number = newCargo.truck_number
-        ? `TRK-${newCargo.truck_number}`
-        : null;
-
-      const bl_number = newCargo.bl_number
-        ? `BLN-${newCargo.bl_number}`
-        : null;
-
+      const container_number = newCargo.container_number;
+      const truck_number = newCargo.truck_number;
+      const bl_number = newCargo.bl_number;
       const type = newCargo.type || 'Standard';
       const weight = newCargo.weight || null;
       const shipped_date = newCargo.shipped_date || null;
@@ -51,20 +41,24 @@ module.exports = {
       const current_location = newCargo.current_location || null;
       const next_stop = newCargo.next_stop || null;
       const next_stop_eta = newCargo.next_stop_eta || null;
+      const owner = newCargo.owner;
       const final_destination = newCargo.final_destination || null;
-      const shipping_address = JSON.stringify(newCargo.shipping_address || {});
-      const tracking_history = JSON.stringify(newCargo.tracking_history || []);
+      const shipping_address_obj = newCargo.shipping_address || {};
+      const shipping_address = JSON.stringify(shipping_address_obj);
+      const tracking_history = newCargo.tracking_history || [];
+      const status = tracking_history[0]?.status || "Created";
+      const recipient_name = newCargo.recipient_name || null;
+      const email = shipping_address_obj.email || null; // Fetch email from shipping_address object
 
       const insertQuery = `
-      INSERT INTO packages (
-        container_number, truck_number, bl_number, type, weight,
+      INSERT INTO packages (container_number, truck_number, bl_number, type, weight,
         shipped_date, estimated_delivery, owner,
         current_location, next_stop, next_stop_eta,
-        final_destination, shipping_address, created_at
+        final_destination, shipping_address, created_at, status, recipient_name
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       RETURNING *;
-    `;
+        `;
 
       const values = [
         container_number,
@@ -80,27 +74,39 @@ module.exports = {
         next_stop_eta,
         final_destination,
         shipping_address,
-        created_at
+        created_at,
+        status,
+        recipient_name
       ];
       const result = await query(insertQuery, values);
       if (result.rowCount === 0) {
         return res.status(500).json({ success: false, message: 'Failed to create package' });
       }
       const packageId = result.rows[0].id;
+      const rawComment = tracking_history[0]?.comment || "Package Created";
+      const comments = rawComment
+          ? [
+          {
+            id: crypto.randomUUID(),
+            author: owner,
+            text: rawComment,
+            timestamp: new Date().toISOString(),
+          },
+        ]
+          : [];
       // Add the first tracking event
       const trackingEventQuery = `
-      INSERT INTO tracking_events (
-        package_id, status, location, timestamp, comment,updated_at
+      INSERT INTO tracking_events (package_id, status, location, timestamp, comment,updated_at
       )
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *;
-    `;
+        `;
       const trackingEventValues = [
         packageId,
         tracking_history[0]?.status || 'Created',
         tracking_history[0]?.location || current_location || 'Unknown',
         tracking_history[0]?.timestamp || created_at,
-        tracking_history[0]?.comment || 'Package created',
+        JSON.stringify(comments),
         updated_at
       ];
 
@@ -113,10 +119,9 @@ module.exports = {
       await insertActivityLog(
         'package_created',
         userId,
-        `New package created with tracking number ${tracking_number}`,
+        `New package created with tracking number ${truck_number}`,
         {
           package_id: packageId,
-          tracking_number: tracking_number,
           container_number: container_number,
           truck_number: truck_number,
           bl_number: bl_number,
@@ -127,19 +132,27 @@ module.exports = {
         }
       );
 
+      // Send cargo dispatch email to customer
+      // const { sendCargoDispatch } = require('../services/SendEmailService');
+      // await sendCargoDispatch({
+      //   email,
+      //   fullname: recipient_name,
+      //   blnNumber: bl_number,
+      //   currentLocation: current_location,
+      //   finalDestination: final_destination
+      // });
 
       res.json({
         success: true,
         message: 'Package created successfully',
         package: result.rows[0],
-        tracking_number,
+        truck_number: truck_number,
       });
-    } catch (error) {
+        } catch (error) {
       console.error('Error creating package:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-  },
-
+        }
+      },
 
   // Get all packages (not deleted)
   getAllPackages: async (req, res) => {
@@ -205,7 +218,7 @@ module.exports = {
       let authorsMap = {};
       if (authorIds.length > 0) {
         const userResult = await query(
-          `SELECT id, fullname FROM profile WHERE id = ANY($1::uuid[])`,
+          `SELECT id, fullname FROM profile WHERE id = ANY($1)`,
           [authorIds]
         );
         authorsMap = Object.fromEntries(userResult.rows.map(user => [user.id, user.fullname]));
@@ -320,7 +333,7 @@ module.exports = {
         latestEvent.status || status || 'updated',
         latestEvent.location || current_location || 'unknown',
         latestEvent.timestamp || updated_at,
-        JSON.stringify(latestEvent.comment || { text: 'Package updated' }),
+        typeof latestEvent.comment === 'object' ? JSON.stringify(latestEvent.comment) : latestEvent.comment,
         updated_at
       ];
 

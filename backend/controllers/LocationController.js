@@ -1,14 +1,17 @@
 const { query } = require('../config/sqlConfig');
+const timestamp = new Date().toISOString();
+
+
 
 // Helper function to insert activity log
 const insertActivityLog = async (type, userId, message, details = {}) => {
     try {
         const activityQuery = `
-            INSERT INTO activity_logs (type, user_id, message, details)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO activity_logs (type, user_id, message, details, time)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *;
         `;
-        const params = [type, userId, message, details];
+        const params = [type, userId, message, details, timestamp];
         await query(activityQuery, params);
     } catch (error) {
         console.error('Error inserting activity log:', error);
@@ -19,14 +22,14 @@ const insertActivityLog = async (type, userId, message, details = {}) => {
 module.exports = {
     // Add a new location
     addLocation: async (req, res) => {
-        const { name, type, address, city, country, coordinates, status } = req.body;
+        const { name, type, address, city, country, coordinates, status} = req.body;
         const userId = req.user?.id || null; // Assuming user info is available in req.user
         try {
             const insertQuery = `
-      INSERT INTO locations (name, type, address, city, country, coordinates, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+      INSERT INTO locations (name, type, address, city, country, coordinates, status, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
 
-            const params = [name, type, address, city, country, coordinates, status || {}];
+            const params = [name, type, address, city, country, coordinates, status,timestamp || {}];
             const result = await query(insertQuery, params);
 
             const newLocation = result.rows[0];
@@ -98,12 +101,12 @@ module.exports = {
         try {
             const updateQuery = `
       UPDATE locations
-      SET name = $1, city = $2, country = $3, coordinates = $4, type = $5, address = $6, status = $7
-      WHERE id = $8
+      SET name = $1, city = $2, country = $3, coordinates = $4, type = $5, address = $6, status = $7, created_at = $8
+      WHERE id = $9
       RETURNING *;
     `;
 
-            const params = [name, city, country, coordinates, type, address, status || {}, id];
+            const params = [name, city, country, coordinates, type, address, status, timestamp || {}, id];
             const result = await query(updateQuery, params);
 
             if (result.rows.length === 0) {
@@ -153,7 +156,7 @@ module.exports = {
                 return res.status(404).json({ success: false, message: 'Location not found' });
             }
 
-            const locationToDelete = locationResult.rows[0];
+            const locationToDelete = result.rows[0];
 
             // Insert activity log
             await insertActivityLog(

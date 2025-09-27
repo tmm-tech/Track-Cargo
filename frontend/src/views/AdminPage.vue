@@ -949,7 +949,7 @@
                             {{ formatDate(pkg.next_stop_eta) || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ formatDate(pkg.latest_timestamp) || 'N/A' }}
+                            {{ formatDate(pkg.updated_at) || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
                             <div class="flex justify-end gap-1">
@@ -962,7 +962,12 @@
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
                                 @click="editCargo(pkg)" title="Edit Cargo">
                                 <PencilIcon class="h-3 w-3" />
-                              </button>
+                                </button>
+                                <button
+                                class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-8 px-2"
+                                @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
+                                <TrashIcon class="h-3 w-3" />
+                                </button>
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
                                 @click="printCargoDetails(pkg)" title="Print Details">
@@ -1078,7 +1083,7 @@
                       </div>
                       <div>
                         <p class="text-sm font-medium text-gray-500">Last Updated</p>
-                        <p class="text-lg">{{ formatDate(viewingCargo.latest_timestamp) }}</p>
+                        <p class="text-lg">{{ formatDate(viewingCargo.updated_at) }}</p>
                       </div>
                     </div>
 
@@ -1155,9 +1160,10 @@
                       <PencilIcon class="h-4 w-4 mr-2" />
                       Edit Cargo
                     </button>
+                   
                     <button
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 space-y-2 sm:space-y-0"
-                      @click="openTrackingDialog(pkg)">
+                      @click="openTrackingDialog(viewingCargo)">
                       <PrinterIcon class="h-4 w-4 mr-2" />
                       Print Details
                     </button>
@@ -1493,7 +1499,7 @@
                           <h3 class="font-medium text-lg mb-3">Tracking History</h3>
                           <div v-if="trackingStops.length === 0" class="text-center py-8 bg-gray-50 rounded-md border">
                             <p class="text-gray-500">No tracking stops added yet</p>
-                            <p class="text-sm text-gray-400 mt-1">Add stops to create the package's tracking history
+                            <p class="text-sm text-gray-400 mt-1">Add stops to create the cargo's tracking history
                             </p>
                           </div>
                           <div v-else class="space-y-4">
@@ -1538,7 +1544,64 @@
                 </div>
               </div>
             </div>
+            <!-- Delete Cargo Confirmation Modal -->
+            <div v-if="showDeleteCargoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+              <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
+                <p class="text-sm text-muted-foreground">
+                  Are you sure you want to delete this cargo? This action cannot be undone.
+                </p>
+                </div>
 
+                <div class="p-4 bg-red-50 rounded-md mb-4">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                  <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+                  </div>
+                  <div class="ml-3">
+                  <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                  <div class="mt-2 text-sm text-red-700">
+                    <p>Deleting this cargo will remove all its shipment and tracking history.</p>
+                  </div>
+                  </div>
+                </div>
+                </div>
+
+                <div v-if="cargoToDelete" class="py-4 border-t border-b">
+                <div class="flex items-center">
+                  <div
+                  class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
+                  <ArchiveBoxIcon class="h-5 w-5 text-[#273272]" />
+                  </div>
+                  <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ cargoToDelete.container_number || 'N/A' }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    Truck: {{ cargoToDelete.truck_number || 'N/A' }},
+                    BL: {{ cargoToDelete.bl_number || 'N/A' }}
+                  </div>
+                  </div>
+                </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                <button
+                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                  @click="closeDeleteCargoModal">
+                  Cancel
+                </button>
+                <button
+                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
+                  @click="deleteCargo">
+                  Delete Cargo
+                </button>
+                </div>
+              </div>
+              </div>
+            </div>
             <!-- Edit Cargo Modal -->
             <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
               @click="closeEditModal">
@@ -1546,7 +1609,7 @@
                 <div class="p-6">
                   <div class="flex flex-col space-y-1.5 pb-4">
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Update Cargo Information</h2>
-                    <p class="text-sm text-muted-foreground">Update the package location and shipping address
+                    <p class="text-sm text-muted-foreground">Update the cargo location and shipping address
                       information.
                     </p>
                   </div>
@@ -1760,7 +1823,7 @@
                   <select v-model="activityFilter"
                     class="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm">
                     <option value="all">All Activities</option>
-                    <option value="package">Package Activities</option>
+                    <option value="package">Cargo Activities</option>
                     <option value="location">Location Activities</option>
                     <option value="user">User Activities</option>
                   </select>
@@ -1969,10 +2032,11 @@
                       <select id="location-type" v-model="newLocation.type"
                         :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.type ? 'border-red-500' : '']">
                         <option value="" disabled selected>Select type</option>
-                        <option value="warehouse">Warehouse</option>
+                        <option value="border">Border</option>
+                        <option value="destination">Destination</option>
                         <option value="port">Port</option>
                         <option value="transit">Transit Point</option>
-                        <option value="destination">Destination</option>
+                        <option value="warehouse">Warehouse</option>
                       </select>
                       <p v-if="locationFormErrors.type" class="text-red-500 text-sm">{{ locationFormErrors.type }}</p>
                     </div>
@@ -2418,6 +2482,8 @@ const selectedCargo = ref(null)
 const packages = ref([]);
 const searchTerm = ref('')
 const currentYear = computed(() => new Date().getFullYear())
+const showDeleteCargoModal = ref(false)
+const cargoToDelete = ref(null)
 
 // Edit package state
 const showEditModal = ref(false)
@@ -2486,7 +2552,7 @@ const openTrackingDialog = async (pkg) => {
   try {
     const response = await ShippingServices.getPackageById(pkg.id)
     if (!response || response.error) {
-      setAlert('Failed to fetch package details for viewing.', 'error')
+      setAlert('Failed to fetch cargo details for viewing.', 'error')
       return
     }
 
@@ -2494,8 +2560,8 @@ const openTrackingDialog = async (pkg) => {
     selectedCargo.value = response.data.package
     showTrackingDialog.value = true
   } catch (error) {
-    console.error('Error fetching package data:', error)
-    setAlert('Failed to load package data for viewing.', 'error')
+    console.error('Error fetching cargo data:', error)
+    setAlert('Failed to load cargo data for viewing.', 'error')
     return
   }
 }
@@ -2726,8 +2792,9 @@ const closeEditModal = () => {
 const editCargo = async (pkg) => {
   try {
     const response = await ShippingServices.getPackageById(pkg.id)
+
     if (!response || response.error) {
-      setAlert('Failed to fetch package details for editing.', 'error')
+      setAlert('Failed to fetch cargo details for editing.', 'error')
       return
     }
     // Populate editingCargo with fetched data
@@ -2741,8 +2808,8 @@ const editCargo = async (pkg) => {
     }
     showEditModal.value = true
   } catch (error) {
-    console.error('Error fetching package data:', error)
-    setAlert('Failed to load package data for editing.', 'error')
+    console.error('Error fetching cargo data:', error)
+    setAlert('Failed to load cargo data for editing.', 'error')
   }
 }
 
@@ -2772,7 +2839,6 @@ const addComment = async () => {
   const userFullname = storedUser.fullname || 'Unknown';
 
   const newTrackingEntry = {
-    id: crypto.randomUUID(),
     package_id: editingCargo.value.id,
     status: newTrackingStatus.value || editingCargo.value.status || 'In Transit',
     location: editingCargo.value.current_location,
@@ -2904,7 +2970,7 @@ const openViewCargoModal = async (pkg) => {
   try {
     const response = await ShippingServices.getPackageById(pkg.id)
     if (!response || response.error) {
-      setAlert('Failed to fetch package details for viewing.', 'error')
+      setAlert('Failed to fetch cargo details for viewing.', 'error')
       return
     }
 
@@ -2912,8 +2978,8 @@ const openViewCargoModal = async (pkg) => {
     viewingCargo.value = response.data.package
     showViewModal.value = true
   } catch (error) {
-    console.error('Error fetching package data:', error)
-    setAlert('Failed to load package data for viewing.', 'error')
+    console.error('Error fetching cargo data:', error)
+    setAlert('Failed to load cargo data for viewing.', 'error')
     return
   }
 
@@ -2934,6 +3000,8 @@ const editFromViewModal = (pkg) => {
     editCargo(pkg)
   }
 }
+
+
 
 // Add package functions
 const openAddCargoModal = () => {
@@ -2969,7 +3037,12 @@ const addNewCargo = async () => {
       next_stop_eta: newCargo.value.next_stop_eta,
       final_destination: newCargo.value.final_destination,
       shipping_address: { ...newCargo.value.shipping_address },
-      trackingHistory: trackingStops.value
+      tracking_history: trackingStops.value.map(stop => ({
+        location: stop.location,
+        eta: stop.eta,
+        status: stop.status,
+        comment: stop.comment
+      }))
     }
 
     try {
@@ -2982,9 +3055,15 @@ const addNewCargo = async () => {
         closeAddModal()
         await fetchCargos()
       } else {
-        setAlert('Failed to add new shipping.', 'error')
-        console.error(response.error)
-        return
+        // Check for duplicate BL number error
+        const rawMessage = response.error?.message || response.error || '';
+        const userMessage = rawMessage.includes('packages_bl_number_key')
+          ? 'A cargo with this BL number already exists.'
+          : rawMessage;
+
+        setAlert(userMessage || 'Failed to add new shipping.', 'error');
+        console.error(response.error);
+        return;
       }
     } catch (error) {
       console.error('Error adding new shipping:', error)
@@ -2996,6 +3075,8 @@ const addNewCargo = async () => {
   }
 }
 
+// Validates the new cargo form fields and tracking stops.
+// Returns true if all required fields are valid, otherwise sets error messages and returns false.
 const validateForm = () => {
   formErrors.value = {}
   let isValid = true
@@ -3025,15 +3106,44 @@ const validateForm = () => {
     isValid = false
   }
 
+  
   if (!newCargo.value.shipped_date) {
     formErrors.value.shipped_date = 'Shipped date is required'
     isValid = false
+  } else {
+    const shippedDate = new Date(newCargo.value.shipped_date)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0) // ignore time part
+
+    // shipped date cannot be before today
+    if (shippedDate < today) {
+      formErrors.value.shipped_date = 'Shipped date cannot be in the past'
+      isValid = false
+    }
+
+    // shipped date cannot be after estimated delivery
+    if (newCargo.value.estimated_delivery) {
+      const estimatedDelivery = new Date(newCargo.value.estimated_delivery)
+      if (shippedDate > estimatedDelivery) {
+        formErrors.value.shipped_date = 'Shipped date cannot be after estimated delivery'
+        isValid = false
+      }
+    }
   }
+
 
   if (!newCargo.value.estimated_delivery) {
     formErrors.value.estimated_delivery = 'Estimated delivery is required'
     isValid = false
+  } else if (newCargo.value.shipped_date) {
+    const shippedDate = new Date(newCargo.value.shipped_date)
+    const estimatedDelivery = new Date(newCargo.value.estimated_delivery)
+    if (estimatedDelivery <= shippedDate) {
+      formErrors.value.estimated_delivery = 'Estimated delivery must be after shipped date'
+      isValid = false
+    }
   }
+  
 
   if (!newCargo.value.current_location) {
     formErrors.value.current_location = 'Current location is required'
@@ -3045,11 +3155,11 @@ const validateForm = () => {
     isValid = false
   }
   if (newCargo.value.shipping_address.recipientName.trim() === '') {
-    formErrors.value.recipientName = 'Recipient name is required'
+    formErrors.value.recipient_name = 'Recipient name is required'
     isValid = false
   }
   if (newCargo.value.shipping_address.streetAddress.trim() === '') {
-    formErrors.value.streetAddress = 'Street address is required'
+    formErrors.value.street_address = 'Street address is required'
     isValid = false
   }
   if (newCargo.value.shipping_address.city.trim() === '') {
@@ -3076,8 +3186,8 @@ const validateForm = () => {
     isValid = false
   }
 
-  if (trackingStops.value.length === 0) {
-    stopErrors.value = 'At least one tracking stop is required'
+  if (!Array.isArray(trackingStops.value) || trackingStops.value.length === 0) {
+    stopErrors.value.general = 'At least one tracking stop is required'
     setAlert('At least one tracking stop is required', 'error')
     isValid = false
   }
@@ -3200,6 +3310,37 @@ const getCargosByStatus = (status) => {
   }).length;
 };
 
+// Shows the delete confirmation modal for the selected cargo package.
+const confirmDeleteCargo = (pkg)=> {
+  cargoToDelete.value = pkg
+  showDeleteCargoModal.value = true
+}
+
+
+//<!-- End of Cargo Management Function -->
+const closeDeleteCargoModal = () => {
+  showDeleteCargoModal.value = false
+  cargoToDelete.value = null
+}
+
+const deleteCargo = async () => {
+  if (!cargoToDelete.value) return
+  try {
+    const response = await ShippingServices.deletePackage(cargoToDelete.value.id)
+    if (response.error) {
+      setAlert(response.error, 'error')
+    } else {
+      setAlert('Cargo deleted successfully!', 'success')
+      packages.value = packages.value.filter(pkg => pkg.id !== cargoToDelete.value.id)
+    }
+  } catch (error) {
+    console.error('Delete error:', error)
+    setAlert('An error occurred while deleting the cargo.', 'error')
+  } finally {
+    closeDeleteCargoModal()
+    cargoToDelete.value = null
+  }
+}
 //<!-- End of Cargo Management Function -->
 
 // <!-- Activity Management Functions  -->
@@ -3216,9 +3357,9 @@ const getActivityIcon = (type) => {
       return Edit
     case 'user_deleted':
       return TrashIcon
-    case 'package_created':
+    case 'cargo_created':
       return ArchiveBoxIcon
-    case 'package_updated':
+    case 'cargo_updated':
       return Edit
     case 'location_created':
       return MapPinIcon
@@ -3235,16 +3376,16 @@ const getActivityIcon = (type) => {
 const getActivityColor = (type) => {
   const colorMap = {
     // Package Activities - Blue theme
-    'package_created': 'bg-blue-100 text-blue-600',
-    'package_updated': 'bg-blue-100 text-blue-600',
-    'package_delivered': 'bg-green-100 text-green-600',
-    'package_cancelled': 'bg-red-100 text-red-600',
-    'package_delayed': 'bg-yellow-100 text-yellow-600',
-    'package_shipped': 'bg-purple-100 text-purple-600',
-    'package_deleted': 'bg-red-100 text-red-600',
-    'package_restored': 'bg-green-100 text-green-600',
-    'package_held': 'bg-orange-100 text-orange-600',
-    'package_released': 'bg-green-100 text-green-600',
+    'cargo_created': 'bg-blue-100 text-blue-600',
+    'cargo_updated': 'bg-blue-100 text-blue-600',
+    'cargo_delivered': 'bg-green-100 text-green-600',
+    'cargo_cancelled': 'bg-red-100 text-red-600',
+    'cargo_delayed': 'bg-yellow-100 text-yellow-600',
+    'cargo_shipped': 'bg-purple-100 text-purple-600',
+    'cargo_deleted': 'bg-red-100 text-red-600',
+    'cargo_restored': 'bg-green-100 text-green-600',
+    'cargo_held': 'bg-orange-100 text-orange-600',
+    'cargo_released': 'bg-green-100 text-green-600',
 
     // Location Activities - Green theme
     'location_created': 'bg-green-100 text-green-600',
@@ -3281,11 +3422,11 @@ const getActivityColor = (type) => {
 const getActivityBadgeColor = (type) => {
   const badgeColorMap = {
     // Package Activities
-    'package_created': 'bg-blue-100 text-blue-800',
-    'package_delivered': 'bg-green-100 text-green-800',
-    'package_cancelled': 'bg-red-100 text-red-800',
-    'package_delayed': 'bg-yellow-100 text-yellow-800',
-    'package_shipped': 'bg-purple-100 text-purple-800',
+    'cargo_created': 'bg-blue-100 text-blue-800',
+    'cargo_delivered': 'bg-green-100 text-green-800',
+    'cargo_cancelled': 'bg-red-100 text-red-800',
+    'cargo_delayed': 'bg-yellow-100 text-yellow-800',
+    'cargo_shipped': 'bg-purple-100 text-purple-800',
 
     // Location Activities
     'location_created': 'bg-green-100 text-green-800',
@@ -3306,7 +3447,7 @@ const getActivityBadgeColor = (type) => {
   }
 
   // Default colors based on category
-  if (type.startsWith('package_')) return badgeColorMap[type] || 'bg-blue-100 text-blue-800'
+  if (type.startsWith('cargo_')) return badgeColorMap[type] || 'bg-blue-100 text-blue-800'
   if (type.startsWith('location_')) return badgeColorMap[type] || 'bg-green-100 text-green-800'
   if (type.startsWith('user_')) return badgeColorMap[type] || 'bg-purple-100 text-purple-800'
   if (type.startsWith('system_')) return badgeColorMap[type] || 'bg-orange-100 text-orange-800'
@@ -3316,7 +3457,7 @@ const getActivityBadgeColor = (type) => {
 
 // Helper functions
 const getActivityCategory = (type) => {
-  if (type.startsWith('package_')) return 'Package'
+  if (type.startsWith('cargo_')) return 'Package'
   if (type.startsWith('location_')) return 'Location'
   if (type.startsWith('user_')) return 'User'
   if (type.startsWith('system_')) return 'System'
@@ -3363,8 +3504,8 @@ const filteredActivities = computed(() => {
   if (activityFilter.value !== 'all') {
     filtered = filtered.filter(activity => activity.type === activityFilter.value)
   }
-  if (activityFilter.value === 'package') {
-    filtered = filtered.filter(activity => activity.type.startsWith('package_'))
+  if (activityFilter.value === 'cargocargo') {
+    filtered = filtered.filter(activity => activity.type.startsWith('cargo_'))
   }
   if (activityFilter.value === 'location') {
     filtered = filtered.filter(activity => activity.type.startsWith('location_'))
@@ -3619,6 +3760,8 @@ const confirmDeleteLocation = (location) => {
   showDeleteLocationModal.value = true
 }
 
+
+
 const closeDeleteLocationModal = () => {
   showDeleteLocationModal.value = false
   locationToDelete.value = null
@@ -3736,7 +3879,7 @@ const addNewUser = async () => {
     }
     try {
       const response = await userServices.registerUser(newUserToAdd)
-      if (response.success) {
+      if (response.data.success) {
         setAlert('User created successfully!', 'success')
         closeAddUserModal()
         await fetchUsers()
@@ -3768,15 +3911,27 @@ const validateUserForm = () => {
   userFormErrors.value = {}
   let isValid = true
 
-  if (!newUser.value.fullname) {
-    userFormErrors.value.fullname = 'Name is required'
-    isValid = false
+  if (!newUser.value.fullname || newUser.value.fullname.length < 5) {
+    userFormErrors.value.fullname = 'Full name must be at least 5 characters';
+    isValid = false;
   }
 
   if (!newUser.value.username) {
-    userFormErrors.value.username = 'Username is required'
-    isValid = false
+    userFormErrors.value.username = 'Username is required';
+    isValid = false;
+  } else if (!/^[a-zA-Z0-9]+$/.test(newUser.value.username)) {
+    userFormErrors.value.username = 'Username must contain only letters and numbers';
+    isValid = false;
+  } else if (newUser.value.username.length < 4) {
+    userFormErrors.value.username = 'Username must be at least 4 characters';
+    isValid = false;
+  } else if (newUser.value.username.length > 30) {
+    userFormErrors.value.username = 'Username must not exceed 30 characters';
+    isValid = false;
   }
+
+
+
   if (!newUser.value.email) {
     userFormErrors.value.email = 'Email is required'
     isValid = false
@@ -3786,13 +3941,15 @@ const validateUserForm = () => {
   }
 
   if (!newUser.value.password) {
-    userFormErrors.value.password = 'Password is required'
-    isValid = false
-  } else if (newUser.value.password.length < 6) {
-    userFormErrors.value.password = 'Password must be at least 6 characters'
-    isValid = false
+    userFormErrors.value.password = 'Password is required';
+    isValid = false;
+  } else if (newUser.value.password.length < 8) {
+    userFormErrors.value.password = 'Password must be at least 8 characters';
+    isValid = false;
+  } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(newUser.value.password)) {
+    userFormErrors.value.password = 'Password must contain uppercase, lowercase, number, and special character';
+    isValid = false;
   }
-
   if (!newUser.value.confirmPassword) {
     userFormErrors.value.confirmPassword = 'Please confirm your password'
     isValid = false
@@ -4019,7 +4176,7 @@ const handleLogin = async () => {
     loginError.value = ''
     const userData = { username: username.value, password: password.value }
 
-    const response = await fetch('https://backend-track3-3.onrender.com/users/login', {
+    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),

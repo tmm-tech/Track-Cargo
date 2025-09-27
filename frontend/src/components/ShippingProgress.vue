@@ -64,7 +64,7 @@
 
         <!-- Tracking Info -->
         <div class="flex-1 pb-6">
-          <p class="font-medium text-[#273272]">{{ event.status }}</p>
+          <p class="font-medium text-[#273272] capitalize">{{ event.status }}</p>
           <p class="text-sm text-gray-500">{{ event.location }}</p>
           <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
           <p v-if="event.comment?.text" class="text-sm text-gray-400 mt-1">
