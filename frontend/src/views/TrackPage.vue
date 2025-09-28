@@ -328,7 +328,7 @@ export default {
       try {
         // Make the real API call to fetch tracking info
         const response = await ShippingServices.trackPackage(trackingNumber.value);
-        if (response.success && response.data) {
+        if (response.data.success && response.data.data) {
           // Save to recent searches
           saveRecentSearch(trackingNumber.value);
 

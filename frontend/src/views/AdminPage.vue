@@ -2403,6 +2403,13 @@ const loadingMessages = ref([
   'Almost ready...'
 ])
 
+const statusCounts = ref({
+  'in transit': 0,
+  'delivered': 0,
+  'delayed': 0
+});
+
+
 const currentMessageIndex = ref(0)
 let messageInterval = null
 
@@ -4304,11 +4311,6 @@ const stopLoadingMessageRotation = () => {
   }
 }
 
-const statusCounts = ref({
-  'in transit': 0,
-  'delivered': 0,
-  'delayed': 0
-});
 
 onMounted(async () => {
   isCheckingAuth.value = true;
