@@ -334,7 +334,7 @@
                       class="w-0.5 h-full bg-gray-200 absolute top-4"></div>
                   </div>
                   <div class="flex-1 pb-6">
-                    <p class="font-medium text-[#273272]">{{ capitalizeWords(event.status) }}</p>
+                    <p class="font-medium text-[#273272] capitalize">{{ event.status }}</p>
                     <p class="text-sm text-gray-500">{{ event.location }}</p>
                     <p class="text-sm text-gray-500">{{ event.timestamp }}</p>
 

@@ -563,7 +563,7 @@
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
                     <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{
                       resetPasswordUser.username
-                        }}</strong></p>
+                    }}</strong></p>
                   </div>
 
                   <form @submit.prevent="saveNewPassword">
@@ -962,12 +962,12 @@
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
                                 @click="editCargo(pkg)" title="Edit Cargo">
                                 <PencilIcon class="h-3 w-3" />
-                                </button>
-                                <button
+                              </button>
+                              <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-8 px-2"
                                 @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
                                 <TrashIcon class="h-3 w-3" />
-                                </button>
+                              </button>
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
                                 @click="printCargoDetails(pkg)" title="Print Details">
@@ -988,8 +988,8 @@
                       class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                       <div class="flex justify-between items-start mb-3">
                         <div class="flex-1">
-                          <h3 class="font-bold text-gray-900 text-sm">{{ pkg.containerNumber }}</h3>
-                          <p class="text-xs text-gray-500 mt-1">{{ pkg.truckNumber }} • {{ pkg.blNumber }}</p>
+                          <h3 class="font-bold text-gray-900 text-sm">{{ pkg.container_number }}</h3>
+                          <p class="text-xs text-gray-500 mt-1">{{ pkg.truck_number }} • {{ pkg.bl_number }}</p>
                         </div>
                         <div class="flex gap-1 ml-2">
                           <button @click="viewCargoDetails(pkg)"
@@ -1007,6 +1007,11 @@
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="Edit Details">
                             <PencilIcon class="h-4 w-4" />
+                          </button>
+                          <button
+                            class="p-2 rounded-md transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+                            @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
+                            <TrashIcon class="h-4 w-4" />
                           </button>
                           <button @click="printCargoDetails(pkg)"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
@@ -1034,7 +1039,7 @@
                         <div class="flex justify-between">
                           <span class="text-gray-500">Updated:</span>
                           <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{
-                            formatDate(pkg.latest_timestamp) || 'N/A' }}</span>
+                            formatDate(pkg.updated_at) || 'N/A' }}</span>
                         </div>
                       </div>
                     </div>
@@ -1160,7 +1165,7 @@
                       <PencilIcon class="h-4 w-4 mr-2" />
                       Edit Cargo
                     </button>
-                   
+
                     <button
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 space-y-2 sm:space-y-0"
                       @click="openTrackingDialog(viewingCargo)">
@@ -1547,59 +1552,59 @@
             <!-- Delete Cargo Confirmation Modal -->
             <div v-if="showDeleteCargoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
               <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
-              <div class="p-6">
-                <div class="flex flex-col space-y-1.5 pb-4">
-                <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
-                <p class="text-sm text-muted-foreground">
-                  Are you sure you want to delete this cargo? This action cannot be undone.
-                </p>
-                </div>
+                <div class="p-6">
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
+                    <p class="text-sm text-muted-foreground">
+                      Are you sure you want to delete this cargo? This action cannot be undone.
+                    </p>
+                  </div>
 
-                <div class="p-4 bg-red-50 rounded-md mb-4">
-                <div class="flex">
-                  <div class="flex-shrink-0">
-                  <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+                  <div class="p-4 bg-red-50 rounded-md mb-4">
+                    <div class="flex">
+                      <div class="flex-shrink-0">
+                        <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+                      </div>
+                      <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                          <p>Deleting this cargo will remove all its shipment and tracking history.</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="ml-3">
-                  <h3 class="text-sm font-medium text-red-800">Warning</h3>
-                  <div class="mt-2 text-sm text-red-700">
-                    <p>Deleting this cargo will remove all its shipment and tracking history.</p>
-                  </div>
-                  </div>
-                </div>
-                </div>
 
-                <div v-if="cargoToDelete" class="py-4 border-t border-b">
-                <div class="flex items-center">
-                  <div
-                  class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
-                  <ArchiveBoxIcon class="h-5 w-5 text-[#273272]" />
+                  <div v-if="cargoToDelete" class="py-4 border-t border-b">
+                    <div class="flex items-center">
+                      <div
+                        class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
+                        <ArchiveBoxIcon class="h-5 w-5 text-[#273272]" />
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                          {{ cargoToDelete.container_number || 'N/A' }}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          Truck: {{ cargoToDelete.truck_number || 'N/A' }},
+                          BL: {{ cargoToDelete.bl_number || 'N/A' }}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ cargoToDelete.container_number || 'N/A' }}
-                  </div>
-                  <div class="text-sm text-gray-500">
-                    Truck: {{ cargoToDelete.truck_number || 'N/A' }},
-                    BL: {{ cargoToDelete.bl_number || 'N/A' }}
-                  </div>
-                  </div>
-                </div>
-                </div>
 
-                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                <button
-                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                  @click="closeDeleteCargoModal">
-                  Cancel
-                </button>
-                <button
-                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
-                  @click="deleteCargo">
-                  Delete Cargo
-                </button>
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                      @click="closeDeleteCargoModal">
+                      Cancel
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
+                      @click="deleteCargo">
+                      Delete Cargo
+                    </button>
+                  </div>
                 </div>
-              </div>
               </div>
             </div>
             <!-- Edit Cargo Modal -->
@@ -1734,11 +1739,10 @@
                                 <div class="flex justify-between items-start">
                                   <div>
                                     <p class="font-medium flex items-center gap-2">
-                                      {{ entry.user_fullname || 'Unknown' }}
+                                      {{ entry.comment.user_fullname || 'Unknown' }}
                                     </p>
                                     <p class="text-sm text-gray-500">{{ formatDate(entry.comment.timestamp) }}</p>
                                   </div>
-
                                 </div>
                                 <p class="mt-2">{{ entry.comment.text || 'No comment' }}</p>
                               </div>
@@ -3106,7 +3110,7 @@ const validateForm = () => {
     isValid = false
   }
 
-  
+
   if (!newCargo.value.shipped_date) {
     formErrors.value.shipped_date = 'Shipped date is required'
     isValid = false
@@ -3143,7 +3147,7 @@ const validateForm = () => {
       isValid = false
     }
   }
-  
+
 
   if (!newCargo.value.current_location) {
     formErrors.value.current_location = 'Current location is required'
@@ -3311,7 +3315,7 @@ const getCargosByStatus = (status) => {
 };
 
 // Shows the delete confirmation modal for the selected cargo package.
-const confirmDeleteCargo = (pkg)=> {
+const confirmDeleteCargo = (pkg) => {
   cargoToDelete.value = pkg
   showDeleteCargoModal.value = true
 }

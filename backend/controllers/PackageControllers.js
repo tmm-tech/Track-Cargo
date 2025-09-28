@@ -85,15 +85,13 @@ module.exports = {
       const packageId = result.rows[0].id;
       const rawComment = tracking_history[0]?.comment || "Package Created";
       const comments = rawComment
-          ? [
-          {
+          ? {
             id: crypto.randomUUID(),
             author: owner,
             text: rawComment,
             timestamp: new Date().toISOString(),
-          },
-        ]
-          : [];
+          }
+          : null ;
       // Add the first tracking event
       const trackingEventQuery = `
       INSERT INTO tracking_events (package_id, status, location, timestamp, comment,updated_at
@@ -156,31 +154,33 @@ module.exports = {
 
   // Get all packages (not deleted)
   getAllPackages: async (req, res) => {
-    try {
-      const result = await query(`
-      SELECT 
-        p.*, 
-        te.timestamp AS latest_timestamp 
-      FROM 
-        packages p
-      LEFT JOIN LATERAL (
-        SELECT timestamp 
-        FROM tracking_events 
-        WHERE package_id = p.id 
-        ORDER BY timestamp DESC 
-        LIMIT 1
-        ) te ON true
-      WHERE 
-        p.is_deleted = FALSE
-      ORDER BY 
-        p.created_at DESC;
+  try {
+    const result = await query(`
+     SELECT 
+  p.*,
+  te.updated_at
+FROM 
+  packages p
+LEFT JOIN LATERAL (
+  SELECT updated_at
+  FROM tracking_events 
+  WHERE package_id = p.id 
+  ORDER BY updated_at DESC 
+  LIMIT 1
+) te ON true
+WHERE 
+  p.is_deleted = FALSE
+ORDER BY 
+  p.created_at DESC;
+
     `);
-      res.json({ success: true, cargo: result.rows });
-    } catch (error) {
-      console.error('Error fetching packages:', error.message);
-      res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-  },
+    res.json({ success: true, cargo: result.rows });
+  } catch (error) {
+    console.error('Error fetching packages:', error.message);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+},
+
 
   // Get a specific package by ID (not deleted)
   getPackageById: async (req, res) => {
@@ -206,36 +206,71 @@ module.exports = {
       ORDER BY timestamp ASC;
     `, [id]);
 
-      const authorIds = [
-        ...new Set(
-          trackingHistoryResult.rows
-            .map(e => e.comment?.author) // get author
-            .filter(Boolean)            // remove null/undefined
-        )
-      ];
+      // Step 1: Parse all comments and collect author IDs
+    let allParsedComments = [];
+    let authorIdsSet = new Set();
+    
+    trackingHistoryResult.rows.forEach(event => {
+      if (event.comment) {
+        try {
+          const raw = typeof event.comment === 'string'
+            ? JSON.parse(event.comment)
+            : event.comment;
+    
+          if (Array.isArray(raw)) {
+            raw.forEach(c => {
+              allParsedComments.push({ ...c, event_id: event.id });
+              if (c.author) authorIdsSet.add(String(c.author)); // ensure string type
+            });
+          }
+        } catch (err) {
+          console.warn('Failed to parse comment array:', err.message);
+        }
+      }
+    });
+    
+    const authorIds = Array.from(authorIdsSet);
 
       // Step 2: Fetch all user fullnames in one batch
       let authorsMap = {};
       if (authorIds.length > 0) {
-        const userResult = await query(
-          `SELECT id, fullname FROM profile WHERE id = ANY($1)`,
-          [authorIds]
-        );
-        authorsMap = Object.fromEntries(userResult.rows.map(user => [user.id, user.fullname]));
-      }
-
-      // Step 3: Map fullnames into tracking history
-      const trackingHistoryWithUser = trackingHistoryResult.rows.map(event => {
-        const authorId = event.comment?.author;
-        const fullname = authorId ? authorsMap[authorId] || 'Unknown User' : 'No Comment';
-
-        return {
-          ...event,
-          user_fullname: fullname
-        };
-      });
+      const userResult = await query(
+        `SELECT id, fullname FROM profile WHERE id = ANY($1)`,
+        [authorIds]
+      );
+      authorsMap = Object.fromEntries(userResult.rows.map(user => [String(user.id), user.fullname]));
+    }
+    
+    // Step 3: Map comments back to their events
+    const trackingHistoryWithUser = trackingHistoryResult.rows.map(event => {
+      const comments = allParsedComments
+        .filter(c => c.event_id === event.id)
+        .map(c => ({
+          id: c.id,
+          text: c.text,
+          timestamp: c.timestamp,
+          author: c.author,
+          user_fullname: c.author ? authorsMap[String(c.author)] || 'Unknown User' : 'No Comment'
+        }));
+    
+      return {
+        ...event,
+        comments
+      };
+    });
 
       packageData.tracking_history = trackingHistoryWithUser;
+
+    // Step 4: Fetch latest updated_at from tracking_events
+    const latestUpdateResult = await query(`
+      SELECT updated_at
+      FROM tracking_events
+      WHERE package_id = $1
+      ORDER BY updated_at DESC
+      LIMIT 1;
+    `, [id]);
+    
+    packageData.updated_at = latestUpdateResult.rows[0]?.updated_at || null;
 
 
       res.json({ success: true, package: packageData });
@@ -370,6 +405,61 @@ module.exports = {
 },
 
 
+//delete package
+deletePackage: async (req, res) => {
+  const client = await pool.connect(); // assuming you're using pg Pool
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id || null;
+
+    await client.query('BEGIN');
+
+    // 1. Delete tracking events linked to the package
+    await client.query(`
+      DELETE FROM tracking_events
+      WHERE package_id = $1;
+    `, [id]);
+
+    // 2. Hard delete the package itself
+    const result = await client.query(`
+      DELETE FROM packages
+      WHERE id = $1
+      RETURNING *;
+    `, [id]);
+
+    if (result.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'Package not found' });
+    }
+
+    // 3. Log activity
+    await insertActivityLog(
+      'package_deleted',
+      userId,
+      `Package ${id} was permanently deleted`,
+      {
+        package_id: id,
+        action: 'DELETE'
+      }
+    );
+
+    await client.query('COMMIT');
+
+    res.json({
+      success: true,
+      message: 'Package and related tracking events permanently deleted',
+      package: result.rows[0]
+    });
+
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error deleting package:', error.message);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  } finally {
+    client.release();
+  }
+},
+
 
 
   // Track package by tracking number
@@ -380,15 +470,14 @@ module.exports = {
       // 1. Get package
       const packageResult = await query(`
       SELECT 
-        p.*, 
-        te.timestamp AS latest_timestamp 
+        p.*
       FROM 
         packages p
       LEFT JOIN LATERAL (
-        SELECT timestamp 
+        SELECT updated_at 
         FROM tracking_events 
         WHERE package_id = p.id 
-        ORDER BY timestamp DESC 
+        ORDER BY updated_at DESC 
         LIMIT 1
       ) te ON true
       WHERE 
