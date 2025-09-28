@@ -33,6 +33,11 @@ export default {
   // Track a package by tracking number (public route)
   trackPackage(trackingNumber) {
     return axios.get(`${API_URL}/track/${trackingNumber}`);
+  },
+
+    // Cargo status
+  StatusPackage() {
+    return axios.get(`${API_URL}/packages/status-summary`);
   }
   
 };

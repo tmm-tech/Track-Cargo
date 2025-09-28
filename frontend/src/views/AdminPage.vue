@@ -1009,7 +1009,7 @@
                             <PencilIcon class="h-4 w-4" />
                           </button>
                           <button
-                            class="p-2 rounded-md transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+                            class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
                             @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
                             <TrashIcon class="h-4 w-4" />
                           </button>
@@ -4329,50 +4329,55 @@ const stopLoadingMessageRotation = () => {
   }
 }
 
+const statusCounts = ref({
+  'in transit': 0,
+  'delivered': 0,
+  'delayed': 0
+});
+
 onMounted(async () => {
-  isCheckingAuth.value = true
-  loading.value = true
+  isCheckingAuth.value = true;
+  loading.value = true;
+  startLoadingMessageRotation();
 
-  // Start loading animation
-  startLoadingMessageRotation()
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
 
-  // Check screen size
-  checkScreenSize()
-  window.addEventListener('resize', checkScreenSize)
-
-  // Collapse sidebar if screen is medium-sized
   if (isMediumScreen.value) {
-    sidebarCollapsed.value = true
+    sidebarCollapsed.value = true;
   }
 
-  const storedUser = localStorage.getItem('user')
+  const storedUser = localStorage.getItem('user');
 
   if (!storedUser) {
-    // No user data — redirect immediately
-    isCheckingAuth.value = false
-    loading.value = false
-    stopLoadingMessageRotation()
-    return
+    isCheckingAuth.value = false;
+    loading.value = false;
+    stopLoadingMessageRotation();
+    return;
   }
 
   try {
-    // Parse stored user data
-    currentUser.value = JSON.parse(storedUser)
+    currentUser.value = JSON.parse(storedUser);
+    await verifyToken();
 
-    // Try verifying token
-    await verifyToken()
+    // Fetch status summary
+    const response = await ShippingServices.StatusPackage();
+    if (response.data.success) {
+      statusCounts.value = response.statusSummary;
+    }
   } catch (error) {
-    console.warn('Token invalid or session expired:', error)
-    localStorage.removeItem('user')
-    sessionStorage.removeItem('token')
-    isAuthenticated.value = false
-    currentUser.value = null
+    console.warn('Token invalid or session expired:', error);
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    isAuthenticated.value = false;
+    currentUser.value = null;
   } finally {
-    isCheckingAuth.value = false
-    loading.value = false
-    stopLoadingMessageRotation()
+    isCheckingAuth.value = false;
+    loading.value = false;
+    stopLoadingMessageRotation();
   }
-})
+});
+
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkScreenSize)
