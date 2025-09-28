@@ -340,16 +340,15 @@
 
                     <!-- Display comments if present and is an array -->
                     <div v-if="Array.isArray(event.comment) && event.comment.length" class="space-y-4 mt-3">
-                      <div v-for="(comments, idx) in event.comment" :key="idx" class="bg-gray-50 border border-gray-200 p-4 rounded-md shadow-sm">
+                      <div v-for="(comment, idx) in event.comment" :key="idx" class="bg-gray-50 border border-gray-200 p-4 rounded-md shadow-sm">
                         <div class="flex justify-between items-center mb-1">
-                          <span class="font-semibold text-[#273272]">{{ comments.author }}</span>
-                          <span class="text-xs text-gray-400">{{ comments.timestamp }}</span>
+                          <span class="text-xs text-gray-400">{{ formatDate(comment.timestamp) }}</span>
                         </div>
-                        <p class="text-gray-700 text-sm">{{ comments.text }}</p>
+                        <p class="text-gray-700 text-sm">{{ comment.text }}</p>
                       </div>
                     </div>
                     <!-- If comment is a string, show as before -->
-                    <p v-else-if="event.comment" class="text-sm text-gray-400 mt-1">{{ event.comment }}</p>
+                    <!-- <p v-else-if="event.comment" class="text-sm text-gray-400 mt-1">{{ event.comment }}</p> -->
                   </div>
                 </div>
               </div>
