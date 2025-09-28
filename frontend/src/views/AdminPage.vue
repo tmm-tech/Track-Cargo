@@ -3285,34 +3285,9 @@ const resetTrackingStops = () => {
 // Location change handlers
 
 const getCargosByStatus = (status) => {
-  const targetStatus = status.toLowerCase();
-
-  return packages.value.filter(pkg => {
-    const history = pkg.trackingHistory;
-    if (!Array.isArray(history) || history.length === 0) return false;
-
-    // Find the latest tracking event by timestamp
-    const latestEvent = history.reduce((latest, current) => {
-      return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
-    });
-
-    const latestStatus = latestEvent?.status?.toLowerCase() || '';
-
-    if (targetStatus === 'delivered') {
-      return latestStatus.includes('delivered');
-    }
-
-    if (targetStatus === 'transit') {
-      return latestStatus.includes('transit') || latestStatus.includes('in-transit');
-    }
-
-    if (targetStatus === 'delayed') {
-      return latestStatus.includes('delay');
-    }
-
-    return false;
-  }).length;
+  return statusCounts.value[status] || 0;
 };
+
 
 // Shows the delete confirmation modal for the selected cargo package.
 const confirmDeleteCargo = (pkg) => {
@@ -4362,7 +4337,7 @@ onMounted(async () => {
 
     // Fetch status summary
     const response = await ShippingServices.StatusPackage();
-    if (response.data.success) {
+    if (response.success) {
       statusCounts.value = response.statusSummary;
     }
   } catch (error) {
@@ -4377,6 +4352,7 @@ onMounted(async () => {
     stopLoadingMessageRotation();
   }
 });
+
 
 
 onUnmounted(() => {
