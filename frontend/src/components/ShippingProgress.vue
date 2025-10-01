@@ -53,7 +53,7 @@
               <div class="relative flex flex-col items-center">
                 <!-- Tick or Dot -->
                 <div class="w-4 h-4 rounded-full flex items-center justify-center z-10"
-                  :class="index < tracking_history.length - 1 ? 'bg-green-500' : index === 0 ? 'bg-[#ffb600]' : 'bg-gray-300'">
+                  :class="index < tracking_history.length - 1 ? 'bg-[#ffb600]' : index === 0 ? 'bg-[#ffb600]' : 'bg-gray-300'">
                   <!-- Tick Icon -->
                   <svg v-if="index < tracking_history.length - 1" class="w-3 h-3 text-white" fill="currentColor"
                     viewBox="0 0 20 20">
@@ -64,7 +64,7 @@
                 </div>
 
                 <!-- Connecting Line -->
-                <div v-if="index < tracking_history.length - 1" class="w-0.5 h-full bg-blue-400 absolute top-4"></div>
+                <div v-if="index < tracking_history.length - 1" class="w-0.5 h-full bg-[#ffb600] absolute top-4"></div>
               </div>
 
               <!-- Tracking Info -->

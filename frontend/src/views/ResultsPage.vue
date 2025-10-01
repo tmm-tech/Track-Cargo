@@ -68,16 +68,20 @@
               </svg>
             </button>
             <div :class="['md:flex flex-col md:flex-row', mobileMenuOpen ? 'flex' : 'hidden']">
-              <router-link to="https://www.texmonlogistics.co.ke/" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <router-link to="https://www.texmonlogistics.co.ke/"
+                class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Home
               </router-link>
-              <a href="https://www.texmonlogistics.co.ke/about-us" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/about-us"
+                class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 About Us
               </a>
-              <a href="https://www.texmonlogistics.co.ke/services" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/services"
+                class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Services
               </a>
-              <a href="https://www.texmonlogistics.co.ke/contact" class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
+              <a href="https://www.texmonlogistics.co.ke/contact"
+                class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Contact Us
               </a>
             </div>
@@ -147,7 +151,7 @@
                 </div>
                 <div>
                   <h3 class="font-medium text-gray-500">Estimated Delivery</h3>
-                  <p class="text-lg">{{ formatDate(packageData.estimated_delivery)}}</p>
+                  <p class="text-lg">{{ formatDate(packageData.estimated_delivery) }}</p>
                 </div>
               </div>
             </div>
@@ -328,24 +332,38 @@
             <div class="p-6">
               <div class="space-y-6">
                 <div v-for="(event, index) in packageData.tracking_history" :key="index" class="flex gap-4">
+                  <!-- Timeline Dot and Line -->
                   <div class="relative flex flex-col items-center">
-                    <div :class="`w-4 h-4 rounded-full ${index === 0 ? 'bg-[#ffb600]' : 'bg-gray-300'}`"></div>
-                    <div v-if="index < packageData.tracking_history.length - 1"
-                      class="w-0.5 h-full bg-gray-200 absolute top-4"></div>
+                    <!-- Tick or Dot -->
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center z-10"
+                      :class="index < packageData.tracking_history.length - 1 ? 'bg-[#ffb600]' : index === 0 ? 'bg-[#ffb600]' : 'bg-gray-300'">
+                      <!-- Tick Icon -->
+                      <svg v-if="index < packageData.tracking_history.length - 1" class="w-3 h-3 text-white" fill="currentColor"
+                        viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
+                          clip-rule="evenodd" />
+                      </svg>
+                    </div>
+
+                    <!-- Connecting Line -->
+                    <div v-if="index < packageData.tracking_history.length - 1" class="w-0.5 h-full bg-[#ffb600] absolute top-4">
+                    </div>
                   </div>
+
                   <div class="flex-1 pb-6">
                     <p class="font-medium text-[#273272] capitalize">{{ event.status }}</p>
                     <p class="text-sm text-gray-500">{{ event.location }}</p>
                     <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
 
-                   <!-- Display single comment if present -->
-                  <div v-if="event.comment" class="space-y-4 mt-3">
-                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-md shadow-sm">
-                      <p class="text-gray-700 text-sm">{{ event.comment.text }}</p>
-                      <span class="text-xs text-gray-400 block mt-1">{{ formatDate(event.comment.timestamp) }}</span>
+                    <!-- Display single comment if present -->
+                    <div v-if="event.comment" class="space-y-4 mt-3">
+                      <div class="bg-gray-50 border border-gray-200 p-4 rounded-md shadow-sm">
+                        <p class="text-gray-700 text-sm">{{ event.comment.text }}</p>
+                        <span class="text-xs text-gray-400 block mt-1">{{ formatDate(event.comment.timestamp) }}</span>
+                      </div>
                     </div>
-                  </div>
-                  
+
                   </div>
                 </div>
               </div>
@@ -552,20 +570,20 @@ const determineShippingStep = () => {
   // Always at least at step 1 (Shipped) if we have package data
   let step = 1
 
- // Check for "In Transit" status
-if (history.some(event => (event.status || '').toLowerCase().includes('in transit'))) {
-  step = 2;
-}
+  // Check for "In Transit" status
+  if (history.some(event => (event.status || '').toLowerCase().includes('in transit'))) {
+    step = 2;
+  }
 
-// Check for "Out for Delivery" status
-if (history.some(event => (event.status || '').toLowerCase().includes('out for delivery'))) {
-  step = 3;
-}
+  // Check for "Out for Delivery" status
+  if (history.some(event => (event.status || '').toLowerCase().includes('out for delivery'))) {
+    step = 3;
+  }
 
-// Check for "Delivered" status
-if (history.some(event => (event.status || '').toLowerCase().includes('delivered'))) {
-  step = 4;
-}
+  // Check for "Delivered" status
+  if (history.some(event => (event.status || '').toLowerCase().includes('delivered'))) {
+    step = 4;
+  }
 
 
   return step

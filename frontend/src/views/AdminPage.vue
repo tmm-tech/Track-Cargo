@@ -563,7 +563,7 @@
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
                     <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{
                       resetPasswordUser.username
-                    }}</strong></p>
+                        }}</strong></p>
                   </div>
 
                   <form @submit.prevent="saveNewPassword">
@@ -1008,8 +1008,7 @@
                             title="Edit Details">
                             <PencilIcon class="h-4 w-4" />
                           </button>
-                          <button
-                            class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
+                          <button class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
                             @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
                             <TrashIcon class="h-4 w-4" />
                           </button>
@@ -1056,14 +1055,11 @@
                   <div class="flex flex-col space-y-1.5 pb-4">
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Cargo Details</h2>
                     <p class="text-sm text-muted-foreground" v-if="viewingCargo">
-                      Container Number: {{ viewingCargo.container_number }} | Truck Number: {{
-                        viewingCargo.truck_number
-                      }}
-                      |
-                      BL Number: {{ viewingCargo.bl_number }}
+                      <strong>Container Number:</strong> {{ viewingCargo.container_number }} |
+                      <strong>Truck Number:</strong> {{ viewingCargo.truck_number }} |
+                      <strong>BL Number:</strong> {{ viewingCargo.bl_number }}
                     </p>
                   </div>
-
                   <div v-if="viewingCargo" class="space-y-6">
                     <div class="grid grid-cols-2 gap-4">
                       <div>
@@ -2541,10 +2537,10 @@ const fetchCargos = async () => {
 
 const fetchStatus = async () => {
   try {
-     // Fetch status summary
+    // Fetch status summary
     const response = await ShippingServices.StatusPackage();
 
-      statusCounts.value = response.data.statusSummary
+    statusCounts.value = response.data.statusSummary
   } catch (error) {
     console.error('Error fetching Cargo Status:', error);
     setAlert('Failed to load cargo status', 'error')
@@ -4347,7 +4343,7 @@ onMounted(async () => {
     currentUser.value = JSON.parse(storedUser);
     await verifyToken();
 
-   
+
   } catch (error) {
     console.warn('Token invalid or session expired:', error);
     localStorage.removeItem('user');
