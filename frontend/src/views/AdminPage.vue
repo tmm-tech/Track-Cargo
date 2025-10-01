@@ -2403,13 +2403,6 @@ const loadingMessages = ref([
   'Almost ready...'
 ])
 
-const statusCounts = ref({
-  'in transit': 0,
-  'delivered': 0,
-  'delayed': 0
-});
-
-
 const currentMessageIndex = ref(0)
 let messageInterval = null
 
@@ -2418,7 +2411,6 @@ const sidebarCollapsed = ref(false)
 
 // Current view state
 const currentView = ref('dashboard')
-
 const formErrors = ref({})
 
 // Tracking stops state
@@ -2544,6 +2536,18 @@ const fetchCargos = async () => {
   } catch (error) {
     console.error('Error fetching Cargo:', error);
     setAlert('Failed to load cargo data', 'error')
+  }
+};
+
+const fetchStatus = async () => {
+  try {
+     // Fetch status summary
+    const response = await ShippingServices.StatusPackage();
+
+      statusCounts.value = response.data.statusSummary
+  } catch (error) {
+    console.error('Error fetching Cargo Status:', error);
+    setAlert('Failed to load cargo status', 'error')
   }
 };
 
@@ -4214,7 +4218,8 @@ const verifyToken = async () => {
         fetchUsers(),
         fetchCargos(),
         fetchLocation(),
-        fetchActivities()
+        fetchActivities(),
+        fetchStatus()
       ])
     } else {
       // Token expired or invalid
@@ -4311,6 +4316,11 @@ const stopLoadingMessageRotation = () => {
   }
 }
 
+const statusCounts = ref({
+  'in transit': 0,
+  'delivered': 0,
+  'delayed': 0
+});
 
 onMounted(async () => {
   isCheckingAuth.value = true;
@@ -4337,11 +4347,7 @@ onMounted(async () => {
     currentUser.value = JSON.parse(storedUser);
     await verifyToken();
 
-    // Fetch status summary
-    const response = await ShippingServices.StatusPackage();
-    if (response.success) {
-      statusCounts.value = response.statusSummary;
-    }
+   
   } catch (error) {
     console.warn('Token invalid or session expired:', error);
     localStorage.removeItem('user');
