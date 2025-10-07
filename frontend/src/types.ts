@@ -15,6 +15,8 @@ export interface TrackingEvent {
   timestamp: string
   comment?: {
     text?: string
+    message?: string
+    user_fullname?: string
   }
 }
 

@@ -2,13 +2,13 @@
   <div class="flex flex-col min-h-screen">
     <header class="bg-[#273272] text-white">
       <div class="container mx-auto">
-        <div class="flex justify-between items-center py-2 px-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center py-2 px-4 space-y-2 sm:space-y-0">
           <div class="flex items-center">
             <span class="text-sm">
               <i class="mr-2">📍</i> Texmon Logistics Limited, Kenya
             </span>
           </div>
-          <div class="flex space-x-4">
+          <div class="flex overflow-x-auto space-x-4">
             <a href="#" class="text-sm hover:text-[#ffb600]">
               <i class="mr-1">📱</i> Facebook
             </a>
@@ -26,33 +26,42 @@
       </div>
     </header>
 
-    <div class="bg-white border-b">
-      <div class="container mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center py-4 px-4">
-          <div class="mb-4 md:mb-0">
-            <router-link to="/" class="flex items-center">
-              <span class="text-2xl font-bold text-[#273272]">Texmon Logistics</span>
-            </router-link>
+  <div class="bg-white py-4 px-4 border-b">
+  <div class="container mx-auto">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
+
+      <!-- Branding -->
+      <div class="text-center sm:text-left">
+        <router-link to="/" class="inline-block">
+          <span class="text-2xl font-bold text-[#273272]">Texmon Logistics</span>
+        </router-link>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 items-center sm:items-start">
+
+        <!-- Phone -->
+        <div class="flex items-center space-x-2">
+          <div class="text-[#ffb600] text-xl">📞</div>
+          <div>
+            <p class="text-sm text-gray-600">Call Us</p>
+            <p class="font-semibold text-base">(+254) 795 616 827</p>
           </div>
-          <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
-            <div class="flex items-center">
-              <div class="mr-2 text-[#ffb600]">📞</div>
-              <div>
-                <p class="text-sm text-gray-600">Call Us</p>
-                <p class="font-semibold">(+254) 795 616 827</p>
-              </div>
-            </div>
-            <div class="flex items-center">
-              <div class="mr-2 text-[#ffb600]">✉️</div>
-              <div>
-                <p class="text-sm text-gray-600">Email Us</p>
-                <p class="font-semibold">enquiries@texmonlogistics.co.ke</p>
-              </div>
-            </div>
+        </div>
+
+        <!-- Email -->
+        <div class="flex items-center space-x-2">
+          <div class="text-[#ffb600] text-xl">✉️</div>
+          <div>
+            <p class="text-sm text-gray-600">Email Us</p>
+            <p class="font-semibold text-base">enquiries@texmonlogistics.co.ke</p>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
 
     <nav class="bg-[#273272] text-white">
       <div class="container mx-auto">

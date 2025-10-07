@@ -3,13 +3,13 @@
     <!-- Header -->
     <header class="bg-[#273272] text-white">
       <div class="container mx-auto">
-        <div class="flex justify-between items-center py-2 px-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center py-2 px-4 space-y-2 sm:space-y-0">
           <div class="flex items-center">
             <span class="text-sm">
               <i class="mr-2">📍</i> Texmon Logistics Limited, Kenya
             </span>
           </div>
-          <div class="flex space-x-4">
+          <div class="flex overflow-x-auto space-x-4">
             <a href="#" class="text-sm hover:text-[#ffb600]">
               <i class="mr-1">📱</i> Facebook
             </a>
@@ -27,34 +27,43 @@
       </div>
     </header>
 
-    <!-- Logo section -->
-    <div class="bg-white border-b">
+
+    <div class="bg-white py-4 px-4 border-b">
       <div class="container mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center py-4 px-4">
-          <div class="mb-4 md:mb-0">
-            <router-link to="/" class="flex items-center">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
+
+          <!-- Branding -->
+          <div class="text-center sm:text-left">
+            <router-link to="/" class="inline-block">
               <span class="text-2xl font-bold text-[#273272]">Texmon Logistics</span>
             </router-link>
           </div>
-          <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
-            <div class="flex items-center">
-              <div class="mr-2 text-[#ffb600]">📞</div>
+
+          <!-- Contact Info -->
+          <div class="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 items-center sm:items-start">
+
+            <!-- Phone -->
+            <div class="flex items-center space-x-2">
+              <div class="text-[#ffb600] text-xl">📞</div>
               <div>
                 <p class="text-sm text-gray-600">Call Us</p>
-                <p class="font-semibold">(+254) 795 616 827</p>
+                <p class="font-semibold text-base">(+254) 795 616 827</p>
               </div>
             </div>
-            <div class="flex items-center">
-              <div class="mr-2 text-[#ffb600]">✉️</div>
+
+            <!-- Email -->
+            <div class="flex items-center space-x-2">
+              <div class="text-[#ffb600] text-xl">✉️</div>
               <div>
                 <p class="text-sm text-gray-600">Email Us</p>
-                <p class="font-semibold">enquiries@texmonlogistics.co.ke</p>
+                <p class="font-semibold text-base">enquiries@texmonlogistics.co.ke</p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
 
     <!-- Navigation -->
     <nav class="bg-[#273272] text-white">
@@ -162,8 +171,10 @@
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
               <h2 class="text-xl font-semibold">Current Status</h2>
             </div>
-            <div class="p-6">
-              <div class="flex items-start gap-4 mb-8">
+            <div class="p-6 space-y-8">
+
+              <!-- Current Location -->
+              <div class="flex items-start gap-4">
                 <div :class="[
                   'p-3 rounded-full transition-all duration-300',
                   isCurrentLocation ? 'bg-[#ffb600]/20 ring-2 ring-[#ffb600]' : 'bg-[#273272]/10'
@@ -188,7 +199,8 @@
                 </div>
               </div>
 
-              <div class="flex items-start gap-4 mb-8">
+              <!-- Next Stop -->
+              <div v-if="!isDelivered" class="flex items-start gap-4">
                 <div :class="[
                   'p-3 rounded-full transition-all duration-300',
                   isNextStop ? 'bg-[#ffb600]/20 ring-2 ring-[#ffb600]' : 'bg-[#273272]/10'
@@ -211,14 +223,15 @@
                 </div>
               </div>
 
+              <!-- Final Destination -->
               <div class="flex items-start gap-4">
                 <div :class="[
                   'p-3 rounded-full transition-all duration-300',
-                  isFinalDestination ? 'bg-[#ffb600]/20 ring-2 ring-[#ffb600]' : 'bg-[#273272]/10'
+                  isFinalDestination || isDelivered ? 'bg-green-100 ring-2 ring-green-500' : 'bg-[#273272]/10'
                 ]">
                   <CheckCircleIcon :class="[
                     'h-6 w-6 transition-colors duration-300',
-                    isFinalDestination ? 'text-[#ffb600]' : 'text-[#273272]'
+                    isFinalDestination || isDelivered ? 'text-green-600' : 'text-[#273272]'
                   ]" />
                 </div>
                 <div class="flex-1">
@@ -226,8 +239,12 @@
                   <p class="text-xl font-bold text-[#273272]">{{ packageData.final_destination }}</p>
                   <p class="text-gray-500">Estimated delivery: {{ formatDate(packageData.estimated_delivery) }}</p>
                   <div class="flex items-center mt-2">
-                    <span
-                      class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
+                    <span :class="[
+                      'px-2 py-1 text-xs font-medium rounded-full',
+                      isDelivered
+                        ? 'bg-green-100 text-green-700 border border-green-300'
+                        : 'bg-yellow-100 text-yellow-700 border border-yellow-300'
+                    ]">
                       {{ isDelivered ? 'Delivered' : 'Pending' }}
                     </span>
                   </div>
@@ -235,6 +252,7 @@
               </div>
             </div>
           </div>
+
           <!-- Shipping Status Icons with Animation -->
           <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
@@ -335,11 +353,14 @@
                   <!-- Timeline Dot and Line -->
                   <div class="relative flex flex-col items-center">
                     <!-- Tick or Dot -->
-                    <div class="w-4 h-4 rounded-full flex items-center justify-center z-10"
-                      :class="index < packageData.tracking_history.length - 1 ? 'bg-[#ffb600]' : index === 0 ? 'bg-[#ffb600]' : 'bg-gray-300'">
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center z-10" :class="{
+                      'bg-[#ffb600]': index < packageData.tracking_history.length - 1 || index === 0,
+                      'bg-green-500': event.status?.toLowerCase() === 'delivered',
+                      'bg-gray-300': index === packageData.tracking_history.length - 1 && event.status?.toLowerCase() !== 'delivered'
+                    }">
                       <!-- Tick Icon -->
-                      <svg v-if="index < packageData.tracking_history.length - 1" class="w-3 h-3 text-white" fill="currentColor"
-                        viewBox="0 0 20 20">
+                      <svg v-if="index < packageData.tracking_history.length - 1" class="w-3 h-3 text-white"
+                        fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                           d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
                           clip-rule="evenodd" />
@@ -347,28 +368,41 @@
                     </div>
 
                     <!-- Connecting Line -->
-                    <div v-if="index < packageData.tracking_history.length - 1" class="w-0.5 h-full bg-[#ffb600] absolute top-4">
-                    </div>
+                    <div v-if="index < packageData.tracking_history.length - 1"
+                      class="w-0.5 h-full bg-[#ffb600] absolute top-4"></div>
                   </div>
 
+                  <!-- Tracking Info -->
                   <div class="flex-1 pb-6">
-                    <p class="font-medium text-[#273272] capitalize">{{ event.status }}</p>
+                    <p class="font-medium capitalize"
+                      :class="event.status?.toLowerCase() === 'delivered' ? 'text-green-700' : 'text-[#273272]'">
+                      {{ event.status }}
+                    </p>
                     <p class="text-sm text-gray-500">{{ event.location }}</p>
                     <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
 
-                    <!-- Display single comment if present -->
-                    <div v-if="event.comment" class="space-y-4 mt-3">
+                    <!-- Comment Section -->
+                    <div v-if="event.comment" class="space-y-2 mt-3">
                       <div class="bg-gray-50 border border-gray-200 p-4 rounded-md shadow-sm">
-                        <p class="text-gray-700 text-sm">{{ event.comment.text }}</p>
-                        <span class="text-xs text-gray-400 block mt-1">{{ formatDate(event.comment.timestamp) }}</span>
+                        <p class="text-gray-700 text-sm">
+                          {{ event.comment.text || event.comment.message }}
+                        </p>
+                        <div class="flex justify-between items-center mt-2">
+                          <span class="text-xs text-gray-400">
+                            {{ formatDate(event.comment.timestamp || event.timestamp) }}
+                          </span>
+                          <span v-if="event.comment.user_fullname" class="text-xs text-gray-400 italic">
+                            — {{ event.comment.user_fullname }}
+                          </span>
+                        </div>
                       </div>
                     </div>
-
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </main>

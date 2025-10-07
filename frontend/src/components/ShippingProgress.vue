@@ -18,7 +18,7 @@
         </div>
 
         <!-- Next Stop -->
-        <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-md">
+        <div v-if="status !== 'Delivered'" class="flex items-center gap-4 p-3 bg-gray-50 rounded-md">
           <div class="bg-gray-200 p-2 rounded-full">
             <Clock class="h-5 w-5 text-gray-600" />
           </div>
@@ -30,8 +30,10 @@
           <Badge class="ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300">Pending</Badge>
         </div>
 
+
         <!-- Final Destination -->
-        <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-md">
+        <div class="flex items-center gap-4 p-3 rounded-md"
+          :class="status === 'Delivered' ? 'bg-green-50' : 'bg-gray-50'">
           <div class="bg-gray-200 p-2 rounded-full">
             <CheckCircle class="h-5 w-5 text-gray-600" />
           </div>
@@ -40,7 +42,11 @@
             <p class="font-medium">{{ final_destination }}</p>
             <p class="text-xs text-gray-500">ETA: {{ formatDate(estimated_delivery) }}</p>
           </div>
-          <Badge class="ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300">Pending</Badge>
+          <Badge :class="status === 'Delivered'
+            ? 'ml-auto bg-green-100 text-green-700 border border-green-300'
+            : 'ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300'">
+            {{ status === 'Delivered' ? 'Delivered' : 'Pending' }}
+          </Badge>
         </div>
 
         <!-- Tracking History Timeline -->
@@ -52,8 +58,11 @@
               <!-- Timeline Dot and Line -->
               <div class="relative flex flex-col items-center">
                 <!-- Tick or Dot -->
-                <div class="w-4 h-4 rounded-full flex items-center justify-center z-10"
-                  :class="index < tracking_history.length - 1 ? 'bg-[#ffb600]' : index === 0 ? 'bg-[#ffb600]' : 'bg-gray-300'">
+                <div class="w-4 h-4 rounded-full flex items-center justify-center z-10" :class="{
+                  'bg-[#ffb600]': index < tracking_history.length - 1 || index === 0,
+                  'bg-green-500': event.status?.toLowerCase() === 'delivered',
+                  'bg-gray-300': index === tracking_history.length - 1 && event.status?.toLowerCase() !== 'delivered'
+                }">
                   <!-- Tick Icon -->
                   <svg v-if="index < tracking_history.length - 1" class="w-3 h-3 text-white" fill="currentColor"
                     viewBox="0 0 20 20">
@@ -69,11 +78,26 @@
 
               <!-- Tracking Info -->
               <div class="flex-1 pb-6">
-                <p class="font-medium text-[#273272] capitalize">{{ event.status }}</p>
+                <p class="font-medium capitalize"
+                  :class="event.status?.toLowerCase() === 'delivered' ? 'text-green-700' : 'text-[#273272]'">
+                  {{ event.status }}
+                </p>
                 <p class="text-sm text-gray-500">{{ event.location }}</p>
                 <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
+
+                <!-- Comment Text -->
                 <p v-if="event.comment?.text" class="text-sm text-gray-400 mt-1">
                   {{ event.comment.text }}
+                </p>
+
+                <!-- System Message Fallback -->
+                <p v-else-if="event.comment?.message" class="text-sm italic text-gray-400 mt-1">
+                  {{ event.comment.message }}
+                </p>
+
+                <!-- Author Info -->
+                <p v-if="event.comment?.user_fullname" class="text-xs text-gray-400 mt-1">
+                  — {{ event.comment.user_fullname }}
                 </p>
               </div>
             </div>
@@ -119,6 +143,10 @@ const props = defineProps({
     required: true
   },
   estimated_delivery: {
+    type: String,
+    required: true
+  },
+  status: {
     type: String,
     required: true
   }
