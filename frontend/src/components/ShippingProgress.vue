@@ -18,7 +18,7 @@
         </div>
 
         <!-- Next Stop -->
-        <div v-if="status !== 'Delivered'" class="flex items-center gap-4 p-3 bg-gray-50 rounded-md">
+        <div v-if="status !== 'delivered'" class="flex items-center gap-4 p-3 bg-gray-50 rounded-md">
           <div class="bg-gray-200 p-2 rounded-full">
             <Clock class="h-5 w-5 text-gray-600" />
           </div>
@@ -33,7 +33,7 @@
 
         <!-- Final Destination -->
         <div class="flex items-center gap-4 p-3 rounded-md"
-          :class="status === 'Delivered' ? 'bg-green-50' : 'bg-gray-50'">
+          :class="status === 'delivered' ? 'bg-green-50' : 'bg-gray-50'">
           <div class="bg-gray-200 p-2 rounded-full">
             <CheckCircle class="h-5 w-5 text-gray-600" />
           </div>
@@ -42,10 +42,10 @@
             <p class="font-medium">{{ final_destination }}</p>
             <p class="text-xs text-gray-500">ETA: {{ formatDate(estimated_delivery) }}</p>
           </div>
-          <Badge :class="status === 'Delivered'
+          <Badge :class="status === 'delivered'
             ? 'ml-auto bg-green-100 text-green-700 border border-green-300'
             : 'ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300'">
-            {{ status === 'Delivered' ? 'Delivered' : 'Pending' }}
+            {{ status === 'delivered' ? 'delivered' : 'pending' }}
           </Badge>
         </div>
 
