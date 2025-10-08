@@ -958,12 +958,12 @@
                                 @click="viewCargoDetails(pkg)" title="View Details">
                                 View
                               </button>
-                              <button
+                              <button v-if="pkg.status !== 'delivered'"
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
                                 @click="editCargo(pkg)" title="Edit Cargo">
                                 <PencilIcon class="h-3 w-3" />
                               </button>
-                              <button
+                              <button v-if="pkg.status !== 'delivered'"
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-8 px-2"
                                 @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
                                 <TrashIcon class="h-3 w-3" />
@@ -1003,12 +1003,12 @@
                               </path>
                             </svg>
                           </button>
-                          <button @click="editCargo(pkg)"
+                          <button v-if="pkg.status !== 'delivered'" @click="editCargo(pkg)"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="Edit Details">
                             <PencilIcon class="h-4 w-4" />
                           </button>
-                          <button class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
+                          <button v-if="pkg.status !== 'delivered'" class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
                             @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
                             <TrashIcon class="h-4 w-4" />
                           </button>
@@ -1111,7 +1111,8 @@
                       :tracking_history="viewingCargo.tracking_history || []"
                       :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
                       :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
-                      :estimated_delivery="viewingCargo.estimated_delivery" showComments />
+                      :estimated_delivery="viewingCargo.estimated_delivery" showComments
+                      :status="viewingCargo.status?.toLowerCase()" />
                   </div>
 
                   <!-- Comments Section -->

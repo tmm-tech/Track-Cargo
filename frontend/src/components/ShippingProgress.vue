@@ -30,12 +30,11 @@
           <Badge class="ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300">Pending</Badge>
         </div>
 
-
         <!-- Final Destination -->
         <div class="flex items-center gap-4 p-3 rounded-md"
           :class="status === 'delivered' ? 'bg-green-50' : 'bg-gray-50'">
-          <div class="bg-gray-200 p-2 rounded-full">
-            <CheckCircle class="h-5 w-5 text-gray-600" />
+          <div class="p-2 rounded-full" :class="status === 'delivered' ? 'bg-green-100' : 'bg-gray-200'">
+            <CheckCircle :class="status === 'delivered' ? 'h-5 w-5 text-green-600' : 'h-5 w-5 text-gray-600'" />
           </div>
           <div>
             <p class="text-sm text-gray-500">Final Destination</p>
@@ -45,9 +44,11 @@
           <Badge :class="status === 'delivered'
             ? 'ml-auto bg-green-100 text-green-700 border border-green-300'
             : 'ml-auto bg-yellow-100 text-yellow-700 border border-yellow-300'">
-            {{ status === 'delivered' ? 'delivered' : 'pending' }}
+            {{ status === 'delivered' ? 'Delivered' : 'Pending' }}
           </Badge>
+
         </div>
+
 
         <!-- Tracking History Timeline -->
         <div class="mt-8">
