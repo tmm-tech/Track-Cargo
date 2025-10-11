@@ -563,7 +563,7 @@
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
                     <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{
                       resetPasswordUser.username
-                        }}</strong></p>
+                    }}</strong></p>
                   </div>
 
                   <form @submit.prevent="saveNewPassword">
@@ -942,12 +942,23 @@
                             :title="pkg.current_location">
                             {{ pkg.current_location || 'N/A' }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.nex_stop">
-                            {{ pkg.next_stop || 'N/A' }}
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.next_stop">
+                            <span v-if="pkg.status === 'delivered'">N/A</span>
+                            <span v-else>{{ pkg.next_stop || 'N/A' }}</span>
                           </td>
+
+
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ formatDate(pkg.next_stop_eta) || 'N/A' }}
+                            <span v-if="pkg.status === 'delivered'"
+                              class="text-gray-900 text-right flex-1 ml-2 truncate">Delivered</span>
+                            <span v-else>{{ formatDate(pkg.next_stop_eta) || 'N/A' }}</span>
                           </td>
+                          <td class="px-6 py-4 sm:px-4 text-sm tex  t-gray-900 whitespace-nowrap">
+                            <span v-if="pkg.status === 'delivered'">Delivered on {{ formatDate(pkg.next_stop_eta) ||
+                              'N/A' }}</span>
+                            <span v-else>{{ formatDate(pkg.next_stop_eta) || 'N/A' }}</span>
+                          </td>
+
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ formatDate(pkg.updated_at) || 'N/A' }}
                           </td>
@@ -1008,7 +1019,8 @@
                             title="Edit Details">
                             <PencilIcon class="h-4 w-4" />
                           </button>
-                          <button v-if="pkg.status !== 'delivered'" class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
+                          <button v-if="pkg.status !== 'delivered'"
+                            class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
                             @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
                             <TrashIcon class="h-4 w-4" />
                           </button>
@@ -1027,6 +1039,8 @@
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Next:</span>
+                          <span v-if="pkg.status === 'delivered'"
+                            class="text-gray-900 text-right flex-1 ml-2 truncate">N/A</span>
                           <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A'
                           }}</span>
                         </div>
@@ -1703,7 +1717,10 @@
                               <p class="text-xs text-gray-500">Automatically determined based on current location</p>
                             </div>
                             <div class="space-y-2">
-                              <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
+                              <label for="nextStopETA" class="text-sm font-medium">
+                                {{ newTrackingStatus === 'delivered' ? 'Delivered on' : 'Next Stop ETA' }}
+                              </label>
+
                               <input id="nextStopETA" type="datetime-local" v-model="editingCargo.next_stop_eta"
                                 class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                               <p class="text-xs text-gray-500">Estimated based on standard transit times</p>

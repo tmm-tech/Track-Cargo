@@ -39,7 +39,10 @@
           <div>
             <p class="text-sm text-gray-500">Final Destination</p>
             <p class="font-medium">{{ final_destination }}</p>
-            <p class="text-xs text-gray-500">ETA: {{ formatDate(estimated_delivery) }}</p>
+            <p class="text-xs text-gray-500">
+              {{ status === 'delivered' ? 'Delivered on' : 'ETA:' }} {{ formatDate(estimated_delivery) }}
+            </p>
+
           </div>
           <Badge :class="status === 'delivered'
             ? 'ml-auto bg-green-100 text-green-700 border border-green-300'

@@ -34,9 +34,9 @@
 
           <!-- Branding -->
           <div class="text-center sm:text-left">
-            <router-link to="/" class="inline-block">
+            <a href="https://www.texmonlogistics.co.ke/" class="inline-block">
               <span class="text-2xl font-bold text-[#273272]">Texmon Logistics</span>
-            </router-link>
+            </a>
           </div>
 
           <!-- Contact Info -->
@@ -77,10 +77,10 @@
               </svg>
             </button>
             <div :class="['md:flex flex-col md:flex-row', mobileMenuOpen ? 'flex' : 'hidden']">
-              <router-link to="https://www.texmonlogistics.co.ke/"
+              <a href="https://www.texmonlogistics.co.ke/"
                 class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 Home
-              </router-link>
+            </a>
               <a href="https://www.texmonlogistics.co.ke/about-us"
                 class="px-4 py-3 hover:bg-[#ffb600] hover:text-[#273272]">
                 About Us
@@ -96,10 +96,10 @@
             </div>
           </div>
           <div class="hidden md:flex items-center space-x-6">
-            <router-link to="https://www.texmonlogistics.co.ke/track"
+            <a href="https://www.texmonlogistics.co.ke/track"
               class="px-4 py-2 bg-transparent text-white border border-white rounded-md hover:bg-red-600 hover:border-red-600 hover:text-white transition-colors duration-300 inline-block">
               Track Cargo
-            </router-link>
+          </a>
           </div>
 
         </div>

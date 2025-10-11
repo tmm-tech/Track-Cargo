@@ -32,9 +32,9 @@
 
       <!-- Branding -->
       <div class="text-center sm:text-left">
-        <router-link to="/" class="inline-block">
+        <a href="https://www.texmonlogistics.co.ke/" class="inline-block">
           <span class="text-2xl font-bold text-[#273272]">Texmon Logistics</span>
-        </router-link>
+        </a>
       </div>
 
       <!-- Contact Info -->
