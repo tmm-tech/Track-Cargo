@@ -953,12 +953,7 @@
                               class="text-gray-900 text-right flex-1 ml-2 truncate">Delivered</span>
                             <span v-else>{{ formatDate(pkg.next_stop_eta) || 'N/A' }}</span>
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm tex  t-gray-900 whitespace-nowrap">
-                            <span v-if="pkg.status === 'delivered'">Delivered on {{ formatDate(pkg.next_stop_eta) ||
-                              'N/A' }}</span>
-                            <span v-else>{{ formatDate(pkg.next_stop_eta) || 'N/A' }}</span>
-                          </td>
-
+                         
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ formatDate(pkg.updated_at) || 'N/A' }}
                           </td>
