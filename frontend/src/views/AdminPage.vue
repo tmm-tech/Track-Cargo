@@ -1700,7 +1700,7 @@
                             <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                           </div>
                           <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-2">
+                            <div class="space-y-2" v-if="editingCargo.current_location !== editingCargo.final_destination">
                               <label for="nextStop" class="text-sm font-medium">Next Stop</label>
                               <select id="nextStop" v-model="editingCargo.next_stop"
                                 class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
