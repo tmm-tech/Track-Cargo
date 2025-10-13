@@ -563,7 +563,7 @@
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
                     <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{
                       resetPasswordUser.username
-                    }}</strong></p>
+                        }}</strong></p>
                   </div>
 
                   <form @submit.prevent="saveNewPassword">
@@ -953,7 +953,7 @@
                               class="text-gray-900 text-right flex-1 ml-2 truncate">Delivered</span>
                             <span v-else>{{ formatDate(pkg.next_stop_eta) || 'N/A' }}</span>
                           </td>
-                         
+
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ formatDate(pkg.updated_at) || 'N/A' }}
                           </td>
@@ -1036,13 +1036,16 @@
                           <span class="text-gray-500">Next:</span>
                           <span v-if="pkg.status === 'delivered'"
                             class="text-gray-900 text-right flex-1 ml-2 truncate">N/A</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A'
-                          }}</span>
+                          <span v-else class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A'
+                            }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">ETA:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ formatDate(pkg.next_stop_eta)
+                          <span v-if="pkg.status === 'delivered'"
+                            class="text-gray-900 text-right flex-1 ml-2 truncate">Delivered</span>
+                          <span v-else class="text-gray-900 text-right flex-1 ml-2 truncate">{{ formatDate(pkg.next_stop_eta)
                             || 'N/A' }}</span>
+                         
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Updated:</span>
@@ -1700,7 +1703,8 @@
                             <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                           </div>
                           <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-2" v-if="editingCargo.current_location !== editingCargo.final_destination">
+                            <div class="space-y-2"
+                              v-if="editingCargo.current_location !== editingCargo.final_destination">
                               <label for="nextStop" class="text-sm font-medium">Next Stop</label>
                               <select id="nextStop" v-model="editingCargo.next_stop"
                                 class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
