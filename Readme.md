@@ -1,99 +1,114 @@
-### Logistics Cargo Tracking System
+# 🚚 Logistics Cargo Tracking System
 
-## Overview
+A modern, responsive web application built with Vue.js that enables customers to track shipments in real-time and provides administrators with powerful tools to manage cargo operations.
 
-Cargo Tracking System is a comprehensive web application built with Vue.js that allows customers to track their shipments in real-time. The system provides detailed information about package location, estimated delivery times, and shipping history. It also includes an admin dashboard for managing packages and updating their status.
+---
 
-## Features
+## 📦 Overview
 
-### Customer-Facing Features
+The Logistics Cargo Tracking System offers:
 
-- **Real-time Tracking**: Track packages using tracking or dispatch numbers
+- Real-time package tracking  
+- Detailed shipment information  
+- Visual shipping progress  
+- A secure admin dashboard for managing packages, locations, and user profiles
+
+---
+
+## ✨ Features
+
+### 👤 Customer-Facing
+
+- **Real-Time Tracking**  
+  Track packages using tracking or dispatch numbers  
   ![Tracking Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Tracking%20Page.PNG)
-- **Detailed Package Information**: View current location, next stop, and final destination
-  ![Tracking Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Tracking%20Result.PNG)
-- **Shipping Progress**: Visual timeline of package movement history
-  ![Tracking Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Shipping%20Progress.PNG)
-- **Responsive Design**: Optimized for both desktop and mobile devices
-  [Tracking Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Responsive.PNG)
 
+- **Detailed Package Information**  
+  View current location, next stop, and final destination  
+  ![Tracking Result](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Tracking%20Result.PNG)
 
-### Admin Features
-![Dashboard Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Dashboard.PNG)
-- **Package Management**: Add, edit, view and Delete package details
-   ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Add%20New%20Cargo.PNG)
-   ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Update%20Cargo.PNG)
-   ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Cargo%20Page.PNG)
-   ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/View%20Cargo.PNG)
-- **Location Updates**: Add, edit, view and Delete package location
-  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Add%20New%20location.PNG)
-  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Update%20Location.PNG)
-  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Location.PNG)
-  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/View%20Location.PNG)
-- **Profile Management**: Add, Edit, View and Delete User information
-  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Add%20Profile.PNG)
-  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Edit%20user.PNG)
-  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/P.PNG)
-- **Activity History**: Add and manage tracking stops with timestamps
-  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Activity%20Log.PNG)
-- **Secure Admin Access**: Password-protected admin area
-  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Admin%20Login.PNG)
-  
+- **Shipping Progress Timeline**  
+  Visual representation of package movement history  
+  ![Shipping Progress](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Shipping%20Progress.PNG)
 
+- **Responsive Design**  
+  Optimized for desktop and mobile devices  
+  ![Responsive View](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Responsive.PNG)
 
-## Technology Stack
+---
 
-- **Frontend Framework**: Vue.js 3 with Composition API
-- **Styling**: Tailwind CSS
-- **Routing**: Vue Router
-- **Icons**: Lucide Vue
-- **TypeScript**: For type safety and better developer experience
+### 🛠️ Admin Dashboard
 
+![Dashboard](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Dashboard.PNG)
 
-## Installation
+- **Package Management**  
+  Add, edit, view, and delete package details  
+  ![Cargo Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Cargo%20Page.PNG)  
+  ![Add Cargo](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Add%20New%20Cargo.PNG)  
+  ![Update Cargo](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Update%20Cargo.PNG)  
+  ![View Cargo](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/View%20Cargo.PNG)
+
+- **Location Updates**  
+  Manage package location data  
+  ![Location Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Location.PNG)  
+  ![Add Location](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Add%20New%20location.PNG)  
+  ![Update Location](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Update%20Location.PNG)  
+  ![View Location](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/View%20Location.PNG)
+
+- **User Profile Management**  
+  Add, edit, view, and delete user profiles
+  ![User Profile](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/P.PNG)
+  ![Add Profile](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Add%20Profile.PNG)  
+  ![Edit User](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Edit%20user.PNG)
+
+- **Activity History**  
+  Track and manage package movement logs  
+  ![Activity Log](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Activity%20Log.PNG)
+
+- **Secure Admin Access**  
+  Password-protected login for administrators  
+  ![Admin Login](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Admin%20Login.PNG)
+
+---
+
+## 🧰 Technology Stack
+
+- **Frontend**: Vue.js 3 (Composition API)  
+- **Styling**: Tailwind CSS  
+- **Routing**: Vue Router  
+- **Icons**: Lucide Vue  
+- **Language**: TypeScript
+
+---
+
+## ⚙️ Installation
 
 ### Prerequisites
 
-- Node.js (v14.x or higher)
+- Node.js (v14+)
 - npm or yarn
 
+### Setup
 
-### Setup Instructions
-
-1. Clone the repository
-
-
-```shellscript
+```bash
+# Clone the repository
 git clone https://github.com/your-username/texmon-logistics.git
 cd texmon-logistics
-```
 
-2. Install dependencies
-
-
-```shellscript
+# Install dependencies
 npm install
 # or
 yarn install
-```
 
-3. Start the development server
-
-
-```shellscript
+# Start development server
 npm run dev
 # or
 yarn dev
-```
 
-4. Build for production
-
-
-```shellscript
+# Build for production
 npm run build
 # or
 yarn build
-```
 
 ## Project Structure
 
@@ -133,10 +148,7 @@ texmon-logistics/
 ### Admin Access
 
 1. Navigate to the admin page
-2. Login with the following credentials:
-
-1. Username: `admin`
-2. Password: `texmon2024`
+2. Login
 
 
 
