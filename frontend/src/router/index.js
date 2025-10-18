@@ -6,7 +6,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/track',
+      path: '/',
       name: 'track',
       component: TrackPage
     },

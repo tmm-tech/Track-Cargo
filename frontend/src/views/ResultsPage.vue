@@ -114,7 +114,7 @@
             </div>
           </div>
           <div class="hidden md:flex items-center space-x-6">
-            <a href="https://www.texmonlogistics.co.ke/track"
+            <a href="/"
               class="px-4 py-2 bg-transparent text-white border border-white rounded-md hover:bg-red-600 hover:border-red-600 hover:text-white transition-colors duration-300 inline-block">
               Track Cargo
             </a>
@@ -143,7 +143,7 @@
           </div>
           <div class="p-6">
             <p class="mb-6 text-gray-600">Please check your tracking or dispatch number and try again.</p>
-            <router-link to="/track">
+            <router-link to="/">
               <button
                 class="bg-[#ffb600] hover:bg-[#e6a500] text-[#273272] font-bold px-4 py-2 rounded inline-flex items-center justify-center">
                 Try Again
