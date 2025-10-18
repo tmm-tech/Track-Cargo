@@ -200,24 +200,6 @@ export const getPackage = async (trackingNumber: string) => {
 2. Vercel will automatically detect Vue.js and deploy
 
 
-
-2. **Netlify**
-
-1. Connect your GitHub repository
-2. Set build command to `npm run build`
-3. Set publish directory to `dist`
-
-
-
-3. **Traditional Hosting**
-
-1. Run `npm run build`
-2. Upload the contents of the `dist` folder to your web server
-
-
-
-
-
 ## Environment Variables
 
 Create a `.env` file in the root directory with the following variables:
@@ -258,10 +240,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-Texmon Logistics - [enquiries@texmonlogistics.co.ke](mailto:enquiries@texmonlogistics.co.ke)
-
 Project Link: [https://github.com/tmm-tech/Track-Cargo](https://github.com/tmm-tech/Track-Cargo)
 
 ---
 
-© 2024 Texmon Logistics Limited. All Rights Reserved.
+© 2025 Tony Mwangi Mugi. All Rights Reserved.
