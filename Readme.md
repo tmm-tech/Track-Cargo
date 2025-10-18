@@ -2,7 +2,7 @@
 
 ## Overview
 
-Texmon Logistics Cargo Tracking System is a comprehensive web application built with Vue.js that allows customers to track their shipments in real-time. The system provides detailed information about package location, estimated delivery times, and shipping history. It also includes an admin dashboard for managing packages and updating their status.
+Cargo Tracking System is a comprehensive web application built with Vue.js that allows customers to track their shipments in real-time. The system provides detailed information about package location, estimated delivery times, and shipping history. It also includes an admin dashboard for managing packages and updating their status.
 
 ## Features
 
