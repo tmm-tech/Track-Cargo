@@ -9,18 +9,36 @@ Cargo Tracking System is a comprehensive web application built with Vue.js that 
 ### Customer-Facing Features
 
 - **Real-time Tracking**: Track packages using tracking or dispatch numbers
+  ![Tracking Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Tracking%20Page.PNG)
 - **Detailed Package Information**: View current location, next stop, and final destination
+  ![Tracking Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Tracking%20Result.PNG)
 - **Shipping Progress**: Visual timeline of package movement history
+  ![Tracking Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Shipping%20Progress.PNG)
 - **Responsive Design**: Optimized for both desktop and mobile devices
+  ![Tracking Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Responsive.PNG)
 
 
 ### Admin Features
-
-- **Package Management**: Add, edit, and view package details
-- **Location Updates**: Update package location with automatic next stop calculation
-- **Shipping Address Management**: Edit recipient shipping information
-- **Tracking History**: Add and manage tracking stops with timestamps
+![Dashboard Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Dashboard.PNG)
+- **Package Management**: Add, edit, view and Delete package details
+   ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Add%20New%20Cargo.PNG)
+   ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Update%20Cargo.PNG)
+   ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Cargo%20Page.PNG)
+   ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/View%20Cargo.PNG)
+- **Location Updates**: Add, edit, view and Delete package location
+  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Add%20New%20location.PNG)
+  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Update%20Location.PNG)
+  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Location.PNG)
+  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/View%20Location.PNG)
+- **Profile Management**: Add, Edit, View and Delete User information
+  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Add%20Profile.PNG)
+  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Edit%20user.PNG)
+  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/P.PNG)
+- **Activity History**: Add and manage tracking stops with timestamps
+  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Activity%20Log.PNG)
 - **Secure Admin Access**: Password-protected admin area
+  ![Admin Page](https://github.com/tmm-tech/Track-Cargo/blob/main/Images/Admin%20Login.PNG)
+  
 
 
 ## Technology Stack
