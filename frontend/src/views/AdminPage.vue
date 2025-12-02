@@ -1315,20 +1315,6 @@
                               rows="2"
                               class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
                           </div>
-                          <!-- Cargo Clearance Required -->
-                          <div class="space-y-2 mt-4">
-                            <label class="text-sm font-medium">Cargo Requires Clearance?</label>
-                            <div class="flex items-center gap-6">
-                              <label class="flex items-center gap-2">
-                                <input type="radio" value="yes" v-model="newcargo" />
-                                Yes
-                              </label>
-                              <label class="flex items-center gap-2">
-                                <input type="radio" value="no" v-model="newcargo" />
-                                No
-                              </label>
-                            </div>
-                          </div>
                         </div>
                       </div>
                     </div>
