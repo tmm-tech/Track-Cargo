@@ -1266,7 +1266,7 @@
                         <label for="shippingAddress" class="text-sm font-medium">Client Details</label>
                         <div class="grid grid-cols-2 gap-4 mb-4">
                           <div class="space-y-2">
-                            <label for="recipientName" class="text-sm font-medium">Recipient Name</label>
+                            <label for="recipientName" class="text-sm font-medium">Client Name</label>
                             <input id="recipientName" v-model="newCargo.shipping_address.recipientName"
                               :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.recipient_name ? 'border-red-500' : '']" />
                             <p v-if="formErrors.recipient_name" class="text-red-500 text-sm">{{
@@ -1368,6 +1368,17 @@
                             <option value="lcl">LCL (Less than Container Load)</option>
                           </select>
                           <p v-if="formErrors.type" class="text-red-500 text-sm">{{ formErrors.type }}</p>
+                          <!-- Cargo Description (NEW) -->
+                          <label for="description" class="text-sm font-medium mt-2 block">
+                            Cargo Description (Comment)
+                          </label>
+                          <textarea
+                            id="description"
+                            v-model="newCargo.description"
+                            rows="2"
+                            placeholder="Enter cargo description or comments..."
+                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                          ></textarea>
                         </div>
                         <div class="space-y-2">
                           <label for="weight" class="text-sm font-medium">Weight (kg)</label>
