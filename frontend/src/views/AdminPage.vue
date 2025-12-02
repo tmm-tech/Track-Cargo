@@ -1242,6 +1242,13 @@
                       <button :class="[
                         'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
                         'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                        addCargoTab === 'address' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                      ]" @click="addCargoTab = 'address'">
+                        Client Details
+                      </button>
+                      <button :class="[
+                        'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                         addCargoTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
                       ]" @click="addCargoTab = 'details'">
                         Cargo Details
@@ -1249,20 +1256,82 @@
                       <button :class="[
                         'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
                         'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                        addCargoTab === 'address' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                      ]" @click="addCargoTab = 'address'">
-                        Shipping Address
-                      </button>
-                      <button :class="[
-                        'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
-                        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                         addCargoTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
                       ]" @click="addCargoTab = 'stops'">
-                        Tracking Stops
+                        Tracking Movement
                       </button>
                     </div>
-
-
+                    <div v-if="addCargoTab === 'address'" class="space-y-4 mt-4">
+                      <div class="space-y-2">
+                        <label for="shippingAddress" class="text-sm font-medium">Client Details</label>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                          <div class="space-y-2">
+                            <label for="recipientName" class="text-sm font-medium">Recipient Name</label>
+                            <input id="recipientName" v-model="newCargo.shipping_address.recipientName"
+                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.recipient_name ? 'border-red-500' : '']" />
+                            <p v-if="formErrors.recipient_name" class="text-red-500 text-sm">{{
+                              formErrors.recipient_name }}</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="streetAddress" class="text-sm font-medium">Street Address</label>
+                            <input id="streetAddress" v-model="newCargo.shipping_address.streetAddress"
+                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.street_address ? 'border-red-500' : '']" />
+                            <p v-if="formErrors.street_address" class="text-red-500 text-sm">{{
+                              formErrors.street_address }}</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="city" class="text-sm font-medium">City/Town</label>
+                            <input id="city" v-model="newCargo.shipping_address.city"
+                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.city ? 'border-red-500' : '']" />
+                            <p v-if="formErrors.city" class="text-red-500 text-sm">{{ formErrors.city }}</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="state" class="text-sm font-medium">County</label>
+                            <input id="state" v-model="newCargo.shipping_address.state"
+                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.state ? 'border-red-500' : '']" />
+                            <p v-if="formErrors.state" class="text-red-500 text-sm">{{ formErrors.state }}</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="country" class="text-sm font-medium">Country</label>
+                            <input id="country" v-model="newCargo.shipping_address.country"
+                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.country ? 'border-red-500' : '']" />
+                            <p v-if="formErrors.country" class="text-red-500 text-sm">{{ formErrors.country }}</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="phone" class="text-sm font-medium">Phone Number</label>
+                            <input id="phone" v-model="newCargo.shipping_address.phone"
+                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.phone ? 'border-red-500' : '']" />
+                            <p v-if="formErrors.phone" class="text-red-500 text-sm">{{ formErrors.phone }}</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="email" class="text-sm font-medium">Email</label>
+                            <input id="email" type="email" v-model="newCargo.shipping_address.email"
+                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.email ? 'border-red-500' : '']" />
+                            <p v-if="formErrors.email" class="text-red-500 text-sm">{{ formErrors.email }}</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="specialInstructions" class="text-sm font-medium">Special Instructions</label>
+                            <textarea id="specialInstructions" v-model="newCargo.shipping_address.special_instructions"
+                              rows="2"
+                              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                          </div>
+                          <!-- Cargo Clearance Required -->
+                          <div class="space-y-2 mt-4">
+                            <label class="text-sm font-medium">Cargo Requires Clearance?</label>
+                            <div class="flex items-center gap-6">
+                              <label class="flex items-center gap-2">
+                                <input type="radio" value="yes" v-model="" />
+                                Yes
+                              </label>
+                              <label class="flex items-center gap-2">
+                                <input type="radio" value="no" v-model="" />
+                                No
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div v-if="addCargoTab === 'details'" class="space-y-4 mt-4">
                       <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
@@ -1375,63 +1444,6 @@
                           formErrors.final_destination
                         }}
                         </p>
-                      </div>
-                    </div>
-                    <div v-if="addCargoTab === 'address'" class="space-y-4 mt-4">
-                      <div class="space-y-2">
-                        <label for="shippingAddress" class="text-sm font-medium">Shipping Address</label>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                          <div class="space-y-2">
-                            <label for="recipientName" class="text-sm font-medium">Recipient Name</label>
-                            <input id="recipientName" v-model="newCargo.shipping_address.recipientName"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.recipient_name ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.recipient_name" class="text-red-500 text-sm">{{
-                              formErrors.recipient_name }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="streetAddress" class="text-sm font-medium">Street Address</label>
-                            <input id="streetAddress" v-model="newCargo.shipping_address.streetAddress"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.street_address ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.street_address" class="text-red-500 text-sm">{{
-                              formErrors.street_address }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="city" class="text-sm font-medium">City/Town</label>
-                            <input id="city" v-model="newCargo.shipping_address.city"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.city ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.city" class="text-red-500 text-sm">{{ formErrors.city }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="state" class="text-sm font-medium">County</label>
-                            <input id="state" v-model="newCargo.shipping_address.state"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.state ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.state" class="text-red-500 text-sm">{{ formErrors.state }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="country" class="text-sm font-medium">Country</label>
-                            <input id="country" v-model="newCargo.shipping_address.country"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.country ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.country" class="text-red-500 text-sm">{{ formErrors.country }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="phone" class="text-sm font-medium">Phone Number</label>
-                            <input id="phone" v-model="newCargo.shipping_address.phone"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.phone ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.phone" class="text-red-500 text-sm">{{ formErrors.phone }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="email" class="text-sm font-medium">Email</label>
-                            <input id="email" type="email" v-model="newCargo.shipping_address.email"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.email ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.email" class="text-red-500 text-sm">{{ formErrors.email }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="specialInstructions" class="text-sm font-medium">Special Instructions</label>
-                            <textarea id="specialInstructions" v-model="newCargo.shipping_address.special_instructions"
-                              rows="2"
-                              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                          </div>
-                        </div>
                       </div>
                     </div>
                     <div v-if="addCargoTab === 'stops'" class="space-y-4 mt-4">
