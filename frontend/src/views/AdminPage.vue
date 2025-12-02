@@ -1320,11 +1320,11 @@
                             <label class="text-sm font-medium">Cargo Requires Clearance?</label>
                             <div class="flex items-center gap-6">
                               <label class="flex items-center gap-2">
-                                <input type="radio" value="yes" v-model="" />
+                                <input type="radio" value="yes" v-model="newcargo" />
                                 Yes
                               </label>
                               <label class="flex items-center gap-2">
-                                <input type="radio" value="no" v-model="" />
+                                <input type="radio" value="no" v-model="newcargo" />
                                 No
                               </label>
                             </div>
