@@ -3043,7 +3043,7 @@ const editFromViewModal = (pkg) => {
 // Add package functions
 const openAddCargoModal = () => {
   showAddModal.value = true
-  addCargoTab.value = 'details'
+  addCargoTab.value = 'address'
   resetNewCargoForm()
   resetTrackingStops()
 }
