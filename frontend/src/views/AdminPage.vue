@@ -1247,6 +1247,19 @@
                         Client Details
                       </button>
                       <button :class="[
+                            'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                            addCargoTab === 'clearance'
+                              ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black'
+                              : cargoClearanceEnabled
+                                ? 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                                : 'text-gray-400 cursor-not-allowed'
+                          ]"
+                          @click="cargoClearanceEnabled && (addCargoTab = 'clearance')"
+                        >
+                          Cargo Clearance
+                        </button>
+                      <button :class="[
                         'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
                         'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                         addCargoTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -1315,9 +1328,126 @@
                               rows="2"
                               class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
                           </div>
+                          <div class="flex items-center gap-3 mt-4">
+                          <label class="text-sm font-medium">Cargo Clearance</label>
+                        
+                          <button
+                            @click="cargoClearanceEnabled = !cargoClearanceEnabled"
+                            :class="[
+                              'relative inline-flex h-6 w-11 items-center rounded-full transition',
+                              cargoClearanceEnabled ? 'bg-green-500' : 'bg-gray-400'
+                            ]">
+                              <span
+                                :class="[
+                                  'inline-block h-4 w-4 transform rounded-full bg-white transition',
+                                  cargoClearanceEnabled ? 'translate-x-6' : 'translate-x-1'
+                                ]">
+                              </span>
+                          </button>
+                        </div>
                         </div>
                       </div>
                     </div>
+                    <div v-if="addCargoTab === 'clearance' && cargoClearanceEnabled" class="space-y-4 mt-6">
+
+                        <h3 class="text-lg font-semibold">Cargo Clearance Information</h3>
+                      
+                        <div class="grid grid-cols-2 gap-4">
+                      
+                          <!-- File Reference -->
+                          <div class="space-y-2">
+                            <label class="text-sm font-medium">File Reference</label>
+                            <input
+                              v-model="clearance.fileReference"
+                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                              placeholder="Enter file reference"
+                            />
+                          </div>
+                      
+                          <!-- Bill of Lading -->
+                          <div class="space-y-2">
+                            <label class="text-sm font-medium">Bill of Lading</label>
+                            <input
+                              v-model="clearance.billOfLading"
+                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                              placeholder="Enter bill of lading"
+                            />
+                          </div>
+                      
+                          <!-- Vessel Name -->
+                          <div class="space-y-2">
+                            <label class="text-sm font-medium">Vessel Name</label>
+                            <input
+                              v-model="clearance.vesselName"
+                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                              placeholder="Enter vessel name"
+                            />
+                          </div>
+                      
+                          <!-- ETA -->
+                          <div class="space-y-2">
+                            <label class="text-sm font-medium">ETA</label>
+                            <input
+                              type="date"
+                              v-model="clearance.eta"
+                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                            />
+                          </div>
+                      
+                          <!-- Client Details -->
+                          <div class="col-span-2 space-y-2">
+                            <label class="text-sm font-medium">Client Details</label>
+                            <textarea
+                              v-model="clearance.clientDetails"
+                              rows="2"
+                              class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                              placeholder="Enter client details"
+                            ></textarea>
+                          </div>
+                      
+                          <!-- Cargo Description -->
+                          <div class="col-span-2 space-y-2">
+                            <label class="text-sm font-medium">Cargo Description</label>
+                            <textarea
+                              v-model="clearance.cargoDescription"
+                              rows="2"
+                              class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                              placeholder="Describe the cargo"
+                            ></textarea>
+                          </div>
+                      
+                          <!-- Net Weight -->
+                          <div class="space-y-2">
+                            <label class="text-sm font-medium">Net Weight</label>
+                            <input
+                              v-model="clearance.netWeight"
+                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                              placeholder="Net weight"
+                            />
+                          </div>
+                      
+                          <!-- Gross Weight -->
+                          <div class="space-y-2">
+                            <label class="text-sm font-medium">Gross Weight</label>
+                            <input
+                              v-model="clearance.grossWeight"
+                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                              placeholder="Gross weight"
+                            />
+                          </div>
+                      
+                          <!-- Container Number -->
+                          <div class="col-span-2 space-y-2">
+                            <label class="text-sm font-medium">Container Number</label>
+                            <input
+                              v-model="clearance.containerNumber"
+                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                              placeholder="Container number"
+                            />
+                          </div>
+                      
+                        </div>
+                      </div>
                     <div v-if="addCargoTab === 'details'" class="space-y-4 mt-4">
                       <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
@@ -1356,7 +1486,7 @@
                           <p v-if="formErrors.type" class="text-red-500 text-sm">{{ formErrors.type }}</p>
                           <!-- Cargo Description (NEW) -->
                           <label for="description" class="text-sm font-medium mt-2 block">
-                            Cargo Description (Comment)
+                            Cargo Description
                           </label>
                           <textarea
                             id="description"
@@ -2513,6 +2643,9 @@ const cargoToDelete = ref(null)
 // Edit package state
 const showEditModal = ref(false)
 const editingCargo = ref(null)
+
+const cargoClearanceEnabled = ref(false)
+
 const activeEditTab = ref('location')
 const editData = ref({
   currentLocation: '',
