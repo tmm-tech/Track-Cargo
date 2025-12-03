@@ -1348,12 +1348,11 @@
                         </div>
                       </div>
                     </div>
-                    <div v-if="addCargoTab === 'clearance' && cargoClearanceEnabled" class="space-y-4 mt-6">
-
-                        <h3 class="text-lg font-semibold">Cargo Clearance Information</h3>
+                    <div v-if="addCargoTab === 'clearance' && cargoClearanceEnabled" class="space-y-4 mt-4">
+                      <div class="space-y-2">
+                        <label for="cargoclearance" class="text-sm font-medium">Cargo Clearance Information</label>
                       
-                        <div class="grid grid-cols-2 gap-4">
-                      
+                        <div class="grid grid-cols-2 gap-4 mb-4">
                           <!-- File Reference -->
                           <div class="space-y-2">
                             <label class="text-sm font-medium">File Reference</label>
@@ -1446,6 +1445,7 @@
                             />
                           </div>
                       
+                        </div>
                         </div>
                       </div>
                     <div v-if="addCargoTab === 'details'" class="space-y-4 mt-4">
