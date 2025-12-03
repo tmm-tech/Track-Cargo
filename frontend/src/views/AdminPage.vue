@@ -2527,7 +2527,7 @@ const viewingCargo = ref(null)
 
 // Add package state
 const showAddModal = ref(false)
-const addCargoTab = ref('details')
+const addCargoTab = ref('address')
 const newCargo = ref({
   container_number: '',
   truck_number: '',
