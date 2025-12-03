@@ -1348,7 +1348,7 @@
                         </div>
                       </div>
                     </div>
-                    <div v-if="addCargoTab === 'clearance' && cargoClearanceEnabled" class="space-y-4 mt-4">
+                    <div v-if="addCargoTab === 'clearance' class="space-y-4 mt-4">
                       <div class="space-y-2">
                         <label for="cargoclearance" class="text-sm font-medium">Cargo Clearance Information</label>
                       
