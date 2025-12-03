@@ -1246,16 +1246,16 @@
                       ]" @click="addCargoTab = 'address'">
                         Client Details
                       </button>
-                      <button :class="[
+                      <button
+                          v-if="cargoClearanceEnabled"
+                          :class="[
                             'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
                             'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                             addCargoTab === 'clearance'
                               ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black'
-                              : cargoClearanceEnabled
-                                ? 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                                : 'text-gray-400 cursor-not-allowed'
+                              : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
                           ]"
-                          @click="cargoClearanceEnabled && (addCargoTab = 'clearance')"
+                          @click="addCargoTab = 'clearance'"
                         >
                           Cargo Clearance
                         </button>
@@ -1335,7 +1335,7 @@
                             @click="cargoClearanceEnabled = !cargoClearanceEnabled"
                             :class="[
                               'relative inline-flex h-6 w-11 items-center rounded-full transition',
-                              cargoClearanceEnabled ? 'bg-green-500' : 'bg-gray-400'
+                              cargoClearanceEnabled ? 'bg-blue-500' : 'bg-gray-400'
                             ]">
                               <span
                                 :class="[
