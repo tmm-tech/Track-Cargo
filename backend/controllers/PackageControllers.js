@@ -296,6 +296,7 @@ ORDER BY
       truck_number,
       bl_number,
       type,
+      description,
       weight,
       shipped_date,
       estimated_delivery,
@@ -326,8 +327,9 @@ ORDER BY
         next_stop_eta = $10,
         final_destination = $11,
         shipping_address = $12,
-        status = $13
-      WHERE id = $14 AND is_deleted = FALSE
+        status = $13,
+        description=$14
+      WHERE id = $15 AND is_deleted = FALSE
       RETURNING *;
     `;
 
@@ -345,6 +347,7 @@ ORDER BY
       final_destination,
       JSON.stringify(shipping_address),     // Store as JSON
       status,
+      description,
       id
     ];
 
