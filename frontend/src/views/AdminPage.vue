@@ -1079,6 +1079,10 @@
                         <p class="text-lg">{{ viewingCargo.type.toUpperCase() }}</p>
                       </div>
                       <div>
+                        <p class="text-sm font-medium text-gray-500">Cargo Description</p>
+                        <p class="text-lg">{{ viewingCargo.description}}</p>
+                      </div>
+                      <div>
                         <p class="text-sm font-medium text-gray-500">Weight</p>
                         <p class="text-lg">{{ viewingCargo.weight }} kg</p>
                       </div>
@@ -1119,98 +1123,98 @@
                       </div>
                     </div>
                     <!-- Clearance Section -->
-<div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
-  <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
-    <ClipboardDocumentCheckIcon class="h-5 w-5 mr-2" />
-    <h3 class="text-xl font-semibold">Clearance Information</h3>
-  </div>
+                    <div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
+                      <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
+                        <ClipboardDocumentCheckIcon class="h-5 w-5 mr-2" />
+                        <h3 class="text-xl font-semibold">Clearance Information</h3>
+                      </div>
 
-  <div class="p-6">
+                      <div class="p-6">
 
-    <!-- Not Required -->
-    <div v-if="!viewingCargo.clearance || viewingCargo.clearance.status === 'not_required'"
-         class="text-gray-500 italic">
-      Clearance not required for this shipment.
-    </div>
+                        <!-- Not Required -->
+                        <div v-if="!viewingCargo.clearance || viewingCargo.clearance.status === 'not_required'"
+                            class="text-gray-500 italic">
+                          Clearance not required for this shipment.
+                        </div>
 
-    <!-- Required -->
-    <div v-else class="grid grid-cols-2 gap-4">
+                        <!-- Required -->
+                        <div v-else class="grid grid-cols-2 gap-4">
 
-      <!-- File Reference -->
-      <div>
-        <p class="text-sm font-medium text-gray-500">File Reference</p>
-        <p class="text-lg">
-          {{ viewingCargo.clearance.fileReference || 'N/A' }}
-        </p>
-      </div>
+                          <!-- File Reference -->
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">File Reference</p>
+                            <p class="text-lg">
+                              {{ viewingCargo.clearance.fileReference || 'N/A' }}
+                            </p>
+                          </div>
 
-      <!-- Bill of Lading -->
-      <div>
-        <p class="text-sm font-medium text-gray-500">Bill of Lading</p>
-        <p class="text-lg">
-          {{ viewingCargo.clearance.billOfLading || 'N/A' }}
-        </p>
-      </div>
+                          <!-- Bill of Lading -->
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Bill of Lading</p>
+                            <p class="text-lg">
+                              {{ viewingCargo.clearance.billOfLading || 'N/A' }}
+                            </p>
+                          </div>
 
-      <!-- Vessel Name -->
-      <div>
-        <p class="text-sm font-medium text-gray-500">Vessel Name</p>
-        <p class="text-lg">
-          {{ viewingCargo.clearance.vesselName || 'N/A' }}
-        </p>
-      </div>
+                          <!-- Vessel Name -->
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Vessel Name</p>
+                            <p class="text-lg">
+                              {{ viewingCargo.clearance.vesselName || 'N/A' }}
+                            </p>
+                          </div>
 
-      <!-- ETA -->
-      <div>
-        <p class="text-sm font-medium text-gray-500">ETA</p>
-        <p class="text-lg">
-          {{ formatDate(viewingCargo.clearance.eta) || 'N/A' }}
-        </p>
-      </div>
+                          <!-- ETA -->
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">ETA</p>
+                            <p class="text-lg">
+                              {{ formatDate(viewingCargo.clearance.eta) || 'N/A' }}
+                            </p>
+                          </div>
 
-      <!-- Client Details -->
-      <div class="col-span-2">
-        <p class="text-sm font-medium text-gray-500">Client Details</p>
-        <p class="text-lg whitespace-pre-line">
-          {{ viewingCargo.clearance.clientDetails || 'N/A' }}
-        </p>
-      </div>
+                          <!-- Client Details -->
+                          <div class="col-span-2">
+                            <p class="text-sm font-medium text-gray-500">Client Details</p>
+                            <p class="text-lg whitespace-pre-line">
+                              {{ viewingCargo.clearance.clientDetails || 'N/A' }}
+                            </p>
+                          </div>
 
-      <!-- Cargo Description -->
-      <div class="col-span-2">
-        <p class="text-sm font-medium text-gray-500">Cargo Description</p>
-        <p class="text-lg whitespace-pre-line">
-          {{ viewingCargo.clearance.cargoDescription || 'N/A' }}
-        </p>
-      </div>
+                          <!-- Cargo Description -->
+                          <div class="col-span-2">
+                            <p class="text-sm font-medium text-gray-500">Cargo Description</p>
+                            <p class="text-lg whitespace-pre-line">
+                              {{ viewingCargo.clearance.cargoDescription || 'N/A' }}
+                            </p>
+                          </div>
 
-      <!-- Net Weight -->
-      <div>
-        <p class="text-sm font-medium text-gray-500">Net Weight</p>
-        <p class="text-lg">
-          {{ viewingCargo.clearance.netWeight || 'N/A' }}
-        </p>
-      </div>
+                          <!-- Net Weight -->
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Net Weight</p>
+                            <p class="text-lg">
+                              {{ viewingCargo.clearance.netWeight || 'N/A' }}
+                            </p>
+                          </div>
 
-      <!-- Gross Weight -->
-      <div>
-        <p class="text-sm font-medium text-gray-500">Gross Weight</p>
-        <p class="text-lg">
-          {{ viewingCargo.clearance.grossWeight || 'N/A' }}
-        </p>
-      </div>
+                          <!-- Gross Weight -->
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Gross Weight</p>
+                            <p class="text-lg">
+                              {{ viewingCargo.clearance.grossWeight || 'N/A' }}
+                            </p>
+                          </div>
 
-      <!-- Container Number -->
-      <div class="col-span-2">
-        <p class="text-sm font-medium text-gray-500">Container Number</p>
-        <p class="text-lg">
-          {{ viewingCargo.clearance.containerNumber || 'N/A' }}
-        </p>
-      </div>
+                          <!-- Container Number -->
+                          <div class="col-span-2">
+                            <p class="text-sm font-medium text-gray-500">Container Number</p>
+                            <p class="text-lg">
+                              {{ viewingCargo.clearance.containerNumber || 'N/A' }}
+                            </p>
+                          </div>
 
-    </div>
-  </div>
-</div>
+                        </div>
+                      </div>
+                    </div>
 
                     <!-- Cargo Progress -->
                     <ShippingProgress v-if="viewingCargo && viewingCargo.tracking_history"
@@ -1873,6 +1877,19 @@
                         <div class="flex-1">
                           <p class="text-sm font-medium text-gray-500">BL Number</p>
                           <input id="bl_number" type="text" v-model="editingCargo.bl_number"
+                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                        </div>
+                      </div>
+                          <!-- Second Row — Cargo Type & Description -->
+                      <div class="flex justify-between items-center gap-4">
+                        <div class="flex-1">
+                          <p class="text-sm font-medium text-gray-500">Cargo Type</p>
+                          <input id="bl_number" type="text" v-model="editingCargo.type" readonly
+                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 uppercase" />
+                        </div>
+                        <div class="flex-1">
+                          <p class="text-sm font-medium text-gray-500">Cargo Description</p>
+                          <input id="bl_number" type="text" v-model="editingCargo.description"
                             class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         </div>
                       </div>

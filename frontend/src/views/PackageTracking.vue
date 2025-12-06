@@ -38,6 +38,10 @@
             <div :style="fieldValueStyle" class="uppercase">{{ pkg.type }}</div>
           </div>
           <div :style="fieldStyle">
+            <div :style="fieldLabelStyle">Cargo Description</div>
+            <div :style="fieldValueStyle">{{ pkg.description }}</div>
+          </div>
+          <div :style="fieldStyle">
             <div :style="fieldLabelStyle">Weight</div>
             <div :style="fieldValueStyle">{{ pkg.weight }} kg</div>
           </div>
