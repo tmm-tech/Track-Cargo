@@ -1118,6 +1118,100 @@
                         <p v-else class="text-gray-500">No shipping address information available</p>
                       </div>
                     </div>
+                    <!-- Clearance Section -->
+<div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
+  <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
+    <ClipboardDocumentCheckIcon class="h-5 w-5 mr-2" />
+    <h3 class="text-xl font-semibold">Clearance Information</h3>
+  </div>
+
+  <div class="p-6">
+
+    <!-- Not Required -->
+    <div v-if="!viewingCargo.clearance || viewingCargo.clearance.status === 'not_required'"
+         class="text-gray-500 italic">
+      Clearance not required for this shipment.
+    </div>
+
+    <!-- Required -->
+    <div v-else class="grid grid-cols-2 gap-4">
+
+      <!-- File Reference -->
+      <div>
+        <p class="text-sm font-medium text-gray-500">File Reference</p>
+        <p class="text-lg">
+          {{ viewingCargo.clearance.fileReference || 'N/A' }}
+        </p>
+      </div>
+
+      <!-- Bill of Lading -->
+      <div>
+        <p class="text-sm font-medium text-gray-500">Bill of Lading</p>
+        <p class="text-lg">
+          {{ viewingCargo.clearance.billOfLading || 'N/A' }}
+        </p>
+      </div>
+
+      <!-- Vessel Name -->
+      <div>
+        <p class="text-sm font-medium text-gray-500">Vessel Name</p>
+        <p class="text-lg">
+          {{ viewingCargo.clearance.vesselName || 'N/A' }}
+        </p>
+      </div>
+
+      <!-- ETA -->
+      <div>
+        <p class="text-sm font-medium text-gray-500">ETA</p>
+        <p class="text-lg">
+          {{ formatDate(viewingCargo.clearance.eta) || 'N/A' }}
+        </p>
+      </div>
+
+      <!-- Client Details -->
+      <div class="col-span-2">
+        <p class="text-sm font-medium text-gray-500">Client Details</p>
+        <p class="text-lg whitespace-pre-line">
+          {{ viewingCargo.clearance.clientDetails || 'N/A' }}
+        </p>
+      </div>
+
+      <!-- Cargo Description -->
+      <div class="col-span-2">
+        <p class="text-sm font-medium text-gray-500">Cargo Description</p>
+        <p class="text-lg whitespace-pre-line">
+          {{ viewingCargo.clearance.cargoDescription || 'N/A' }}
+        </p>
+      </div>
+
+      <!-- Net Weight -->
+      <div>
+        <p class="text-sm font-medium text-gray-500">Net Weight</p>
+        <p class="text-lg">
+          {{ viewingCargo.clearance.netWeight || 'N/A' }}
+        </p>
+      </div>
+
+      <!-- Gross Weight -->
+      <div>
+        <p class="text-sm font-medium text-gray-500">Gross Weight</p>
+        <p class="text-lg">
+          {{ viewingCargo.clearance.grossWeight || 'N/A' }}
+        </p>
+      </div>
+
+      <!-- Container Number -->
+      <div class="col-span-2">
+        <p class="text-sm font-medium text-gray-500">Container Number</p>
+        <p class="text-lg">
+          {{ viewingCargo.clearance.containerNumber || 'N/A' }}
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
                     <!-- Cargo Progress -->
                     <ShippingProgress v-if="viewingCargo && viewingCargo.tracking_history"
                       :tracking_history="viewingCargo.tracking_history || []"
@@ -1276,7 +1370,6 @@
                     </div>
                     <div v-if="addCargoTab === 'address'" class="space-y-4 mt-4">
                       <div class="space-y-2">
-                        <label for="shippingAddress" class="text-sm font-medium">Client Details</label>
                         <div class="grid grid-cols-2 gap-4 mb-4">
                           <div class="space-y-2">
                             <label for="recipientName" class="text-sm font-medium">Client Name</label>
@@ -1350,8 +1443,6 @@
                     </div>
                     <div v-if="addCargoTab === 'clearance'" class="space-y-4 mt-4">
                       <div class="space-y-2">
-                        <label for="cargoclearance" class="text-sm font-medium">Cargo Clearance Information</label>
-                      
                         <div class="grid grid-cols-2 gap-4 mb-4">
                           <!-- File Reference -->
                           <div class="space-y-2">
@@ -2555,6 +2646,7 @@ const loadingMessages = ref([
   'Almost ready...'
 ])
 
+
 const currentMessageIndex = ref(0)
 let messageInterval = null
 
@@ -2578,6 +2670,55 @@ const stopErrors = ref({})
 // Comments state
 const newComment = ref({ text: '' });
 const newTrackingStatus = ref('');
+const DRAFT_STORAGE_KEY = 'cargo_form_draft'
+
+const getLocalStorage = () => {
+  if (typeof window !== 'undefined') {
+    return window.localStorage
+  }
+  return null
+}
+
+const saveCargoDraft = (cargoData) => {
+  const storage = getLocalStorage()
+  if (storage) {
+    try {
+      const draftData = {
+        cargo: cargoData,
+        savedAt: new Date().toISOString()
+      }
+      storage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftData))
+    } catch (error) {
+      console.error('Error saving cargo draft:', error)
+    }
+  }
+}
+
+const loadCargoDraft = () => {
+  const storage = getLocalStorage()
+  if (storage) {
+    try {
+      const draft = storage.getItem(DRAFT_STORAGE_KEY)
+      if (draft) {
+        return JSON.parse(draft).cargo
+      }
+    } catch (error) {
+      console.error('Error loading cargo draft:', error)
+    }
+  }
+  return null
+}
+
+const clearCargoDraft = () => {
+  const storage = getLocalStorage()
+  if (storage) {
+    try {
+      storage.removeItem(DRAFT_STORAGE_KEY)
+    } catch (error) {
+      console.error('Error clearing cargo draft:', error)
+    }
+  }
+}
 
 const latestTrackingEvent = computed(() => {
   const history = editingCargo.value?.tracking_history || [];
@@ -2645,6 +2786,18 @@ const showEditModal = ref(false)
 const editingCargo = ref(null)
 
 const cargoClearanceEnabled = ref(false)
+
+const clearance = ref({
+  fileReference: "",
+  billOfLading: "",
+  vesselName: "",
+  eta: "",
+  clientDetails: "",
+  cargoDescription: "",
+  netWeight: "",
+  grossWeight: "",
+  containerNumber: "",
+})
 
 const activeEditTab = ref('location')
 const editData = ref({
@@ -3172,18 +3325,38 @@ const editFromViewModal = (pkg) => {
 }
 
 
-
 // Add package functions
 const openAddCargoModal = () => {
+  const draft = loadCargoDraft()
+  if (draft) {
+    newCargo.value = draft
+  }
   showAddModal.value = true
   addCargoTab.value = 'address'
   resetNewCargoForm()
   resetTrackingStops()
+  if (draft && draft.trackingHistory) { // If draft has history, load it
+    trackingStops.value = draft.trackingHistory
+  }
 }
 
 const closeAddModal = () => {
+   // Save draft when closing
+  if (Object.values(newCargo.value).some(val => val !== '' && val !== null)) {
+    saveCargoDraft(newCargo.value)
+  } else {
+    clearCargoDraft() // Clear if form is empty
+  }
   showAddModal.value = false
+  // Reset form and other related states
+  resetNewCargoForm()
+  resetNewStopForm()
+  resetTrackingStops()
+  formErrors.value = {}
+  stopErrors.value = {}
+  addCargoTab.value = 'address' // Reset tab
 }
+
 
 const addNewCargo = async () => {
   // Validate the form before submission
@@ -3212,7 +3385,10 @@ const addNewCargo = async () => {
         eta: stop.eta,
         status: stop.status,
         comment: stop.comment
-      }))
+      })),
+       // Include clearance data if enabled
+      clearance: cargoClearanceEnabled.value ? { status: "required", ...clearance.value } : {
+  status: "not_required", message: "Not Applicable (Clearance Not Required)"},
     }
 
     try {
@@ -3222,6 +3398,7 @@ const addNewCargo = async () => {
         setAlert('Cargo added successfully!', 'success')
         resetNewCargoForm()
         resetTrackingStops()
+        clearCargoDraft() // Clear draft on success
         closeAddModal()
         await fetchCargos()
       } else {
@@ -3238,6 +3415,8 @@ const addNewCargo = async () => {
     } catch (error) {
       console.error('Error adding new shipping:', error)
       setAlert('Failed to add new shipping.', 'error')
+      // Keep draft on error
+      saveCargoDraft(newCargo.value)
     }
     finally {
       isSubmitting.value = false
@@ -3391,6 +3570,19 @@ const resetNewCargoForm = () => {
     }
   }
   formErrors.value = {}
+  cargoClearanceEnabled.value = false // Reset clearance toggle
+  clearance.value = {
+    // Reset clearance object
+    fileReference: "",
+    billOfLading: "",
+    vesselName: "",
+    eta: "",
+    clientDetails: "",
+    cargoDescription: "",
+    netWeight: "",
+    grossWeight: "",
+    containerNumber: "",
+  }
 }
 
 // Tracking stops functions
