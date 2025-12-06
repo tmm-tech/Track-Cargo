@@ -49,15 +49,16 @@ module.exports = {
       const status = tracking_history[0]?.status || "Created";
       const recipient_name = newCargo.recipient_name || null;
       const clearance = JSON.stringify(newCargo.clearance);
+      const description =  newCargo.description || null;
       const email = shipping_address_obj.email || null; // Fetch email from shipping_address object
 
       const insertQuery = `
       INSERT INTO packages (container_number, truck_number, bl_number, type, weight,
         shipped_date, estimated_delivery, owner,
         current_location, next_stop, next_stop_eta,
-        final_destination, shipping_address, created_at, status, recipient_name,clearance
+        final_destination, shipping_address, created_at, status, recipient_name,clearance,description
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,$18)
       RETURNING *;
         `;
 
@@ -78,7 +79,8 @@ module.exports = {
         created_at,
         status,
         recipient_name,
-        clearance
+        clearance,
+        description
       ];
       const result = await query(insertQuery, values);
       if (result.rowCount === 0) {
