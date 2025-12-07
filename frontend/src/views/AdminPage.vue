@@ -528,7 +528,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div class="flex justify-end gap-2">
-                            <button
+                            <button 
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
                               @click="editUser(user)">
                               <PencilIcon class="h-4 w-4 mr-1" />
@@ -964,12 +964,13 @@
                                 @click="viewCargoDetails(pkg)" title="View Details">
                                 View
                               </button>
-                              <button v-if="pkg.status !== 'delivered'"
+                            
+                              <button v-if="pkg.status !== 'container returned'"
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
                                 @click="editCargo(pkg)" title="Edit Cargo">
                                 <PencilIcon class="h-3 w-3" />
                               </button>
-                              <button v-if="pkg.status !== 'delivered'"
+                              <button v-if="pkg.status !== 'container returned'"
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-8 px-2"
                                 @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
                                 <TrashIcon class="h-3 w-3" />
@@ -1009,12 +1010,12 @@
                               </path>
                             </svg>
                           </button>
-                          <button v-if="pkg.status !== 'delivered'" @click="editCargo(pkg)"
+                          <button v-if="pkg.status !== 'container returned'" @click="editCargo(pkg)" 
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="Edit Details">
                             <PencilIcon class="h-4 w-4" />
                           </button>
-                          <button v-if="pkg.status !== 'delivered'"
+                          <button v-if="pkg.status !== 'container returned'"
                             class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
                             @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
                             <TrashIcon class="h-4 w-4" />
@@ -1680,30 +1681,12 @@
                             <select id="status" v-model="newStop.status"
                               :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
                               <option value="" disabled selected>Select Status</option>
-                              <option value="in transit">In Transit</option>
-                              <option value="pending">Pending</option>
-                              <option value="delivered">Delivered</option>
-                              <option value="delayed">Delayed</option>
-                              <option value="processing">Processing</option>
-                              <option value="cancelled">Cancelled</option>
-                              <option value="sorted">sorted</option>
-                              <option value="out for delivery">Out for Delivery</option>
-                              <option value="arrived at destination">Arrived at Destination</option>
-                              <option value="departed from origin">Departed from Origin</option>
-                              <option value="customs clearance">Customs Clearance</option>
-                              <option value="awaiting pickup">Awaiting Pickup</option>
-                              <option value="ready for pickup">Ready for Pickup</option>
-                              <option value="on hold">On Hold</option>
-                              <option value="returned to sender">Returned to Sender</option>
-                              <option value="damaged">Damaged</option>
-                              <option value="lost">Lost</option>
-                              <option value="rejected">Rejected</option>
-                              <option value="rescheduled">Rescheduled</option>
-                              <option value="delivered to agent">Delivered to Agent</option>
-                              <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
-                              `<option value="documentation requested">Documentation Requested</option>
-                              <option value="awaiting final delivery">Awaiting Final Delivery</option>
-                              <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>`
+                               <option v-for="opt in statusOptionsForStop"
+                                      :key="opt.value"
+                                      :value="opt.value"
+                                      :disabled="opt.disabled">
+                                  {{ opt.label }}
+                              </option>
                             </select>
                             <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                           </div>
@@ -1922,30 +1905,12 @@
                             <select id="status" v-model="newTrackingStatus"
                               :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
                               <option value="" disabled>Select Status</option>
-                              <option value="in transit">In Transit</option>
-                              <option value="pending">Pending</option>
-                              <option value="delivered">Delivered</option>
-                              <option value="delayed">Delayed</option>
-                              <option value="processing">Processing</option>
-                              <option value="cancelled">Cancelled</option>
-                              <option value="sorted">Sorted</option>
-                              <option value="out for delivery">Out for Delivery</option>
-                              <option value="arrived at destination">Arrived at Destination</option>
-                              <option value="departed from origin">Departed from Origin</option>
-                              <option value="customs clearance">Customs Clearance</option>
-                              <option value="awaiting pickup">Awaiting Pickup</option>
-                              <option value="ready for pickup">Ready for Pickup</option>
-                              <option value="on hold">On Hold</option>
-                              <option value="returned to sender">Returned to Sender</option>
-                              <option value="damaged">Damaged</option>
-                              <option value="lost">Lost</option>
-                              <option value="rejected">Rejected</option>
-                              <option value="rescheduled">Rescheduled</option>
-                              <option value="delivered to agent">Delivered to Agent</option>
-                              <option value="awaiting customs clearance">Awaiting Customs Clearance</option>
-                              <option value="documentation requested">Documentation Requested</option>
-                              <option value="awaiting final delivery">Awaiting Final Delivery</option>
-                              <option value="awaiting pickup instructions">Awaiting Pickup Instructions</option>
+                              <option v-for="opt in statusOptionsForTracking"
+                                      :key="opt.value"
+                                      :value="opt.value"
+                                      :disabled="opt.disabled">
+                                  {{ opt.label }}
+                              </option>
                             </select>
                             <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
                           </div>
@@ -2596,7 +2561,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { reactive, ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   MagnifyingGlassIcon,
@@ -2653,6 +2618,9 @@ const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
 
+
+
+
 // Loading animation state
 const loadingMessages = ref([
   'Initializing admin portal...',
@@ -2662,6 +2630,7 @@ const loadingMessages = ref([
   'Verifying permissions...',
   'Almost ready...'
 ])
+
 
 
 const currentMessageIndex = ref(0)
@@ -2864,6 +2833,7 @@ const fetchCargos = async () => {
     setAlert('Failed to load cargo data', 'error')
   }
 };
+
 
 const fetchStatus = async () => {
   try {
@@ -3346,15 +3316,22 @@ const editFromViewModal = (pkg) => {
 // Add package functions
 const openAddCargoModal = () => {
   const draft = loadCargoDraft()
-  if (draft) {
-    newCargo.value = draft
-  }
+
   showAddModal.value = true
   addCargoTab.value = 'address'
-  resetNewCargoForm()
-  resetTrackingStops()
-  if (draft && draft.trackingHistory) { // If draft has history, load it
-    trackingStops.value = draft.trackingHistory
+
+  if (draft) {
+    // Load draft into form
+    newCargo.value = draft
+
+    // Load tracking history if available
+    if (draft.trackingHistory) {
+      trackingStops.value = draft.trackingHistory
+    }
+  } else {
+    // Only reset if NO draft found
+    resetNewCargoForm()
+    resetTrackingStops()
   }
 }
 
@@ -4494,6 +4471,51 @@ const updateUser = async () => {
   }
 };
 
+
+const getStatusOptions = (currentStatus) => {
+  // All statuses
+  const all = [
+    { label: "In Transit", value: "in transit" },
+    { label: "Delivered", value: "delivered" },
+    { label: "Delayed", value: "delayed" },
+    { label: "Arrived at Destination", value: "arrived at destination" },
+    { label: "Departed from Origin", value: "departed from origin" },
+    { label: "Customs Clearance", value: "customs clearance" },
+    { label: "Awaiting Customs Clearance", value: "awaiting customs clearance" },
+    { label: "Rescheduled", value: "rescheduled" },
+    { label: "Delivered To Agent", value: "delivered to agent" },
+
+    // follow-up statuses after delivered
+    { label: "Container Loading", value: "container loading" },
+    { label: "Container Off-Loading", value: "container off-loading" },
+    { label: "Container Returned", value: "container returned" },
+  ]
+
+  // After Delivered → restrict options
+  if (currentStatus === "delivered") {
+    return all.map((s) => ({
+      ...s,
+      disabled: ![
+        "delivered",
+        "container loading",
+        "container off-loading",
+        "container returned"
+      ].includes(s.value)
+    }))
+  }
+
+  // Before Delivered → all enabled
+  return all.map((s) => ({ ...s, disabled: false }));
+}
+
+const statusOptionsForStop = computed(() => 
+  getStatusOptions(newStop.value.status)
+)
+
+const statusOptionsForTracking = computed(() =>
+  getStatusOptions(newTrackingStatus.value)
+)
+
 const confirmDeleteUser = (user) => {
   userToDelete.value = user
   showDeleteUserModal.value = true
@@ -4669,6 +4691,7 @@ const shouldCollapseSidebar = computed(() => {
 })
 
 // Loading message rotation
+
 const startLoadingMessageRotation = () => {
   messageInterval = setInterval(() => {
     currentMessageIndex.value = (currentMessageIndex.value + 1) % loadingMessages.value.length
