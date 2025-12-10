@@ -1,7 +1,7 @@
 // services/activityService.js
 import axios from 'axios';
 
-const API_BASE_URL = 'https://track-cargo.onrender.com/activity'; // your backend base URL
+const API_BASE_URL = 'https://www.texmonlogistics.co.ke/backend/activity'; // your backend base URL
 
 // https://www.texmonlogistics.co.ke/backend/activity
 // Create a new location

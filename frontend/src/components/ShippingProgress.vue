@@ -55,7 +55,7 @@
 
         <!-- Tracking History Timeline -->
         <div class="mt-8">
-          <h3 class="font-semibold text-lg text-[#273272] mb-4">Tracking History</h3>
+          <h3 class="font-semibold text-lg text-[#273272] mb-4">Truck History</h3>
 
           <div v-if="tracking_history.length > 0" class="space-y-6">
             <div v-for="(event, index) in tracking_history as TrackingEvent[]" :key="index" class="flex gap-4">

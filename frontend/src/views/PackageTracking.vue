@@ -129,7 +129,7 @@
     <div :style="sectionStyle">
       <div :style="sectionHeaderStyle">
         <span :style="{ marginRight: '10px', fontSize: '20px' }">📍</span>
-        Shipping Address
+        Client Details
       </div>
       <div :style="sectionContentStyle">
         <div v-if="pkg.shipping_address" :style="shippingAddressStyle">
@@ -216,7 +216,8 @@ interface Package {
   next_stop: string
   next_stop_eta: string
   final_destination: string
-  shipping_address?: ShippingAddress
+  shipping_address?: ShippingAddress,
+  description: string,
   tracking_history: TrackingEvent[]
   comment?: {
     text?: string

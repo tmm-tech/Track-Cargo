@@ -906,6 +906,12 @@
                           <th scope="col"
                             class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             BL #</th>
+                             <th scope="col"
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            Client Name</th>
+                             <th scope="col"
+                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            Client Email</th>
                           <th scope="col"
                             class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Current Location</th>
@@ -937,6 +943,12 @@
 
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ pkg.bl_number || 'N/A' }}
+                          </td>
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                            {{ pkg.shipping_address.recipientName || 'N/A' }}
+                          </td>
+                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                            {{ pkg.shipping_address.email || 'N/A' }}
                           </td>
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
                             :title="pkg.current_location">
@@ -1041,6 +1053,16 @@
                             }}</span>
                         </div>
                         <div class="flex justify-between">
+                          <span class="text-gray-500">Client Name:</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.shipping_address.recipientName || 'N/A'
+                            }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span class="text-gray-500">Client Email:</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.shipping_address.email || 'N/A'
+                            }}</span>
+                        </div>
+                        <div class="flex justify-between">
                           <span class="text-gray-500">ETA:</span>
                           <span v-if="pkg.status === 'delivered'"
                             class="text-gray-900 text-right flex-1 ml-2 truncate">Delivered</span>
@@ -1109,7 +1131,7 @@
                     <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
                       <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
                         <MapPinIcon class="h-5 w-5 mr-2" />
-                        <h3 class="text-xl font-semibold">Cargo Address</h3>
+                        <h3 class="text-xl font-semibold">Client Details</h3>
                       </div>
                       <div class="p-6">
                         <div v-if="viewingCargo.shipping_address" class="space-y-1">
@@ -1120,7 +1142,7 @@
                           </p>
                           <p>{{ viewingCargo.shipping_address.country }}</p>
                         </div>
-                        <p v-else class="text-gray-500">No shipping address information available</p>
+                        <p v-else class="text-gray-500">No Client information available</p>
                       </div>
                     </div>
                     <!-- Clearance Section -->
@@ -1135,7 +1157,7 @@
                         <!-- Not Required -->
                         <div v-if="!viewingCargo.clearance || viewingCargo.clearance.status === 'not_required'"
                             class="text-gray-500 italic">
-                          Clearance not required for this shipment.
+                          Clearance not required for this Cargo.
                         </div>
 
                         <!-- Required -->
@@ -1370,7 +1392,7 @@
                         'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                         addCargoTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
                       ]" @click="addCargoTab = 'stops'">
-                        Tracking Movement
+                        Truck Movement
                       </button>
                     </div>
                     <div v-if="addCargoTab === 'address'" class="space-y-4 mt-4">
@@ -1727,7 +1749,7 @@
                         </div>
 
                         <div class="mt-6">
-                          <h3 class="font-medium text-lg mb-3">Tracking History</h3>
+                          <h3 class="font-medium text-lg mb-3">Truck History</h3>
                           <div v-if="trackingStops.length === 0" class="text-center py-8 bg-gray-50 rounded-md border">
                             <p class="text-gray-500">No tracking stops added yet</p>
                             <p class="text-sm text-gray-400 mt-1">Add stops to create the cargo's tracking history
@@ -1840,7 +1862,7 @@
                 <div class="p-6">
                   <div class="flex flex-col space-y-1.5 pb-4">
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Update Cargo Information</h2>
-                    <p class="text-sm text-muted-foreground">Update the cargo location and shipping address
+                    <p class="text-sm text-muted-foreground">Update the cargo location and cargo status
                       information.
                     </p>
                   </div>
@@ -1939,7 +1961,7 @@
                           </div>
                           <!-- Comments Section -->
                           <div class="mt-6 pt-6 border-t">
-                            <h3 class="text-lg font-medium mb-4">Comments & Tracking History</h3>
+                            <h3 class="text-lg font-medium mb-4">Comments & Truck History</h3>
 
                             <!-- Display latest tracking -->
                             <div v-if="latestTrackingEvent" class="relative text-sm text-gray-500 mt-2">
@@ -2854,7 +2876,9 @@ const filteredCargos = computed(() => {
   return packages.value.filter(pkg =>
     pkg.container_number.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
     pkg.truck_number.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    pkg.bl_number.toLowerCase().includes(searchTerm.value.toLowerCase())
+    pkg.bl_number.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    pkg.shipping_address.recipientName.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    pkg.shipping_address.email.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
 })
 
@@ -3404,13 +3428,13 @@ const addNewCargo = async () => {
           ? 'A cargo with this BL number already exists.'
           : rawMessage;
 
-        setAlert(userMessage || 'Failed to add new shipping.', 'error');
+        setAlert(userMessage || 'Failed to add new cargo.', 'error');
         console.error(response.error);
         return;
       }
     } catch (error) {
-      console.error('Error adding new shipping:', error)
-      setAlert('Failed to add new shipping.', 'error')
+      console.error('Error adding new cargo:', error)
+      setAlert('Failed to add new cargo.', 'error')
       // Keep draft on error
       saveCargoDraft(newCargo.value)
     }
@@ -3710,27 +3734,18 @@ const getActivityColor = (type) => {
   const colorMap = {
     // Package Activities - Blue theme
     'cargo_created': 'bg-blue-100 text-blue-600',
-    'cargo_updated': 'bg-blue-100 text-blue-600',
-    'cargo_delivered': 'bg-green-100 text-green-600',
-    'cargo_cancelled': 'bg-red-100 text-red-600',
-    'cargo_delayed': 'bg-yellow-100 text-yellow-600',
-    'cargo_shipped': 'bg-purple-100 text-purple-600',
+    'cargo_updated': 'bg-yellow-100 text-yellow-600',
     'cargo_deleted': 'bg-red-100 text-red-600',
-    'cargo_restored': 'bg-green-100 text-green-600',
-    'cargo_held': 'bg-orange-100 text-orange-600',
-    'cargo_released': 'bg-green-100 text-green-600',
+    
 
     // Location Activities - Green theme
     'location_created': 'bg-green-100 text-green-600',
-    'location_updated': 'bg-green-100 text-green-600',
+    'location_updated': 'bg-orange-100 text-orange-600',
     'location_deleted': 'bg-red-100 text-red-600',
-    'location_activated': 'bg-green-100 text-green-600',
-    'location_deactivated': 'bg-gray-100 text-gray-600',
-    'location_maintenance_scheduled': 'bg-orange-100 text-orange-600',
 
     // User Activities - Purple theme
     'user_created': 'bg-purple-100 text-purple-600',
-    'user_updated': 'bg-purple-100 text-purple-600',
+    'user_updated': 'bg-orange-100 text-orange-600',
     'user_login': 'bg-green-100 text-green-600',
     'user_logout': 'bg-gray-100 text-gray-600',
     'user_deleted': 'bg-red-100 text-red-600',
@@ -4554,7 +4569,7 @@ const handleLogin = async () => {
     loginError.value = ''
     const userData = { username: username.value, password: password.value }
 // https://www.texmonlogistics.co.ke/backend/users/login
-    const response = await fetch('https://track-cargo.onrender.com/users/login', {
+    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
@@ -4591,7 +4606,7 @@ const handleLogin = async () => {
 const verifyToken = async () => {
   loading.value = true
   try {
-    const response = await fetch('https://track-cargo.onrender.com/users/protected', {
+    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/protected', {
       method: 'GET',
       credentials: 'include'
     })

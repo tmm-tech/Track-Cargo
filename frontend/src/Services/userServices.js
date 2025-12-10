@@ -1,7 +1,7 @@
 // src/services/userServices.js
 import axios from 'axios';
 
-const API_BASE = 'https://track-cargo.onrender.com/users';
+const API_BASE = 'https://www.texmonlogistics.co.ke/backend/users';
 
 // https://www.texmonlogistics.co.ke/backend/users
 
