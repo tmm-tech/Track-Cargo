@@ -2048,6 +2048,7 @@
             </div>
           </div>
           <!-- End of Cargo Management View -->
+
           <!-- Customer Management View -->
           <div v-if="currentView === 'customers'" class="space-y-6">
 
@@ -2114,15 +2115,22 @@
                         </span>
                       </td>
 
-                      <td class="px-4 py-3 text-right space-x-2">
-                        <button @click="editCustomer(customer)" class="text-blue-600 hover:underline text-xs">
-                          Edit
-                        </button>
+                      <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
+                        <div class="flex justify-end gap-1">
+                          <button @click="viewCustomerDetails(customer)"
+                            class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2">
+                            View
+                          </button>
+                          <button @click="editCustomer(customer)"
+                            class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2">
+                            <PencilIcon class="h-4 w-4 mr-1" />
+                          </button>
 
-                        <button v-if="customer.is_active" @click="deactivateCustomer(customer.id)"
-                          class="text-red-600 hover:underline text-xs">
-                          Deactivate
-                        </button>
+                          <button v-if="customer.is_active" @click="deactivateCustomer(customer.id)"
+                            class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-8 px-2">
+                            <TrashIcon class="h-4 w-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -2138,6 +2146,94 @@
                 </table>
               </div>
             </div>
+
+            <!-- View Customer Modal -->
+            <div v-if="showViewCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              @click="closeViewCustomerModal">
+              <div class="bg-white rounded-lg shadow-xl w-full max-w-[600px] max-h-[90vh] overflow-hidden" @click.stop>
+
+                <!-- Header -->
+                <div class="px-6 py-4 border-b">
+                  <h2 class="text-lg font-semibold text-gray-900">Customer Details</h2>
+                  <p class="text-sm text-gray-500">
+                    View customer profile and contact information
+                  </p>
+                </div>
+
+                <!-- Body -->
+                <div class="p-6 space-y-6 overflow-y-auto">
+
+                  <!-- Status -->
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-500">Status</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium" :class="viewCustomer?.is_active
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'">
+                      {{ viewCustomer?.is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                  </div>
+
+                  <!-- Customer Info Grid -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                    <div>
+                      <p class="text-xs uppercase text-gray-500">Name</p>
+                      <p class="mt-1 text-sm font-medium text-gray-900">
+                        {{ viewCustomer?.name }}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p class="text-xs uppercase text-gray-500">Phone</p>
+                      <p class="mt-1 text-sm text-gray-900">
+                        {{ viewCustomer?.phone }}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p class="text-xs uppercase text-gray-500">Email</p>
+                      <p class="mt-1 text-sm text-gray-900">
+                        {{ viewCustomer?.email || 'N/A' }}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p class="text-xs uppercase text-gray-500">City / County</p>
+                      <p class="mt-1 text-sm text-gray-900">
+                        {{ viewCustomer?.city || '-' }} / {{ viewCustomer?.county || '-' }}
+                      </p>
+                    </div>
+
+                    <!-- Address Full Width -->
+                    <div class="sm:col-span-2">
+                      <p class="text-xs uppercase text-gray-500">Address</p>
+                      <p class="mt-1 text-sm text-gray-900">
+                        {{ viewCustomer?.address || 'N/A' }}
+                      </p>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                      <p class="text-xs uppercase text-gray-500">Country</p>
+                      <p class="mt-1 text-sm text-gray-900">
+                        {{ viewCustomer?.country || 'N/A' }}
+                      </p>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="px-6 py-4 border-t flex justify-end gap-2">
+                  <button @click="closeViewCustomerModal"
+                    class="px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50">
+                    Close
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+
 
             <!-- Edit Customer Modal -->
             <div v-if="showEditCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
@@ -2160,7 +2256,7 @@
                       <!-- Name -->
                       <div class="space-y-2">
                         <label class="text-sm font-medium">Name</label>
-                        <input v-model="editCustomer.name"
+                        <input v-model="editingCustomer.name"
                           :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.name ? 'border-red-500' : '']"
                           placeholder="Customer name" />
                         <p v-if="editFormErrors.name" class="text-red-500 text-sm">{{ editFormErrors.name }}</p>
@@ -2169,7 +2265,7 @@
                       <!-- Phone -->
                       <div class="space-y-2">
                         <label class="text-sm font-medium">Phone</label>
-                        <input v-model="editCustomer.phone"
+                        <input v-model="editingCustomer.phone"
                           :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.phone ? 'border-red-500' : '']"
                           placeholder="Phone number" />
                         <p v-if="editFormErrors.phone" class="text-red-500 text-sm">{{ editFormErrors.phone }}</p>
@@ -2178,7 +2274,7 @@
                       <!-- Email -->
                       <div class="space-y-2">
                         <label class="text-sm font-medium">Email</label>
-                        <input type="email" v-model="editCustomer.email"
+                        <input type="email" v-model="editingCustomer.email"
                           :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.email ? 'border-red-500' : '']"
                           placeholder="Email address" />
                         <p v-if="editFormErrors.email" class="text-red-500 text-sm">{{ editFormErrors.email }}</p>
@@ -2187,7 +2283,7 @@
                       <!-- Country -->
                       <div class="space-y-2">
                         <label class="text-sm font-medium">Country</label>
-                        <input v-model="editCustomer.country"
+                        <input v-model="editingCustomer.country"
                           :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.country ? 'border-red-500' : '']"
                           placeholder="Country" />
                         <p v-if="editFormErrors.country" class="text-red-500 text-sm">{{ editFormErrors.country }}</p>
@@ -2196,7 +2292,7 @@
                       <!-- City -->
                       <div class="space-y-2">
                         <label class="text-sm font-medium">City/Town</label>
-                        <input v-model="editCustomer.city"
+                        <input v-model="editingCustomer.city"
                           :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.city ? 'border-red-500' : '']"
                           placeholder="City or Town" />
                         <p v-if="editFormErrors.city" class="text-red-500 text-sm">{{ editFormErrors.city }}</p>
@@ -2205,7 +2301,7 @@
                       <!-- County -->
                       <div class="space-y-2">
                         <label class="text-sm font-medium">County</label>
-                        <input v-model="editCustomer.county"
+                        <input v-model="editingCustomer.county"
                           :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.county ? 'border-red-500' : '']"
                           placeholder="County" />
                         <p v-if="editFormErrors.county" class="text-red-500 text-sm">{{ editFormErrors.county }}</p>
@@ -2214,7 +2310,7 @@
                       <!-- Address -->
                       <div class="col-span-2 space-y-2">
                         <label class="text-sm font-medium">Street Address</label>
-                        <input v-model="editCustomer.address"
+                        <input v-model="editingCustomer.address"
                           :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.address ? 'border-red-500' : '']"
                           placeholder="Street address" />
                         <p v-if="editFormErrors.address" class="text-red-500 text-sm">{{ editFormErrors.address }}</p>
@@ -2223,10 +2319,10 @@
                       <!-- Active Status -->
                       <div class="flex items-center gap-3 mt-2 col-span-2">
                         <label class="text-sm font-medium">Active</label>
-                        <button @click="editCustomer.is_active = !editCustomer.is_active"
-                          :class="['relative inline-flex h-6 w-11 items-center rounded-full transition', editCustomer.is_active ? 'bg-green-500' : 'bg-gray-400']">
+                        <button @click="editingCustomer.is_active = !editingCustomer.is_active"
+                          :class="['relative inline-flex h-6 w-11 items-center rounded-full transition', editingCustomer.is_active ? 'bg-green-500' : 'bg-gray-400']">
                           <span
-                            :class="['inline-block h-4 w-4 transform rounded-full bg-white transition', editCustomer.is_active ? 'translate-x-6' : 'translate-x-1']"></span>
+                            :class="['inline-block h-4 w-4 transform rounded-full bg-white transition', editingCustomer.is_active ? 'translate-x-6' : 'translate-x-1']"></span>
                         </button>
 
                       </div>
@@ -3186,9 +3282,19 @@ const newCargo = ref({
   }
 })
 
-const customers = ref([])
+const customers = ref({
+  name: '',
+  phone: '',
+  email: '',
+  address: '',
+  city: '',
+  county: '',
+  country: '',
+  is_active: true
+})
 const customerSearch = ref('')
-
+const showViewCustomerModal = ref(false)
+const viewCustomer = ref(null)
 const filteredCustomers = computed(() => {
   if (!customerSearch.value) return customers.value
 
@@ -3211,7 +3317,18 @@ const deactivateCustomer = async (id) => {
 
 const fetchCustomers = async () => {
   const res = await CustomerServices.getCustomers()
-  customers.value = res.data
+  customers.value = res.data.customers
+}
+
+const viewCustomerDetails = async (customer) => {
+  const data = await fetchCustomerInfo(customer.id)
+  viewCustomer.value = data.customer
+  showViewCustomerModal.value = true
+}
+
+const closeViewCustomerModal = () => {
+  showViewCustomerModal.value = false
+  viewCustomer.value = null
 }
 
 const fetchCustomerInfo = async (id) => {
@@ -3280,8 +3397,7 @@ const submitNewCustomer = async () => {
 }
 
 const showEditCustomerModal = ref(false)
-const editCustomer = ref({
-  id: null,
+const editingCustomer = ref({
   name: '',
   phone: '',
   email: '',
@@ -3289,8 +3405,15 @@ const editCustomer = ref({
   city: '',
   county: '',
   country: '',
-  is_active: true
+  is_active: false
 })
+
+
+const editCustomer = async (customer) => {
+  const data = await fetchCustomerInfo(customer.id)
+  Object.assign(editingCustomer.value, data.customer)
+  showEditCustomerModal.value = true
+}
 
 const editFormErrors = reactive({})
 
@@ -3302,11 +3425,11 @@ const validateEditCustomerForm = () => {
   let valid = true
   Object.keys(editFormErrors).forEach(k => editFormErrors[k] = '')
 
-  if (!editCustomer.value.name) { editFormErrors.name = 'Name is required'; valid = false }
-  if (!editCustomer.value.phone) { editFormErrors.phone = 'Phone is required'; valid = false }
-  if (!editCustomer.value.address) { editFormErrors.address = 'Address is required'; valid = false }
-  if (!editCustomer.value.city) { editFormErrors.city = 'City is required'; valid = false }
-  if (!editCustomer.value.country) { editFormErrors.country = 'Country is required'; valid = false }
+  if (!editingCustomer.value.name) { editFormErrors.name = 'Name is required'; valid = false }
+  if (!editingCustomer.value.phone) { editFormErrors.phone = 'Phone is required'; valid = false }
+  if (!editingCustomer.value.address) { editFormErrors.address = 'Address is required'; valid = false }
+  if (!editingCustomer.value.city) { editFormErrors.city = 'City is required'; valid = false }
+  if (!editingCustomer.value.country) { editFormErrors.country = 'Country is required'; valid = false }
 
   return valid
 }
@@ -3315,11 +3438,11 @@ const submitEditCustomer = async () => {
   if (!validateEditCustomerForm()) return
 
   try {
-    const response = await CustomerServices.updateCustomer(editCustomer.value.id, editCustomer.value)
+    const response = await CustomerServices.updateCustomer(editingCustomer.value.id, editingCustomer.value)
     if (response.success) {
       setAlert('Customer updated successfully!', 'success')
-      resetCustomerForm()
       closeEditCustomerModal()
+      resetCustomerForm()
       await fetchCustomers()
     }
   } catch (err) {
@@ -5135,7 +5258,8 @@ const verifyToken = async () => {
         fetchCargos(),
         fetchLocation(),
         fetchActivities(),
-        fetchStatus()
+        fetchStatus(),
+        fetchCustomers()
       ])
     } else {
       // Token expired or invalid

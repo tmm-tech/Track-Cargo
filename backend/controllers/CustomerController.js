@@ -32,6 +32,7 @@ module.exports = {
                 county,
                 country
             } = req.body;
+            const userId = req.user?.id || null;
 
             if (!name || !phone) {
                 return res.status(400).json({
@@ -77,7 +78,21 @@ module.exports = {
             ];
 
             const result = await query(insertQuery, values);
-
+            await insertActivityLog(
+                'CREATE_CUSTOMER',
+                userId,
+                `Created new customer: ${name}`,
+                {
+                    customerId: result.rows[0].id,
+                    name: name,
+                    phone: phone,
+                    email: email,
+                    address: address,
+                    city: city,
+                    county: county,
+                    country: country
+                }
+            );
             res.status(201).json({
                 success: true,
                 message: 'Customer created successfully',
@@ -192,6 +207,22 @@ module.exports = {
                 country,
                 id
             ]);
+            const userId = req.user?.id || null;
+            await insertActivityLog(
+                'UPDATE_CUSTOMER',
+                userId,
+                `Updated customer: ${name}`,
+                {
+                    customerId: id,
+                    name: name,
+                    phone: phone,
+                    email: email,
+                    address: address,
+                    city: city,
+                    county: county,
+                    country: country
+                }
+            );
 
             res.json({
                 success: true,
@@ -217,6 +248,13 @@ module.exports = {
                 [id]
             );
 
+            const userId = req.user?.id || null;
+            await insertActivityLog(
+                'DEACTIVATE_CUSTOMER',
+                userId,
+                `Deactivated customer ID: ${id}`,
+                { customerId: id }
+            );
             res.json({
                 success: true,
                 message: 'Customer deactivated successfully'
