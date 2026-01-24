@@ -98,12 +98,13 @@
                 'px-3 py-2.5': !shouldCollapseSidebar || isMobileDevice,
                 'bg-[#273272] text-white': currentView === 'dashboard'
               }" active-class="bg-[#273272] text-white">
+              <!-- Dashboard Button -->
               <HomeIcon
                 :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
                 class="flex-shrink-0" />
               <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Dashboard</span>
             </button>
-
+            <!-- Packages Button -->
             <button @click="navigateToView('packages')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Cargos' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
@@ -116,7 +117,21 @@
                 class="flex-shrink-0" />
               <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Cargo</span>
             </button>
-
+            <!-- CustomersButton -->
+            <button @click="navigateToView('customers')"
+              :title="(sidebarCollapsed && !isMobileDevice) ? 'Customers' : ''"
+              class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
+              :class="{
+                'justify-center px-2 py-3': (shouldCollapseSidebar && !isMobileDevice),
+                'px-3 py-2.5': !shouldCollapseSidebar || isMobileDevice,
+                'bg-[#273272] text-white': currentView === 'customers'
+              }">
+              <UserGroupIcon
+                :class="{ 'h-6 w-6': sidebarCollapsed && !isMobileDevice, 'h-5 w-5': !sidebarCollapsed || isMobileDevice }"
+                class="flex-shrink-0" />
+              <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Customers</span>
+            </button>
+            <!-- New Locations Button -->
             <button @click="navigateToView('locations')"
               :title="(sidebarCollapsed && !isMobileDevice) ? 'Locations' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
@@ -130,7 +145,7 @@
                 class="flex-shrink-0" />
               <span v-if="!sidebarCollapsed || isMobileDevice" class="ml-3 font-medium">Locations</span>
             </button>
-
+            <!-- Users Button -->
             <button @click="navigateToView('users')" :title="(sidebarCollapsed && !isMobileDevice) ? 'Users' : ''"
               class="flex items-center text-gray-300 hover:bg-[#273272] hover:text-white rounded-md transition-colors text-sm group relative"
               :class="{
@@ -145,7 +160,7 @@
             </button>
           </nav>
         </div>
-
+        <!-- System Section -->
         <div class="px-2 mb-3">
           <p v-if="!sidebarCollapsed || isMobileDevice" class="text-xs uppercase text-gray-500 font-medium px-3 py-2">
             System</p>
@@ -563,7 +578,7 @@
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
                     <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{
                       resetPasswordUser.username
-                        }}</strong></p>
+                    }}</strong></p>
                   </div>
 
                   <form @submit.prevent="saveNewPassword">
@@ -2032,6 +2047,347 @@
               </div>
             </div>
           </div>
+          <!-- End of Cargo Management View -->
+          <!-- Customer Management View -->
+          <div v-if="currentView === 'customers'" class="space-y-6">
+
+            <!-- Header -->
+            <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
+              <div class="bg-[#273272] text-white p-6 rounded-t-lg flex justify-between items-center">
+                <div>
+                  <h2 class="text-xl font-semibold">Customer Management</h2>
+                  <p class="text-gray-200 text-sm">
+                    Manage customers and reuse them for recurring shipments
+                  </p>
+                </div>
+
+                <button @click="openAddCustomerModal"
+                  class="inline-flex items-center gap-2 bg-white text-[#273272] px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition">
+                  <PlusIcon class="h-4 w-4" />
+                  Add Customer
+                </button>
+              </div>
+
+              <!-- Search -->
+              <div class="p-4 border-b bg-gray-50">
+                <input v-model="customerSearch" placeholder="Search by name, phone or email..."
+                  class="w-full max-w-md rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]" />
+              </div>
+
+              <!-- Customers Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-gray-100 border-b">
+                    <tr>
+                      <th class="text-left px-4 py-3">Name</th>
+                      <th class="text-left px-4 py-3">Phone</th>
+                      <th class="text-left px-4 py-3">Email</th>
+                      <th class="text-left px-4 py-3">Location</th>
+                      <th class="text-left px-4 py-3">Status</th>
+                      <th class="text-right px-4 py-3">Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody v-if="customers.length">
+                    <tr v-for="customer in filteredCustomers" :key="customer.id" class="border-b hover:bg-gray-50">
+                      <td class="px-4 py-3 font-medium">
+                        {{ customer.name }}
+                      </td>
+
+                      <td class="px-4 py-3">
+                        {{ customer.phone }}
+                      </td>
+
+                      <td class="px-4 py-3">
+                        {{ customer.email || '-' }}
+                      </td>
+
+                      <td class="px-4 py-3">
+                        {{ customer.city }}, {{ customer.country }}
+                      </td>
+
+                      <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium" :class="customer.is_active
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-700'">
+                          {{ customer.is_active ? 'Active' : 'Inactive' }}
+                        </span>
+                      </td>
+
+                      <td class="px-4 py-3 text-right space-x-2">
+                        <button @click="editCustomer(customer)" class="text-blue-600 hover:underline text-xs">
+                          Edit
+                        </button>
+
+                        <button v-if="customer.is_active" @click="deactivateCustomer(customer.id)"
+                          class="text-red-600 hover:underline text-xs">
+                          Deactivate
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+
+                  <!-- Empty State -->
+                  <tbody v-else>
+                    <tr>
+                      <td colspan="6" class="text-center py-10 text-gray-500">
+                        No customers found
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Edit Customer Modal -->
+            <div v-if="showEditCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              @click="closeEditCustomerModal">
+              <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
+
+                <div class="p-6">
+                  <!-- Header -->
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Edit Customer</h2>
+                    <p class="text-sm text-muted-foreground">
+                      Update customer details below.
+                    </p>
+                  </div>
+
+                  <!-- Form -->
+                  <div class="space-y-4">
+
+                    <div class="grid grid-cols-2 gap-4">
+                      <!-- Name -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">Name</label>
+                        <input v-model="editCustomer.name"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.name ? 'border-red-500' : '']"
+                          placeholder="Customer name" />
+                        <p v-if="editFormErrors.name" class="text-red-500 text-sm">{{ editFormErrors.name }}</p>
+                      </div>
+
+                      <!-- Phone -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">Phone</label>
+                        <input v-model="editCustomer.phone"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.phone ? 'border-red-500' : '']"
+                          placeholder="Phone number" />
+                        <p v-if="editFormErrors.phone" class="text-red-500 text-sm">{{ editFormErrors.phone }}</p>
+                      </div>
+
+                      <!-- Email -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">Email</label>
+                        <input type="email" v-model="editCustomer.email"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.email ? 'border-red-500' : '']"
+                          placeholder="Email address" />
+                        <p v-if="editFormErrors.email" class="text-red-500 text-sm">{{ editFormErrors.email }}</p>
+                      </div>
+
+                      <!-- Country -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">Country</label>
+                        <input v-model="editCustomer.country"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.country ? 'border-red-500' : '']"
+                          placeholder="Country" />
+                        <p v-if="editFormErrors.country" class="text-red-500 text-sm">{{ editFormErrors.country }}</p>
+                      </div>
+
+                      <!-- City -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">City/Town</label>
+                        <input v-model="editCustomer.city"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.city ? 'border-red-500' : '']"
+                          placeholder="City or Town" />
+                        <p v-if="editFormErrors.city" class="text-red-500 text-sm">{{ editFormErrors.city }}</p>
+                      </div>
+
+                      <!-- County -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">County</label>
+                        <input v-model="editCustomer.county"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.county ? 'border-red-500' : '']"
+                          placeholder="County" />
+                        <p v-if="editFormErrors.county" class="text-red-500 text-sm">{{ editFormErrors.county }}</p>
+                      </div>
+
+                      <!-- Address -->
+                      <div class="col-span-2 space-y-2">
+                        <label class="text-sm font-medium">Street Address</label>
+                        <input v-model="editCustomer.address"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.address ? 'border-red-500' : '']"
+                          placeholder="Street address" />
+                        <p v-if="editFormErrors.address" class="text-red-500 text-sm">{{ editFormErrors.address }}</p>
+                      </div>
+
+                      <!-- Active Status -->
+                      <div class="flex items-center gap-3 mt-2 col-span-2">
+                        <label class="text-sm font-medium">Active</label>
+                        <button @click="editCustomer.is_active = !editCustomer.is_active"
+                          :class="['relative inline-flex h-6 w-11 items-center rounded-full transition', editCustomer.is_active ? 'bg-green-500' : 'bg-gray-400']">
+                          <span
+                            :class="['inline-block h-4 w-4 transform rounded-full bg-white transition', editCustomer.is_active ? 'translate-x-6' : 'translate-x-1']"></span>
+                        </button>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Modal Actions -->
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-gray-100 h-10 px-4 py-2"
+                      @click="closeEditCustomerModal">
+                      Cancel
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                      @click="submitEditCustomer">
+                      Save Changes
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Customer Modal -->
+            <div v-if="showAddCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              @click="closeAddCustomerModal">
+              <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
+
+                <div class="p-6">
+                  <!-- Header -->
+                  <div class="flex flex-col space-y-1.5 pb-4">
+                    <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Customer</h2>
+                    <p class="text-sm text-muted-foreground">
+                      Enter customer details to reuse for recurring shipments.
+                    </p>
+                  </div>
+
+                  <!-- Form -->
+                  <div class="space-y-4">
+
+                    <div class="grid grid-cols-2 gap-4">
+                      <!-- Name -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">Name</label>
+                        <input v-model="newCustomer.name"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.name ? 'border-red-500' : '']"
+                          placeholder="Customer name" />
+                        <p v-if="formErrors.name" class="text-red-500 text-sm">{{ formErrors.name }}</p>
+                      </div>
+
+                      <!-- Phone -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">Phone</label>
+                        <input v-model="newCustomer.phone"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.phone ? 'border-red-500' : '']"
+                          placeholder="Phone number" />
+                        <p v-if="formErrors.phone" class="text-red-500 text-sm">{{ formErrors.phone }}</p>
+                      </div>
+
+                      <!-- Email -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">Email</label>
+                        <input type="email" v-model="newCustomer.email"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.email ? 'border-red-500' : '']"
+                          placeholder="Email address" />
+                        <p v-if="formErrors.email" class="text-red-500 text-sm">{{ formErrors.email }}</p>
+                      </div>
+
+                      <!-- Country -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">Country</label>
+                        <input v-model="newCustomer.country"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.country ? 'border-red-500' : '']"
+                          placeholder="Country" />
+                        <p v-if="formErrors.country" class="text-red-500 text-sm">{{ formErrors.country }}</p>
+                      </div>
+
+                      <!-- City -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">City/Town</label>
+                        <input v-model="newCustomer.city"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.city ? 'border-red-500' : '']"
+                          placeholder="City or Town" />
+                        <p v-if="formErrors.city" class="text-red-500 text-sm">{{ formErrors.city }}</p>
+                      </div>
+
+                      <!-- County -->
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium">County</label>
+                        <input v-model="newCustomer.county"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.county ? 'border-red-500' : '']"
+                          placeholder="County" />
+                        <p v-if="formErrors.county" class="text-red-500 text-sm">{{ formErrors.county }}</p>
+                      </div>
+
+                      <!-- Address -->
+                      <div class="col-span-2 space-y-2">
+                        <label class="text-sm font-medium">Street Address</label>
+                        <input v-model="newCustomer.address"
+                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.address ? 'border-red-500' : '']"
+                          placeholder="Street address" />
+                        <p v-if="formErrors.address" class="text-red-500 text-sm">{{ formErrors.address }}</p>
+                      </div>
+
+                      <!-- Active Status -->
+                      <div class="flex items-center gap-3 mt-2 col-span-2">
+                        <label class="text-sm font-medium">Active</label>
+                        <button @click="newCustomer.is_active = !newCustomer.is_active"
+                          :class="['relative inline-flex h-6 w-11 items-center rounded-full transition', newCustomer.is_active ? 'bg-green-500' : 'bg-gray-400']">
+                          <span
+                            :class="['inline-block h-4 w-4 transform rounded-full bg-white transition', newCustomer.is_active ? 'translate-x-6' : 'translate-x-1']"></span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Modal Actions -->
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-gray-100 h-10 px-4 py-2"
+                      @click="closeAddCustomerModal">
+                      Cancel
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                      @click="submitNewCustomer">
+                      Add Customer
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete Customer Modal -->
+            <div v-if="showDeleteCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              @click="closeDeleteCustomerModal">
+              <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6" @click.stop>
+                <h2 class="text-lg font-semibold mb-4">Delete Customer</h2>
+                <p class="text-gray-600 mb-6">
+                  Are you sure you want to delete <span class="font-medium">{{ customerToDelete?.name }}</span>? This
+                  action cannot be undone.
+                </p>
+
+                <div class="flex justify-end gap-2">
+                  <button @click="closeDeleteCustomerModal"
+                    class="px-4 py-2 rounded-md border hover:bg-gray-100 text-sm">
+                    Cancel
+                  </button>
+                  <button @click="deleteCustomer"
+                    class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 text-sm">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- End Customer Management Modal -->
+
 
           <!-- Activity Log View -->
           <div v-if="currentView === 'activity'" class="space-y-8">
@@ -2275,7 +2631,8 @@
                       <label for="location-address" class="text-sm font-medium">Address</label>
                       <textarea id="location-address" v-model="newLocation.address" rows="3"
                         :class="['flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.address ? 'border-red-500' : '']"></textarea>
-                      <p v-if="locationFormErrors.address" class="text-red-500 text-sm">{{ locationFormErrors.address }}
+                      <p v-if="locationFormErrors.address" class="text-red-500 text-sm">{{ locationFormErrors.address
+                      }}
                       </p>
                     </div>
 
@@ -2284,13 +2641,15 @@
                         <label for="location-city" class="text-sm font-medium">City</label>
                         <input id="location-city" v-model="newLocation.city"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.city ? 'border-red-500' : '']" />
-                        <p v-if="locationFormErrors.city" class="text-red-500 text-sm">{{ locationFormErrors.city }}</p>
+                        <p v-if="locationFormErrors.city" class="text-red-500 text-sm">{{ locationFormErrors.city }}
+                        </p>
                       </div>
                       <div class="space-y-2">
                         <label for="location-country" class="text-sm font-medium">Country</label>
                         <input id="location-country" v-model="newLocation.country"
                           :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', locationFormErrors.country ? 'border-red-500' : '']" />
-                        <p v-if="locationFormErrors.country" class="text-red-500 text-sm">{{ locationFormErrors.country
+                        <p v-if="locationFormErrors.country" class="text-red-500 text-sm">{{
+                          locationFormErrors.country
                         }}
                         </p>
                       </div>
@@ -2459,7 +2818,8 @@
                       <p class="text-sm font-medium text-gray-500 mb-2">Address</p>
                       <div class="bg-gray-50 p-3 rounded-md">
                         <p>{{ viewingLocation.address }}</p>
-                        <p class="text-sm text-gray-600 mt-1">{{ viewingLocation.city }}, {{ viewingLocation.country }}
+                        <p class="text-sm text-gray-600 mt-1">{{ viewingLocation.city }}, {{ viewingLocation.country
+                        }}
                         </p>
                       </div>
                     </div>
@@ -2498,7 +2858,8 @@
                 <div class="p-6">
                   <div class="flex flex-col space-y-1.5 pb-4">
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
-                    <p class="text-sm text-muted-foreground">Are you sure you want to delete this location? This action
+                    <p class="text-sm text-muted-foreground">Are you sure you want to delete this location? This
+                      action
                       cannot be undone.</p>
                   </div>
 
@@ -2568,6 +2929,7 @@ import {
   MagnifyingGlassIcon,
   PencilIcon,
   PlusIcon,
+  UserGroupIcon,
   DocumentCheckIcon,
   MapPinIcon,
   CalendarIcon,
@@ -2595,6 +2957,7 @@ import ShippingProgress from '../components/ShippingProgress.vue';
 import userServices from '../Services/userServices.js';
 import locationService from '../Services/locationServices.js';
 import ShippingServices from '../Services/ShippingServices.js';
+import CustomerServices from '../Services/customerServices.js';
 import Alert from '../components/ui/Alert.vue';
 import activityServices from '../Services/activityServices.js'
 import { User, Edit } from 'lucide-vue-next';
@@ -2822,6 +3185,173 @@ const newCargo = ref({
     specialInstructions: ''
   }
 })
+
+const customers = ref([])
+const customerSearch = ref('')
+
+const filteredCustomers = computed(() => {
+  if (!customerSearch.value) return customers.value
+
+  const q = customerSearch.value.toLowerCase()
+  return customers.value.filter(c =>
+    c.name.toLowerCase().includes(q) ||
+    c.phone.toLowerCase().includes(q) ||
+    (c.email && c.email.toLowerCase().includes(q))
+  )
+})
+
+const openAddCustomerModal = () => {
+  showAddCustomerModal.value = true
+}
+
+const deactivateCustomer = async (id) => {
+  await CustomerServices.deleteCustomer(id)
+  await fetchCustomers()
+}
+
+const fetchCustomers = async () => {
+  const res = await CustomerServices.getCustomers()
+  customers.value = res.data
+}
+
+const fetchCustomerInfo = async (id) => {
+  const res = await CustomerServices.getCustomerById(id)
+  return res.data
+}
+
+const showAddCustomerModal = ref(false)
+const newCustomer = ref({
+  name: '',
+  phone: '',
+  email: '',
+  address: '',
+  city: '',
+  county: '',
+  country: '',
+  is_active: true
+})
+
+const closeAddCustomerModal = () => {
+  showAddCustomerModal.value = false
+}
+
+const resetCustomerForm = () => {
+  Object.assign(newCustomer.value, {
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    county: '',
+    country: '',
+    is_active: true
+  })
+  Object.keys(formErrors).forEach(k => formErrors[k] = '')
+}
+
+const validateCustomerForm = () => {
+  let valid = true
+  Object.keys(formErrors).forEach(k => formErrors[k] = '')
+
+  if (!newCustomer.value.name) { formErrors.name = 'Name is required'; valid = false }
+  if (!newCustomer.value.phone) { formErrors.phone = 'Phone is required'; valid = false }
+  if (!newCustomer.value.address) { formErrors.address = 'Address is required'; valid = false }
+  if (!newCustomer.value.city) { formErrors.city = 'City is required'; valid = false }
+  if (!newCustomer.value.country) { formErrors.country = 'Country is required'; valid = false }
+
+  return valid
+}
+
+const submitNewCustomer = async () => {
+  if (!validateCustomerForm()) return
+
+  try {
+    const response = await CustomerServices.addCustomer(newCustomer.value)
+    if (response.success) {
+      setAlert('Customer added successfully!', 'success')
+      resetCustomerForm()
+      closeAddCustomerModal()
+      await fetchCustomers()
+    }
+  } catch (err) {
+    console.error(err)
+    setAlert('Failed to add customer.', 'error')
+  }
+}
+
+const showEditCustomerModal = ref(false)
+const editCustomer = ref({
+  id: null,
+  name: '',
+  phone: '',
+  email: '',
+  address: '',
+  city: '',
+  county: '',
+  country: '',
+  is_active: true
+})
+
+const editFormErrors = reactive({})
+
+const closeEditCustomerModal = () => {
+  showEditCustomerModal.value = false
+}
+
+const validateEditCustomerForm = () => {
+  let valid = true
+  Object.keys(editFormErrors).forEach(k => editFormErrors[k] = '')
+
+  if (!editCustomer.value.name) { editFormErrors.name = 'Name is required'; valid = false }
+  if (!editCustomer.value.phone) { editFormErrors.phone = 'Phone is required'; valid = false }
+  if (!editCustomer.value.address) { editFormErrors.address = 'Address is required'; valid = false }
+  if (!editCustomer.value.city) { editFormErrors.city = 'City is required'; valid = false }
+  if (!editCustomer.value.country) { editFormErrors.country = 'Country is required'; valid = false }
+
+  return valid
+}
+
+const submitEditCustomer = async () => {
+  if (!validateEditCustomerForm()) return
+
+  try {
+    const response = await CustomerServices.updateCustomer(editCustomer.value.id, editCustomer.value)
+    if (response.success) {
+      setAlert('Customer updated successfully!', 'success')
+      resetCustomerForm()
+      closeEditCustomerModal()
+      await fetchCustomers()
+    }
+  } catch (err) {
+    console.error(err)
+    setAlert('Failed to update customer.', 'error')
+  }
+}
+
+const showDeleteCustomerModal = ref(false)
+const customerToDelete = ref(null)
+
+const closeDeleteCustomerModal = () => {
+  customerToDelete.value = null
+  showDeleteCustomerModal.value = false
+}
+
+const deleteCustomer = async () => {
+  if (!customerToDelete.value) return
+
+  try {
+    const response = await CustomerServices.deleteCustomer(customerToDelete.value.id)
+    if (response.success) {
+      setAlert('Customer deleted successfully!', 'success')
+      await fetchCustomers() // Refresh customer list
+    }
+  } catch (err) {
+    console.error(err)
+    setAlert('Failed to delete customer.', 'error')
+  } finally {
+    closeDeleteCustomerModal()
+  }
+}
 
 // Load Cargo Details from the service
 const fetchCargos = async () => {

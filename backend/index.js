@@ -6,6 +6,7 @@ const UserRoutes = require('./routes/UserRoutes');
 const PackageRoutes = require('./routes/PackageRoutes');
 const ActivityRoutes = require('./routes/ActivityRoutes');
 const LocationRoutes = require('./routes/LocationRoutes');
+const CustomerRoutes = require('./routes/CustomerRoutes');
 const cookieParser = require('cookie-parser');
 const app = express();
 
@@ -61,6 +62,7 @@ app.use('/users', UserRoutes);
 app.use('/package', PackageRoutes);
 app.use('/activity', ActivityRoutes);
 app.use('/location', LocationRoutes);
+app.use('/customer', CustomerRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: "Confirmed Connection to Texmon Logistics" });
