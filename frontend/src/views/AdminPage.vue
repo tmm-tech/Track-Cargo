@@ -878,959 +878,900 @@
               </div>
             </div>
           </div>
-
-          <!-- Cargo Management View -->
-          <div v-if="currentView === 'packages'" class="space-y-6 sm:space-y-8">
-            <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-6 sm:mb-8">
-              <div
-                class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#273272] text-white p-4 sm:p-6 rounded-t-lg gap-4 sm:gap-0">
-                <div>
-                  <h2 class="text-lg sm:text-xl font-semibold">Cargo Management</h2>
-                  <p class="text-gray-200 text-sm">
-                    Update the current location and next stop information for shipments.
-                  </p>
-                </div>
-                <button @click="openAddCargoModal"
-                  class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-3 sm:px-4 py-2 rounded inline-flex items-center text-sm">
-                  <PlusIcon class="h-4 w-4 mr-2" />
-                  <span class="hidden sm:inline">Add Cargo</span>
-                  <span class="sm:hidden">Add</span>
-                </button>
+        </div>
+        <!-- End User Management View -->
+        <!-- Cargo Management View -->
+        <div v-if="currentView === 'packages'" class="space-y-6 sm:space-y-8">
+          <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-6 sm:mb-8">
+            <div
+              class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#273272] text-white p-4 sm:p-6 rounded-t-lg gap-4 sm:gap-0">
+              <div>
+                <h2 class="text-lg sm:text-xl font-semibold">Cargo Management</h2>
+                <p class="text-gray-200 text-sm">
+                  Update the current location and next stop information for shipments.
+                </p>
               </div>
-              <div class="p-4 sm:p-6">
-                <div class="mb-4 sm:mb-6">
-                  <div class="relative">
-                    <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                    <input placeholder="Search by container, B/L or truck number" v-model="searchTerm"
-                      class="flex h-10 w-full rounded-md border border-gray-300 bg-white pl-10 px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#273272] focus:ring-offset-2" />
-                  </div>
+              <button @click="openAddCargoModal"
+                class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-3 sm:px-4 py-2 rounded inline-flex items-center text-sm">
+                <PlusIcon class="h-4 w-4 mr-2" />
+                <span class="hidden sm:inline">Add Cargo</span>
+                <span class="sm:hidden">Add</span>
+              </button>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="mb-4 sm:mb-6">
+                <div class="relative">
+                  <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  <input placeholder="Search by container, B/L or truck number" v-model="searchTerm"
+                    class="flex h-10 w-full rounded-md border border-gray-300 bg-white pl-10 px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#273272] focus:ring-offset-2" />
                 </div>
+              </div>
 
-                <!-- Desktop Table View -->
-                <div class="hidden md:block w-full overflow-hidden rounded-md border border-gray-200">
-                  <div class="overflow-x-auto max-w-full">
-                    <table class="min-w-full divide-y divide-gray-200">
-                      <thead class="bg-gray-50">
-                        <tr>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            Container #</th>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            Truck #</th>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            BL #</th>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            Client Name</th>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            Client Email</th>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            Current Location</th>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            Next Stop</th>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            Next Stop ETA</th>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            Last Updated</th>
-                          <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                            Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="filteredCargos.length === 0">
-                          <td colspan="8" class="text-center py-4 text-gray-500">No shipment found</td>
-                        </tr>
-                        <tr v-for="pkg in filteredCargos" :key="pkg.id" class="hover:bg-gray-50">
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
-                            {{ pkg.container_number || 'N/A' }}
-                          </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.truck_number || 'N/A' }}
-                          </td>
+              <!-- Desktop Table View -->
+              <div class="hidden md:block w-full overflow-hidden rounded-md border border-gray-200">
+                <div class="overflow-x-auto max-w-full">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          Container #</th>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          Truck #</th>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          BL #</th>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          Client Name</th>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          Client Email</th>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          Current Location</th>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          Next Stop</th>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          Next Stop ETA</th>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          Last Updated</th>
+                        <th scope="col"
+                          class="px-4 sm:px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                          Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                      <tr v-if="filteredCargos.length === 0">
+                        <td colspan="8" class="text-center py-4 text-gray-500">No shipment found</td>
+                      </tr>
+                      <tr v-for="pkg in filteredCargos" :key="pkg.id" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 font-medium whitespace-nowrap">
+                          {{ pkg.container_number || 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          {{ pkg.truck_number || 'N/A' }}
+                        </td>
 
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.bl_number || 'N/A' }}
-                          </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.shipping_address.recipientName || 'N/A' }}
-                          </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ pkg.shipping_address.email || 'N/A' }}
-                          </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
-                            :title="pkg.current_location">
-                            {{ pkg.current_location || 'N/A' }}
-                          </td>
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.next_stop">
-                            <span v-if="pkg.status === 'delivered'">N/A</span>
-                            <span v-else>{{ pkg.next_stop || 'N/A' }}</span>
-                          </td>
+                        <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          {{ pkg.bl_number || 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          {{ pkg.shipping_address.recipientName || 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          {{ pkg.shipping_address.email || 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate"
+                          :title="pkg.current_location">
+                          {{ pkg.current_location || 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 max-w-xs truncate" :title="pkg.next_stop">
+                          <span v-if="pkg.status === 'delivered'">N/A</span>
+                          <span v-else>{{ pkg.next_stop || 'N/A' }}</span>
+                        </td>
 
 
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            <span v-if="pkg.status === 'delivered'"
-                              class="text-gray-900 text-right flex-1 ml-2 truncate">Delivered</span>
-                            <span v-else>{{ formatDate(pkg.next_stop_eta) || 'N/A' }}</span>
-                          </td>
-
-                          <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
-                            {{ formatDate(pkg.updated_at) || 'N/A' }}
-                          </td>
-                          <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
-                            <div class="flex justify-end gap-1">
-                              <button
-                                class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
-                                @click="viewCargoDetails(pkg)" title="View Details">
-                                View
-                              </button>
-
-                              <button v-if="pkg.status !== 'container returned'"
-                                class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
-                                @click="editCargo(pkg)" title="Edit Cargo">
-                                <PencilIcon class="h-3 w-3" />
-                              </button>
-                              <button v-if="pkg.status !== 'container returned'"
-                                class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-8 px-2"
-                                @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
-                                <TrashIcon class="h-3 w-3" />
-                              </button>
-                              <button
-                                class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
-                                @click="printCargoDetails(pkg)" title="Print Details">
-                                <PrinterIcon class="h-3 w-3" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <!-- Mobile-friendly card view for smaller screens -->
-                <div class="block md:hidden">
-                  <div class="space-y-4">
-                    <div v-for="pkg in filteredCargos" :key="pkg.id"
-                      class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                      <div class="flex justify-between items-start mb-3">
-                        <div class="flex-1">
-                          <h3 class="font-bold text-gray-900 text-sm">{{ pkg.container_number }}</h3>
-                          <p class="text-xs text-gray-500 mt-1">{{ pkg.truck_number }} • {{ pkg.bl_number }}</p>
-                        </div>
-                        <div class="flex gap-1 ml-2">
-                          <button @click="viewCargoDetails(pkg)"
-                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                            title="View Details">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                              </path>
-                            </svg>
-                          </button>
-                          <button v-if="pkg.status !== 'container returned'" @click="editCargo(pkg)"
-                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                            title="Edit Details">
-                            <PencilIcon class="h-4 w-4" />
-                          </button>
-                          <button v-if="pkg.status !== 'container returned'"
-                            class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
-                            @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
-                            <TrashIcon class="h-4 w-4" />
-                          </button>
-                          <button @click="printCargoDetails(pkg)"
-                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                            title="Print Details">
-                            <PrinterIcon class="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <div class="grid grid-cols-1 gap-2 text-xs">
-                        <div class="flex justify-between">
-                          <span class="text-gray-500">Current:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.current_location ||
-                            'N/A' }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                          <span class="text-gray-500">Next:</span>
-                          <span v-if="pkg.status === 'delivered'"
-                            class="text-gray-900 text-right flex-1 ml-2 truncate">N/A</span>
-                          <span v-else class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A'
-                          }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                          <span class="text-gray-500">Client Name:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{
-                            pkg.shipping_address.recipientName || 'N/A'
-                          }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                          <span class="text-gray-500">Client Email:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.shipping_address.email ||
-                            'N/A'
-                          }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                          <span class="text-gray-500">ETA:</span>
+                        <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                           <span v-if="pkg.status === 'delivered'"
                             class="text-gray-900 text-right flex-1 ml-2 truncate">Delivered</span>
-                          <span v-else class="text-gray-900 text-right flex-1 ml-2 truncate">{{
-                            formatDate(pkg.next_stop_eta)
-                            || 'N/A' }}</span>
+                          <span v-else>{{ formatDate(pkg.next_stop_eta) || 'N/A' }}</span>
+                        </td>
 
-                        </div>
-                        <div class="flex justify-between">
-                          <span class="text-gray-500">Updated:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{
-                            formatDate(pkg.updated_at) || 'N/A' }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                        <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
+                          {{ formatDate(pkg.updated_at) || 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
+                          <div class="flex justify-end gap-1">
+                            <button
+                              class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
+                              @click="viewCargoDetails(pkg)" title="View Details">
+                              View
+                            </button>
 
-            <!-- View Cargo Modal -->
-            <div v-if="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeViewModal">
-              <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
-                <div class="p-6">
-                  <div class="flex flex-col space-y-1.5 pb-4">
-                    <h2 class="text-lg font-semibold leading-none tracking-tight">Cargo Details</h2>
-                    <p class="text-sm text-muted-foreground" v-if="viewingCargo">
-                      <strong>Container Number:</strong> {{ viewingCargo.container_number }} |
-                      <strong>Truck Number:</strong> {{ viewingCargo.truck_number }} |
-                      <strong>BL Number:</strong> {{ viewingCargo.bl_number }}
-                    </p>
-                  </div>
-                  <div v-if="viewingCargo" class="space-y-6">
-                    <div class="grid grid-cols-2 gap-4">
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Cargo Type</p>
-                        <p class="text-lg">{{ viewingCargo.type.toUpperCase() }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Cargo Description</p>
-                        <p class="text-lg">{{ viewingCargo.description }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Weight</p>
-                        <p class="text-lg">{{ viewingCargo.weight }} kg</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Shipped Date</p>
-                        <p class="text-lg">{{ formatDate(viewingCargo.shipped_date) }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
-                        <p class="text-lg">{{ formatDate(viewingCargo.estimated_delivery) }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Final Destination</p>
-                        <p class="text-lg">{{ viewingCargo.final_destination }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Last Updated</p>
-                        <p class="text-lg">{{ formatDate(viewingCargo.updated_at) }}</p>
-                      </div>
-                    </div>
-
-                    <!-- Cargo Address Card -->
-                    <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
-                      <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
-                        <MapPinIcon class="h-5 w-5 mr-2" />
-                        <h3 class="text-xl font-semibold">Client Details</h3>
-                      </div>
-                      <div class="p-6">
-                        <div v-if="viewingCargo.shipping_address" class="space-y-1">
-                          <p class="font-medium">{{ viewingCargo.shipping_address.recipientName }}</p>
-                          <p>{{ viewingCargo.shipping_address.streetAddress }}</p>
-                          <p>
-                            {{ viewingCargo.shipping_address.city }}, {{ viewingCargo.shipping_address.state }}
-                          </p>
-                          <p>{{ viewingCargo.shipping_address.country }}</p>
-                        </div>
-                        <p v-else class="text-gray-500">No Client information available</p>
-                      </div>
-                    </div>
-                    <!-- Clearance Section -->
-                    <div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
-                      <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
-                        <ClipboardDocumentCheckIcon class="h-5 w-5 mr-2" />
-                        <h3 class="text-xl font-semibold">Clearance Information</h3>
-                      </div>
-
-                      <div class="p-6">
-
-                        <!-- Not Required -->
-                        <div v-if="!viewingCargo.clearance || viewingCargo.clearance.status === 'not_required'"
-                          class="text-gray-500 italic">
-                          Clearance not required for this Cargo.
-                        </div>
-
-                        <!-- Required -->
-                        <div v-else class="grid grid-cols-2 gap-4">
-
-                          <!-- File Reference -->
-                          <div>
-                            <p class="text-sm font-medium text-gray-500">File Reference</p>
-                            <p class="text-lg">
-                              {{ viewingCargo.clearance.fileReference || 'N/A' }}
-                            </p>
-                          </div>
-
-                          <!-- Bill of Lading -->
-                          <div>
-                            <p class="text-sm font-medium text-gray-500">Bill of Lading</p>
-                            <p class="text-lg">
-                              {{ viewingCargo.clearance.billOfLading || 'N/A' }}
-                            </p>
-                          </div>
-
-                          <!-- Vessel Name -->
-                          <div>
-                            <p class="text-sm font-medium text-gray-500">Vessel Name</p>
-                            <p class="text-lg">
-                              {{ viewingCargo.clearance.vesselName || 'N/A' }}
-                            </p>
-                          </div>
-
-                          <!-- ETA -->
-                          <div>
-                            <p class="text-sm font-medium text-gray-500">ETA</p>
-                            <p class="text-lg">
-                              {{ formatDate(viewingCargo.clearance.eta) || 'N/A' }}
-                            </p>
-                          </div>
-
-                          <!-- Client Details -->
-                          <div class="col-span-2">
-                            <p class="text-sm font-medium text-gray-500">Client Details</p>
-                            <p class="text-lg whitespace-pre-line">
-                              {{ viewingCargo.clearance.clientDetails || 'N/A' }}
-                            </p>
-                          </div>
-
-                          <!-- Cargo Description -->
-                          <div class="col-span-2">
-                            <p class="text-sm font-medium text-gray-500">Cargo Description</p>
-                            <p class="text-lg whitespace-pre-line">
-                              {{ viewingCargo.clearance.cargoDescription || 'N/A' }}
-                            </p>
-                          </div>
-
-                          <!-- Net Weight -->
-                          <div>
-                            <p class="text-sm font-medium text-gray-500">Net Weight</p>
-                            <p class="text-lg">
-                              {{ viewingCargo.clearance.netWeight || 'N/A' }}
-                            </p>
-                          </div>
-
-                          <!-- Gross Weight -->
-                          <div>
-                            <p class="text-sm font-medium text-gray-500">Gross Weight</p>
-                            <p class="text-lg">
-                              {{ viewingCargo.clearance.grossWeight || 'N/A' }}
-                            </p>
-                          </div>
-
-                          <!-- Container Number -->
-                          <div class="col-span-2">
-                            <p class="text-sm font-medium text-gray-500">Container Number</p>
-                            <p class="text-lg">
-                              {{ viewingCargo.clearance.containerNumber || 'N/A' }}
-                            </p>
-                          </div>
-
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Cargo Progress -->
-                    <ShippingProgress v-if="viewingCargo && viewingCargo.tracking_history"
-                      :tracking_history="viewingCargo.tracking_history || []"
-                      :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
-                      :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
-                      :estimated_delivery="viewingCargo.estimated_delivery" showComments
-                      :status="viewingCargo.status?.toLowerCase()" />
-                  </div>
-
-                  <!-- Comments Section -->
-                  <div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
-                    <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
-                      <ChatBubbleLeftRightIcon class="h-5 w-5 mr-2" />
-                      <h3 class="text-xl font-semibold">Comments</h3>
-                    </div>
-                    <div class="p-6">
-                      <div v-if="cargocomment.length != 0" class="space-y-4 mb-6">
-                        <div v-for="(comments, index) in cargocomment" :key="index" class="bg-gray-50 p-4 rounded-md">
-                          <div class="flex justify-between items-start">
-                            <div>
-                              <p class="font-medium">{{ comments.author }}</p>
-                              <p class="text-sm text-gray-500">{{ comments.timestamp }}</p>
-                            </div>
-                          </div>
-                          <p class="mt-2">{{ comments.text }}</p>
-                        </div>
-                      </div>
-                      <div v-else class="text-gray-500 mb-6">No comments yet</div>
-
-
-                      <div class="space-y-2">
-                        <label for="commentText" class="text-sm font-medium">Add Comment</label>
-                        <textarea id="commentText" v-model="newComment.text" rows="3"
-                          placeholder="Enter your comment here..."
-                          class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                      </div>
-                      <button @click="addComment"
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                        Add Comment
-                      </button>
-                    </div>
-                  </div>
-
-                  <div
-                    class="flex flex-col-reverse sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 space-y-2 sm:space-y-0"
-                      @click="closeViewModal">
-                      Close
-                    </button>
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 space-y-2 sm:space-y-0"
-                      @click="editFromViewModal(viewingCargo)">
-                      <PencilIcon class="h-4 w-4 mr-2" />
-                      Edit Cargo
-                    </button>
-
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 space-y-2 sm:space-y-0"
-                      @click="openTrackingDialog(viewingCargo)">
-                      <PrinterIcon class="h-4 w-4 mr-2" />
-                      Print Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-            <!-- Cargo Tracking Dialog -->
-            <div v-if="showTrackingDialog"
-              class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
-              @click="closeTrackingDialog">
-              <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden" @click.stop>
-                <!-- Dialog Header -->
-                <div
-                  class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-[#273272] text-white">
-                  <div class="flex-1 min-w-0">
-                    <h2 class="text-lg sm:text-xl font-semibold truncate">Cargo Tracking Details</h2>
-                    <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{
-                      selectedCargo?.container_number
-                    }}</p>
-                  </div>
-                  <div class="flex items-center gap-2 sm:gap-3 ml-4">
-                    <!-- Action Buttons -->
-                    <button @click="handlePrint"
-                      class="px-2 sm:px-4 py-2 bg-[#ffb600] text-[#273272] rounded-md hover:bg-[#e6a500] transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                      <PrinterIcon class="w-4 h-4" />
-                      <span class="hidden sm:inline">{{ isMobileDevice ? 'Download PDF' : 'Print' }}</span>
-                    </button>
-                    <button @click="closeTrackingDialog" class="text-white/70 hover:text-white transition-colors p-1">
-                      <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Dialog Content -->
-                <div class="overflow-y-auto max-h-[calc(95vh-120px)]" id="tracking-content">
-                  <PackageTracking v-if="selectedCargo" :pkg="selectedCargo" class="print-content" />
-                </div>
-              </div>
-            </div>
-
-            <!-- Add Cargo Modal -->
-            <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeAddModal">
-              <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
-                <div class="p-6">
-                  <div class="flex flex-col space-y-1.5 pb-4">
-                    <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Cargo</h2>
-                    <p class="text-sm text-muted-foreground">Enter the details for the new cargo and its tracking
-                      history.
-                    </p>
-                  </div>
-
-                  <div>
-                    <div
-                      class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
-                      <button :class="[
-                        'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
-                        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                        addCargoTab === 'address' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                      ]" @click="addCargoTab = 'address'">
-                        Client Details
-                      </button>
-                      <button v-if="cargoClearanceEnabled" :class="[
-                        'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
-                        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                        addCargoTab === 'clearance'
-                          ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black'
-                          : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                      ]" @click="addCargoTab = 'clearance'">
-                        Cargo Clearance
-                      </button>
-                      <button :class="[
-                        'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
-                        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                        addCargoTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                      ]" @click="addCargoTab = 'details'">
-                        Cargo Details
-                      </button>
-                      <button :class="[
-                        'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
-                        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                        addCargoTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                      ]" @click="addCargoTab = 'stops'">
-                        Truck Movement
-                      </button>
-                    </div>
-                    <div v-if="addCargoTab === 'address'" class="space-y-4 mt-4">
-                      <div class="space-y-2">
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                          <div class="space-y-2">
-                            <label class="text-sm font-medium">Select Existing Client</label>
-
-                            <select v-model="selectedClientId" @change="onClientSelected"
-                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring">
-                              <option value="">New Client</option>
-                              <option v-for="client in clients" :key="client.id" :value="client.id">
-                                {{ client.name }} — {{ client.phone }}
-                              </option>
-                            </select>
-                          </div>
-
-                          <div class="space-y-2">
-                            <label for="recipientName" class="text-sm font-medium">Client Name</label>
-                            <input id="recipientName" v-model="newCargo.shipping_address.recipientName"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.recipient_name ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.recipient_name" class="text-red-500 text-sm">{{
-                              formErrors.recipient_name }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="streetAddress" class="text-sm font-medium">Street Address</label>
-                            <input id="streetAddress" v-model="newCargo.shipping_address.streetAddress"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.street_address ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.street_address" class="text-red-500 text-sm">{{
-                              formErrors.street_address }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="city" class="text-sm font-medium">City/Town</label>
-                            <input id="city" v-model="newCargo.shipping_address.city"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.city ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.city" class="text-red-500 text-sm">{{ formErrors.city }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="state" class="text-sm font-medium">County</label>
-                            <input id="state" v-model="newCargo.shipping_address.state"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.state ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.state" class="text-red-500 text-sm">{{ formErrors.state }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="country" class="text-sm font-medium">Country</label>
-                            <input id="country" v-model="newCargo.shipping_address.country"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.country ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.country" class="text-red-500 text-sm">{{ formErrors.country }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="phone" class="text-sm font-medium">Phone Number</label>
-                            <input id="phone" v-model="newCargo.shipping_address.phone"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.phone ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.phone" class="text-red-500 text-sm">{{ formErrors.phone }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="email" class="text-sm font-medium">Email</label>
-                            <input id="email" type="email" v-model="newCargo.shipping_address.email"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.email ? 'border-red-500' : '']" />
-                            <p v-if="formErrors.email" class="text-red-500 text-sm">{{ formErrors.email }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="specialInstructions" class="text-sm font-medium">Special Instructions</label>
-                            <textarea id="specialInstructions" v-model="newCargo.shipping_address.special_instructions"
-                              rows="2"
-                              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                          </div>
-                          <div class="flex items-center gap-3 mt-4">
-                            <label class="text-sm font-medium">Cargo Clearance</label>
-
-                            <button @click="cargoClearanceEnabled = !cargoClearanceEnabled" :class="[
-                              'relative inline-flex h-6 w-11 items-center rounded-full transition',
-                              cargoClearanceEnabled ? 'bg-blue-500' : 'bg-gray-400'
-                            ]">
-                              <span :class="[
-                                'inline-block h-4 w-4 transform rounded-full bg-white transition',
-                                cargoClearanceEnabled ? 'translate-x-6' : 'translate-x-1'
-                              ]">
-                              </span>
+                            <button v-if="pkg.status !== 'container returned'"
+                              class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
+                              @click="editCargo(pkg)" title="Edit Cargo">
+                              <PencilIcon class="h-3 w-3" />
+                            </button>
+                            <button v-if="pkg.status !== 'container returned'"
+                              class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-8 px-2"
+                              @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
+                              <TrashIcon class="h-3 w-3" />
+                            </button>
+                            <button
+                              class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
+                              @click="printCargoDetails(pkg)" title="Print Details">
+                              <PrinterIcon class="h-3 w-3" />
                             </button>
                           </div>
-                        </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Mobile-friendly card view for smaller screens -->
+              <div class="block md:hidden">
+                <div class="space-y-4">
+                  <div v-for="pkg in filteredCargos" :key="pkg.id"
+                    class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <div class="flex justify-between items-start mb-3">
+                      <div class="flex-1">
+                        <h3 class="font-bold text-gray-900 text-sm">{{ pkg.container_number }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">{{ pkg.truck_number }} • {{ pkg.bl_number }}</p>
+                      </div>
+                      <div class="flex gap-1 ml-2">
+                        <button @click="viewCargoDetails(pkg)"
+                          class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                          title="View Details">
+                          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                            </path>
+                          </svg>
+                        </button>
+                        <button v-if="pkg.status !== 'container returned'" @click="editCargo(pkg)"
+                          class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                          title="Edit Details">
+                          <PencilIcon class="h-4 w-4" />
+                        </button>
+                        <button v-if="pkg.status !== 'container returned'"
+                          class="p-2 rounded-md transition-colors  text-red-600 hover:bg-red-100"
+                          @click="confirmDeleteCargo(pkg)" title="Delete Cargo">
+                          <TrashIcon class="h-4 w-4" />
+                        </button>
+                        <button @click="printCargoDetails(pkg)"
+                          class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                          title="Print Details">
+                          <PrinterIcon class="h-4 w-4" />
+                        </button>
                       </div>
                     </div>
-                    <div v-if="addCargoTab === 'clearance'" class="space-y-4 mt-4">
-                      <div class="space-y-2">
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                          <!-- File Reference -->
-                          <div class="space-y-2">
-                            <label class="text-sm font-medium">File Reference</label>
-                            <input v-model="clearance.fileReference"
-                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Enter file reference" />
-                          </div>
+                    <div class="grid grid-cols-1 gap-2 text-xs">
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">Current:</span>
+                        <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.current_location ||
+                          'N/A' }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">Next:</span>
+                        <span v-if="pkg.status === 'delivered'"
+                          class="text-gray-900 text-right flex-1 ml-2 truncate">N/A</span>
+                        <span v-else class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A'
+                        }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">Client Name:</span>
+                        <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{
+                          pkg.shipping_address.recipientName || 'N/A'
+                        }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">Client Email:</span>
+                        <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.shipping_address.email ||
+                          'N/A'
+                        }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">ETA:</span>
+                        <span v-if="pkg.status === 'delivered'"
+                          class="text-gray-900 text-right flex-1 ml-2 truncate">Delivered</span>
+                        <span v-else class="text-gray-900 text-right flex-1 ml-2 truncate">{{
+                          formatDate(pkg.next_stop_eta)
+                          || 'N/A' }}</span>
 
-                          <!-- Bill of Lading -->
-                          <div class="space-y-2">
-                            <label class="text-sm font-medium">Bill of Lading</label>
-                            <input v-model="clearance.billOfLading"
-                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Enter bill of lading" />
-                          </div>
-
-                          <!-- Vessel Name -->
-                          <div class="space-y-2">
-                            <label class="text-sm font-medium">Vessel Name</label>
-                            <input v-model="clearance.vesselName"
-                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Enter vessel name" />
-                          </div>
-
-                          <!-- ETA -->
-                          <div class="space-y-2">
-                            <label class="text-sm font-medium">ETA</label>
-                            <input type="date" v-model="clearance.eta"
-                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring" />
-                          </div>
-
-                          <!-- Client Details -->
-                          <div class="col-span-2 space-y-2">
-                            <label class="text-sm font-medium">Client Details</label>
-                            <textarea v-model="clearance.clientDetails" rows="2"
-                              class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Enter client details"></textarea>
-                          </div>
-
-                          <!-- Cargo Description -->
-                          <div class="col-span-2 space-y-2">
-                            <label class="text-sm font-medium">Cargo Description</label>
-                            <textarea v-model="clearance.cargoDescription" rows="2"
-                              class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Describe the cargo"></textarea>
-                          </div>
-
-                          <!-- Net Weight -->
-                          <div class="space-y-2">
-                            <label class="text-sm font-medium">Net Weight</label>
-                            <input v-model="clearance.netWeight"
-                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Net weight" />
-                          </div>
-
-                          <!-- Gross Weight -->
-                          <div class="space-y-2">
-                            <label class="text-sm font-medium">Gross Weight</label>
-                            <input v-model="clearance.grossWeight"
-                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Gross weight" />
-                          </div>
-
-                          <!-- Container Number -->
-                          <div class="col-span-2 space-y-2">
-                            <label class="text-sm font-medium">Container Number</label>
-                            <input v-model="clearance.containerNumber"
-                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Container number" />
-                          </div>
-
-                        </div>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">Updated:</span>
+                        <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{
+                          formatDate(pkg.updated_at) || 'N/A' }}</span>
                       </div>
                     </div>
-                    <div v-if="addCargoTab === 'details'" class="space-y-4 mt-4">
-                      <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                          <label for="containerNumber" class="text-sm font-medium">Container Number</label>
-                          <input id="containerNumber" v-model="newCargo.container_number"
-                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.container_number ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.container_number" class="text-red-500 text-sm">{{
-                            formErrors.container_number
-                          }}
-                          </p>
-                        </div>
-                        <div class="space-y-2">
-                          <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
-                          <input id="truckNumber" v-model="newCargo.truck_number"
-                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truck_number ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.truck_number" class="text-red-500 text-sm">{{ formErrors.truck_number }}
-                          </p>
-                        </div>
-                        <div class="space-y-2">
-                          <label for="blNumber" class="text-sm font-medium">BL Number</label>
-                          <input id="blNumber" v-model="newCargo.bl_number"
-                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.bl_number ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.bl_number" class="text-red-500 text-sm">{{ formErrors.bl_number }}</p>
-                        </div>
-                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-                      <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                          <label for="type" class="text-sm font-medium">Cargo Type</label>
-                          <select id="type" v-model="newCargo.type"
-                            :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.type ? 'border-red-500' : '']">
-                            <option value="" disabled selected>Select Cargo Type</option>
-                            <option value="fcl">FCL (Full Container Load)</option>
-                            <option value="lcl">LCL (Less than Container Load)</option>
-                          </select>
-                          <p v-if="formErrors.type" class="text-red-500 text-sm">{{ formErrors.type }}</p>
-                          <!-- Cargo Description (NEW) -->
-                          <label for="description" class="text-sm font-medium mt-2 block">
-                            Cargo Description
-                          </label>
-                          <textarea id="description" v-model="newCargo.description" rows="2"
-                            placeholder="Enter cargo description or comments..."
-                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"></textarea>
-                        </div>
-                        <div class="space-y-2">
-                          <label for="weight" class="text-sm font-medium">Weight (kg)</label>
-                          <input id="weight" v-model="newCargo.weight"
-                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.weight ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.weight" class="text-red-500 text-sm">{{ formErrors.weight }}</p>
-                        </div>
-                      </div>
+          <!-- View Cargo Modal -->
+          <div v-if="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeViewModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Cargo Details</h2>
+                  <p class="text-sm text-muted-foreground" v-if="viewingCargo">
+                    <strong>Container Number:</strong> {{ viewingCargo.container_number }} |
+                    <strong>Truck Number:</strong> {{ viewingCargo.truck_number }} |
+                    <strong>BL Number:</strong> {{ viewingCargo.bl_number }}
+                  </p>
+                </div>
+                <div v-if="viewingCargo" class="space-y-6">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Cargo Type</p>
+                      <p class="text-lg">{{ viewingCargo.type.toUpperCase() }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Cargo Description</p>
+                      <p class="text-lg">{{ viewingCargo.description }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Weight</p>
+                      <p class="text-lg">{{ viewingCargo.weight }} kg</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Shipped Date</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.shipped_date) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.estimated_delivery) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Final Destination</p>
+                      <p class="text-lg">{{ viewingCargo.final_destination }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Last Updated</p>
+                      <p class="text-lg">{{ formatDate(viewingCargo.updated_at) }}</p>
+                    </div>
+                  </div>
 
-                      <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                          <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
-                          <input id="shippedDate" type="date" v-model="newCargo.shipped_date"
-                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shipped_date ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.shipped_date" class="text-red-500 text-sm">{{ formErrors.shipped_date }}
-                          </p>
-                        </div>
-                        <div class="space-y-2">
-                          <label for="estimatedDelivery" class="text-sm font-medium">Estimated Delivery</label>
-                          <input id="estimatedDelivery" type="date" v-model="newCargo.estimated_delivery"
-                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.estimated_delivery ? 'border-red-500' : '']" />
-                          <p v-if="formErrors.estimated_delivery" class="text-red-500 text-sm">{{
-                            formErrors.estimated_delivery
-                          }}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div class="space-y-2">
-                        <label for="currentLocation" class="text-sm font-medium">Current Location</label>
-                        <select id="currentLocation" v-model="newCargo.current_location"
-                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.current_location ? 'border-red-500' : '']">
-                          <option value="" disabled selected>Select location</option>
-                          <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
-                            location.name }}
-                          </option>
-                        </select>
-                        <p v-if="formErrors.current_location" class="text-red-500 text-sm">{{
-                          formErrors.current_location
-                        }}
+                  <!-- Cargo Address Card -->
+                  <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
+                    <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
+                      <MapPinIcon class="h-5 w-5 mr-2" />
+                      <h3 class="text-xl font-semibold">Client Details</h3>
+                    </div>
+                    <div class="p-6">
+                      <div v-if="viewingCargo.shipping_address" class="space-y-1">
+                        <p class="font-medium">{{ viewingCargo.shipping_address.recipientName }}</p>
+                        <p>{{ viewingCargo.shipping_address.streetAddress }}</p>
+                        <p>
+                          {{ viewingCargo.shipping_address.city }}, {{ viewingCargo.shipping_address.state }}
                         </p>
+                        <p>{{ viewingCargo.shipping_address.country }}</p>
+                      </div>
+                      <p v-else class="text-gray-500">No Client information available</p>
+                    </div>
+                  </div>
+                  <!-- Clearance Section -->
+                  <div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
+                    <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
+                      <ClipboardDocumentCheckIcon class="h-5 w-5 mr-2" />
+                      <h3 class="text-xl font-semibold">Clearance Information</h3>
+                    </div>
+
+                    <div class="p-6">
+
+                      <!-- Not Required -->
+                      <div v-if="!viewingCargo.clearance || viewingCargo.clearance.status === 'not_required'"
+                        class="text-gray-500 italic">
+                        Clearance not required for this Cargo.
                       </div>
 
-                      <div class="grid grid-cols-2 gap-4">
+                      <!-- Required -->
+                      <div v-else class="grid grid-cols-2 gap-4">
+
+                        <!-- File Reference -->
+                        <div>
+                          <p class="text-sm font-medium text-gray-500">File Reference</p>
+                          <p class="text-lg">
+                            {{ viewingCargo.clearance.fileReference || 'N/A' }}
+                          </p>
+                        </div>
+
+                        <!-- Bill of Lading -->
+                        <div>
+                          <p class="text-sm font-medium text-gray-500">Bill of Lading</p>
+                          <p class="text-lg">
+                            {{ viewingCargo.clearance.billOfLading || 'N/A' }}
+                          </p>
+                        </div>
+
+                        <!-- Vessel Name -->
+                        <div>
+                          <p class="text-sm font-medium text-gray-500">Vessel Name</p>
+                          <p class="text-lg">
+                            {{ viewingCargo.clearance.vesselName || 'N/A' }}
+                          </p>
+                        </div>
+
+                        <!-- ETA -->
+                        <div>
+                          <p class="text-sm font-medium text-gray-500">ETA</p>
+                          <p class="text-lg">
+                            {{ formatDate(viewingCargo.clearance.eta) || 'N/A' }}
+                          </p>
+                        </div>
+
+                        <!-- Client Details -->
+                        <div class="col-span-2">
+                          <p class="text-sm font-medium text-gray-500">Client Details</p>
+                          <p class="text-lg whitespace-pre-line">
+                            {{ viewingCargo.clearance.clientDetails || 'N/A' }}
+                          </p>
+                        </div>
+
+                        <!-- Cargo Description -->
+                        <div class="col-span-2">
+                          <p class="text-sm font-medium text-gray-500">Cargo Description</p>
+                          <p class="text-lg whitespace-pre-line">
+                            {{ viewingCargo.clearance.cargoDescription || 'N/A' }}
+                          </p>
+                        </div>
+
+                        <!-- Net Weight -->
+                        <div>
+                          <p class="text-sm font-medium text-gray-500">Net Weight</p>
+                          <p class="text-lg">
+                            {{ viewingCargo.clearance.netWeight || 'N/A' }}
+                          </p>
+                        </div>
+
+                        <!-- Gross Weight -->
+                        <div>
+                          <p class="text-sm font-medium text-gray-500">Gross Weight</p>
+                          <p class="text-lg">
+                            {{ viewingCargo.clearance.grossWeight || 'N/A' }}
+                          </p>
+                        </div>
+
+                        <!-- Container Number -->
+                        <div class="col-span-2">
+                          <p class="text-sm font-medium text-gray-500">Container Number</p>
+                          <p class="text-lg">
+                            {{ viewingCargo.clearance.containerNumber || 'N/A' }}
+                          </p>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Cargo Progress -->
+                  <ShippingProgress v-if="viewingCargo && viewingCargo.tracking_history"
+                    :tracking_history="viewingCargo.tracking_history || []"
+                    :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
+                    :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
+                    :estimated_delivery="viewingCargo.estimated_delivery" showComments
+                    :status="viewingCargo.status?.toLowerCase()" />
+                </div>
+
+                <!-- Comments Section -->
+                <div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
+                  <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
+                    <ChatBubbleLeftRightIcon class="h-5 w-5 mr-2" />
+                    <h3 class="text-xl font-semibold">Comments</h3>
+                  </div>
+                  <div class="p-6">
+                    <div v-if="cargocomment.length != 0" class="space-y-4 mb-6">
+                      <div v-for="(comments, index) in cargocomment" :key="index" class="bg-gray-50 p-4 rounded-md">
+                        <div class="flex justify-between items-start">
+                          <div>
+                            <p class="font-medium">{{ comments.author }}</p>
+                            <p class="text-sm text-gray-500">{{ comments.timestamp }}</p>
+                          </div>
+                        </div>
+                        <p class="mt-2">{{ comments.text }}</p>
+                      </div>
+                    </div>
+                    <div v-else class="text-gray-500 mb-6">No comments yet</div>
+
+
+                    <div class="space-y-2">
+                      <label for="commentText" class="text-sm font-medium">Add Comment</label>
+                      <textarea id="commentText" v-model="newComment.text" rows="3"
+                        placeholder="Enter your comment here..."
+                        class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                    </div>
+                    <button @click="addComment"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                      Add Comment
+                    </button>
+                  </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 space-y-2 sm:space-y-0"
+                    @click="closeViewModal">
+                    Close
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 space-y-2 sm:space-y-0"
+                    @click="editFromViewModal(viewingCargo)">
+                    <PencilIcon class="h-4 w-4 mr-2" />
+                    Edit Cargo
+                  </button>
+
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#ffb600] text-[#273272] hover:bg-[#e6a500] h-10 px-4 space-y-2 sm:space-y-0"
+                    @click="openTrackingDialog(viewingCargo)">
+                    <PrinterIcon class="h-4 w-4 mr-2" />
+                    Print Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Cargo Tracking Dialog -->
+          <div v-if="showTrackingDialog"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4"
+            @click="closeTrackingDialog">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden" @click.stop>
+              <!-- Dialog Header -->
+              <div
+                class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-[#273272] text-white">
+                <div class="flex-1 min-w-0">
+                  <h2 class="text-lg sm:text-xl font-semibold truncate">Cargo Tracking Details</h2>
+                  <p class="text-gray-200 text-xs sm:text-sm mt-1 truncate">Container: {{
+                    selectedCargo?.container_number
+                  }}</p>
+                </div>
+                <div class="flex items-center gap-2 sm:gap-3 ml-4">
+                  <!-- Action Buttons -->
+                  <button @click="handlePrint"
+                    class="px-2 sm:px-4 py-2 bg-[#ffb600] text-[#273272] rounded-md hover:bg-[#e6a500] transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                    <PrinterIcon class="w-4 h-4" />
+                    <span class="hidden sm:inline">{{ isMobileDevice ? 'Download PDF' : 'Print' }}</span>
+                  </button>
+                  <button @click="closeTrackingDialog" class="text-white/70 hover:text-white transition-colors p-1">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                      </path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dialog Content -->
+              <div class="overflow-y-auto max-h-[calc(95vh-120px)]" id="tracking-content">
+                <PackageTracking v-if="selectedCargo" :pkg="selectedCargo" class="print-content" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Cargo Modal -->
+          <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeAddModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-[800px] w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Cargo</h2>
+                  <p class="text-sm text-muted-foreground">Enter the details for the new cargo and its tracking
+                    history.
+                  </p>
+                </div>
+
+                <div>
+                  <div
+                    class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
+                    <button :class="[
+                      'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      addCargoTab === 'address' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addCargoTab = 'address'">
+                      Client Details
+                    </button>
+                    <button v-if="cargoClearanceEnabled" :class="[
+                      'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      addCargoTab === 'clearance'
+                        ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black'
+                        : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addCargoTab = 'clearance'">
+                      Cargo Clearance
+                    </button>
+                    <button :class="[
+                      'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      addCargoTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addCargoTab = 'details'">
+                      Cargo Details
+                    </button>
+                    <button :class="[
+                      'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      addCargoTab === 'stops' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ]" @click="addCargoTab = 'stops'">
+                      Truck Movement
+                    </button>
+                  </div>
+                  <div v-if="addCargoTab === 'address'" class="space-y-4 mt-4">
+                    <div class="space-y-2">
+                      <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="space-y-2">
-                          <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                          <select id="nextStop" v-model="newCargo.next_stop"
-                            :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.next_stop ? 'border-red-500' : '']">
-                            <option value="" disabled selected>Select Next Stop</option>
-                            <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
-                              location.name }}
+                          <label class="text-sm font-medium">Select Existing Client</label>
+
+                          <select v-model="selectedClientId" @change="onClientSelected"
+                            class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring">
+                            <option value="">New Client</option>
+                            <option v-for="client in clients" :key="client.id" :value="client.id">
+                              {{ client.name }} — {{ client.phone }}
                             </option>
                           </select>
-                          <p v-if="formErrors.next_stop" class="text-red-500 text-sm">{{ formErrors.next_stop }}
-                          </p>
+                        </div>
+
+                        <div class="space-y-2">
+                          <label for="recipientName" class="text-sm font-medium">Client Name</label>
+                          <input id="recipientName" v-model="newCargo.shipping_address.recipientName"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.recipient_name ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.recipient_name" class="text-red-500 text-sm">{{
+                            formErrors.recipient_name }}</p>
                         </div>
                         <div class="space-y-2">
-                          <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
-                          <input id="nextStopETA" type="datetime-local" v-model="newCargo.next_stop_eta"
-                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                          <label for="streetAddress" class="text-sm font-medium">Street Address</label>
+                          <input id="streetAddress" v-model="newCargo.shipping_address.streetAddress"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.street_address ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.street_address" class="text-red-500 text-sm">{{
+                            formErrors.street_address }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="city" class="text-sm font-medium">City/Town</label>
+                          <input id="city" v-model="newCargo.shipping_address.city"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.city ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.city" class="text-red-500 text-sm">{{ formErrors.city }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="state" class="text-sm font-medium">County</label>
+                          <input id="state" v-model="newCargo.shipping_address.state"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.state ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.state" class="text-red-500 text-sm">{{ formErrors.state }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="country" class="text-sm font-medium">Country</label>
+                          <input id="country" v-model="newCargo.shipping_address.country"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.country ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.country" class="text-red-500 text-sm">{{ formErrors.country }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="phone" class="text-sm font-medium">Phone Number</label>
+                          <input id="phone" v-model="newCargo.shipping_address.phone"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.phone ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.phone" class="text-red-500 text-sm">{{ formErrors.phone }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="email" class="text-sm font-medium">Email</label>
+                          <input id="email" type="email" v-model="newCargo.shipping_address.email"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.email ? 'border-red-500' : '']" />
+                          <p v-if="formErrors.email" class="text-red-500 text-sm">{{ formErrors.email }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="specialInstructions" class="text-sm font-medium">Special Instructions</label>
+                          <textarea id="specialInstructions" v-model="newCargo.shipping_address.special_instructions"
+                            rows="2"
+                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                        </div>
+                        <div class="flex items-center gap-3 mt-4">
+                          <label class="text-sm font-medium">Cargo Clearance</label>
+
+                          <button @click="cargoClearanceEnabled = !cargoClearanceEnabled" :class="[
+                            'relative inline-flex h-6 w-11 items-center rounded-full transition',
+                            cargoClearanceEnabled ? 'bg-blue-500' : 'bg-gray-400'
+                          ]">
+                            <span :class="[
+                              'inline-block h-4 w-4 transform rounded-full bg-white transition',
+                              cargoClearanceEnabled ? 'translate-x-6' : 'translate-x-1'
+                            ]">
+                            </span>
+                          </button>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                  <div v-if="addCargoTab === 'clearance'" class="space-y-4 mt-4">
+                    <div class="space-y-2">
+                      <div class="grid grid-cols-2 gap-4 mb-4">
+                        <!-- File Reference -->
+                        <div class="space-y-2">
+                          <label class="text-sm font-medium">File Reference</label>
+                          <input v-model="clearance.fileReference"
+                            class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                            placeholder="Enter file reference" />
+                        </div>
 
+                        <!-- Bill of Lading -->
+                        <div class="space-y-2">
+                          <label class="text-sm font-medium">Bill of Lading</label>
+                          <input v-model="clearance.billOfLading"
+                            class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                            placeholder="Enter bill of lading" />
+                        </div>
+
+                        <!-- Vessel Name -->
+                        <div class="space-y-2">
+                          <label class="text-sm font-medium">Vessel Name</label>
+                          <input v-model="clearance.vesselName"
+                            class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                            placeholder="Enter vessel name" />
+                        </div>
+
+                        <!-- ETA -->
+                        <div class="space-y-2">
+                          <label class="text-sm font-medium">ETA</label>
+                          <input type="date" v-model="clearance.eta"
+                            class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring" />
+                        </div>
+
+                        <!-- Client Details -->
+                        <div class="col-span-2 space-y-2">
+                          <label class="text-sm font-medium">Client Details</label>
+                          <textarea v-model="clearance.clientDetails" rows="2"
+                            class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                            placeholder="Enter client details"></textarea>
+                        </div>
+
+                        <!-- Cargo Description -->
+                        <div class="col-span-2 space-y-2">
+                          <label class="text-sm font-medium">Cargo Description</label>
+                          <textarea v-model="clearance.cargoDescription" rows="2"
+                            class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                            placeholder="Describe the cargo"></textarea>
+                        </div>
+
+                        <!-- Net Weight -->
+                        <div class="space-y-2">
+                          <label class="text-sm font-medium">Net Weight</label>
+                          <input v-model="clearance.netWeight"
+                            class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                            placeholder="Net weight" />
+                        </div>
+
+                        <!-- Gross Weight -->
+                        <div class="space-y-2">
+                          <label class="text-sm font-medium">Gross Weight</label>
+                          <input v-model="clearance.grossWeight"
+                            class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                            placeholder="Gross weight" />
+                        </div>
+
+                        <!-- Container Number -->
+                        <div class="col-span-2 space-y-2">
+                          <label class="text-sm font-medium">Container Number</label>
+                          <input v-model="clearance.containerNumber"
+                            class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
+                            placeholder="Container number" />
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="addCargoTab === 'details'" class="space-y-4 mt-4">
+                    <div class="grid grid-cols-2 gap-4">
                       <div class="space-y-2">
-                        <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
-                        <select id="finalDestination" v-model="newCargo.final_destination"
-                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.final_destination ? 'border-red-500' : '']">
-                          <option value="" disabled selected>Select Final Destination</option>
-                          <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
-                            location.name }}
-                          </option>
+                        <label for="containerNumber" class="text-sm font-medium">Container Number</label>
+                        <input id="containerNumber" v-model="newCargo.container_number"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.container_number ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.container_number" class="text-red-500 text-sm">{{
+                          formErrors.container_number
+                        }}
+                        </p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="truckNumber" class="text-sm font-medium">Truck Number</label>
+                        <input id="truckNumber" v-model="newCargo.truck_number"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.truck_number ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.truck_number" class="text-red-500 text-sm">{{ formErrors.truck_number }}
+                        </p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="blNumber" class="text-sm font-medium">BL Number</label>
+                        <input id="blNumber" v-model="newCargo.bl_number"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.bl_number ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.bl_number" class="text-red-500 text-sm">{{ formErrors.bl_number }}</p>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="space-y-2">
+                        <label for="type" class="text-sm font-medium">Cargo Type</label>
+                        <select id="type" v-model="newCargo.type"
+                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.type ? 'border-red-500' : '']">
+                          <option value="" disabled selected>Select Cargo Type</option>
+                          <option value="fcl">FCL (Full Container Load)</option>
+                          <option value="lcl">LCL (Less than Container Load)</option>
                         </select>
-                        <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{
-                          formErrors.final_destination
+                        <p v-if="formErrors.type" class="text-red-500 text-sm">{{ formErrors.type }}</p>
+                        <!-- Cargo Description (NEW) -->
+                        <label for="description" class="text-sm font-medium mt-2 block">
+                          Cargo Description
+                        </label>
+                        <textarea id="description" v-model="newCargo.description" rows="2"
+                          placeholder="Enter cargo description or comments..."
+                          class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"></textarea>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="weight" class="text-sm font-medium">Weight (kg)</label>
+                        <input id="weight" v-model="newCargo.weight"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.weight ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.weight" class="text-red-500 text-sm">{{ formErrors.weight }}</p>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="space-y-2">
+                        <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
+                        <input id="shippedDate" type="date" v-model="newCargo.shipped_date"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shipped_date ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.shipped_date" class="text-red-500 text-sm">{{ formErrors.shipped_date }}
+                        </p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="estimatedDelivery" class="text-sm font-medium">Estimated Delivery</label>
+                        <input id="estimatedDelivery" type="date" v-model="newCargo.estimated_delivery"
+                          :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.estimated_delivery ? 'border-red-500' : '']" />
+                        <p v-if="formErrors.estimated_delivery" class="text-red-500 text-sm">{{
+                          formErrors.estimated_delivery
                         }}
                         </p>
                       </div>
                     </div>
-                    <div v-if="addCargoTab === 'stops'" class="space-y-4 mt-4">
-                      <div v-if="stopErrors.general" class="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">{{
-                        stopErrors.general }}</div>
 
-                      <div class="bg-gray-50 p-4 rounded-md border">
-                        <h3 class="font-medium text-lg mb-3">Add Tracking Stop</h3>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                          <div class="space-y-2">
-                            <label for="status" class="text-sm font-medium">Status</label>
-                            <select id="status" v-model="newStop.status"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
-                              <option value="" disabled selected>Select Status</option>
-                              <option v-for="opt in statusOptionsForStop" :key="opt.value" :value="opt.value"
-                                :disabled="opt.disabled">
-                                {{ opt.label }}
-                              </option>
-                            </select>
-                            <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="location" class="text-sm font-medium">Location</label>
-                            <select id="nextStop" v-model="newCargo.next_stop" readonly
-                              :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.nextStop ? 'border-red-500' : '']">
-                              <option value="" disabled selected>Select Next Stop</option>
-                              <option v-for="location in filteredLocations" :key="location.name" :value="location.name">
-                                {{
-                                  location.name }}
-                              </option>
-                            </select>
-                            <p v-if="stopErrors.location" class="text-red-500 text-sm">{{ stopErrors.location }}</p>
-                          </div>
+                    <div class="space-y-2">
+                      <label for="currentLocation" class="text-sm font-medium">Current Location</label>
+                      <select id="currentLocation" v-model="newCargo.current_location"
+                        :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.current_location ? 'border-red-500' : '']">
+                        <option value="" disabled selected>Select location</option>
+                        <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                          location.name }}
+                        </option>
+                      </select>
+                      <p v-if="formErrors.current_location" class="text-red-500 text-sm">{{
+                        formErrors.current_location
+                      }}
+                      </p>
+                    </div>
 
-                          <div class="space-y-2">
-                            <label for="timestamp" class="text-sm font-medium">Date & Time</label>
-                            <input id="timestamp" type="datetime-local" v-model="newCargo.next_stop_eta" readonly
-                              class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="space-y-2">
+                        <label for="nextStop" class="text-sm font-medium">Next Stop</label>
+                        <select id="nextStop" v-model="newCargo.next_stop"
+                          :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.next_stop ? 'border-red-500' : '']">
+                          <option value="" disabled selected>Select Next Stop</option>
+                          <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                            location.name }}
+                          </option>
+                        </select>
+                        <p v-if="formErrors.next_stop" class="text-red-500 text-sm">{{ formErrors.next_stop }}
+                        </p>
+                      </div>
+                      <div class="space-y-2">
+                        <label for="nextStopETA" class="text-sm font-medium">Next Stop ETA</label>
+                        <input id="nextStopETA" type="datetime-local" v-model="newCargo.next_stop_eta"
+                          class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                    </div>
 
-                            <p v-if="stopErrors.timestamp" class="text-red-500 text-sm">{{ stopErrors.timestamp }}</p>
-                          </div>
+                    <div class="space-y-2">
+                      <label for="finalDestination" class="text-sm font-medium">Final Destination</label>
+                      <select id="finalDestination" v-model="newCargo.final_destination"
+                        :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', formErrors.final_destination ? 'border-red-500' : '']">
+                        <option value="" disabled selected>Select Final Destination</option>
+                        <option v-for="location in filteredLocations" :key="location.name" :value="location.name">{{
+                          location.name }}
+                        </option>
+                      </select>
+                      <p v-if="formErrors.final_destination" class="text-red-500 text-sm">{{
+                        formErrors.final_destination
+                      }}
+                      </p>
+                    </div>
+                  </div>
+                  <div v-if="addCargoTab === 'stops'" class="space-y-4 mt-4">
+                    <div v-if="stopErrors.general" class="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">{{
+                      stopErrors.general }}</div>
 
-                          <div class="space-y-2">
-                            <label for="stopComment" class="text-sm font-medium">Comment</label>
-                            <textarea id="stopComment" placeholder="Enter comment for this stop"
-                              v-model="newStop.comment" rows="2"
-                              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                            <p v-if="stopErrors.comment" class="text-red-500 text-sm">{{ stopErrors.comment }}</p>
-                          </div>
-
-                          <button @click="addTrackingStop"
-                            class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] hover:bg-[#1e2759] text-white h-10 px-4 py-2">
-                            <PlusIcon class="h-4 w-4 mr-2" />
-                            Add Stop
-                          </button>
+                    <div class="bg-gray-50 p-4 rounded-md border">
+                      <h3 class="font-medium text-lg mb-3">Add Tracking Stop</h3>
+                      <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="space-y-2">
+                          <label for="status" class="text-sm font-medium">Status</label>
+                          <select id="status" v-model="newStop.status"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
+                            <option value="" disabled selected>Select Status</option>
+                            <option v-for="opt in statusOptionsForStop" :key="opt.value" :value="opt.value"
+                              :disabled="opt.disabled">
+                              {{ opt.label }}
+                            </option>
+                          </select>
+                          <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="location" class="text-sm font-medium">Location</label>
+                          <select id="nextStop" v-model="newCargo.next_stop" readonly
+                            :class="['flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.nextStop ? 'border-red-500' : '']">
+                            <option value="" disabled selected>Select Next Stop</option>
+                            <option v-for="location in filteredLocations" :key="location.name" :value="location.name">
+                              {{
+                                location.name }}
+                            </option>
+                          </select>
+                          <p v-if="stopErrors.location" class="text-red-500 text-sm">{{ stopErrors.location }}</p>
                         </div>
 
-                        <div class="mt-6">
-                          <h3 class="font-medium text-lg mb-3">Truck History</h3>
-                          <div v-if="trackingStops.length === 0" class="text-center py-8 bg-gray-50 rounded-md border">
-                            <p class="text-gray-500">No tracking stops added yet</p>
-                            <p class="text-sm text-gray-400 mt-1">Add stops to create the cargo's tracking history
-                            </p>
-                          </div>
-                          <div v-else class="space-y-4">
-                            <div v-for="(stop, index) in trackingStops" :key="index"
-                              class="flex items-start gap-4 bg-white p-4 rounded-md border">
-                              <div class="flex-1">
-                                <div class="flex justify-between">
-                                  <div>
-                                    <p class="font-medium">{{ stop.status }}</p>
-                                    <p class="text-sm text-gray-500">{{ stop.location }}</p>
-                                    <p class="text-sm text-gray-500">{{ formatDate(stop.timestamp) }}</p>
-                                    <div v-if="stop.comment" class="mt-2 p-2 bg-gray-50 rounded-md">
-                                      <p class="text-sm font-medium text-gray-700">Comment:</p>
-                                      <p class="text-sm text-gray-600">{{ stop.comment }}</p>
-                                    </div>
+                        <div class="space-y-2">
+                          <label for="timestamp" class="text-sm font-medium">Date & Time</label>
+                          <input id="timestamp" type="datetime-local" v-model="newCargo.next_stop_eta" readonly
+                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+
+                          <p v-if="stopErrors.timestamp" class="text-red-500 text-sm">{{ stopErrors.timestamp }}</p>
+                        </div>
+
+                        <div class="space-y-2">
+                          <label for="stopComment" class="text-sm font-medium">Comment</label>
+                          <textarea id="stopComment" placeholder="Enter comment for this stop" v-model="newStop.comment"
+                            rows="2"
+                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                          <p v-if="stopErrors.comment" class="text-red-500 text-sm">{{ stopErrors.comment }}</p>
+                        </div>
+
+                        <button @click="addTrackingStop"
+                          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] hover:bg-[#1e2759] text-white h-10 px-4 py-2">
+                          <PlusIcon class="h-4 w-4 mr-2" />
+                          Add Stop
+                        </button>
+                      </div>
+
+                      <div class="mt-6">
+                        <h3 class="font-medium text-lg mb-3">Truck History</h3>
+                        <div v-if="trackingStops.length === 0" class="text-center py-8 bg-gray-50 rounded-md border">
+                          <p class="text-gray-500">No tracking stops added yet</p>
+                          <p class="text-sm text-gray-400 mt-1">Add stops to create the cargo's tracking history
+                          </p>
+                        </div>
+                        <div v-else class="space-y-4">
+                          <div v-for="(stop, index) in trackingStops" :key="index"
+                            class="flex items-start gap-4 bg-white p-4 rounded-md border">
+                            <div class="flex-1">
+                              <div class="flex justify-between">
+                                <div>
+                                  <p class="font-medium">{{ stop.status }}</p>
+                                  <p class="text-sm text-gray-500">{{ stop.location }}</p>
+                                  <p class="text-sm text-gray-500">{{ formatDate(stop.timestamp) }}</p>
+                                  <div v-if="stop.comment" class="mt-2 p-2 bg-gray-50 rounded-md">
+                                    <p class="text-sm font-medium text-gray-700">Comment:</p>
+                                    <p class="text-sm text-gray-600">{{ stop.comment }}</p>
                                   </div>
-                                  <button @click="removeTrackingStop(index)"
-                                    class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded">
-                                    <TrashIcon class="h-4 w-4" />
-                                  </button>
                                 </div>
+                                <button @click="removeTrackingStop(index)"
+                                  class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded">
+                                  <TrashIcon class="h-4 w-4" />
+                                </button>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                      <button
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                        @click="closeAddModal">
-                        Cancel
-                      </button>
-                      <button
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                        @click="addNewCargo">
-                        Add Cargo
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Delete Cargo Confirmation Modal -->
-            <div v-if="showDeleteCargoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
-                <div class="p-6">
-                  <div class="flex flex-col space-y-1.5 pb-4">
-                    <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
-                    <p class="text-sm text-muted-foreground">
-                      Are you sure you want to delete this cargo? This action cannot be undone.
-                    </p>
-                  </div>
-
-                  <div class="p-4 bg-red-50 rounded-md mb-4">
-                    <div class="flex">
-                      <div class="flex-shrink-0">
-                        <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
-                      </div>
-                      <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800">Warning</h3>
-                        <div class="mt-2 text-sm text-red-700">
-                          <p>Deleting this cargo will remove all its shipment and tracking history.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="cargoToDelete" class="py-4 border-t border-b">
-                    <div class="flex items-center">
-                      <div
-                        class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
-                        <ArchiveBoxIcon class="h-5 w-5 text-[#273272]" />
-                      </div>
-                      <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900">
-                          {{ cargoToDelete.container_number || 'N/A' }}
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          Truck: {{ cargoToDelete.truck_number || 'N/A' }},
-                          BL: {{ cargoToDelete.bl_number || 'N/A' }}
                         </div>
                       </div>
                     </div>
@@ -1839,648 +1780,733 @@
                   <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
                     <button
                       class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                      @click="closeDeleteCargoModal">
+                      @click="closeAddModal">
                       Cancel
                     </button>
                     <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
-                      @click="deleteCargo">
-                      Delete Cargo
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                      @click="addNewCargo">
+                      Add Cargo
                     </button>
                   </div>
-                </div>
-              </div>
-            </div>
-            <!-- Edit Cargo Modal -->
-            <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeEditModal">
-              <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
-                <div class="p-6">
-                  <div class="flex flex-col space-y-1.5 pb-4">
-                    <h2 class="text-lg font-semibold leading-none tracking-tight">Update Cargo Information</h2>
-                    <p class="text-sm text-muted-foreground">Update the cargo location and cargo status
-                      information.
-                    </p>
-                  </div>
-                  <form @submit.prevent="saveEditedCargo" class="space-y-4 py-4">
-                    <div v-if="editingCargo" class="space-y-4 py-4">
-                      <div class="flex justify-between items-center gap-4">
-                        <div class="flex-1">
-                          <p class="text-sm font-medium text-gray-500">Container Number</p>
-                          <input id="container_number" type="text" v-model="editingCargo.container_number"
-                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                        </div>
-                        <div class="flex-1">
-                          <p class="text-sm font-medium text-gray-500">Truck Number</p>
-                          <input id="truck_number" type="text" v-model="editingCargo.truck_number"
-                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                        </div>
-                        <div class="flex-1">
-                          <p class="text-sm font-medium text-gray-500">BL Number</p>
-                          <input id="bl_number" type="text" v-model="editingCargo.bl_number"
-                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                        </div>
-                      </div>
-                      <!-- Second Row — Cargo Type & Description -->
-                      <div class="flex justify-between items-center gap-4">
-                        <div class="flex-1">
-                          <p class="text-sm font-medium text-gray-500">Cargo Type</p>
-                          <input id="bl_number" type="text" v-model="editingCargo.type" readonly
-                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 uppercase" />
-                        </div>
-                        <div class="flex-1">
-                          <p class="text-sm font-medium text-gray-500">Cargo Description</p>
-                          <input id="bl_number" type="text" v-model="editingCargo.description"
-                            class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                        </div>
-                      </div>
-                      <div>
-                        <div
-                          class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
-                          <button :class="[
-                            'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
-                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                            activeEditTab === 'location' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                          ]" @click="activeEditTab = 'location'">
-                            Location
-                          </button>
-                        </div>
-                        <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
-
-                          <div class="space-y-2">
-                            <label for="currentLocation" class="text-sm font-medium">Current Location</label>
-                            <select id="currentLocation" v-model="editingCargo.current_location"
-                              @change="handleLocationChange"
-                              class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                              <option value="" disabled>Select location</option>
-                              <option v-for="location in activeLocations" :key="location.id" :value="location.name">
-                                {{ location.name }}
-                              </option>
-                            </select>
-                          </div>
-                          <div class="space-y-2">
-                            <label for="status" class="text-sm font-medium">Status</label>
-                            <select id="status" v-model="newTrackingStatus"
-                              :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
-                              <option value="" disabled>Select Status</option>
-                              <option v-for="opt in statusOptionsForTracking" :key="opt.value" :value="opt.value"
-                                :disabled="opt.disabled">
-                                {{ opt.label }}
-                              </option>
-                            </select>
-                            <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
-                          </div>
-                          <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-2"
-                              v-if="editingCargo.current_location !== editingCargo.final_destination">
-                              <label for="nextStop" class="text-sm font-medium">Next Stop</label>
-                              <select id="nextStop" v-model="editingCargo.next_stop"
-                                class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                <option value="" disabled>Select next stop</option>
-                                <option v-for="location in activeLocations" :key="location.id" :value="location.name">
-                                  {{ location.name }}
-                                </option>
-                              </select>
-                              <p class="text-xs text-gray-500">Automatically determined based on current location</p>
-                            </div>
-                            <div class="space-y-2">
-                              <label for="nextStopETA" class="text-sm font-medium">
-                                {{ newTrackingStatus === 'delivered' ? 'Delivered on' : 'Next Stop ETA' }}
-                              </label>
-
-                              <input id="nextStopETA" type="datetime-local" v-model="editingCargo.next_stop_eta"
-                                class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                              <p class="text-xs text-gray-500">Estimated based on standard transit times</p>
-                            </div>
-                          </div>
-                          <!-- Comments Section -->
-                          <div class="mt-6 pt-6 border-t">
-                            <h3 class="text-lg font-medium mb-4">Comments & Truck History</h3>
-
-                            <!-- Display latest tracking -->
-                            <div v-if="latestTrackingEvent" class="relative text-sm text-gray-500 mt-2">
-                              Latest:
-                              <strong class="capitalize">{{ latestTrackingEvent.status }}</strong> —
-                              {{ formatDate(latestTrackingEvent.timestamp) }}
-
-                              <!-- Delete Button -->
-                              <button @click="deleteTrackingEntry(latestTrackingEvent.id)"
-                                class="text-red-500 hover:text-red-700 absolute top-0 right-0" title="Delete Comment">
-                                🗑️
-                              </button>
-                            </div>
-
-                            <!-- Display existing comments -->
-                            <div v-if="editingCargo.tracking_history?.length > 0"
-                              class="space-y-4 mb-6 max-h-60 overflow-y-auto">
-                              <div v-for="entry in editingCargo.tracking_history" :key="entry.id" :class="[
-                                'p-4 rounded-md border-l-4',
-                                'bg-gray-50 border-l-gray-400'
-                              ]">
-                                <div class="flex justify-between items-start">
-                                  <div>
-                                    <p class="font-medium flex items-center gap-2">
-                                      {{ entry.comment.user_fullname || 'Unknown' }}
-                                    </p>
-                                    <p class="text-sm text-gray-500">{{ formatDate(entry.comment.timestamp) }}</p>
-                                  </div>
-                                </div>
-                                <p class="mt-2">{{ entry.comment.text || 'No comment' }}</p>
-                              </div>
-                            </div>
-                            <div v-else
-                              class="text-gray-500 mb-6 p-4 text-center border-2 border-dashed border-gray-200 rounded-md">
-                              No comments or tracking history yet
-                            </div>
-
-                            <!-- Add new comment form -->
-                            <div class="space-y-4 border-t pt-4">
-                              <div class="space-y-2">
-                                <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
-                                <textarea id="editCommentText" v-model="newComment.text" rows="3"
-                                  placeholder="Enter your comment here..."
-                                  class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                              </div>
-
-                              <div class="flex gap-2">
-                                <button @click="addComment" :disabled="!newComment.text.trim() || isAddingComment"
-                                  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                  <span v-if="!isAddingComment">Add Comment</span>
-                                  <span v-else class="flex items-center">
-                                    <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
-                                        fill="none" />
-                                      <path class="opacity-75" fill="white"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                    </svg>
-                                    Adding...
-                                  </span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                      <button
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-                        @click="closeEditModal">
-                        Cancel
-                      </button>
-                      <button type="submit" :disabled="isSubmitting"
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
-                        <span v-if="!isSubmitting">Update Cargo</span>
-                        <span v-else class="flex items-center">
-                          <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
-                              fill="none" />
-                            <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                          </svg>
-                          Updating...
-                        </span>
-                      </button>
-                    </div>
-                  </form>
                 </div>
               </div>
             </div>
           </div>
-          <!-- End of Cargo Management View -->
-
-          <!-- Customer Management View -->
-          <div v-if="currentView === 'customers'" class="space-y-6">
-
-            <!-- Header -->
-            <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
-              <div class="bg-[#273272] text-white p-6 rounded-t-lg flex justify-between items-center">
-                <div>
-                  <h2 class="text-xl font-semibold">Customer Management</h2>
-                  <p class="text-gray-200 text-sm">
-                    Manage customers and reuse them for recurring shipments
+          <!-- Delete Cargo Confirmation Modal -->
+          <div v-if="showDeleteCargoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
+                  <p class="text-sm text-muted-foreground">
+                    Are you sure you want to delete this cargo? This action cannot be undone.
                   </p>
                 </div>
 
-                <button @click="openAddCustomerModal"
-                  class="inline-flex items-center gap-2 bg-white text-[#273272] px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition">
-                  <PlusIcon class="h-4 w-4" />
-                  Add Customer
+                <div class="p-4 bg-red-50 rounded-md mb-4">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                      <div class="mt-2 text-sm text-red-700">
+                        <p>Deleting this cargo will remove all its shipment and tracking history.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="cargoToDelete" class="py-4 border-t border-b">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-[#273272]/10 flex items-center justify-center">
+                      <ArchiveBoxIcon class="h-5 w-5 text-[#273272]" />
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ cargoToDelete.container_number || 'N/A' }}
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        Truck: {{ cargoToDelete.truck_number || 'N/A' }},
+                        BL: {{ cargoToDelete.bl_number || 'N/A' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                    @click="closeDeleteCargoModal">
+                    Cancel
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2"
+                    @click="deleteCargo">
+                    Delete Cargo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Edit Cargo Modal -->
+          <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeEditModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Update Cargo Information</h2>
+                  <p class="text-sm text-muted-foreground">Update the cargo location and cargo status
+                    information.
+                  </p>
+                </div>
+                <form @submit.prevent="saveEditedCargo" class="space-y-4 py-4">
+                  <div v-if="editingCargo" class="space-y-4 py-4">
+                    <div class="flex justify-between items-center gap-4">
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-500">Container Number</p>
+                        <input id="container_number" type="text" v-model="editingCargo.container_number"
+                          class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-500">Truck Number</p>
+                        <input id="truck_number" type="text" v-model="editingCargo.truck_number"
+                          class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-500">BL Number</p>
+                        <input id="bl_number" type="text" v-model="editingCargo.bl_number"
+                          class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                    </div>
+                    <!-- Second Row — Cargo Type & Description -->
+                    <div class="flex justify-between items-center gap-4">
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-500">Cargo Type</p>
+                        <input id="bl_number" type="text" v-model="editingCargo.type" readonly
+                          class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 uppercase" />
+                      </div>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-500">Cargo Description</p>
+                        <input id="bl_number" type="text" v-model="editingCargo.description"
+                          class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                    </div>
+                    <div>
+                      <div
+                        class="w-full max-w-md mx-auto rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-1 flex">
+                        <button :class="[
+                          'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                          'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                          activeEditTab === 'location' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black' : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                        ]" @click="activeEditTab = 'location'">
+                          Location
+                        </button>
+                      </div>
+                      <div v-if="activeEditTab === 'location'" class="space-y-4 mt-4">
+
+                        <div class="space-y-2">
+                          <label for="currentLocation" class="text-sm font-medium">Current Location</label>
+                          <select id="currentLocation" v-model="editingCargo.current_location"
+                            @change="handleLocationChange"
+                            class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                            <option value="" disabled>Select location</option>
+                            <option v-for="location in activeLocations" :key="location.id" :value="location.name">
+                              {{ location.name }}
+                            </option>
+                          </select>
+                        </div>
+                        <div class="space-y-2">
+                          <label for="status" class="text-sm font-medium">Status</label>
+                          <select id="status" v-model="newTrackingStatus"
+                            :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
+                            <option value="" disabled>Select Status</option>
+                            <option v-for="opt in statusOptionsForTracking" :key="opt.value" :value="opt.value"
+                              :disabled="opt.disabled">
+                              {{ opt.label }}
+                            </option>
+                          </select>
+                          <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                          <div class="space-y-2"
+                            v-if="editingCargo.current_location !== editingCargo.final_destination">
+                            <label for="nextStop" class="text-sm font-medium">Next Stop</label>
+                            <select id="nextStop" v-model="editingCargo.next_stop"
+                              class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                              <option value="" disabled>Select next stop</option>
+                              <option v-for="location in activeLocations" :key="location.id" :value="location.name">
+                                {{ location.name }}
+                              </option>
+                            </select>
+                            <p class="text-xs text-gray-500">Automatically determined based on current location</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="nextStopETA" class="text-sm font-medium">
+                              {{ newTrackingStatus === 'delivered' ? 'Delivered on' : 'Next Stop ETA' }}
+                            </label>
+
+                            <input id="nextStopETA" type="datetime-local" v-model="editingCargo.next_stop_eta"
+                              class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                            <p class="text-xs text-gray-500">Estimated based on standard transit times</p>
+                          </div>
+                        </div>
+                        <!-- Comments Section -->
+                        <div class="mt-6 pt-6 border-t">
+                          <h3 class="text-lg font-medium mb-4">Comments & Truck History</h3>
+
+                          <!-- Display latest tracking -->
+                          <div v-if="latestTrackingEvent" class="relative text-sm text-gray-500 mt-2">
+                            Latest:
+                            <strong class="capitalize">{{ latestTrackingEvent.status }}</strong> —
+                            {{ formatDate(latestTrackingEvent.timestamp) }}
+
+                            <!-- Delete Button -->
+                            <button @click="deleteTrackingEntry(latestTrackingEvent.id)"
+                              class="text-red-500 hover:text-red-700 absolute top-0 right-0" title="Delete Comment">
+                              🗑️
+                            </button>
+                          </div>
+
+                          <!-- Display existing comments -->
+                          <div v-if="editingCargo.tracking_history?.length > 0"
+                            class="space-y-4 mb-6 max-h-60 overflow-y-auto">
+                            <div v-for="entry in editingCargo.tracking_history" :key="entry.id" :class="[
+                              'p-4 rounded-md border-l-4',
+                              'bg-gray-50 border-l-gray-400'
+                            ]">
+                              <div class="flex justify-between items-start">
+                                <div>
+                                  <p class="font-medium flex items-center gap-2">
+                                    {{ entry.comment.user_fullname || 'Unknown' }}
+                                  </p>
+                                  <p class="text-sm text-gray-500">{{ formatDate(entry.comment.timestamp) }}</p>
+                                </div>
+                              </div>
+                              <p class="mt-2">{{ entry.comment.text || 'No comment' }}</p>
+                            </div>
+                          </div>
+                          <div v-else
+                            class="text-gray-500 mb-6 p-4 text-center border-2 border-dashed border-gray-200 rounded-md">
+                            No comments or tracking history yet
+                          </div>
+
+                          <!-- Add new comment form -->
+                          <div class="space-y-4 border-t pt-4">
+                            <div class="space-y-2">
+                              <label for="editCommentText" class="text-sm font-medium">Add Comment</label>
+                              <textarea id="editCommentText" v-model="newComment.text" rows="3"
+                                placeholder="Enter your comment here..."
+                                class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                            </div>
+
+                            <div class="flex gap-2">
+                              <button @click="addComment" :disabled="!newComment.text.trim() || isAddingComment"
+                                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span v-if="!isAddingComment">Add Comment</span>
+                                <span v-else class="flex items-center">
+                                  <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                                      fill="none" />
+                                    <path class="opacity-75" fill="white"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                  </svg>
+                                  Adding...
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                    <button
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                      @click="closeEditModal">
+                      Cancel
+                    </button>
+                    <button type="submit" :disabled="isSubmitting"
+                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2">
+                      <span v-if="!isSubmitting">Update Cargo</span>
+                      <span v-else class="flex items-center">
+                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"
+                            fill="none" />
+                          <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Updating...
+                      </span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End of Cargo Management View -->
+
+        <!-- Customer Management View -->
+        <div v-if="currentView === 'customers'" class="space-y-6">
+
+          <!-- Header -->
+          <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
+            <div class="bg-[#273272] text-white p-6 rounded-t-lg flex justify-between items-center">
+              <div>
+                <h2 class="text-xl font-semibold">Customer Management</h2>
+                <p class="text-gray-200 text-sm">
+                  Manage customers and reuse them for recurring shipments
+                </p>
+              </div>
+
+              <button @click="openAddCustomerModal"
+                class="inline-flex items-center gap-2 bg-white text-[#273272] px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition">
+                <PlusIcon class="h-4 w-4" />
+                Add Customer
+              </button>
+            </div>
+
+            <!-- Search -->
+            <div class="p-4 border-b bg-gray-50">
+              <input v-model="customerSearch" placeholder="Search by name, phone or email..."
+                class="w-full max-w-md rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]" />
+            </div>
+
+            <!-- Customers Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-100 border-b">
+                  <tr>
+                    <th class="text-left px-4 py-3">Name</th>
+                    <th class="text-left px-4 py-3">Phone</th>
+                    <th class="text-left px-4 py-3">Email</th>
+                    <th class="text-left px-4 py-3">Location</th>
+                    <th class="text-left px-4 py-3">Status</th>
+                    <th class="text-right px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody v-if="customers.length">
+                  <tr v-for="customer in filteredCustomers" :key="customer.id" class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium">
+                      {{ customer.name }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                      {{ customer.phone }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                      {{ customer.email || '-' }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                      {{ customer.city }}, {{ customer.country }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <span class="px-2 py-1 rounded-full text-xs font-medium" :class="customer.is_active
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'">
+                        {{ customer.is_active ? 'Active' : 'Inactive' }}
+                      </span>
+                    </td>
+
+                    <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
+                      <div class="flex justify-end gap-1">
+                        <button @click="viewCustomerDetails(customer)"
+                          class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2">
+                          View
+                        </button>
+                        <button @click="editCustomer(customer)"
+                          class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2">
+                          <PencilIcon class="h-4 w-4 mr-1" />
+                        </button>
+
+                        <button v-if="customer.is_active" @click="deactivateCustomer(customer)"
+                          class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-8 px-2">
+                          <TrashIcon class="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+
+                <!-- Empty State -->
+                <tbody v-else>
+                  <tr>
+                    <td colspan="6" class="text-center py-10 text-gray-500">
+                      No customers found
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- View Customer Modal -->
+          <div v-if="showViewCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeViewCustomerModal">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-[600px] max-h-[90vh] overflow-hidden" @click.stop>
+
+              <!-- Header -->
+              <div class="px-6 py-4 border-b">
+                <h2 class="text-lg font-semibold text-gray-900">Customer Details</h2>
+                <p class="text-sm text-gray-500">
+                  View customer profile and contact information
+                </p>
+              </div>
+
+              <!-- Body -->
+              <div class="p-6 space-y-6 overflow-y-auto">
+
+                <!-- Status -->
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-gray-500">Status</span>
+                  <span class="px-3 py-1 rounded-full text-xs font-medium" :class="viewCustomer?.is_active
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'">
+                    {{ viewCustomer?.is_active ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+
+                <!-- Customer Info Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                  <div>
+                    <p class="text-xs uppercase text-gray-500">Name</p>
+                    <p class="mt-1 text-sm font-medium text-gray-900">
+                      {{ viewCustomer?.name }}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p class="text-xs uppercase text-gray-500">Phone</p>
+                    <p class="mt-1 text-sm text-gray-900">
+                      {{ viewCustomer?.phone }}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p class="text-xs uppercase text-gray-500">Email</p>
+                    <p class="mt-1 text-sm text-gray-900">
+                      {{ viewCustomer?.email || 'N/A' }}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p class="text-xs uppercase text-gray-500">City / County</p>
+                    <p class="mt-1 text-sm text-gray-900">
+                      {{ viewCustomer?.city || '-' }} / {{ viewCustomer?.county || '-' }}
+                    </p>
+                  </div>
+
+                  <!-- Address Full Width -->
+                  <div class="sm:col-span-2">
+                    <p class="text-xs uppercase text-gray-500">Address</p>
+                    <p class="mt-1 text-sm text-gray-900">
+                      {{ viewCustomer?.address || 'N/A' }}
+                    </p>
+                  </div>
+
+                  <div class="sm:col-span-2">
+                    <p class="text-xs uppercase text-gray-500">Country</p>
+                    <p class="mt-1 text-sm text-gray-900">
+                      {{ viewCustomer?.country || 'N/A' }}
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="px-6 py-4 border-t flex justify-end gap-2">
+                <button @click="closeViewCustomerModal"
+                  class="px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50">
+                  Close
                 </button>
               </div>
 
-              <!-- Search -->
-              <div class="p-4 border-b bg-gray-50">
-                <input v-model="customerSearch" placeholder="Search by name, phone or email..."
-                  class="w-full max-w-md rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]" />
-              </div>
-
-              <!-- Customers Table -->
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead class="bg-gray-100 border-b">
-                    <tr>
-                      <th class="text-left px-4 py-3">Name</th>
-                      <th class="text-left px-4 py-3">Phone</th>
-                      <th class="text-left px-4 py-3">Email</th>
-                      <th class="text-left px-4 py-3">Location</th>
-                      <th class="text-left px-4 py-3">Status</th>
-                      <th class="text-right px-4 py-3">Actions</th>
-                    </tr>
-                  </thead>
-
-                  <tbody v-if="customers.length">
-                    <tr v-for="customer in filteredCustomers" :key="customer.id" class="border-b hover:bg-gray-50">
-                      <td class="px-4 py-3 font-medium">
-                        {{ customer.name }}
-                      </td>
-
-                      <td class="px-4 py-3">
-                        {{ customer.phone }}
-                      </td>
-
-                      <td class="px-4 py-3">
-                        {{ customer.email || '-' }}
-                      </td>
-
-                      <td class="px-4 py-3">
-                        {{ customer.city }}, {{ customer.country }}
-                      </td>
-
-                      <td class="px-4 py-3">
-                        <span class="px-2 py-1 rounded-full text-xs font-medium" :class="customer.is_active
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-red-100 text-red-700'">
-                          {{ customer.is_active ? 'Active' : 'Inactive' }}
-                        </span>
-                      </td>
-
-                      <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
-                        <div class="flex justify-end gap-1">
-                          <button @click="viewCustomerDetails(customer)"
-                            class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2">
-                            View
-                          </button>
-                          <button @click="editCustomer(customer)"
-                            class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2">
-                            <PencilIcon class="h-4 w-4 mr-1" />
-                          </button>
-
-                          <button v-if="customer.is_active" @click="deactivateCustomer(customer.id)"
-                            class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 h-8 px-2">
-                            <TrashIcon class="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-
-                  <!-- Empty State -->
-                  <tbody v-else>
-                    <tr>
-                      <td colspan="6" class="text-center py-10 text-gray-500">
-                        No customers found
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
+          </div>
 
-            <!-- View Customer Modal -->
-            <div v-if="showViewCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeViewCustomerModal">
-              <div class="bg-white rounded-lg shadow-xl w-full max-w-[600px] max-h-[90vh] overflow-hidden" @click.stop>
 
+
+          <!-- Edit Customer Modal -->
+          <div v-if="showEditCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeEditCustomerModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
+
+              <div class="p-6">
                 <!-- Header -->
-                <div class="px-6 py-4 border-b">
-                  <h2 class="text-lg font-semibold text-gray-900">Customer Details</h2>
-                  <p class="text-sm text-gray-500">
-                    View customer profile and contact information
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Edit Customer</h2>
+                  <p class="text-sm text-muted-foreground">
+                    Update customer details below.
                   </p>
                 </div>
 
-                <!-- Body -->
-                <div class="p-6 space-y-6 overflow-y-auto">
+                <!-- Form -->
+                <div class="space-y-4">
 
-                  <!-- Status -->
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-gray-500">Status</span>
-                    <span class="px-3 py-1 rounded-full text-xs font-medium" :class="viewCustomer?.is_active
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'">
-                      {{ viewCustomer?.is_active ? 'Active' : 'Inactive' }}
-                    </span>
-                  </div>
-
-                  <!-- Customer Info Grid -->
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                    <div>
-                      <p class="text-xs uppercase text-gray-500">Name</p>
-                      <p class="mt-1 text-sm font-medium text-gray-900">
-                        {{ viewCustomer?.name }}
-                      </p>
+                  <div class="grid grid-cols-2 gap-4">
+                    <!-- Name -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Name</label>
+                      <input v-model="editingCustomer.name"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.name ? 'border-red-500' : '']"
+                        placeholder="Customer name" />
+                      <p v-if="editFormErrors.name" class="text-red-500 text-sm">{{ editFormErrors.name }}</p>
                     </div>
 
-                    <div>
-                      <p class="text-xs uppercase text-gray-500">Phone</p>
-                      <p class="mt-1 text-sm text-gray-900">
-                        {{ viewCustomer?.phone }}
-                      </p>
+                    <!-- Phone -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Phone</label>
+                      <input v-model="editingCustomer.phone"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.phone ? 'border-red-500' : '']"
+                        placeholder="Phone number" />
+                      <p v-if="editFormErrors.phone" class="text-red-500 text-sm">{{ editFormErrors.phone }}</p>
                     </div>
 
-                    <div>
-                      <p class="text-xs uppercase text-gray-500">Email</p>
-                      <p class="mt-1 text-sm text-gray-900">
-                        {{ viewCustomer?.email || 'N/A' }}
-                      </p>
+                    <!-- Email -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Email</label>
+                      <input type="email" v-model="editingCustomer.email"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.email ? 'border-red-500' : '']"
+                        placeholder="Email address" />
+                      <p v-if="editFormErrors.email" class="text-red-500 text-sm">{{ editFormErrors.email }}</p>
                     </div>
 
-                    <div>
-                      <p class="text-xs uppercase text-gray-500">City / County</p>
-                      <p class="mt-1 text-sm text-gray-900">
-                        {{ viewCustomer?.city || '-' }} / {{ viewCustomer?.county || '-' }}
-                      </p>
+                    <!-- Country -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Country</label>
+                      <input v-model="editingCustomer.country"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.country ? 'border-red-500' : '']"
+                        placeholder="Country" />
+                      <p v-if="editFormErrors.country" class="text-red-500 text-sm">{{ editFormErrors.country }}</p>
                     </div>
 
-                    <!-- Address Full Width -->
-                    <div class="sm:col-span-2">
-                      <p class="text-xs uppercase text-gray-500">Address</p>
-                      <p class="mt-1 text-sm text-gray-900">
-                        {{ viewCustomer?.address || 'N/A' }}
-                      </p>
+                    <!-- City -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">City/Town</label>
+                      <input v-model="editingCustomer.city"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.city ? 'border-red-500' : '']"
+                        placeholder="City or Town" />
+                      <p v-if="editFormErrors.city" class="text-red-500 text-sm">{{ editFormErrors.city }}</p>
                     </div>
 
-                    <div class="sm:col-span-2">
-                      <p class="text-xs uppercase text-gray-500">Country</p>
-                      <p class="mt-1 text-sm text-gray-900">
-                        {{ viewCustomer?.country || 'N/A' }}
-                      </p>
+                    <!-- County -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">County</label>
+                      <input v-model="editingCustomer.county"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.county ? 'border-red-500' : '']"
+                        placeholder="County" />
+                      <p v-if="editFormErrors.county" class="text-red-500 text-sm">{{ editFormErrors.county }}</p>
                     </div>
 
+                    <!-- Address -->
+                    <div class="col-span-2 space-y-2">
+                      <label class="text-sm font-medium">Street Address</label>
+                      <input v-model="editingCustomer.address"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.address ? 'border-red-500' : '']"
+                        placeholder="Street address" />
+                      <p v-if="editFormErrors.address" class="text-red-500 text-sm">{{ editFormErrors.address }}</p>
+                    </div>
+
+                    <!-- Active Status -->
+                    <div class="flex items-center gap-3 mt-2 col-span-2">
+                      <label class="text-sm font-medium">Active</label>
+                      <button @click="editingCustomer.is_active = !editingCustomer.is_active"
+                        :class="['relative inline-flex h-6 w-11 items-center rounded-full transition', editingCustomer.is_active ? 'bg-green-500' : 'bg-gray-400']">
+                        <span
+                          :class="['inline-block h-4 w-4 transform rounded-full bg-white transition', editingCustomer.is_active ? 'translate-x-6' : 'translate-x-1']"></span>
+                      </button>
+
+                    </div>
                   </div>
                 </div>
 
-                <!-- Footer -->
-                <div class="px-6 py-4 border-t flex justify-end gap-2">
-                  <button @click="closeViewCustomerModal"
-                    class="px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50">
-                    Close
+                <!-- Modal Actions -->
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-gray-100 h-10 px-4 py-2"
+                    @click="closeEditCustomerModal">
+                    Cancel
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                    @click="submitEditCustomer">
+                    Save Changes
                   </button>
                 </div>
 
               </div>
             </div>
+          </div>
 
+          <!-- Add Customer Modal -->
+          <div v-if="showAddCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            @click="closeAddCustomerModal">
+            <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
 
+              <div class="p-6">
+                <!-- Header -->
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Customer</h2>
+                  <p class="text-sm text-muted-foreground">
+                    Enter customer details to reuse for recurring shipments.
+                  </p>
+                </div>
 
-            <!-- Edit Customer Modal -->
-            <div v-if="showEditCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeEditCustomerModal">
-              <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
+                <!-- Form -->
+                <div class="space-y-4">
 
-                <div class="p-6">
-                  <!-- Header -->
-                  <div class="flex flex-col space-y-1.5 pb-4">
-                    <h2 class="text-lg font-semibold leading-none tracking-tight">Edit Customer</h2>
-                    <p class="text-sm text-muted-foreground">
-                      Update customer details below.
-                    </p>
+                  <div class="grid grid-cols-2 gap-4">
+                    <!-- Name -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Name</label>
+                      <input v-model="newCustomer.name"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.name ? 'border-red-500' : '']"
+                        placeholder="Customer name" />
+                      <p v-if="formErrors.name" class="text-red-500 text-sm">{{ formErrors.name }}</p>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Phone</label>
+                      <input v-model="newCustomer.phone"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.phone ? 'border-red-500' : '']"
+                        placeholder="Phone number" />
+                      <p v-if="formErrors.phone" class="text-red-500 text-sm">{{ formErrors.phone }}</p>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Email</label>
+                      <input type="email" v-model="newCustomer.email"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.email ? 'border-red-500' : '']"
+                        placeholder="Email address" />
+                      <p v-if="formErrors.email" class="text-red-500 text-sm">{{ formErrors.email }}</p>
+                    </div>
+
+                    <!-- Country -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Country</label>
+                      <input v-model="newCustomer.country"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.country ? 'border-red-500' : '']"
+                        placeholder="Country" />
+                      <p v-if="formErrors.country" class="text-red-500 text-sm">{{ formErrors.country }}</p>
+                    </div>
+
+                    <!-- City -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">City/Town</label>
+                      <input v-model="newCustomer.city"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.city ? 'border-red-500' : '']"
+                        placeholder="City or Town" />
+                      <p v-if="formErrors.city" class="text-red-500 text-sm">{{ formErrors.city }}</p>
+                    </div>
+
+                    <!-- County -->
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">County</label>
+                      <input v-model="newCustomer.county"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.county ? 'border-red-500' : '']"
+                        placeholder="County" />
+                      <p v-if="formErrors.county" class="text-red-500 text-sm">{{ formErrors.county }}</p>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-span-2 space-y-2">
+                      <label class="text-sm font-medium">Street Address</label>
+                      <input v-model="newCustomer.address"
+                        :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.address ? 'border-red-500' : '']"
+                        placeholder="Street address" />
+                      <p v-if="formErrors.address" class="text-red-500 text-sm">{{ formErrors.address }}</p>
+                    </div>
+
+                    <!-- Active Status -->
+                    <div class="flex items-center gap-3 mt-2 col-span-2">
+                      <label class="text-sm font-medium">Active</label>
+                      <button @click="newCustomer.is_active = !newCustomer.is_active"
+                        :class="['relative inline-flex h-6 w-11 items-center rounded-full transition', newCustomer.is_active ? 'bg-green-500' : 'bg-gray-400']">
+                        <span
+                          :class="['inline-block h-4 w-4 transform rounded-full bg-white transition', newCustomer.is_active ? 'translate-x-6' : 'translate-x-1']"></span>
+                      </button>
+                    </div>
                   </div>
+                </div>
 
-                  <!-- Form -->
-                  <div class="space-y-4">
+                <!-- Modal Actions -->
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-gray-100 h-10 px-4 py-2"
+                    @click="closeAddCustomerModal">
+                    Cancel
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
+                    @click="submitNewCustomer">
+                    Add Customer
+                  </button>
+                </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                      <!-- Name -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">Name</label>
-                        <input v-model="editingCustomer.name"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.name ? 'border-red-500' : '']"
-                          placeholder="Customer name" />
-                        <p v-if="editFormErrors.name" class="text-red-500 text-sm">{{ editFormErrors.name }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete Customer Modal -->
+          <div v-if="showDeleteCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full" @click.stop>
+              <div class="p-6">
+                <div class="flex flex-col space-y-1.5 pb-4">
+                  <h2 class="text-lg font-semibold leading-none tracking-tight">Confirm Delete</h2>
+                  <p class="text-sm text-muted-foreground">
+                    Are you sure you want to delete this customer? This action cannot be undone.
+                  </p>
+                </div>
+
+                <div class="p-4 bg-red-50 rounded-md mb-4">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+                    </div>
+
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                      <div class="mt-2 text-sm text-red-700">
+                        <p>Deleting this customer will remove all associated data.</p>
                       </div>
-
-                      <!-- Phone -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">Phone</label>
-                        <input v-model="editingCustomer.phone"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.phone ? 'border-red-500' : '']"
-                          placeholder="Phone number" />
-                        <p v-if="editFormErrors.phone" class="text-red-500 text-sm">{{ editFormErrors.phone }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="customerToDelete" class="py-4 border-t border-b">
+                    <div class="flex items-center">
+                      <div
+                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-[#273272] font-medium">
+                        {{ getInitials(customerToDelete.name) }}
                       </div>
-
-                      <!-- Email -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">Email</label>
-                        <input type="email" v-model="editingCustomer.email"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.email ? 'border-red-500' : '']"
-                          placeholder="Email address" />
-                        <p v-if="editFormErrors.email" class="text-red-500 text-sm">{{ editFormErrors.email }}</p>
-                      </div>
-
-                      <!-- Country -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">Country</label>
-                        <input v-model="editingCustomer.country"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.country ? 'border-red-500' : '']"
-                          placeholder="Country" />
-                        <p v-if="editFormErrors.country" class="text-red-500 text-sm">{{ editFormErrors.country }}</p>
-                      </div>
-
-                      <!-- City -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">City/Town</label>
-                        <input v-model="editingCustomer.city"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.city ? 'border-red-500' : '']"
-                          placeholder="City or Town" />
-                        <p v-if="editFormErrors.city" class="text-red-500 text-sm">{{ editFormErrors.city }}</p>
-                      </div>
-
-                      <!-- County -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">County</label>
-                        <input v-model="editingCustomer.county"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.county ? 'border-red-500' : '']"
-                          placeholder="County" />
-                        <p v-if="editFormErrors.county" class="text-red-500 text-sm">{{ editFormErrors.county }}</p>
-                      </div>
-
-                      <!-- Address -->
-                      <div class="col-span-2 space-y-2">
-                        <label class="text-sm font-medium">Street Address</label>
-                        <input v-model="editingCustomer.address"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', editFormErrors.address ? 'border-red-500' : '']"
-                          placeholder="Street address" />
-                        <p v-if="editFormErrors.address" class="text-red-500 text-sm">{{ editFormErrors.address }}</p>
-                      </div>
-
-                      <!-- Active Status -->
-                      <div class="flex items-center gap-3 mt-2 col-span-2">
-                        <label class="text-sm font-medium">Active</label>
-                        <button @click="editingCustomer.is_active = !editingCustomer.is_active"
-                          :class="['relative inline-flex h-6 w-11 items-center rounded-full transition', editingCustomer.is_active ? 'bg-green-500' : 'bg-gray-400']">
-                          <span
-                            :class="['inline-block h-4 w-4 transform rounded-full bg-white transition', editingCustomer.is_active ? 'translate-x-6' : 'translate-x-1']"></span>
-                        </button>
-
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ customerToDelete.name }}</div>
+                        <div class="text-sm text-gray-500">{{ customerToDelete.email }}</div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Modal Actions -->
-                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-gray-100 h-10 px-4 py-2"
-                      @click="closeEditCustomerModal">
-                      Cancel
-                    </button>
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                      @click="submitEditCustomer">
-                      Save Changes
-                    </button>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-            <!-- Add Customer Modal -->
-            <div v-if="showAddCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeAddCustomerModal">
-              <div class="bg-white rounded-lg shadow-lg max-w-[600px] w-full max-h-[90vh] overflow-auto" @click.stop>
-
-                <div class="p-6">
-                  <!-- Header -->
-                  <div class="flex flex-col space-y-1.5 pb-4">
-                    <h2 class="text-lg font-semibold leading-none tracking-tight">Add New Customer</h2>
-                    <p class="text-sm text-muted-foreground">
-                      Enter customer details to reuse for recurring shipments.
-                    </p>
-                  </div>
-
-                  <!-- Form -->
-                  <div class="space-y-4">
-
-                    <div class="grid grid-cols-2 gap-4">
-                      <!-- Name -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">Name</label>
-                        <input v-model="newCustomer.name"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.name ? 'border-red-500' : '']"
-                          placeholder="Customer name" />
-                        <p v-if="formErrors.name" class="text-red-500 text-sm">{{ formErrors.name }}</p>
-                      </div>
-
-                      <!-- Phone -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">Phone</label>
-                        <input v-model="newCustomer.phone"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.phone ? 'border-red-500' : '']"
-                          placeholder="Phone number" />
-                        <p v-if="formErrors.phone" class="text-red-500 text-sm">{{ formErrors.phone }}</p>
-                      </div>
-
-                      <!-- Email -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">Email</label>
-                        <input type="email" v-model="newCustomer.email"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.email ? 'border-red-500' : '']"
-                          placeholder="Email address" />
-                        <p v-if="formErrors.email" class="text-red-500 text-sm">{{ formErrors.email }}</p>
-                      </div>
-
-                      <!-- Country -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">Country</label>
-                        <input v-model="newCustomer.country"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.country ? 'border-red-500' : '']"
-                          placeholder="Country" />
-                        <p v-if="formErrors.country" class="text-red-500 text-sm">{{ formErrors.country }}</p>
-                      </div>
-
-                      <!-- City -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">City/Town</label>
-                        <input v-model="newCustomer.city"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.city ? 'border-red-500' : '']"
-                          placeholder="City or Town" />
-                        <p v-if="formErrors.city" class="text-red-500 text-sm">{{ formErrors.city }}</p>
-                      </div>
-
-                      <!-- County -->
-                      <div class="space-y-2">
-                        <label class="text-sm font-medium">County</label>
-                        <input v-model="newCustomer.county"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.county ? 'border-red-500' : '']"
-                          placeholder="County" />
-                        <p v-if="formErrors.county" class="text-red-500 text-sm">{{ formErrors.county }}</p>
-                      </div>
-
-                      <!-- Address -->
-                      <div class="col-span-2 space-y-2">
-                        <label class="text-sm font-medium">Street Address</label>
-                        <input v-model="newCustomer.address"
-                          :class="['flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-[#273272]', formErrors.address ? 'border-red-500' : '']"
-                          placeholder="Street address" />
-                        <p v-if="formErrors.address" class="text-red-500 text-sm">{{ formErrors.address }}</p>
-                      </div>
-
-                      <!-- Active Status -->
-                      <div class="flex items-center gap-3 mt-2 col-span-2">
-                        <label class="text-sm font-medium">Active</label>
-                        <button @click="newCustomer.is_active = !newCustomer.is_active"
-                          :class="['relative inline-flex h-6 w-11 items-center rounded-full transition', newCustomer.is_active ? 'bg-green-500' : 'bg-gray-400']">
-                          <span
-                            :class="['inline-block h-4 w-4 transform rounded-full bg-white transition', newCustomer.is_active ? 'translate-x-6' : 'translate-x-1']"></span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Modal Actions -->
-                  <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-gray-100 h-10 px-4 py-2"
-                      @click="closeAddCustomerModal">
-                      Cancel
-                    </button>
-                    <button
-                      class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-[#273272] text-white hover:bg-[#1e2759] h-10 px-4 py-2"
-                      @click="submitNewCustomer">
-                      Add Customer
-                    </button>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-            <!-- Delete Customer Modal -->
-            <div v-if="showDeleteCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              @click="closeDeleteCustomerModal">
-              <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6" @click.stop>
-                <h2 class="text-lg font-semibold mb-4">Delete Customer</h2>
-                <p class="text-gray-600 mb-6">
-                  Are you sure you want to delete <span class="font-medium">{{ customerToDelete?.name }}</span>? This
-                  action cannot be undone.
-                </p>
-
-                <div class="flex justify-end gap-2">
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
                   <button @click="closeDeleteCustomerModal"
-                    class="px-4 py-2 rounded-md border hover:bg-gray-100 text-sm">
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
                     Cancel
                   </button>
                   <button @click="deleteCustomer"
-                    class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 text-sm">
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 text-white hover:bg-red-700 h-10 px-4 py-2">
                     Delete
                   </button>
                 </div>
               </div>
             </div>
-
           </div>
           <!-- End Customer Management Modal -->
 
@@ -3310,10 +3336,7 @@ const openAddCustomerModal = () => {
   showAddCustomerModal.value = true
 }
 
-const deactivateCustomer = async (id) => {
-  await CustomerServices.deleteCustomer(id)
-  await fetchCustomers()
-}
+
 
 const fetchCustomers = async () => {
   const res = await CustomerServices.getCustomers()
@@ -3453,6 +3476,11 @@ const submitEditCustomer = async () => {
 
 const showDeleteCustomerModal = ref(false)
 const customerToDelete = ref(null)
+
+const deactivateCustomer = async (customer) => {
+  customerToDelete.value = customer
+  showDeleteCustomerModal.value = true
+}
 
 const closeDeleteCustomerModal = () => {
   customerToDelete.value = null
