@@ -18,10 +18,10 @@ exports.sendCargoDispatch = (email, fullname, blnNumber, currentLocation, finalD
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
-        subject: 'Cargo Dispatch Notification',
+        subject: 'Cargo Clearance Notification',
         html: `<html>
         <head>
-            <title>Cargo Dispatch Notification</title>
+            <title>Cargo Clearance Notification</title>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
@@ -70,9 +70,9 @@ exports.sendCargoDispatch = (email, fullname, blnNumber, currentLocation, finalD
         </head>
         <body>
             <div class="container">
-                <h1>Cargo Dispatched</h1>
+                <h1>Cargo Clearance</h1>
                 <p>Dear ${fullname},</p>
-                <p>Your cargo has been dispatched. Please find the details below:</p>
+                <p>Your cargo has been cleared for dispatch. Please find the details below:</p>
                 <ul>
                     <li><strong>BLN Number:</strong> ${blnNumber}</li>
                     <li><strong>Current Location:</strong> ${currentLocation}</li>

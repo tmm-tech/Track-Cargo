@@ -528,7 +528,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div class="flex justify-end gap-2">
-                            <button 
+                            <button
                               class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
                               @click="editUser(user)">
                               <PencilIcon class="h-4 w-4 mr-1" />
@@ -906,10 +906,10 @@
                           <th scope="col"
                             class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             BL #</th>
-                             <th scope="col"
+                          <th scope="col"
                             class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Client Name</th>
-                             <th scope="col"
+                          <th scope="col"
                             class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Client Email</th>
                           <th scope="col"
@@ -976,7 +976,7 @@
                                 @click="viewCargoDetails(pkg)" title="View Details">
                                 View
                               </button>
-                            
+
                               <button v-if="pkg.status !== 'container returned'"
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
                                 @click="editCargo(pkg)" title="Edit Cargo">
@@ -1022,7 +1022,7 @@
                               </path>
                             </svg>
                           </button>
-                          <button v-if="pkg.status !== 'container returned'" @click="editCargo(pkg)" 
+                          <button v-if="pkg.status !== 'container returned'" @click="editCargo(pkg)"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="Edit Details">
                             <PencilIcon class="h-4 w-4" />
@@ -1050,25 +1050,28 @@
                           <span v-if="pkg.status === 'delivered'"
                             class="text-gray-900 text-right flex-1 ml-2 truncate">N/A</span>
                           <span v-else class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.next_stop || 'N/A'
-                            }}</span>
+                          }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Client Name:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.shipping_address.recipientName || 'N/A'
-                            }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{
+                            pkg.shipping_address.recipientName || 'N/A'
+                          }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Client Email:</span>
-                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.shipping_address.email || 'N/A'
-                            }}</span>
+                          <span class="text-gray-900 text-right flex-1 ml-2 truncate">{{ pkg.shipping_address.email ||
+                            'N/A'
+                          }}</span>
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">ETA:</span>
                           <span v-if="pkg.status === 'delivered'"
                             class="text-gray-900 text-right flex-1 ml-2 truncate">Delivered</span>
-                          <span v-else class="text-gray-900 text-right flex-1 ml-2 truncate">{{ formatDate(pkg.next_stop_eta)
+                          <span v-else class="text-gray-900 text-right flex-1 ml-2 truncate">{{
+                            formatDate(pkg.next_stop_eta)
                             || 'N/A' }}</span>
-                         
+
                         </div>
                         <div class="flex justify-between">
                           <span class="text-gray-500">Updated:</span>
@@ -1103,7 +1106,7 @@
                       </div>
                       <div>
                         <p class="text-sm font-medium text-gray-500">Cargo Description</p>
-                        <p class="text-lg">{{ viewingCargo.description}}</p>
+                        <p class="text-lg">{{ viewingCargo.description }}</p>
                       </div>
                       <div>
                         <p class="text-sm font-medium text-gray-500">Weight</p>
@@ -1156,7 +1159,7 @@
 
                         <!-- Not Required -->
                         <div v-if="!viewingCargo.clearance || viewingCargo.clearance.status === 'not_required'"
-                            class="text-gray-500 italic">
+                          class="text-gray-500 italic">
                           Clearance not required for this Cargo.
                         </div>
 
@@ -1367,19 +1370,15 @@
                       ]" @click="addCargoTab = 'address'">
                         Client Details
                       </button>
-                      <button
-                          v-if="cargoClearanceEnabled"
-                          :class="[
-                            'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
-                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                            addCargoTab === 'clearance'
-                              ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black'
-                              : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-                          ]"
-                          @click="addCargoTab = 'clearance'"
-                        >
-                          Cargo Clearance
-                        </button>
+                      <button v-if="cargoClearanceEnabled" :class="[
+                        'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
+                        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                        addCargoTab === 'clearance'
+                          ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-200 dark:text-black'
+                          : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
+                      ]" @click="addCargoTab = 'clearance'">
+                        Cargo Clearance
+                      </button>
                       <button :class="[
                         'flex-1 text-sm font-medium rounded-md px-4 py-2 transition-colors duration-200',
                         'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
@@ -1398,6 +1397,18 @@
                     <div v-if="addCargoTab === 'address'" class="space-y-4 mt-4">
                       <div class="space-y-2">
                         <div class="grid grid-cols-2 gap-4 mb-4">
+                          <div class="space-y-2">
+                            <label class="text-sm font-medium">Select Existing Client</label>
+
+                            <select v-model="selectedClientId" @change="onClientSelected"
+                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring">
+                              <option value="">New Client</option>
+                              <option v-for="client in clients" :key="client.id" :value="client.id">
+                                {{ client.name }} — {{ client.phone }}
+                              </option>
+                            </select>
+                          </div>
+
                           <div class="space-y-2">
                             <label for="recipientName" class="text-sm font-medium">Client Name</label>
                             <input id="recipientName" v-model="newCargo.shipping_address.recipientName"
@@ -1449,22 +1460,19 @@
                               class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
                           </div>
                           <div class="flex items-center gap-3 mt-4">
-                          <label class="text-sm font-medium">Cargo Clearance</label>
-                        
-                          <button
-                            @click="cargoClearanceEnabled = !cargoClearanceEnabled"
-                            :class="[
+                            <label class="text-sm font-medium">Cargo Clearance</label>
+
+                            <button @click="cargoClearanceEnabled = !cargoClearanceEnabled" :class="[
                               'relative inline-flex h-6 w-11 items-center rounded-full transition',
                               cargoClearanceEnabled ? 'bg-blue-500' : 'bg-gray-400'
                             ]">
-                              <span
-                                :class="[
-                                  'inline-block h-4 w-4 transform rounded-full bg-white transition',
-                                  cargoClearanceEnabled ? 'translate-x-6' : 'translate-x-1'
-                                ]">
+                              <span :class="[
+                                'inline-block h-4 w-4 transform rounded-full bg-white transition',
+                                cargoClearanceEnabled ? 'translate-x-6' : 'translate-x-1'
+                              ]">
                               </span>
-                          </button>
-                        </div>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1474,98 +1482,77 @@
                           <!-- File Reference -->
                           <div class="space-y-2">
                             <label class="text-sm font-medium">File Reference</label>
-                            <input
-                              v-model="clearance.fileReference"
+                            <input v-model="clearance.fileReference"
                               class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Enter file reference"
-                            />
+                              placeholder="Enter file reference" />
                           </div>
-                      
+
                           <!-- Bill of Lading -->
                           <div class="space-y-2">
                             <label class="text-sm font-medium">Bill of Lading</label>
-                            <input
-                              v-model="clearance.billOfLading"
+                            <input v-model="clearance.billOfLading"
                               class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Enter bill of lading"
-                            />
+                              placeholder="Enter bill of lading" />
                           </div>
-                      
+
                           <!-- Vessel Name -->
                           <div class="space-y-2">
                             <label class="text-sm font-medium">Vessel Name</label>
-                            <input
-                              v-model="clearance.vesselName"
+                            <input v-model="clearance.vesselName"
                               class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Enter vessel name"
-                            />
+                              placeholder="Enter vessel name" />
                           </div>
-                      
+
                           <!-- ETA -->
                           <div class="space-y-2">
                             <label class="text-sm font-medium">ETA</label>
-                            <input
-                              type="date"
-                              v-model="clearance.eta"
-                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                            />
+                            <input type="date" v-model="clearance.eta"
+                              class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring" />
                           </div>
-                      
+
                           <!-- Client Details -->
                           <div class="col-span-2 space-y-2">
                             <label class="text-sm font-medium">Client Details</label>
-                            <textarea
-                              v-model="clearance.clientDetails"
-                              rows="2"
+                            <textarea v-model="clearance.clientDetails" rows="2"
                               class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Enter client details"
-                            ></textarea>
+                              placeholder="Enter client details"></textarea>
                           </div>
-                      
+
                           <!-- Cargo Description -->
                           <div class="col-span-2 space-y-2">
                             <label class="text-sm font-medium">Cargo Description</label>
-                            <textarea
-                              v-model="clearance.cargoDescription"
-                              rows="2"
+                            <textarea v-model="clearance.cargoDescription" rows="2"
                               class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Describe the cargo"
-                            ></textarea>
+                              placeholder="Describe the cargo"></textarea>
                           </div>
-                      
+
                           <!-- Net Weight -->
                           <div class="space-y-2">
                             <label class="text-sm font-medium">Net Weight</label>
-                            <input
-                              v-model="clearance.netWeight"
+                            <input v-model="clearance.netWeight"
                               class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Net weight"
-                            />
+                              placeholder="Net weight" />
                           </div>
-                      
+
                           <!-- Gross Weight -->
                           <div class="space-y-2">
                             <label class="text-sm font-medium">Gross Weight</label>
-                            <input
-                              v-model="clearance.grossWeight"
+                            <input v-model="clearance.grossWeight"
                               class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Gross weight"
-                            />
+                              placeholder="Gross weight" />
                           </div>
-                      
+
                           <!-- Container Number -->
                           <div class="col-span-2 space-y-2">
                             <label class="text-sm font-medium">Container Number</label>
-                            <input
-                              v-model="clearance.containerNumber"
+                            <input v-model="clearance.containerNumber"
                               class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Container number"
-                            />
+                              placeholder="Container number" />
                           </div>
-                      
-                        </div>
+
                         </div>
                       </div>
+                    </div>
                     <div v-if="addCargoTab === 'details'" class="space-y-4 mt-4">
                       <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
@@ -1606,13 +1593,9 @@
                           <label for="description" class="text-sm font-medium mt-2 block">
                             Cargo Description
                           </label>
-                          <textarea
-                            id="description"
-                            v-model="newCargo.description"
-                            rows="2"
+                          <textarea id="description" v-model="newCargo.description" rows="2"
                             placeholder="Enter cargo description or comments..."
-                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                          ></textarea>
+                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"></textarea>
                         </div>
                         <div class="space-y-2">
                           <label for="weight" class="text-sm font-medium">Weight (kg)</label>
@@ -1703,11 +1686,9 @@
                             <select id="status" v-model="newStop.status"
                               :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
                               <option value="" disabled selected>Select Status</option>
-                               <option v-for="opt in statusOptionsForStop"
-                                      :key="opt.value"
-                                      :value="opt.value"
-                                      :disabled="opt.disabled">
-                                  {{ opt.label }}
+                              <option v-for="opt in statusOptionsForStop" :key="opt.value" :value="opt.value"
+                                :disabled="opt.disabled">
+                                {{ opt.label }}
                               </option>
                             </select>
                             <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
@@ -1885,7 +1866,7 @@
                             class="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
                         </div>
                       </div>
-                          <!-- Second Row — Cargo Type & Description -->
+                      <!-- Second Row — Cargo Type & Description -->
                       <div class="flex justify-between items-center gap-4">
                         <div class="flex-1">
                           <p class="text-sm font-medium text-gray-500">Cargo Type</p>
@@ -1927,11 +1908,9 @@
                             <select id="status" v-model="newTrackingStatus"
                               :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2', stopErrors.status ? 'border-red-500' : '']">
                               <option value="" disabled>Select Status</option>
-                              <option v-for="opt in statusOptionsForTracking"
-                                      :key="opt.value"
-                                      :value="opt.value"
-                                      :disabled="opt.disabled">
-                                  {{ opt.label }}
+                              <option v-for="opt in statusOptionsForTracking" :key="opt.value" :value="opt.value"
+                                :disabled="opt.disabled">
+                                {{ opt.label }}
                               </option>
                             </select>
                             <p v-if="stopErrors.status" class="text-red-500 text-sm">{{ stopErrors.status }}</p>
@@ -3360,7 +3339,7 @@ const openAddCargoModal = () => {
 }
 
 const closeAddModal = () => {
-   // Save draft when closing
+  // Save draft when closing
   if (Object.values(newCargo.value).some(val => val !== '' && val !== null)) {
     saveCargoDraft(newCargo.value)
   } else {
@@ -3406,9 +3385,10 @@ const addNewCargo = async () => {
         status: stop.status,
         comment: stop.comment
       })),
-       // Include clearance data if enabled
+      // Include clearance data if enabled
       clearance: cargoClearanceEnabled.value ? { status: "required", ...clearance.value } : {
-  status: "not_required", message: "Not Applicable (Clearance Not Required)"},
+        status: "not_required", message: "Not Applicable (Clearance Not Required)"
+      },
     }
 
     try {
@@ -3736,7 +3716,7 @@ const getActivityColor = (type) => {
     'cargo_created': 'bg-blue-100 text-blue-600',
     'cargo_updated': 'bg-yellow-100 text-yellow-600',
     'cargo_deleted': 'bg-red-100 text-red-600',
-    
+
 
     // Location Activities - Green theme
     'location_created': 'bg-green-100 text-green-600',
@@ -4523,7 +4503,7 @@ const getStatusOptions = (currentStatus) => {
   return all.map((s) => ({ ...s, disabled: false }));
 }
 
-const statusOptionsForStop = computed(() => 
+const statusOptionsForStop = computed(() =>
   getStatusOptions(newStop.value.status)
 )
 
@@ -4568,8 +4548,9 @@ const handleLogin = async () => {
     isSubmitting.value = true
     loginError.value = ''
     const userData = { username: username.value, password: password.value }
-// https://www.texmonlogistics.co.ke/backend/users/login
-    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/login', {
+    // https://www.texmonlogistics.co.ke/backend/users/login
+    //https://track-cargo.onrender.com/users/login
+    const response = await fetch('https://track-cargo.onrender.com/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
@@ -4603,10 +4584,12 @@ const handleLogin = async () => {
   }
 }
 // https://www.texmonlogistics.co.ke/backend/users/protected
+//https://track-cargo.onrender.com/users/protected
+// Verify token function
 const verifyToken = async () => {
   loading.value = true
   try {
-    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/protected', {
+    const response = await fetch('https://track-cargo.onrender.com/users/protected', {
       method: 'GET',
       credentials: 'include'
     })

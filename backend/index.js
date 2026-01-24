@@ -7,8 +7,6 @@ const PackageRoutes = require('./routes/PackageRoutes');
 const ActivityRoutes = require('./routes/ActivityRoutes');
 const LocationRoutes = require('./routes/LocationRoutes');
 const cookieParser = require('cookie-parser');
-
-
 const app = express();
 
 // Middleware to parse cookies
