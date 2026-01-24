@@ -26,6 +26,6 @@ export default {
 
     // Delete a customer
     deleteCustomer(customerId) {
-        return axios.delete(`${API_URL}/${customerId}/deactivate`);
+        return axios.put(`${API_URL}/${customerId}/deactivate`);
     },
 };

@@ -5,7 +5,7 @@ CustomerRoutes.post('/', createCustomer);
 CustomerRoutes.get('/', getCustomers);
 CustomerRoutes.get('/:id', getCustomerById);
 CustomerRoutes.put('/:id', updateCustomer);
-CustomerRoutes.patch('/:id/deactivate', deactivateCustomer);
+CustomerRoutes.put('/:id/deactivate', deactivateCustomer);
 
 
 module.exports = CustomerRoutes;
