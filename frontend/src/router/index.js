@@ -1,26 +1,33 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import TrackPage from '../views/TrackPage.vue';
-import ResultsPage from '../views/ResultsPage.vue';
-import AdminPage from '../views/AdminPage.vue';
+import { createRouter, createWebHistory } from 'vue-router'
+import TrackPage from '../views/TrackPage.vue'
+import ResultsPage from '../views/ResultsPage.vue'
+import AdminPage from '../views/AdminPage.vue'
+
+const routes = [
+  {
+    path: '/',
+    redirect: '/track'   // root goes to /track
+  },
+  {
+    path: '/track',
+    name: 'track',
+    component: TrackPage
+  },
+  {
+    path: '/track/results',
+    name: 'results',
+    component: ResultsPage
+  },
+  {
+    path: '/track/admin',
+    name: 'admin',
+    component: AdminPage
+  }
+]
+
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    {
-      path: '/track',
-      name: 'track',
-      component: TrackPage
-    },
-    {
-      path: '/track/results',
-      name: 'results',
-      component: ResultsPage
-    },
-    {
-      path: '/track/admin',
-      name: 'admin',
-      component: AdminPage
-    }
-  ]
+  routes
 })
 
 export default router

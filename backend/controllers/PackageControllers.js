@@ -180,7 +180,7 @@ ORDER BY
     `);
     res.json({ success: true, cargo: result.rows });
   } catch (error) {
-    console.error('Error fetching packages:', error.message);
+    console.error('Error fetching cargo:', error.message);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 },
@@ -280,7 +280,7 @@ ORDER BY
       res.json({ success: true, package: packageData });
 
     } catch (error) {
-      console.error('Error fetching package:', error.message);
+      console.error('Error fetching cargo:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
   },
@@ -517,6 +517,24 @@ deletePackage: async (req, res) => {
       console.error('Error tracking package:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
-  }
+  },
 
+  //Track cargo status summary
+  getCargoStatusSummary: async (req, res) => {
+    try {
+      const result = await query(`
+        SELECT 
+          status,
+          COUNT(*) as count
+        FROM packages
+        WHERE is_deleted = FALSE
+        GROUP BY status;
+      `);
+
+      res.json({ success: true, data: result.rows });
+    } catch (error) {
+      console.error('Error fetching cargo status summary:', error.message);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  },
 };

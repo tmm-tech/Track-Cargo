@@ -1,6 +1,6 @@
 const express = require('express');
 const PackageRoutes = express.Router();
-const {createPackage, getAllPackages, getPackageById, updatePackage, trackPackageByTrackingNumber} = require('../controllers/PackageControllers');
+const {createPackage, getAllPackages, getPackageById, updatePackage, trackPackageByTrackingNumber, getCargoStatusSummary} = require('../controllers/PackageControllers');
 
 
 // Create a new package (protected)
@@ -18,5 +18,8 @@ PackageRoutes.put('/packages/:id', updatePackage);
 
 // Track a package by tracking number (public)
 PackageRoutes.get('/track/:tracking_number', trackPackageByTrackingNumber);
+
+// Status summary of all cargo (protected)
+PackageRoutes.get('/packages/status-summary', getCargoStatusSummary);
 
 module.exports = PackageRoutes;

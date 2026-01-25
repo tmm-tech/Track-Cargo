@@ -3053,6 +3053,7 @@ import {
   PencilIcon,
   PlusIcon,
   UserGroupIcon,
+  ClipboardDocumentCheckIcon,
   DocumentCheckIcon,
   MapPinIcon,
   CalendarIcon,
@@ -3904,7 +3905,7 @@ const saveEditedCargo = async () => {
     };
     if (!shippingAddress.recipientName || !shippingAddress.streetAddress || !shippingAddress.city ||
       !shippingAddress.state || !shippingAddress.country) {
-      setAlert('Shipping address is incomplete.', 'error');
+      setAlert('Cargo details is incomplete.', 'error');
       isSubmitting.value = false;
       return;
     }
@@ -4036,14 +4037,14 @@ const closeAddModal = () => {
   stopErrors.value = {}
   addCargoTab.value = 'address' // Reset tab
 }
-const clients = ref(null)                // list of all clients
+const clients = ref([])                // list of all clients
 const selectedClientId = ref('')       // currently selected client ID
 
 // Fetch all clients (e.g., on mount)
 async function fetchClients() {
   const response = await CustomerServices.getCustomers()
   const data = response.data
-  clients = data.customers
+  clients.value = data.customers
 }
 
 // Handle selection change
@@ -5077,7 +5078,7 @@ const saveNewPassword = () => {
   if (!validateResetPasswordForm()) return
 
   // Show success message
-  setAlert(`Password has been reset for ${resetPasswordUser.value.username}`)
+  setAlert(`Password has been reset for ${resetPasswordUser.value.username}`, 'success')
 
   closeResetPasswordModal()
 }
