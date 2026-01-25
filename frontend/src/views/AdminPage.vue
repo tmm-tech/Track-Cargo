@@ -3408,7 +3408,7 @@ const submitNewCustomer = async () => {
 
   try {
     const response = await CustomerServices.addCustomer(newCustomer.value)
-    if (response.success) {
+    if (response.data.success) {
       setAlert('Customer added successfully!', 'success')
       resetCustomerForm()
       closeAddCustomerModal()
@@ -3463,7 +3463,7 @@ const submitEditCustomer = async () => {
 
   try {
     const response = await CustomerServices.updateCustomer(editingCustomer.value.id, editingCustomer.value)
-    if (response.success) {
+    if (response.data.success) {
       setAlert('Customer updated successfully!', 'success')
       resetCustomerForm()
       closeEditCustomerModal()
@@ -3493,7 +3493,7 @@ const deleteCustomer = async () => {
 
   try {
     const response = await CustomerServices.deleteCustomer(customerToDelete.value.id)
-    if (response.success) {
+    if (response.data.success) {
       setAlert('Customer deleted successfully!', 'success')
       await fetchCustomers() // Refresh customer list
     }
@@ -4036,26 +4036,44 @@ const closeAddModal = () => {
   stopErrors.value = {}
   addCargoTab.value = 'address' // Reset tab
 }
-const clients = ref([])                // list of all clients
+const clients = ref(null)                // list of all clients
 const selectedClientId = ref('')       // currently selected client ID
-const selectedClient = ref(null)       // full details of selected client
 
 // Fetch all clients (e.g., on mount)
 async function fetchClients() {
   const response = await CustomerServices.getCustomers()
   const data = response.data
-  clients.value = data.customers
+  clients = data.customers
 }
 
 // Handle selection change
 async function onClientSelected() {
   if (!selectedClientId.value) {
-    selectedClient.value = null
+    newCargo.value.shipping_address = {
+      recipientName: '',
+      streetAddress: '',
+      city: '',
+      state: '',
+      country: '',
+      phone: '',
+      email: '',
+      specialInstructions: ''
+    }
     return
   }
   const response = await CustomerServices.getCustomerById(selectedClientId.value)
   const data = response.data
-  selectedClient.value = data.customer
+  const selectedClient = data.customer
+  newCargo.value.shipping_address = {
+    recipientName: selectedClient.name || '',
+    streetAddress: selectedClient.address || '',
+    city: selectedClient.city || '',
+    state: selectedClient.county || '',
+    country: selectedClient.country || '',
+    phone: selectedClient.phone || '',
+    email: selectedClient.email || '',
+    specialInstructions: ''
+  }
 }
 const addNewCargo = async () => {
   // Validate the form before submission
