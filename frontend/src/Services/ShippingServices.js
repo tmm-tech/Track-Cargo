@@ -1,7 +1,7 @@
 // services/packageService.js
 import axios from 'axios';
 
-const API_URL = 'https://track-cargo.onrender.com/package';
+const API_URL = 'https://www.texmonlogistics.co.ke/backend/package';
 
 // https://www.texmonlogistics.co.ke/backend/package
 // https://track-cargo.onrender.com/package

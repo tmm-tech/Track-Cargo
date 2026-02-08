@@ -578,7 +578,7 @@
                     <h2 class="text-lg font-semibold leading-none tracking-tight">Reset Password</h2>
                     <p class="text-sm text-muted-foreground">Reset password for user: <strong>{{
                       resetPasswordUser.username
-                        }}</strong></p>
+                    }}</strong></p>
                   </div>
 
                   <form @submit.prevent="saveNewPassword">
@@ -1147,22 +1147,43 @@
 
                     <!-- Cargo Address Card -->
                     <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
+                      <!-- Header -->
                       <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
                         <MapPinIcon class="h-5 w-5 mr-2" />
                         <h3 class="text-xl font-semibold">Client Details</h3>
                       </div>
+
+                      <!-- Body -->
                       <div class="p-6">
-                        <div v-if="viewingCargo.shipping_address" class="space-y-1">
-                          <p class="font-medium">{{ viewingCargo.shipping_address.recipientName }}</p>
-                          <p>{{ viewingCargo.shipping_address.streetAddress }}</p>
-                          <p>
-                            {{ viewingCargo.shipping_address.city }}, {{ viewingCargo.shipping_address.state }}
-                          </p>
-                          <p>{{ viewingCargo.shipping_address.country }}</p>
+                        <div v-if="viewingCargo.shipping_address" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <!-- Left Column -->
+                          <div class="space-y-1">
+                            <p class="font-medium text-lg">{{ viewingCargo.shipping_address.recipientName || 'N/A' }}
+                            </p>
+                            <p>{{ viewingCargo.shipping_address.streetAddress || 'N/A' }}</p>
+                            <p>{{ viewingCargo.shipping_address.city || 'N/A' }}, {{ viewingCargo.shipping_address.state
+                              || 'N/A' }}</p>
+                            <p>{{ viewingCargo.shipping_address.country || 'N/A' }}</p>
+                          </div>
+
+                          <!-- Right Column -->
+                          <div class="space-y-1">
+                            <p><span class="font-semibold">Phone:</span> {{ viewingCargo.shipping_address.phone || 'N/A'
+                              }}</p>
+                            <p><span class="font-semibold">Email:</span> {{ viewingCargo.shipping_address.email || 'N/A'
+                              }}</p>
+                            <p v-if="viewingCargo.shipping_address.special_instructions">
+                              <span class="font-semibold">Instructions:</span> {{
+                                viewingCargo.shipping_address.special_instructions }}
+                            </p>
+                          </div>
                         </div>
+
+                        <!-- Fallback -->
                         <p v-else class="text-gray-500">No Client information available</p>
                       </div>
                     </div>
+
                     <!-- Clearance Section -->
                     <div class="rounded-lg border bg-white shadow-lg overflow-hidden mt-6">
                       <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
@@ -2062,7 +2083,7 @@
                 </div>
 
                 <button @click="openAddCustomerModal"
-                 class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-3 sm:px-4 py-2 rounded inline-flex items-center text-sm">
+                  class="bg-transparent text-white border border-white hover:bg-red-600 hover:border-red-600 transition-colors duration-300 px-3 sm:px-4 py-2 rounded inline-flex items-center text-sm">
                   <PlusIcon class="h-4 w-4 mr-2" />
                   <span class="hidden sm:inline">Add Customer</span>
                   <span class="sm:hidden">Add</span>
@@ -5270,7 +5291,7 @@ const handleLogin = async () => {
     const userData = { username: username.value, password: password.value }
     // https://www.texmonlogistics.co.ke/backend/users/login
     //https://track-cargo.onrender.com/users/login
-    const response = await fetch('https://track-cargo.onrender.com/users/login', {
+    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
@@ -5309,7 +5330,7 @@ const handleLogin = async () => {
 const verifyToken = async () => {
   loading.value = true
   try {
-    const response = await fetch('https://track-cargo.onrender.com/users/protected', {
+    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/protected', {
       method: 'GET',
       credentials: 'include'
     })

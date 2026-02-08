@@ -1,7 +1,7 @@
 // services/customerService.js
 import axios from 'axios';
 
-const API_URL = 'https://track-cargo.onrender.com/customer'; // Update to match your backend
+const API_URL = 'https://www.texmonlogistics.co.ke/backend/customer'; // Update to match your backend
 
 // https://www.texmonlogistics.co.ke/backend/customer
 // https://track-cargo.onrender.com/customer
