@@ -156,6 +156,49 @@
         <div v-else-if="packageData" class="max-w-4xl mx-auto">
           <h1 class="text-3xl font-bold text-[#273272] mb-6">Tracking Information</h1>
 
+          <!-- Package Client Details Card -->
+          <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
+            <div class="bg-[#273272] text-white p-6 rounded-t-lg">
+              <h2 class="text-xl font-semibold">Client Details</h2>
+            </div>
+            <div class="p-6">
+              <div class="grid gap-6 md:grid-cols-2">
+                <div>
+                  <h3 class="font-medium text-gray-500">Client Name</h3>
+                  <p class="text-lg uppercase">{{ packageData.shipping_address.recipientName }}</p>
+                </div>
+                <div>
+                  <h3 class="font-medium text-gray-500">Email</h3>
+                  <p class="text-lg">{{ packageData.shipping_address.email }}</p>
+                </div>
+                <div>
+                  <h3 class="font-medium text-gray-500">Phone Number</h3>
+                  <p class="text-lg">{{ packageData.shipping_address.phone }}</p>
+                </div>
+                <div>
+                  <h3 class="font-medium text-gray-500">Country</h3>
+                  <p class="text-lg">{{ packageData.shipping_address.country }}</p>
+                </div>
+                <div>
+                  <h3 class="font-medium text-gray-500">State</h3>
+                  <p class="text-lg">{{ packageData.shipping_address.state }}</p>
+                </div>
+                <div>
+                  <h3 class="font-medium text-gray-500">City</h3>
+                  <p class="text-lg">{{ packageData.shipping_address.city }}</p>
+                </div>
+                <div>
+                  <h3 class="font-medium text-gray-500">Street Address</h3>
+                  <p class="text-lg">{{ packageData.shipping_address.streetAddress }}</p>
+                </div>
+                <div>
+                  <h3 class="font-medium text-gray-500">Special Instructions</h3>
+                  <p class="text-lg">{{ packageData.shipping_address.specialInstructions }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Package Details Card -->
           <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
@@ -285,19 +328,38 @@
 
                 <!-- Status Icons -->
                 <div class="flex justify-between relative">
+                  <!-- Clearance (if exists) -->
+                  <div v-if="clearanceReportEvents.length" class="flex flex-col items-center z-10">
+                    <div :class="[
+                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
+                      currentStep >= 0 ? 'bg-[#ffb600]' : 'bg-gray-200'
+                    ]">
+                      <transition name="icon-fade">
+                        <ArchiveBoxIcon v-if="currentStep >= 0" class="h-6 w-6 text-white" />
+                      </transition>
+                    </div>
+                    <p class="mt-2 text-sm font-medium">Clearance</p>
+                    <transition name="fade">
+                      <div v-if="currentStep >= 0" class="mt-1 text-xs text-gray-500">
+                        {{ formatDate(clearanceReportEvents[0]?.timestamp) }}
+                      </div>
+                    </transition>
+                  </div>
                   <!-- Shipped -->
                   <div class="flex flex-col items-center z-10">
                     <div :class="[
                       'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
-                      currentStep >= 1 ? 'bg-[#ffb600]' : 'bg-gray-200'
+                      currentStep >= (clearanceReportEvents.length ? 1 : 0) ? 'bg-[#ffb600]' : 'bg-gray-200'
                     ]">
                       <transition name="icon-fade">
-                        <ArchiveBoxIcon v-if="currentStep >= 1" class="h-6 w-6 text-white" />
+                        <ArchiveBoxIcon v-if="currentStep >= (clearanceReportEvents.length ? 1 : 0)"
+                          class="h-6 w-6 text-white" />
                       </transition>
                     </div>
                     <p class="mt-2 text-sm font-medium">Shipped</p>
                     <transition name="fade">
-                      <div v-if="currentStep >= 1" class="mt-1 text-xs text-gray-500">
+                      <div v-if="currentStep >= (clearanceReportEvents.length ? 1 : 0)"
+                        class="mt-1 text-xs text-gray-500">
                         {{ formatDate(packageData.shipped_date) }}
                       </div>
                     </transition>
@@ -307,15 +369,17 @@
                   <div class="flex flex-col items-center z-10">
                     <div :class="[
                       'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
-                      currentStep >= 2 ? 'bg-[#ffb600]' : 'bg-gray-200'
+                      currentStep >= (clearanceReportEvents.length ? 2 : 1) ? 'bg-[#ffb600]' : 'bg-gray-200'
                     ]">
                       <transition name="icon-fade">
-                        <TruckIcon v-if="currentStep >= 2" class="h-6 w-6 text-white" />
+                        <TruckIcon v-if="currentStep >= (clearanceReportEvents.length ? 2 : 1)"
+                          class="h-6 w-6 text-white" />
                       </transition>
                     </div>
                     <p class="mt-2 text-sm font-medium">In Transit</p>
                     <transition name="fade">
-                      <div v-if="currentStep >= 2" class="mt-1 text-xs text-gray-500">
+                      <div v-if="currentStep >= (clearanceReportEvents.length ? 2 : 1)"
+                        class="mt-1 text-xs text-gray-500">
                         {{ formatDate(getInTransitDate()) }}
                       </div>
                     </transition>
@@ -325,15 +389,17 @@
                   <div class="flex flex-col items-center z-10">
                     <div :class="[
                       'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
-                      currentStep >= 3 ? 'bg-[#ffb600]' : 'bg-gray-200'
+                      currentStep >= (clearanceReportEvents.length ? 3 : 2) ? 'bg-[#ffb600]' : 'bg-gray-200'
                     ]">
                       <transition name="icon-fade">
-                        <MapPinIcon v-if="currentStep >= 3" class="h-6 w-6 text-white" />
+                        <MapPinIcon v-if="currentStep >= (clearanceReportEvents.length ? 3 : 2)"
+                          class="h-6 w-6 text-white" />
                       </transition>
                     </div>
                     <p class="mt-2 text-sm font-medium">Out for Delivery</p>
                     <transition name="fade">
-                      <div v-if="currentStep >= 3" class="mt-1 text-xs text-gray-500">
+                      <div v-if="currentStep >= (clearanceReportEvents.length ? 3 : 2)"
+                        class="mt-1 text-xs text-gray-500">
                         {{ formatDate(getOutForDeliveryDate()) }}
                       </div>
                     </transition>
@@ -343,15 +409,17 @@
                   <div class="flex flex-col items-center z-10">
                     <div :class="[
                       'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
-                      currentStep >= 4 ? 'bg-[#ffb600]' : 'bg-gray-200'
+                      currentStep >= (clearanceReportEvents.length ? 4 : 3) ? 'bg-[#ffb600]' : 'bg-gray-200'
                     ]">
                       <transition name="icon-fade">
-                        <CheckCircleIcon v-if="currentStep >= 4" class="h-6 w-6 text-white" />
+                        <CheckCircleIcon v-if="currentStep >= (clearanceReportEvents.length ? 4 : 3)"
+                          class="h-6 w-6 text-white" />
                       </transition>
                     </div>
                     <p class="mt-2 text-sm font-medium">Delivered</p>
                     <transition name="fade">
-                      <div v-if="currentStep >= 4" class="mt-1 text-xs text-gray-500">
+                      <div v-if="currentStep >= (clearanceReportEvents.length ? 4 : 3)"
+                        class="mt-1 text-xs text-gray-500">
                         {{ formatDate(getDeliveredDate()) || 'Pending' }}
                       </div>
                     </transition>
@@ -360,59 +428,67 @@
               </div>
             </div>
           </div>
-          <!-- Shipping Progress Card -->
-          <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
+          <!-- Clearance Report -->
+          <div v-if="clearanceReportEvents.length" class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
+            <div class="bg-[#273272] text-white p-6 rounded-t-lg">
+              <h2 class="text-xl font-semibold">Clearance Report</h2>
+            </div>
+            <div class="p-6 space-y-4">
+              <div v-for="(event, index) in clearanceReportEvents" :key="index"
+                class="p-4 border-l-4 border-[#ffb600] bg-yellow-50 rounded-md">
+                <div class="flex justify-between items-center mb-2">
+                  <p class="font-medium text-[#273272] capitalize">{{ event.status }}</p>
+                  <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
+                </div>
+                <p class="text-gray-600">{{ event.location }}</p>
+                <p v-if="event.comment" class="text-gray-500 italic mt-1">{{ event.comment.text || event.comment.message
+                  }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Shipping Progress Timeline -->
+          <div v-if="shippingProgressEvents.length" class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
               <h2 class="text-xl font-semibold">Shipping Progress</h2>
             </div>
-            <div class="p-6">
-              <div class="space-y-6">
-                <div v-for="(event, index) in packageData.tracking_history" :key="index" class="flex gap-4">
-                  <!-- Timeline Dot and Line -->
-                  <div class="relative flex flex-col items-center">
-                    <!-- Tick or Dot -->
-                    <div class="w-4 h-4 rounded-full flex items-center justify-center z-10" :class="{
-                      'bg-[#ffb600]': index < packageData.tracking_history.length - 1 || index === 0,
-                      'bg-green-500': event.status?.toLowerCase() === 'delivered',
-                      'bg-gray-300': index === packageData.tracking_history.length - 1 && event.status?.toLowerCase() !== 'delivered'
-                    }">
-                      <!-- Tick Icon -->
-                      <svg v-if="index < packageData.tracking_history.length - 1" class="w-3 h-3 text-white"
-                        fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
-                          clip-rule="evenodd" />
-                      </svg>
-                    </div>
-
-                    <!-- Connecting Line -->
-                    <div v-if="index < packageData.tracking_history.length - 1"
-                      class="w-0.5 h-full bg-[#ffb600] absolute top-4"></div>
+            <div class="p-6 space-y-6">
+              <div v-for="(event, index) in shippingProgressEvents" :key="index" class="flex gap-4">
+                <!-- Timeline Dot -->
+                <div class="relative flex flex-col items-center">
+                  <div class="w-4 h-4 rounded-full flex items-center justify-center z-10" :class="{
+                    'bg-[#ffb600]': index < shippingProgressEvents.length - 1 || index === 0,
+                    'bg-green-500': event.status?.toLowerCase() === 'delivered',
+                    'bg-gray-300': index === shippingProgressEvents.length - 1 && event.status?.toLowerCase() !== 'delivered'
+                  }">
+                    <svg v-if="index < shippingProgressEvents.length - 1" class="w-3 h-3 text-white" fill="currentColor"
+                      viewBox="0 0 20 20">
+                      <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
+                        clip-rule="evenodd" />
+                    </svg>
                   </div>
+                  <div v-if="index < shippingProgressEvents.length - 1"
+                    class="w-0.5 h-full bg-[#ffb600] absolute top-4"></div>
+                </div>
 
-                  <!-- Tracking Info -->
-                  <div class="flex-1 pb-6">
-                    <p class="font-medium capitalize"
-                      :class="event.status?.toLowerCase() === 'delivered' ? 'text-green-700' : 'text-[#273272]'">
-                      {{ event.status }}
-                    </p>
-                    <p class="text-sm text-gray-500">{{ event.location }}</p>
-                    <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
-
-                    <!-- Comment Section -->
-                    <div v-if="event.comment" class="space-y-2 mt-3">
-                      <div class="bg-gray-50 border border-gray-200 p-4 rounded-md shadow-sm">
-                        <p class="text-gray-700 text-sm">
-                          {{ event.comment.text || event.comment.message }}
-                        </p>
-                        <div class="flex justify-between items-center mt-2">
-                          <span class="text-xs text-gray-400">
-                            {{ formatDate(event.comment.timestamp || event.timestamp) }}
-                          </span>
-                          <span v-if="event.comment.user_fullname" class="text-xs text-gray-400 italic">
-                            — {{ event.comment.user_fullname }}
-                          </span>
-                        </div>
+                <!-- Timeline Info -->
+                <div class="flex-1 pb-6">
+                  <p class="font-medium capitalize"
+                    :class="event.status?.toLowerCase() === 'delivered' ? 'text-green-700' : 'text-[#273272]'">
+                    {{ event.status }}
+                  </p>
+                  <p class="text-sm text-gray-500">{{ event.location }}</p>
+                  <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
+                  <div v-if="event.comment" class="space-y-2 mt-3">
+                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-md shadow-sm">
+                      <p class="text-gray-700 text-sm">{{ event.comment.text || event.comment.message }}</p>
+                      <div class="flex justify-between items-center mt-2">
+                        <span class="text-xs text-gray-400">{{ formatDate(event.comment.timestamp ||
+                          event.timestamp)
+                        }}</span>
+                        <span v-if="event.comment.user_fullname" class="text-xs text-gray-400 italic">— {{
+                          event.comment.user_fullname }}</span>
                       </div>
                     </div>
                   </div>
@@ -420,7 +496,6 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </main>
@@ -589,133 +664,80 @@ const formatDate = (dateString) => {
   })
 }
 
-// Get dates for each shipping stage from tracking history
-const getInTransitDate = () => {
-  if (!packageData.value?.tracking_history) return 'N/A'
-  const inTransitEvent = packageData.value.tracking_history.find(
-    event => event.status.toLowerCase().includes('in transit')
-  )
-  return inTransitEvent ? inTransitEvent.timestamp.split(' ')[0] : 'N/A'
-}
+// Computed: Clearance events (filtered from tracking_history)
+const clearanceReportEvents = computed(() => {
+  if (!packageData.value?.tracking_history) return []
 
-const getOutForDeliveryDate = () => {
-  if (!packageData.value?.tracking_history) return 'N/A'
-  const outForDeliveryEvent = packageData.value.tracking_history.find(
-    event => event.status.toLowerCase().includes('out for delivery')
-  )
-  return outForDeliveryEvent ? outForDeliveryEvent.timestamp.split(' ')[0] : 'N/A'
-}
+  return packageData.value.tracking_history.filter(event => {
+    const status = event.status?.toLowerCase() || ''
+    const commentText = event.comment?.text?.toLowerCase() || event.comment?.message?.toLowerCase() || ''
+    return status.includes('customs') || status.includes('clearance') || commentText.includes('customs') || commentText.includes('clearance')
+  })
+})
 
-const getDeliveredDate = () => {
-  if (!packageData.value?.tracking_history) return null
-  const deliveredEvent = packageData.value.tracking_history.find(
-    event => event.status.toLowerCase().includes('delivered')
-  )
-  return deliveredEvent ? deliveredEvent.timestamp.split(' ')[0] : null
-}
+// Shipping progress (exclude clearance events)
+const shippingProgressEvents = computed(() => {
+  if (!packageData.value?.tracking_history) return []
+  return packageData.value.tracking_history.filter(event => !clearanceReportEvents.value.includes(event))
+})
+// Step-related helpers
+const getInTransitDate = () => packageData.value?.tracking_history?.find(e => e.status.toLowerCase().includes('in transit'))?.timestamp.split(' ')[0] || 'N/A'
+const getOutForDeliveryDate = () => packageData.value?.tracking_history?.find(e => e.status.toLowerCase().includes('out for delivery'))?.timestamp.split(' ')[0] || 'N/A'
+const getDeliveredDate = () => packageData.value?.tracking_history?.find(e => e.status.toLowerCase().includes('delivered'))?.timestamp.split(' ')[0] || null
 
-// Determine current shipping step based on tracking history
+// Determine current shipping step
 const determineShippingStep = () => {
   if (!packageData.value) return 0
-
-  const history = packageData.value.tracking_history
-
-  // Always at least at step 1 (Shipped) if we have package data
+  const history = packageData.value.tracking_history || []
   let step = 1
-
-  // Check for "In Transit" status
-  if (history.some(event => (event.status || '').toLowerCase().includes('in transit'))) {
-    step = 2;
-  }
-
-  // Check for "Out for Delivery" status
-  if (history.some(event => (event.status || '').toLowerCase().includes('out for delivery'))) {
-    step = 3;
-  }
-
-  // Check for "Delivered" status
-  if (history.some(event => (event.status || '').toLowerCase().includes('delivered'))) {
-    step = 4;
-  }
-
-
+  if (history.some(e => (e.status || '').toLowerCase().includes('in transit'))) step = 2
+  if (history.some(e => (e.status || '').toLowerCase().includes('out for delivery'))) step = 3
+  if (history.some(e => (e.status || '').toLowerCase().includes('delivered'))) step = 4
   return step
 }
 
-// Animate the progress when package data changes
-watch(() => packageData.value, () => {
-  if (packageData.value) {
-    // Reset animation
-    currentStep.value = 0
-    progressPercentage.value = 0
+// Animate progress
+watch(packageData, () => {
+  if (!packageData.value) return
+  currentStep.value = 0
+  progressPercentage.value = 0
+  const finalStep = determineShippingStep()
 
-    // Determine the final step based on tracking history
-    const finalStep = determineShippingStep()
-
-    // Animate step by step with delays
-    const animateSteps = () => {
-      const stepInterval = setInterval(() => {
-        if (currentStep.value < finalStep) {
-          currentStep.value++
-          progressPercentage.value = (currentStep.value / 4) * 100
-        } else {
-          clearInterval(stepInterval)
-        }
-      }, 500)
-    }
-
-    // Start animation after a short delay
-    setTimeout(animateSteps, 500)
-  }
+  const interval = setInterval(() => {
+    if (currentStep.value < finalStep) {
+      currentStep.value++
+      progressPercentage.value = (currentStep.value / 4) * 100
+    } else clearInterval(interval)
+  }, 500)
 }, { immediate: false })
 
+
+// Fetch package data
 onMounted(async () => {
   loading.value = true
   error.value = null
   packageData.value = null
-
   try {
-    // Call your backend service to track the package
     const response = await ShippingServices.trackPackage(trackingNumber.value)
-
     if (response.data.success) {
       packageData.value = response.data.data
     } else {
-      error.value = response.message || 'No cargo found with the provided information'
+      error.value = response.message || 'No cargo found'
     }
   } catch (err) {
-    console.error('Error tracking cargo:', err)
+    console.error(err)
     error.value = 'An error occurred while fetching cargo data'
   } finally {
     loading.value = false
   }
 })
 
-// Add these after the other computed properties in the script section
-const isCurrentLocation = computed(() => {
-  if (!packageData.value) return false
-  // Check if we're in the "in transit" or earlier phase
-  return currentStep.value <= 2
-})
+// Compute current status highlights
+const isCurrentLocation = computed(() => currentStep.value === 1 || currentStep.value === 2)
+const isNextStop = computed(() => currentStep.value === 3)
+const isFinalDestination = computed(() => currentStep.value === 4)
+const isDelivered = computed(() => packageData.value?.tracking_history?.some(e => e.status.toLowerCase().includes('delivered')))
 
-const isNextStop = computed(() => {
-  if (!packageData.value) return false
-  // Check if we're in the "out for delivery" phase
-  return currentStep.value === 3
-})
-
-const isFinalDestination = computed(() => {
-  if (!packageData.value) return false
-  // Check if we're in the "delivered" phase
-  return currentStep.value === 4
-})
-
-const isDelivered = computed(() => {
-  if (!packageData.value) return false
-  return packageData.value.tracking_history.some(
-    event => event.status.toLowerCase().includes('delivered')
-  )
-})
 
 // Get the current status based on tracking history
 const getCurrentLocationStatus = () => {
@@ -768,5 +790,25 @@ const capitalizeWords = (str) => {
   to {
     transform: rotate(360deg);
   }
+}
+
+.icon-fade-enter-active,
+.icon-fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.icon-fade-enter-from,
+.icon-fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

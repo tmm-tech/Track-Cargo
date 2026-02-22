@@ -10,12 +10,58 @@
       </div>
       <div :style="{ fontSize: '18px' }">Cargo Tracking Details</div>
     </div>
+    <!-- Shipping Address Section -->
+    <div :style="sectionStyle">
+      <!-- Header -->
+      <div :style="sectionHeaderStyle">
+        <span :style="{ marginRight: '10px', fontSize: '20px' }">📍</span>
+        Client Details
+      </div>
+
+      <!-- Content -->
+      <div :style="sectionContentStyle">
+        <div v-if="pkg.shipping_address" :style="shippingAddressStyle">
+          <!-- Recipient Name -->
+          <div :style="{ fontWeight: 'bold', fontSize: '16px', marginBottom: '4px' }">
+            {{ pkg.shipping_address.recipientName || 'N/A' }}
+          </div>
+
+          <!-- Street Address -->
+          <div :style="{ marginBottom: '2px' }">
+            {{ pkg.shipping_address.streetAddress || 'N/A' }}
+          </div>
+
+          <!-- City, State, Country -->
+          <div :style="{ marginBottom: '2px' }">
+            {{ pkg.shipping_address.city || 'N/A' }}, {{ pkg.shipping_address.state || 'N/A' }}
+          </div>
+          <div :style="{ marginBottom: '2px' }">
+            {{ pkg.shipping_address.country || 'N/A' }}
+          </div>
+
+          <!-- Contact Info -->
+          <div :style="{ marginTop: '6px', fontSize: '14px' }">
+            <div><strong>Phone:</strong> {{ pkg.shipping_address.phone || 'N/A' }}</div>
+            <div><strong>Email:</strong> {{ pkg.shipping_address.email || 'N/A' }}</div>
+          </div>
+
+          <!-- Special Instructions -->
+          <div v-if="pkg.shipping_address.specialInstructions"
+            :style="{ marginTop: '6px', fontStyle: 'italic', color: '#555' }">
+            <strong>Instructions:</strong> {{ pkg.shipping_address.specialInstructions }}
+          </div>
+        </div>
+
+        <!-- Fallback -->
+        <div v-else style="color: #888;">No shipping address information available</div>
+      </div>
+    </div>
 
     <!-- Cargo Information Section -->
     <div :style="sectionStyle">
       <div :style="sectionHeaderStyle">
         <span :style="{ marginRight: '10px', fontSize: '20px' }">📦</span>
-        Cargo Information
+        Cargo Details
       </div>
       <div :style="sectionContentStyle">
         <div :style="gridStyle">
@@ -66,7 +112,52 @@
         </div>
       </div>
     </div>
-
+    <!-- Cargo Clearance Section -->
+    <div :style="sectionStyle">
+      <div :style="sectionHeaderStyle">
+        <span :style="{ marginRight: '10px', fontSize: '20px' }">📦</span>
+        Cargo Clearance
+      </div>
+      <div :style="sectionContentStyle">
+        <div :style="gridStyle">
+          <div :style="fieldStyle">
+            <div :style="fieldLabelStyle">File Reference</div>
+            <div :style="fieldValueStyle">
+              {{ pkg.clearance.fileReference }}
+            </div>
+          </div>
+          <div :style="fieldStyle">
+            <div :style="fieldLabelStyle">Container Number</div>
+            <div :style="fieldValueStyle">{{ pkg.container_number }}</div>
+          </div>
+          <div :style="fieldStyle">
+            <div :style="fieldLabelStyle">Bill of Lading</div>
+            <div :style="fieldValueStyle">{{ pkg.bl_number }}</div>
+          </div>
+          <div :style="fieldStyle">
+            <div :style="fieldLabelStyle">ETA</div>
+            <div :style="fieldValueStyle" class="uppercase">{{ formatDate(pkg.clearance.eta) }}</div>
+          </div>
+          <div :style="fieldStyle">
+            <div :style="fieldLabelStyle">Cargo Description</div>
+            <div :style="fieldValueStyle">{{ pkg.clearance.cargoDescription }}</div>
+          </div>
+          <div :style="fieldStyle">
+            <div :style="fieldLabelStyle">Client Details</div>
+            <div :style="fieldValueStyle">{{ pkg.shipping_address?.recipientName }} | {{ pkg.shipping_address?.email }}
+            </div>
+          </div>
+          <div :style="fieldStyle">
+            <div :style="fieldLabelStyle">Net Weight</div>
+            <div :style="fieldValueStyle">{{ pkg.clearance.netWeight }} kg</div>
+          </div>
+          <div :style="fieldStyle">
+            <div :style="fieldLabelStyle">Gross Weight</div>
+            <div :style="fieldValueStyle">{{ pkg.clearance.grossWeight }} kg</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Current Status Section -->
     <div :style="sectionStyle">
       <div :style="sectionHeaderStyle">
@@ -126,63 +217,16 @@
       </div>
     </div>
 
-    <!-- Shipping Address Section -->
-    <div :style="sectionStyle">
-      <!-- Header -->
-      <div :style="sectionHeaderStyle">
-        <span :style="{ marginRight: '10px', fontSize: '20px' }">📍</span>
-        Client Details
-      </div>
-
-      <!-- Content -->
-      <div :style="sectionContentStyle">
-        <div v-if="pkg.shipping_address" :style="shippingAddressStyle">
-          <!-- Recipient Name -->
-          <div :style="{ fontWeight: 'bold', fontSize: '16px', marginBottom: '4px' }">
-            {{ pkg.shipping_address.recipientName || 'N/A' }}
-          </div>
-
-          <!-- Street Address -->
-          <div :style="{ marginBottom: '2px' }">
-            {{ pkg.shipping_address.streetAddress || 'N/A' }}
-          </div>
-
-          <!-- City, State, Country -->
-          <div :style="{ marginBottom: '2px' }">
-            {{ pkg.shipping_address.city || 'N/A' }}, {{ pkg.shipping_address.state || 'N/A' }}
-          </div>
-          <div :style="{ marginBottom: '2px' }">
-            {{ pkg.shipping_address.country || 'N/A' }}
-          </div>
-
-          <!-- Contact Info -->
-          <div :style="{ marginTop: '6px', fontSize: '14px' }">
-            <div><strong>Phone:</strong> {{ pkg.shipping_address.phone || 'N/A' }}</div>
-            <div><strong>Email:</strong> {{ pkg.shipping_address.email || 'N/A' }}</div>
-          </div>
-
-          <!-- Special Instructions -->
-          <div v-if="pkg.shipping_address.specialInstructions"
-            :style="{ marginTop: '6px', fontStyle: 'italic', color: '#555' }">
-            <strong>Instructions:</strong> {{ pkg.shipping_address.specialInstructions }}
-          </div>
-        </div>
-
-        <!-- Fallback -->
-        <div v-else style="color: #888;">No shipping address information available</div>
-      </div>
-    </div>
-
-
-    <!-- Tracking History Section -->
+    <!-- Clearance Report Section (only clearance) -->
     <div :style="sectionStyle">
       <div :style="sectionHeaderStyle">
-        <span :style="{ marginRight: '10px', fontSize: '20px' }">🔄</span>
-        Tracking History
+        <span :style="{ marginRight: '10px', fontSize: '20px' }">✅</span>
+        Clearance Report
       </div>
       <div :style="sectionContentStyle">
         <div :style="trackingTimelineStyle">
-          <div v-for="(event, index) in pkg.tracking_history" :key="index" :style="trackingItemStyle">
+          <div v-for="(event, index) in pkg.tracking_history.filter(e => e.status?.toLowerCase().includes('clearance'))" :key="index"
+            :style="trackingItemStyle">
             <div :style="trackingStatusStyle" class="capitalize">{{ event.status }}</div>
             <div :style="trackingLocationStyle">
               <span :style="{ marginRight: '5px' }">📍</span>
@@ -196,9 +240,43 @@
               <strong>Comment:</strong> {{ event.comment.text }}
             </div>
           </div>
+          <div v-if="pkg.tracking_history.filter(e => e.status?.toLowerCase().includes('clearance')).length === 0">
+            No clearance events found.
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Tracking History Section (excluding clearance) -->
+    <div :style="sectionStyle">
+      <div :style="sectionHeaderStyle">
+        <span :style="{ marginRight: '10px', fontSize: '20px' }">🔄</span>
+        Tracking History
+      </div>
+      <div :style="sectionContentStyle">
+        <div :style="trackingTimelineStyle">
+          <div v-for="(event, index) in pkg.tracking_history.filter(e => !e.status?.toLowerCase().includes('clearance'))" :key="index"
+            :style="trackingItemStyle">
+            <div :style="trackingStatusStyle" class="capitalize">{{ event.status }}</div>
+            <div :style="trackingLocationStyle">
+              <span :style="{ marginRight: '5px' }">📍</span>
+              {{ event.location }}
+            </div>
+            <div :style="trackingTimeStyle">
+              <span :style="{ marginRight: '5px' }">🕒</span>
+              {{ formatDate(event.timestamp) }}
+            </div>
+            <div v-if="event.comment" :style="trackingCommentStyle">
+              <strong>Comment:</strong> {{ event.comment.text }}
+            </div>
+          </div>
+          <div v-if="pkg.tracking_history.filter(e => e.status !== 'CLEARED').length === 0">
+            No tracking events found.
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <!-- Footer -->
     <div :style="footerStyle">
@@ -212,6 +290,7 @@
 <script setup lang="ts">
 import { AlignCenter } from 'lucide-vue-next'
 import { ref, computed, onMounted, watch } from 'vue'
+import { Clearance } from '../types'
 
 // TypeScript interfaces
 interface TrackingEvent {
@@ -222,6 +301,7 @@ interface TrackingEvent {
     text?: string
   }
 }
+
 
 interface ShippingAddress {
   recipientName: string
@@ -235,6 +315,7 @@ interface ShippingAddress {
 }
 
 interface Package {
+  clearance: Clearance
   container_number: string
   truck_number: string
   bl_number: string
@@ -547,11 +628,20 @@ const footerStyle = computed(() => ({
 }))
 
 // Format date utility
-const formatDate = (timestamp: string): string => {
-  const date = new Date(timestamp)
-  return isNaN(date.getTime()) ? timestamp : date.toLocaleString()
-}
+const formatDate = (dateString: string | number | Date) => {
+  if (!dateString) return null; // Handle null, undefined, or empty string
 
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Never'; // Handle invalid date
+
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
 // Lifecycle hooks
 onMounted(async () => {
   const trackingUrl = `https://texmonlogistics.co.ke/track/${props.pkg.container_number}`

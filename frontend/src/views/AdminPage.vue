@@ -940,7 +940,7 @@
                             class="px-4 sm:px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Last Updated</th>
                           <th scope="col"
-                            class="px-4 sm:px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                            class="sticky right-0 bg-gray-50 z-10 px-4 sm:px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             Actions</th>
                         </tr>
                       </thead>
@@ -984,7 +984,7 @@
                           <td class="px-6 py-4 sm:px-4 text-sm text-gray-900 whitespace-nowrap">
                             {{ formatDate(pkg.updated_at) || 'N/A' }}
                           </td>
-                          <td class="px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
+                          <td class="sticky right-0 bg-white z-10 px-6 py-4 sm:px-4 text-right text-sm font-medium whitespace-nowrap">
                             <div class="flex justify-end gap-1">
                               <button
                                 class="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-8 px-2"
@@ -1114,37 +1114,6 @@
                     </p>
                   </div>
                   <div v-if="viewingCargo" class="space-y-6">
-                    <div class="grid grid-cols-2 gap-4">
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Cargo Type</p>
-                        <p class="text-lg">{{ viewingCargo.type.toUpperCase() }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Cargo Description</p>
-                        <p class="text-lg">{{ viewingCargo.description }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Weight</p>
-                        <p class="text-lg">{{ viewingCargo.weight }} kg</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Shipped Date</p>
-                        <p class="text-lg">{{ formatDate(viewingCargo.shipped_date) }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
-                        <p class="text-lg">{{ formatDate(viewingCargo.estimated_delivery) }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Final Destination</p>
-                        <p class="text-lg">{{ viewingCargo.final_destination }}</p>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-500">Last Updated</p>
-                        <p class="text-lg">{{ formatDate(viewingCargo.updated_at) }}</p>
-                      </div>
-                    </div>
-
                     <!-- Cargo Address Card -->
                     <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
                       <!-- Header -->
@@ -1169,9 +1138,9 @@
                           <!-- Right Column -->
                           <div class="space-y-1">
                             <p><span class="font-semibold">Phone:</span> {{ viewingCargo.shipping_address.phone || 'N/A'
-                              }}</p>
+                            }}</p>
                             <p><span class="font-semibold">Email:</span> {{ viewingCargo.shipping_address.email || 'N/A'
-                              }}</p>
+                            }}</p>
                             <p v-if="viewingCargo.shipping_address.special_instructions">
                               <span class="font-semibold">Instructions:</span> {{
                                 viewingCargo.shipping_address.special_instructions }}
@@ -1181,6 +1150,47 @@
 
                         <!-- Fallback -->
                         <p v-else class="text-gray-500">No Client information available</p>
+                      </div>
+                    </div>
+                    <div class="rounded-lg border bg-white shadow-lg overflow-hidden">
+                      <!-- Header -->
+                      <div class="bg-[#273272] text-white p-6 rounded-t-lg flex items-center">
+                        <ArchiveBoxIcon class="h-5 w-5 mr-2" />
+                        <h3 class="text-xl font-semibold">Cargo Details</h3>
+                      </div>
+
+                      <!-- Body -->
+                      <div class="p-6">
+                        <div class="grid grid-cols-2 gap-4">
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Cargo Type</p>
+                            <p class="text-lg">{{ viewingCargo.type.toUpperCase() }}</p>
+                          </div>
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Cargo Description</p>
+                            <p class="text-lg">{{ viewingCargo.description }}</p>
+                          </div>
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Weight</p>
+                            <p class="text-lg">{{ viewingCargo.weight }} kg</p>
+                          </div>
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Shipped Date</p>
+                            <p class="text-lg">{{ formatDate(viewingCargo.shipped_date) }}</p>
+                          </div>
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Estimated Delivery</p>
+                            <p class="text-lg">{{ formatDate(viewingCargo.estimated_delivery) }}</p>
+                          </div>
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Final Destination</p>
+                            <p class="text-lg">{{ viewingCargo.final_destination }}</p>
+                          </div>
+                          <div>
+                            <p class="text-sm font-medium text-gray-500">Last Updated</p>
+                            <p class="text-lg">{{ formatDate(viewingCargo.updated_at) }}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -1214,7 +1224,7 @@
                           <div>
                             <p class="text-sm font-medium text-gray-500">Bill of Lading</p>
                             <p class="text-lg">
-                              {{ viewingCargo.clearance.billOfLading || 'N/A' }}
+                              {{ viewingCargo.bl_number || '' }}
                             </p>
                           </div>
 
@@ -1230,7 +1240,7 @@
                           <div>
                             <p class="text-sm font-medium text-gray-500">ETA</p>
                             <p class="text-lg">
-                              {{ formatDate(viewingCargo.clearance.eta) || 'N/A' }}
+                              {{ formatDate(viewingCargo.clearance.eta) || '' }}
                             </p>
                           </div>
 
@@ -1238,7 +1248,7 @@
                           <div class="col-span-2">
                             <p class="text-sm font-medium text-gray-500">Client Details</p>
                             <p class="text-lg whitespace-pre-line">
-                              {{ viewingCargo.clearance.clientDetails || 'N/A' }}
+                              {{ viewingCargo.shipping_address.recipientName || 'N/A' }} |  {{ viewingCargo.shipping_address.email || 'N/A' }} | {{ viewingCargo.shipping_address.phone || 'N/A' }} 
                             </p>
                           </div>
 
@@ -1246,7 +1256,7 @@
                           <div class="col-span-2">
                             <p class="text-sm font-medium text-gray-500">Cargo Description</p>
                             <p class="text-lg whitespace-pre-line">
-                              {{ viewingCargo.clearance.cargoDescription || 'N/A' }}
+                              {{ viewingCargo.clearance.cargoDescription || '' }}
                             </p>
                           </div>
 
@@ -1254,7 +1264,7 @@
                           <div>
                             <p class="text-sm font-medium text-gray-500">Net Weight</p>
                             <p class="text-lg">
-                              {{ viewingCargo.clearance.netWeight || 'N/A' }}
+                              {{ viewingCargo.clearance.netWeight || '' }} KG
                             </p>
                           </div>
 
@@ -1262,7 +1272,7 @@
                           <div>
                             <p class="text-sm font-medium text-gray-500">Gross Weight</p>
                             <p class="text-lg">
-                              {{ viewingCargo.clearance.grossWeight || 'N/A' }}
+                              {{ viewingCargo.clearance.grossWeight || '' }} KG
                             </p>
                           </div>
 
@@ -1270,7 +1280,7 @@
                           <div class="col-span-2">
                             <p class="text-sm font-medium text-gray-500">Container Number</p>
                             <p class="text-lg">
-                              {{ viewingCargo.clearance.containerNumber || 'N/A' }}
+                              {{ viewingCargo.clearance.containerNumber || '' }}
                             </p>
                           </div>
 
@@ -1284,6 +1294,7 @@
                       :current_location="viewingCargo.current_location" :next_stop="viewingCargo.next_stop"
                       :next_stop_eta="viewingCargo.next_stop_eta" :final_destination="viewingCargo.final_destination"
                       :estimated_delivery="viewingCargo.estimated_delivery" showComments
+                      :clearance_form="viewingCargo.clearance"
                       :status="viewingCargo.status?.toLowerCase()" />
                   </div>
 
@@ -1526,7 +1537,7 @@
                           <!-- Bill of Lading -->
                           <div class="space-y-2">
                             <label class="text-sm font-medium">Bill of Lading</label>
-                            <input v-model="clearance.billOfLading"
+                            <input v-model="newCargo.bl_number"
                               class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
                               placeholder="Enter bill of lading" />
                           </div>
@@ -1549,7 +1560,7 @@
                           <!-- Client Details -->
                           <div class="col-span-2 space-y-2">
                             <label class="text-sm font-medium">Client Details</label>
-                            <textarea v-model="clearance.clientDetails" rows="2"
+                            <textarea v-model="newCargo.shipping_address.email" rows="2"
                               class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
                               placeholder="Enter client details"></textarea>
                           </div>
@@ -1557,7 +1568,7 @@
                           <!-- Cargo Description -->
                           <div class="col-span-2 space-y-2">
                             <label class="text-sm font-medium">Cargo Description</label>
-                            <textarea v-model="clearance.cargoDescription" rows="2"
+                            <textarea v-model="newCargo.description" rows="2"
                               class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
                               placeholder="Describe the cargo"></textarea>
                           </div>
@@ -1581,7 +1592,7 @@
                           <!-- Container Number -->
                           <div class="col-span-2 space-y-2">
                             <label class="text-sm font-medium">Container Number</label>
-                            <input v-model="clearance.containerNumber"
+                            <input v-model="newCargo.container_number"
                               class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
                               placeholder="Container number" />
                           </div>
@@ -4110,7 +4121,7 @@ const addNewCargo = async () => {
       bl_number: newCargo.value.bl_number,
       recipient_name: newCargo.value.shipping_address.recipientName,
       type: newCargo.value.type,
-      description: newCargo.description,
+      description: newCargo.value.description,
       weight: newCargo.value.weight,
       shipped_date: newCargo.value.shipped_date,
       owner: userId,
@@ -5291,7 +5302,7 @@ const handleLogin = async () => {
     const userData = { username: username.value, password: password.value }
     // https://www.texmonlogistics.co.ke/backend/users/login
     //https://track-cargo.onrender.com/users/login
-    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/login', {
+    const response = await fetch('https://track-cargo.onrender.com/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
@@ -5330,7 +5341,7 @@ const handleLogin = async () => {
 const verifyToken = async () => {
   loading.value = true
   try {
-    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/protected', {
+    const response = await fetch('https://track-cargo.onrender.com/users/protected', {
       method: 'GET',
       credentials: 'include'
     })

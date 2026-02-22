@@ -52,23 +52,43 @@
 
         </div>
 
-
+        <!-- Clearance Report (if exists) -->
+        <div v-if="clearanceReportEvents.length" class="space-y-4">
+          <h3 class="font-semibold text-lg text-[#273272]">Clearance Report</h3>
+          <div v-for="(event, index) in clearanceReportEvents" :key="index"
+            class="flex gap-4 p-3 bg-yellow-50 rounded-md border-l-4 border-[#ffb600]">
+            <div class="flex-1">
+              <p class="font-medium text-[#273272] capitalize">{{ event.status }}</p>
+              <p class="text-sm text-gray-500">{{ event.location }}</p>
+              <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
+              <p v-if="event.comment?.text" class="text-sm text-gray-400 italic mt-1">
+                {{ event.comment.text }}
+              </p>
+              <p v-else-if="event.comment?.message" class="text-sm text-gray-400 italic mt-1">
+                {{ event.comment.message }}
+              </p>
+              <p v-if="event.comment?.user_fullname" class="text-xs text-gray-400 mt-1">
+                — {{ event.comment.user_fullname }}
+              </p>
+            </div>
+          </div>
+        </div>
         <!-- Tracking History Timeline -->
         <div class="mt-8">
-          <h3 class="font-semibold text-lg text-[#273272] mb-4">Truck History</h3>
+          <h3 class="font-semibold text-lg text-[#273272] mb-4">Tracking History</h3>
 
-          <div v-if="tracking_history.length > 0" class="space-y-6">
-            <div v-for="(event, index) in tracking_history as TrackingEvent[]" :key="index" class="flex gap-4">
+          <div v-if="filteredTrackingHistory.length > 0" class="space-y-6">
+            <div v-for="(event, index) in filteredTrackingHistory" :key="index" class="flex gap-4">
               <!-- Timeline Dot and Line -->
               <div class="relative flex flex-col items-center">
                 <!-- Tick or Dot -->
                 <div class="w-4 h-4 rounded-full flex items-center justify-center z-10" :class="{
-                  'bg-[#ffb600]': index < tracking_history.length - 1 || index === 0,
+                  'bg-[#ffb600]': index < filteredTrackingHistory.length - 1 || index === 0,
                   'bg-green-500': event.status?.toLowerCase() === 'delivered',
-                  'bg-gray-300': index === tracking_history.length - 1 && event.status?.toLowerCase() !== 'delivered'
+                  'bg-gray-300': index === filteredTrackingHistory.length - 1 && event.status?.toLowerCase() !== 'delivered'
                 }">
                   <!-- Tick Icon -->
-                  <svg v-if="index < tracking_history.length - 1" class="w-3 h-3 text-white" fill="currentColor"
+                  <svg v-if="index < filteredTrackingHistory.length - 1" class="w-3 h-3 text-white" fill="currentColor"
                     viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                       d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
@@ -116,49 +136,62 @@
 
 <script setup lang="ts">
 import { MapPin, Clock, CheckCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
+
 import Card from './ui/Card.vue';
 import CardHeader from './ui/CardHeader.vue';
 import CardTitle from './ui/CardTitle.vue';
 import CardContent from './ui/CardContent.vue';
 import Badge from './ui/Badge.vue';
+
 import type { TrackingEvent } from '../types';
 
+/* -----------------------------
+   Typed Props
+----------------------------- */
+interface Props {
+  tracking_history: TrackingEvent[];
+  current_location: string;
+  next_stop: string;
+  next_stop_eta: string;
+  final_destination: string;
+  estimated_delivery: string;
+  status: string;
+}
 
+const props = defineProps<Props>();
 
-const props = defineProps({
-  tracking_history: {
-    type: Array,
-    default: () => []
-  },
-  current_location: {
-    type: String,
-    required: true
-  },
-  next_stop: {
-    type: String,
-    required: true
-  },
-  next_stop_eta: {
-    type: String,
-    required: true
-  },
-  final_destination: {
-    type: String,
-    required: true
-  },
-  estimated_delivery: {
-    type: String,
-    required: true
-  },
-  status: {
-    type: String,
-    required: true
-  }
-});
+/* -----------------------------
+   Hidden Status Filter
+----------------------------- */
+const clearanceKeywords  = [
+  'clearance',
+  'customs clearance',
+  'customs'
+];
 
-// Date formatting function
+const clearanceReportEvents = computed(() =>
+  props.tracking_history.filter(event =>
+    clearanceKeywords.some(keyword =>
+      event.status?.toLowerCase().includes(keyword)
+    )
+  )
+);
+
+const filteredTrackingHistory = computed(() =>
+  props.tracking_history.filter(event =>
+    !clearanceKeywords.some(keyword =>
+      event.status?.toLowerCase().includes(keyword)
+    )
+  )
+);
+
+/* -----------------------------
+   Date Formatter
+----------------------------- */
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
+
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -167,5 +200,4 @@ const formatDate = (dateString: string): string => {
     minute: '2-digit'
   });
 };
-
 </script>

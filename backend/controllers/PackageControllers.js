@@ -49,7 +49,7 @@ module.exports = {
       const status = tracking_history[0]?.status || "Created";
       const recipient_name = newCargo.recipient_name || null;
       const clearance = JSON.stringify(newCargo.clearance);
-      const description =  newCargo.description || null;
+      const description = newCargo.description || null;
       const email = shipping_address_obj.email || null; // Fetch email from shipping_address object
 
       const insertQuery = `
@@ -89,13 +89,13 @@ module.exports = {
       const packageId = result.rows[0].id;
       const rawComment = tracking_history[0]?.comment || "Package Created";
       const comments = rawComment
-          ? {
-            id: crypto.randomUUID(),
-            author: owner,
-            text: rawComment,
-            timestamp: new Date().toISOString(),
-          }
-          : null ;
+        ? {
+          id: crypto.randomUUID(),
+          author: owner,
+          text: rawComment,
+          timestamp: new Date().toISOString(),
+        }
+        : null;
       // Add the first tracking event
       const trackingEventQuery = `
       INSERT INTO tracking_events (package_id, status, location, timestamp, comment,updated_at
@@ -135,14 +135,21 @@ module.exports = {
       );
 
       // Send cargo dispatch email to customer
-      // const { sendCargoDispatch } = require('../services/SendEmailService');
-      // await sendCargoDispatch({
-      //   email,
-      //   fullname: recipient_name,
-      //   blnNumber: bl_number,
-      //   currentLocation: current_location,
-      //   finalDestination: final_destination
-      // });
+      const { sendCargoDispatch } = require('../services/SendEmailService');
+      await sendCargoDispatch({
+        email,
+        fullname: recipient_name,
+        blnNumber: bl_number,
+        container_number: container_number,
+        truck_number: truck_number,
+        cargotype: type,
+        cargoDescription: description,
+        cargoWeight: weight,
+        shippedDate: shipped_date,
+        estimatedDelivery: estimated_delivery,
+        currentLocation: current_location,
+        finalDestination: final_destination
+      });
 
       res.json({
         success: true,
@@ -150,16 +157,16 @@ module.exports = {
         package: result.rows[0],
         truck_number: truck_number,
       });
-        } catch (error) {
+    } catch (error) {
       console.error('Error creating package:', error.message);
       res.status(500).json({ success: false, message: 'Internal server error' });
-        }
-      },
+    }
+  },
 
   // Get all packages (not deleted)
   getAllPackages: async (req, res) => {
-  try {
-    const result = await query(`
+    try {
+      const result = await query(`
      SELECT 
   p.*,
   te.updated_at
@@ -178,12 +185,12 @@ ORDER BY
   p.created_at DESC;
 
     `);
-    res.json({ success: true, cargo: result.rows });
-  } catch (error) {
-    console.error('Error fetching cargo:', error.message);
-    res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-},
+      res.json({ success: true, cargo: result.rows });
+    } catch (error) {
+      console.error('Error fetching cargo:', error.message);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  },
 
 
   // Get a specific package by ID (not deleted)
@@ -211,70 +218,70 @@ ORDER BY
     `, [id]);
 
       // Step 1: Parse all comments and collect author IDs
-    let allParsedComments = [];
-    let authorIdsSet = new Set();
-    
-    trackingHistoryResult.rows.forEach(event => {
-      if (event.comment) {
-        try {
-          const raw = typeof event.comment === 'string'
-            ? JSON.parse(event.comment)
-            : event.comment;
-    
-          if (Array.isArray(raw)) {
-            raw.forEach(c => {
-              allParsedComments.push({ ...c, event_id: event.id });
-              if (c.author) authorIdsSet.add(String(c.author)); // ensure string type
-            });
+      let allParsedComments = [];
+      let authorIdsSet = new Set();
+
+      trackingHistoryResult.rows.forEach(event => {
+        if (event.comment) {
+          try {
+            const raw = typeof event.comment === 'string'
+              ? JSON.parse(event.comment)
+              : event.comment;
+
+            if (Array.isArray(raw)) {
+              raw.forEach(c => {
+                allParsedComments.push({ ...c, event_id: event.id });
+                if (c.author) authorIdsSet.add(String(c.author)); // ensure string type
+              });
+            }
+          } catch (err) {
+            console.warn('Failed to parse comment array:', err.message);
           }
-        } catch (err) {
-          console.warn('Failed to parse comment array:', err.message);
         }
-      }
-    });
-    
-    const authorIds = Array.from(authorIdsSet);
+      });
+
+      const authorIds = Array.from(authorIdsSet);
 
       // Step 2: Fetch all user fullnames in one batch
       let authorsMap = {};
       if (authorIds.length > 0) {
-      const userResult = await query(
-        `SELECT id, fullname FROM profile WHERE id = ANY($1)`,
-        [authorIds]
-      );
-      authorsMap = Object.fromEntries(userResult.rows.map(user => [String(user.id), user.fullname]));
-    }
-    
-    // Step 3: Map comments back to their events
-    const trackingHistoryWithUser = trackingHistoryResult.rows.map(event => {
-      const comments = allParsedComments
-        .filter(c => c.event_id === event.id)
-        .map(c => ({
-          id: c.id,
-          text: c.text,
-          timestamp: c.timestamp,
-          author: c.author,
-          user_fullname: c.author ? authorsMap[String(c.author)] || 'Unknown User' : 'No Comment'
-        }));
-    
-      return {
-        ...event,
-        comments
-      };
-    });
+        const userResult = await query(
+          `SELECT id, fullname FROM profile WHERE id = ANY($1)`,
+          [authorIds]
+        );
+        authorsMap = Object.fromEntries(userResult.rows.map(user => [String(user.id), user.fullname]));
+      }
+
+      // Step 3: Map comments back to their events
+      const trackingHistoryWithUser = trackingHistoryResult.rows.map(event => {
+        const comments = allParsedComments
+          .filter(c => c.event_id === event.id)
+          .map(c => ({
+            id: c.id,
+            text: c.text,
+            timestamp: c.timestamp,
+            author: c.author,
+            user_fullname: c.author ? authorsMap[String(c.author)] || 'Unknown User' : 'No Comment'
+          }));
+
+        return {
+          ...event,
+          comments
+        };
+      });
 
       packageData.tracking_history = trackingHistoryWithUser;
 
-    // Step 4: Fetch latest updated_at from tracking_events
-    const latestUpdateResult = await query(`
+      // Step 4: Fetch latest updated_at from tracking_events
+      const latestUpdateResult = await query(`
       SELECT updated_at
       FROM tracking_events
       WHERE package_id = $1
       ORDER BY updated_at DESC
       LIMIT 1;
     `, [id]);
-    
-    packageData.updated_at = latestUpdateResult.rows[0]?.updated_at || null;
+
+      packageData.updated_at = latestUpdateResult.rows[0]?.updated_at || null;
 
 
       res.json({ success: true, package: packageData });
@@ -288,31 +295,31 @@ ORDER BY
 
   // Update a package
   updatePackage: async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user?.id || null;
-    const {
-      container_number,
-      truck_number,
-      bl_number,
-      type,
-      description,
-      weight,
-      shipped_date,
-      estimated_delivery,
-      current_location,
-      next_stop,
-      next_stop_eta,
-      final_destination,
-      shipping_address,
-      tracking_history,
-      status 
-    } = req.body;
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id || null;
+      const {
+        container_number,
+        truck_number,
+        bl_number,
+        type,
+        description,
+        weight,
+        shipped_date,
+        estimated_delivery,
+        current_location,
+        next_stop,
+        next_stop_eta,
+        final_destination,
+        shipping_address,
+        tracking_history,
+        status
+      } = req.body;
 
-    const updated_at = new Date();
+      const updated_at = new Date();
 
-    // 1. Update package table
-    const updateQuery = `
+      // 1. Update package table
+      const updateQuery = `
       UPDATE packages
       SET
         container_number = $1,
@@ -333,36 +340,36 @@ ORDER BY
       RETURNING *;
     `;
 
-    const values = [
-      container_number,
-      truck_number,
-      bl_number,
-      type,
-      weight,
-      shipped_date,
-      estimated_delivery,
-      current_location,
-      next_stop,
-      next_stop_eta,
-      final_destination,
-      JSON.stringify(shipping_address),     // Store as JSON
-      status,
-      description,
-      id
-    ];
+      const values = [
+        container_number,
+        truck_number,
+        bl_number,
+        type,
+        weight,
+        shipped_date,
+        estimated_delivery,
+        current_location,
+        next_stop,
+        next_stop_eta,
+        final_destination,
+        JSON.stringify(shipping_address),     // Store as JSON
+        status,
+        description,
+        id
+      ];
 
-    const result = await query(updateQuery, values);
+      const result = await query(updateQuery, values);
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ success: false, message: 'Package not found or deleted' });
-    }
+      if (result.rowCount === 0) {
+        return res.status(404).json({ success: false, message: 'Package not found or deleted' });
+      }
 
-    const updatedPackage = result.rows[0];
+      const updatedPackage = result.rows[0];
 
-    // 2. Add latest tracking history (optional - usually already in tracking_history)
-    const latestEvent = tracking_history?.[tracking_history.length - 1];
-    if (latestEvent) {
-      const trackingEventQuery = `
+      // 2. Add latest tracking history (optional - usually already in tracking_history)
+      const latestEvent = tracking_history?.[tracking_history.length - 1];
+      if (latestEvent) {
+        const trackingEventQuery = `
         INSERT INTO tracking_events (
           package_id, status, location, timestamp, comment, updated_at
         )
@@ -370,102 +377,102 @@ ORDER BY
         RETURNING *;
       `;
 
-      const trackingEventValues = [
-        id,
-        latestEvent.status || status || 'updated',
-        latestEvent.location || current_location || 'unknown',
-        latestEvent.timestamp || updated_at,
-        typeof latestEvent.comment === 'object' ? JSON.stringify(latestEvent.comment) : latestEvent.comment,
-        updated_at
-      ];
+        const trackingEventValues = [
+          id,
+          latestEvent.status || status || 'updated',
+          latestEvent.location || current_location || 'unknown',
+          latestEvent.timestamp || updated_at,
+          typeof latestEvent.comment === 'object' ? JSON.stringify(latestEvent.comment) : latestEvent.comment,
+          updated_at
+        ];
 
-      await query(trackingEventQuery, trackingEventValues);
-    }
-
-    // 3. Optional: log activity
-    await insertActivityLog(
-      'package_updated',
-      userId,
-      `Package ${container_number || truck_number || bl_number || id} was updated`,
-      {
-        package_id: id,
-        tracking_numbers: {
-          container_number,
-          truck_number,
-          bl_number
-        },
-        status,
-        action: 'UPDATE'
+        await query(trackingEventQuery, trackingEventValues);
       }
-    );
 
-    res.json({
-      success: true,
-      message: 'Package updated successfully',
-      package: updatedPackage
-    });
+      // 3. Optional: log activity
+      await insertActivityLog(
+        'package_updated',
+        userId,
+        `Package ${container_number || truck_number || bl_number || id} was updated`,
+        {
+          package_id: id,
+          tracking_numbers: {
+            container_number,
+            truck_number,
+            bl_number
+          },
+          status,
+          action: 'UPDATE'
+        }
+      );
 
-  } catch (error) {
-    console.error('Error updating package:', error.message);
-    res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-},
+      res.json({
+        success: true,
+        message: 'Package updated successfully',
+        package: updatedPackage
+      });
+
+    } catch (error) {
+      console.error('Error updating package:', error.message);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  },
 
 
-//delete package
-deletePackage: async (req, res) => {
-  const client = await pool.connect(); // assuming you're using pg Pool
-  try {
-    const { id } = req.params;
-    const userId = req.user?.id || null;
+  //delete package
+  deletePackage: async (req, res) => {
+    const client = await pool.connect(); // assuming you're using pg Pool
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id || null;
 
-    await client.query('BEGIN');
+      await client.query('BEGIN');
 
-    // 1. Delete tracking events linked to the package
-    await client.query(`
+      // 1. Delete tracking events linked to the package
+      await client.query(`
       DELETE FROM tracking_events
       WHERE package_id = $1;
     `, [id]);
 
-    // 2. Hard delete the package itself
-    const result = await client.query(`
+      // 2. Hard delete the package itself
+      const result = await client.query(`
       DELETE FROM packages
       WHERE id = $1
       RETURNING *;
     `, [id]);
 
-    if (result.rowCount === 0) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ success: false, message: 'Package not found' });
-    }
-
-    // 3. Log activity
-    await insertActivityLog(
-      'package_deleted',
-      userId,
-      `Package ${id} was permanently deleted`,
-      {
-        package_id: id,
-        action: 'DELETE'
+      if (result.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ success: false, message: 'Package not found' });
       }
-    );
 
-    await client.query('COMMIT');
+      // 3. Log activity
+      await insertActivityLog(
+        'package_deleted',
+        userId,
+        `Package ${id} was permanently deleted`,
+        {
+          package_id: id,
+          action: 'DELETE'
+        }
+      );
 
-    res.json({
-      success: true,
-      message: 'Package and related tracking events permanently deleted',
-      package: result.rows[0]
-    });
+      await client.query('COMMIT');
 
-  } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('Error deleting package:', error.message);
-    res.status(500).json({ success: false, message: 'Internal server error' });
-  } finally {
-    client.release();
-  }
-},
+      res.json({
+        success: true,
+        message: 'Package and related tracking events permanently deleted',
+        package: result.rows[0]
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Error deleting package:', error.message);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    } finally {
+      client.release();
+    }
+  },
 
 
 

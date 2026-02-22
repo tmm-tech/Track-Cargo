@@ -13,7 +13,18 @@ const transporter = nodemailer.createTransport({
 })
 
 // Package Dispatch
-exports.sendCargoDispatch = (email, fullname, blnNumber, currentLocation, finalDestination) => {
+exports.sendCargoDispatch = (email,
+    fullname,
+    blnNumber,
+    container_number,
+    truck_number,
+    cargotype,
+    cargoDescription,
+    cargoWeight,
+    shippedDate,
+    estimatedDelivery,
+    currentLocation,
+    finalDestination) => {
     const trackUrl = `https://texmonlogistics.co.ke/track/results?number=${encodeURIComponent(blnNumber)}`;
     const mailOptions = {
         from: process.env.EMAIL_USER,
@@ -72,12 +83,22 @@ exports.sendCargoDispatch = (email, fullname, blnNumber, currentLocation, finalD
             <div class="container">
                 <h1>Cargo Clearance</h1>
                 <p>Dear ${fullname},</p>
-                <p>Your cargo has been cleared for dispatch. Please find the details below:</p>
-                <ul>
-                    <li><strong>BLN Number:</strong> ${blnNumber}</li>
-                    <li><strong>Current Location:</strong> ${currentLocation}</li>
-                    <li><strong>Final Destination:</strong> ${finalDestination}</li>
-                </ul>
+                <p>The clearance process for your cargo has been started. Please find the details below:</p>
+               <table width="100%" cellpadding="6" cellspacing="0"
+          style="border-collapse:collapse;font-size:14px;">
+
+          <tr><td><b>BL Number</b></td><td>${blnNumber}</td></tr>
+          <tr><td><b>Container Number</b></td><td>${container_number}</td></tr>
+          <tr><td><b>Truck Number</b></td><td>${truck_number}</td></tr>
+          <tr><td><b>Cargo Type</b></td><td>${cargotype}</td></tr>
+          <tr><td><b>Description</b></td><td>${cargoDescription}</td></tr>
+          <tr><td><b>Weight</b></td><td>${cargoWeight}</td></tr>
+          <tr><td><b>Shipped Date</b></td><td>${shippedDate}</td></tr>
+          <tr><td><b>Estimated Delivery</b></td><td>${estimatedDelivery}</td></tr>
+          <tr><td><b>Current Location</b></td><td>${currentLocation}</td></tr>
+          <tr><td><b>Final Destination</b></td><td>${finalDestination}</td></tr>
+
+        </table>
                 <p>You can track your cargo using the link below:</p>
                 <a href="${trackUrl}" class="btn">Track Cargo</a>
                 <p>If you have any questions or concerns, please contact our support team.</p>

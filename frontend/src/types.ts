@@ -1,3 +1,13 @@
+
+export interface Clearance {
+  fileReference: string
+  cargoDescription: string
+  eta: Date
+  grossWeight: number
+  netWeight: number
+  vesselName: string
+}
+
 export interface ShippingAddress {
   recipientName: string
   streetAddress: string
