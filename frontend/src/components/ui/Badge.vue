@@ -29,7 +29,7 @@ const props = defineProps({
 const variantClasses = computed(() => {
   switch (props.variant) {
     case 'default':
-      return 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80';
+      return 'border-transparent';
     case 'secondary':
       return 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80';
     case 'destructive':
@@ -37,7 +37,7 @@ const variantClasses = computed(() => {
     case 'outline':
       return 'text-foreground';
     default:
-      return 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80';
+      return 'border-transparent';
   }
 });
 </script>

@@ -1175,7 +1175,7 @@
                             <p class="text-lg">{{ viewingCargo.weight }} kg</p>
                           </div>
                           <div>
-                            <p class="text-sm font-medium text-gray-500">Shipped Date</p>
+                            <p class="text-sm font-medium text-gray-500">ETD (Expected Time of Depature)</p>
                             <p class="text-lg">{{ formatDate(viewingCargo.shipped_date) }}</p>
                           </div>
                           <div>
@@ -1557,14 +1557,6 @@
                               class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring" />
                           </div>
 
-                          <!-- Client Details -->
-                          <div class="col-span-2 space-y-2">
-                            <label class="text-sm font-medium">Client Details</label>
-                            <textarea v-model="newCargo.shipping_address.email" rows="2"
-                              class="flex w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-ring"
-                              placeholder="Enter client details"></textarea>
-                          </div>
-
                           <!-- Cargo Description -->
                           <div class="col-span-2 space-y-2">
                             <label class="text-sm font-medium">Cargo Description</label>
@@ -1654,7 +1646,7 @@
 
                       <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
-                          <label for="shippedDate" class="text-sm font-medium">Shipped Date</label>
+                          <label for="shippedDate" class="text-sm font-medium">ETD (Expected Time of Depature)</label>
                           <input id="shippedDate" type="date" v-model="newCargo.shipped_date"
                             :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.shipped_date ? 'border-red-500' : '']" />
                           <p v-if="formErrors.shipped_date" class="text-red-500 text-sm">{{ formErrors.shipped_date }}
@@ -3298,7 +3290,6 @@ const clearance = ref({
   billOfLading: "",
   vesselName: "",
   eta: "",
-  clientDetails: "",
   cargoDescription: "",
   netWeight: "",
   grossWeight: "",
@@ -4209,7 +4200,7 @@ const validateForm = () => {
 
 
   if (!newCargo.value.shipped_date) {
-    formErrors.value.shipped_date = 'Shipped date is required'
+    formErrors.value.shipped_date = 'ETD (Expected Time of Depature) is required'
     isValid = false
   } else {
     const shippedDate = new Date(newCargo.value.shipped_date)
@@ -4218,7 +4209,7 @@ const validateForm = () => {
 
     // shipped date cannot be before today
     if (shippedDate < today) {
-      formErrors.value.shipped_date = 'Shipped date cannot be in the past'
+      formErrors.value.shipped_date = 'ETD (Expected Time of Depature) cannot be in the past'
       isValid = false
     }
 
@@ -4329,7 +4320,6 @@ const resetNewCargoForm = () => {
     billOfLading: "",
     vesselName: "",
     eta: "",
-    clientDetails: "",
     cargoDescription: "",
     netWeight: "",
     grossWeight: "",
@@ -5302,7 +5292,7 @@ const handleLogin = async () => {
     const userData = { username: username.value, password: password.value }
     // https://www.texmonlogistics.co.ke/backend/users/login
     //https://track-cargo.onrender.com/users/login
-    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/login', {
+    const response = await fetch('https://track-cargo.onrender.com/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
@@ -5341,7 +5331,7 @@ const handleLogin = async () => {
 const verifyToken = async () => {
   loading.value = true
   try {
-    const response = await fetch('https://www.texmonlogistics.co.ke/backend/users/protected', {
+    const response = await fetch('https://track-cargo.onrender.com/users/protected', {
       method: 'GET',
       credentials: 'include'
     })

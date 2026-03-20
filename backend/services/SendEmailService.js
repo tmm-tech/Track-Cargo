@@ -83,7 +83,7 @@ exports.sendCargoDispatch = (email,
             <div class="container">
                 <h1>Cargo Clearance</h1>
                 <p>Dear ${fullname},</p>
-                <p>The clearance process for your cargo has been started. Please find the details below:</p>
+                <p>Progressive report of your cargo. Please find the details below:</p>
                <table width="100%" cellpadding="6" cellspacing="0"
           style="border-collapse:collapse;font-size:14px;">
 

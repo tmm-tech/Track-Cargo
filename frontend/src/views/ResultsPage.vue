@@ -314,120 +314,6 @@
             </div>
           </div>
 
-          <!-- Shipping Status Icons with Animation -->
-          <div class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
-            <div class="bg-[#273272] text-white p-6 rounded-t-lg">
-              <h2 class="text-xl font-semibold">Shipping Status</h2>
-            </div>
-            <div class="p-6">
-              <div class="relative">
-                <!-- Progress Line -->
-                <div class="absolute top-6 left-4 w-full h-1 bg-gray-200"></div>
-                <div class="absolute top-6 left-4 h-1 bg-[#ffb600] transition-all duration-1000 ease-out"
-                  :style="{ width: `${progressPercentage}%` }"></div>
-
-                <!-- Status Icons -->
-                <div class="flex justify-between relative">
-                  <!-- Clearance (if exists) -->
-                  <div v-if="clearanceReportEvents.length" class="flex flex-col items-center z-10">
-                    <div :class="[
-                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
-                      currentStep >= 0 ? 'bg-[#ffb600]' : 'bg-gray-200'
-                    ]">
-                      <transition name="icon-fade">
-                        <ArchiveBoxIcon v-if="currentStep >= 0" class="h-6 w-6 text-white" />
-                      </transition>
-                    </div>
-                    <p class="mt-2 text-sm font-medium">Clearance</p>
-                    <transition name="fade">
-                      <div v-if="currentStep >= 0" class="mt-1 text-xs text-gray-500">
-                        {{ formatDate(clearanceReportEvents[0]?.timestamp) }}
-                      </div>
-                    </transition>
-                  </div>
-                  <!-- Shipped -->
-                  <div class="flex flex-col items-center z-10">
-                    <div :class="[
-                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
-                      currentStep >= (clearanceReportEvents.length ? 1 : 0) ? 'bg-[#ffb600]' : 'bg-gray-200'
-                    ]">
-                      <transition name="icon-fade">
-                        <ArchiveBoxIcon v-if="currentStep >= (clearanceReportEvents.length ? 1 : 0)"
-                          class="h-6 w-6 text-white" />
-                      </transition>
-                    </div>
-                    <p class="mt-2 text-sm font-medium">Shipped</p>
-                    <transition name="fade">
-                      <div v-if="currentStep >= (clearanceReportEvents.length ? 1 : 0)"
-                        class="mt-1 text-xs text-gray-500">
-                        {{ formatDate(packageData.shipped_date) }}
-                      </div>
-                    </transition>
-                  </div>
-
-                  <!-- In Transit -->
-                  <div class="flex flex-col items-center z-10">
-                    <div :class="[
-                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
-                      currentStep >= (clearanceReportEvents.length ? 2 : 1) ? 'bg-[#ffb600]' : 'bg-gray-200'
-                    ]">
-                      <transition name="icon-fade">
-                        <TruckIcon v-if="currentStep >= (clearanceReportEvents.length ? 2 : 1)"
-                          class="h-6 w-6 text-white" />
-                      </transition>
-                    </div>
-                    <p class="mt-2 text-sm font-medium">In Transit</p>
-                    <transition name="fade">
-                      <div v-if="currentStep >= (clearanceReportEvents.length ? 2 : 1)"
-                        class="mt-1 text-xs text-gray-500">
-                        {{ formatDate(getInTransitDate()) }}
-                      </div>
-                    </transition>
-                  </div>
-
-                  <!-- Out for Delivery -->
-                  <div class="flex flex-col items-center z-10">
-                    <div :class="[
-                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
-                      currentStep >= (clearanceReportEvents.length ? 3 : 2) ? 'bg-[#ffb600]' : 'bg-gray-200'
-                    ]">
-                      <transition name="icon-fade">
-                        <MapPinIcon v-if="currentStep >= (clearanceReportEvents.length ? 3 : 2)"
-                          class="h-6 w-6 text-white" />
-                      </transition>
-                    </div>
-                    <p class="mt-2 text-sm font-medium">Out for Delivery</p>
-                    <transition name="fade">
-                      <div v-if="currentStep >= (clearanceReportEvents.length ? 3 : 2)"
-                        class="mt-1 text-xs text-gray-500">
-                        {{ formatDate(getOutForDeliveryDate()) }}
-                      </div>
-                    </transition>
-                  </div>
-
-                  <!-- Delivered -->
-                  <div class="flex flex-col items-center z-10">
-                    <div :class="[
-                      'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500',
-                      currentStep >= (clearanceReportEvents.length ? 4 : 3) ? 'bg-[#ffb600]' : 'bg-gray-200'
-                    ]">
-                      <transition name="icon-fade">
-                        <CheckCircleIcon v-if="currentStep >= (clearanceReportEvents.length ? 4 : 3)"
-                          class="h-6 w-6 text-white" />
-                      </transition>
-                    </div>
-                    <p class="mt-2 text-sm font-medium">Delivered</p>
-                    <transition name="fade">
-                      <div v-if="currentStep >= (clearanceReportEvents.length ? 4 : 3)"
-                        class="mt-1 text-xs text-gray-500">
-                        {{ formatDate(getDeliveredDate()) || 'Pending' }}
-                      </div>
-                    </transition>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
           <!-- Clearance Report -->
           <div v-if="clearanceReportEvents.length" class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
@@ -442,57 +328,132 @@
                 </div>
                 <p class="text-gray-600">{{ event.location }}</p>
                 <p v-if="event.comment" class="text-gray-500 italic mt-1">{{ event.comment.text || event.comment.message
-                  }}</p>
+                }}</p>
               </div>
             </div>
           </div>
-          
-          <!-- Shipping Progress Timeline -->
-          <div v-if="shippingProgressEvents.length" class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
-            <div class="bg-[#273272] text-white p-6 rounded-t-lg">
-              <h2 class="text-xl font-semibold">Shipping Progress</h2>
-            </div>
-            <div class="p-6 space-y-6">
-              <div v-for="(event, index) in shippingProgressEvents" :key="index" class="flex gap-4">
-                <!-- Timeline Dot -->
-                <div class="relative flex flex-col items-center">
-                  <div class="w-4 h-4 rounded-full flex items-center justify-center z-10" :class="{
-                    'bg-[#ffb600]': index < shippingProgressEvents.length - 1 || index === 0,
-                    'bg-green-500': event.status?.toLowerCase() === 'delivered',
-                    'bg-gray-300': index === shippingProgressEvents.length - 1 && event.status?.toLowerCase() !== 'delivered'
-                  }">
-                    <svg v-if="index < shippingProgressEvents.length - 1" class="w-3 h-3 text-white" fill="currentColor"
-                      viewBox="0 0 20 20">
-                      <path fill-rule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
-                        clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <div v-if="index < shippingProgressEvents.length - 1"
-                    class="w-0.5 h-full bg-[#ffb600] absolute top-4"></div>
-                </div>
 
-                <!-- Timeline Info -->
-                <div class="flex-1 pb-6">
-                  <p class="font-medium capitalize"
-                    :class="event.status?.toLowerCase() === 'delivered' ? 'text-green-700' : 'text-[#273272]'">
-                    {{ event.status }}
-                  </p>
-                  <p class="text-sm text-gray-500">{{ event.location }}</p>
-                  <p class="text-sm text-gray-500">{{ formatDate(event.timestamp) }}</p>
-                  <div v-if="event.comment" class="space-y-2 mt-3">
-                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-md shadow-sm">
-                      <p class="text-gray-700 text-sm">{{ event.comment.text || event.comment.message }}</p>
-                      <div class="flex justify-between items-center mt-2">
-                        <span class="text-xs text-gray-400">{{ formatDate(event.comment.timestamp ||
-                          event.timestamp)
-                        }}</span>
-                        <span v-if="event.comment.user_fullname" class="text-xs text-gray-400 italic">— {{
-                          event.comment.user_fullname }}</span>
-                      </div>
+          <!-- Shipping Progress Timeline -->
+          <!-- PREMIUM SHIPMENT TIMELINE -->
+          <div v-if="shippingProgressEvents.length" class="rounded-xl border bg-white shadow-lg overflow-hidden mb-8">
+            <div class="bg-[#273272] text-white px-6 py-5">
+              <h2 class="text-xl font-semibold tracking-wide">Shipment Progress</h2>
+            </div>
+
+            <div class="px-6 py-10">
+
+              <div class="relative">
+
+                <!-- MAIN LINE -->
+                <div class="absolute left-[20px] top-0 bottom-0 w-[2px] bg-gray-200"></div>
+
+                <!-- PROGRESS LINE -->
+                <div class="absolute left-[20px] top-0 w-[2px] transition-all duration-700" :class="{
+                  'bg-green-500': shipmentStatus === 'delivered',
+                  'bg-red-500': shipmentStatus === 'issue',
+                  'bg-[#ffb600]': shipmentStatus === 'in-transit'
+                }" :style="{
+          height: shippingProgressEvents.length
+            ? `${((currentStep + 1) / shippingProgressEvents.length) * 100}%`
+            : '0%'
+        }"></div>
+
+                <!-- EVENTS -->
+                <div v-for="(event, index) in shippingProgressEvents" :key="index"
+                  class="relative flex items-start gap-6 mb-10">
+
+                  <!-- NODE -->
+                  <div class="relative z-10">
+
+                    <!-- OUTER RING (for active pulse effect) -->
+                    <div v-if="index === currentStep && shipmentStatus !== 'delivered'"
+                      class="absolute inset-0 rounded-full animate-ping opacity-30"
+                      :class="shipmentStatus === 'issue' ? 'bg-red-400' : 'bg-[#ffb600]'"></div>
+
+                    <!-- ICON CIRCLE -->
+                    <div :class="[
+                      'w-10 h-10 rounded-full flex items-center justify-center shadow-md border-2 transition-all duration-300',
+
+                      // completed
+                      index < currentStep
+                        ? 'bg-[#ffb600] text-white border-[#ffb600]'
+
+                        // active
+                        : index === currentStep
+                          ? shipmentStatus === 'delivered'
+                            ? 'bg-green-600 text-white border-green-600'
+                            : shipmentStatus === 'issue'
+                              ? 'bg-red-500 text-white border-red-500'
+                              : 'bg-[#273272] text-white border-[#273272] scale-110'
+
+                          // upcoming
+                          : 'bg-white text-gray-400 border-gray-300'
+                    ]">
+                      <component :is="getEventIconComponent(event.status)" class="w-5 h-5" />
                     </div>
                   </div>
+
+                  <!-- CONTENT -->
+                  <div :class="[
+                    'flex-1 transition-all duration-300',
+
+                    index === currentStep
+                      ? 'bg-blue-50 border border-blue-100 rounded-lg p-4 shadow-sm'
+                      : ''
+                  ]">
+
+                    <!-- HEADER -->
+                    <div class="flex justify-between items-center">
+
+                      <p class="font-semibold text-gray-800 capitalize flex items-center gap-2">
+                        {{ event.status }}
+
+                        <!-- STATUS BADGES -->
+                        <span v-if="index === currentStep" :class="[
+                          'text-xs px-2 py-1 rounded-full',
+
+                          shipmentStatus === 'delivered'
+                            ? 'bg-green-100 text-green-700'
+
+                            : shipmentStatus === 'issue'
+                              ? 'bg-red-100 text-red-700'
+
+                              : 'bg-blue-100 text-blue-700 animate-pulse'
+                        ]">
+                          {{
+                            shipmentStatus === 'delivered'
+                              ? 'Delivered'
+                              : shipmentStatus === 'issue'
+                                ? 'Issue'
+                                : 'In Progress'
+                          }}
+                        </span>
+                      </p>
+
+                      <p class="text-xs text-gray-400">
+                        {{ formatDate(event.timestamp) }}
+                      </p>
+                    </div>
+
+                    <!-- LOCATION -->
+                    <p class="text-sm text-gray-500 uppercase tracking-wide mt-1">
+                      {{ event.location }}
+                    </p>
+
+                    <!-- COMMENT -->
+                    <p v-if="event.comment" class="mt-2 text-sm text-gray-500 italic">
+                      {{ event.comment.text || event.comment.message }}
+                    </p>
+
+                    <!-- DELIVERED HIGHLIGHT -->
+                    <p v-if="shipmentStatus === 'delivered' && index === currentStep"
+                      class="text-green-600 text-sm mt-2 font-medium">
+                      Delivered on {{ formatDate(event.timestamp) }}
+                    </p>
+
+                  </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -630,7 +591,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { MapPinIcon, TruckIcon, CheckCircleIcon, ArchiveBoxIcon } from '@heroicons/vue/24/outline'
+import { MapPinIcon, TruckIcon, CheckCircleIcon, ArchiveBoxIcon, GlobeAltIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 import ShippingServices from '../Services/ShippingServices.js';
 
 const route = useRoute()
@@ -643,15 +604,50 @@ const mobileMenuOpen = ref(false)
 const currentYear = computed(() => new Date().getFullYear())
 
 
+const getEventIconComponent = (status) => {
+  const s = status?.toLowerCase() || ''
+
+  if (s.includes('delivered')) return CheckCircleIcon
+  if (s.includes('delay') || s.includes('hold')) return ExclamationTriangleIcon
+  if (s.includes('transit')) return TruckIcon
+  if (s.includes('arrival')) return MapPinIcon
+  if (s.includes('departure')) return GlobeAltIcon
+  if (s.includes('loaded') || s.includes('package')) return ArchiveBoxIcon
+
+  return ArchiveBoxIcon
+}
 
 
-// Shipping status tracking
-const currentStep = ref(0)
+const shippingProgressEvents = computed(() => {
+  if (!packageData.value?.tracking_history) return []
+
+  return [...packageData.value.tracking_history]
+    .filter(event => !clearanceReportEvents.value.includes(event))
+    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+})
+
 const progressPercentage = ref(0)
 
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
+
+const shipmentStatus = computed(() => {
+  if (!shippingProgressEvents.value.length) return 'processing'
+
+  const latest =
+    shippingProgressEvents.value[shippingProgressEvents.value.length - 1]
+      ?.status?.toLowerCase() || ''
+
+  if (latest.includes('delivered')) return 'delivered'
+  if (latest.includes('delay') || latest.includes('hold')) return 'issue'
+  return 'in-transit'
+})
+
+
+const currentStep = computed(() => {
+  return shippingProgressEvents.value.length - 1
+})
 
 // Format date to more readable format
 const formatDate = (dateString) => {
@@ -675,41 +671,6 @@ const clearanceReportEvents = computed(() => {
   })
 })
 
-// Shipping progress (exclude clearance events)
-const shippingProgressEvents = computed(() => {
-  if (!packageData.value?.tracking_history) return []
-  return packageData.value.tracking_history.filter(event => !clearanceReportEvents.value.includes(event))
-})
-// Step-related helpers
-const getInTransitDate = () => packageData.value?.tracking_history?.find(e => e.status.toLowerCase().includes('in transit'))?.timestamp.split(' ')[0] || 'N/A'
-const getOutForDeliveryDate = () => packageData.value?.tracking_history?.find(e => e.status.toLowerCase().includes('out for delivery'))?.timestamp.split(' ')[0] || 'N/A'
-const getDeliveredDate = () => packageData.value?.tracking_history?.find(e => e.status.toLowerCase().includes('delivered'))?.timestamp.split(' ')[0] || null
-
-// Determine current shipping step
-const determineShippingStep = () => {
-  if (!packageData.value) return 0
-  const history = packageData.value.tracking_history || []
-  let step = 1
-  if (history.some(e => (e.status || '').toLowerCase().includes('in transit'))) step = 2
-  if (history.some(e => (e.status || '').toLowerCase().includes('out for delivery'))) step = 3
-  if (history.some(e => (e.status || '').toLowerCase().includes('delivered'))) step = 4
-  return step
-}
-
-// Animate progress
-watch(packageData, () => {
-  if (!packageData.value) return
-  currentStep.value = 0
-  progressPercentage.value = 0
-  const finalStep = determineShippingStep()
-
-  const interval = setInterval(() => {
-    if (currentStep.value < finalStep) {
-      currentStep.value++
-      progressPercentage.value = (currentStep.value / 4) * 100
-    } else clearInterval(interval)
-  }, 500)
-}, { immediate: false })
 
 
 // Fetch package data
