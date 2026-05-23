@@ -5,7 +5,7 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   //track/
-  base: '/track/',
+  base: '/',
   plugins: [vue()],
   resolve: {
     alias: {

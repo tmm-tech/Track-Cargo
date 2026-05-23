@@ -4,12 +4,12 @@ import ResultsPage from '../views/ResultsPage.vue'
 import AdminPage from '../views/AdminPage.vue'
 
 const routes = [
+  // {
+  //   path: '/',
+  //   redirect: '/track'   // root goes to /track
+  // },
   {
     path: '/',
-    redirect: '/track'   // root goes to /track
-  },
-  {
-    path: '/track',
     name: 'track',
     component: TrackPage
   },
