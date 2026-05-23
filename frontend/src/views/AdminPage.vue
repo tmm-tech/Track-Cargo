@@ -1133,6 +1133,8 @@
                             <p>{{ viewingCargo.shipping_address.city || 'N/A' }}, {{ viewingCargo.shipping_address.state
                               || 'N/A' }}</p>
                             <p>{{ viewingCargo.shipping_address.country || 'N/A' }}</p>
+                             <p>{{ viewingCargo.shipping_address.postalcode || 'N/A' }}</p>
+                              <p>{{ viewingCargo.shipping_address.attention || 'N/A' }}</p>
                           </div>
 
                           <!-- Right Column -->
@@ -1499,6 +1501,18 @@
                             <input id="email" type="email" v-model="newCargo.shipping_address.email"
                               :class="['flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', formErrors.email ? 'border-red-500' : '']" />
                             <p v-if="formErrors.email" class="text-red-500 text-sm">{{ formErrors.email }}</p>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="postalcode" class="text-sm font-medium">Postal Code</label>
+                            <textarea id="postalcode" v-model="newCargo.shipping_address.postalcode"
+                              rows="2"
+                              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                          </div>
+                          <div class="space-y-2">
+                            <label for="attention" class="text-sm font-medium">Attention</label>
+                            <textarea id="attention" v-model="newCargo.shipping_address.attention"
+                              rows="2"
+                              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
                           </div>
                           <div class="space-y-2">
                             <label for="specialInstructions" class="text-sm font-medium">Special Instructions</label>
@@ -3329,7 +3343,9 @@ const newCargo = ref({
     country: '',
     phone: '',
     email: '',
-    specialInstructions: ''
+    specialInstructions: '',
+    postalcode: '',
+    attention: ''
   }
 })
 
@@ -3924,6 +3940,8 @@ const saveEditedCargo = async () => {
       country: editingCargo.value.shipping_address.country.trim(),
       phone: editingCargo.value.shipping_address.phone.trim(),
       email: editingCargo.value.shipping_address.email.trim(),
+      postalcode: editingCargo.value.shipping_address.postalcode.trim(),
+      attention: editingCargo.value.shipping_address.attention.trim(),
       specialInstructions: editingCargo.value.shipping_address.specialInstructions.trim()
     };
     if (!shippingAddress.recipientName || !shippingAddress.streetAddress || !shippingAddress.city ||
@@ -4081,6 +4099,8 @@ async function onClientSelected() {
       country: '',
       phone: '',
       email: '',
+      postalcode: '',
+      attention: '',
       specialInstructions: ''
     }
     return
@@ -4096,6 +4116,8 @@ async function onClientSelected() {
     country: selectedClient.country || '',
     phone: selectedClient.phone || '',
     email: selectedClient.email || '',
+    postalcode: selectedClient.postalcode || '',  
+    attention: selectedClient.attention || '', 
     specialInstructions: ''
   }
 }

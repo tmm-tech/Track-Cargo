@@ -313,7 +313,60 @@
               </div>
             </div>
           </div>
+          <!-- Cargo Clearance Section -->
+          <div v-if="clearance" class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
+            <div class="bg-[#273272] text-white p-6">
+              <h2 class="text-xl font-semibold">Cargo Clearance</h2>
+            </div>
 
+            <div class="p-6 grid md:grid-cols-2 gap-6">
+
+              <div>
+                <p class="text-gray-500">File Reference</p>
+                <p class="font-semibold">{{ clearance.fileReference }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Container Number</p>
+                <p class="font-semibold">{{ packageData.container_number }}</p>
+              </div>
+
+              <div>
+                <p class="text-gray-500">Bill of Lading</p>
+                <p class="font-semibold">{{ packageData.bl_number }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500">ETA</p>
+                <p class="font-semibold">{{ formatDate(clearance.eta) }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Cargo Description</p>
+                <p class="font-semibold">{{ clearance.cargoDescription || packageData.description }}</p>
+              </div>
+
+              <div>
+                <p class="text-gray-500">Client Details</p>
+                <p class="font-semibold"> {{ packageData.shipping_address?.recipientName }} |
+                  {{ packageData.shipping_address?.email }}
+                </p>
+              </div>
+              <div>
+                <p class="text-gray-500">Vessel Name</p>
+                <p class="font-semibold">{{ clearance.vesselName }}</p>
+              </div>
+
+              <div>
+                <p class="text-gray-500">Net Weight</p>
+                <p class="font-semibold">{{ clearance.netWeight || packageData.weight }} kg</p>
+              </div>
+
+              <div>
+                <p class="text-gray-500">Gross Weight</p>
+                <p class="font-semibold">{{ clearance.grossWeight || packageData.weight }} kg</p>
+              </div>
+
+
+            </div>
+          </div>
           <!-- Clearance Report -->
           <div v-if="clearanceReportEvents.length" class="rounded-lg border bg-white shadow-lg overflow-hidden mb-8">
             <div class="bg-[#273272] text-white p-6 rounded-t-lg">
@@ -353,10 +406,10 @@
                   'bg-red-500': shipmentStatus === 'issue',
                   'bg-[#ffb600]': shipmentStatus === 'in-transit'
                 }" :style="{
-          height: shippingProgressEvents.length
-            ? `${((currentStep + 1) / shippingProgressEvents.length) * 100}%`
-            : '0%'
-        }"></div>
+                  height: shippingProgressEvents.length
+                    ? `${((currentStep + 1) / shippingProgressEvents.length) * 100}%`
+                    : '0%'
+                }"></div>
 
                 <!-- EVENTS -->
                 <div v-for="(event, index) in shippingProgressEvents" :key="index"
@@ -729,6 +782,21 @@ const getStatusClass = (status) => {
     return 'bg-gray-100 text-gray-700 border border-gray-300'
   }
 }
+
+
+const clearance = computed(() => {
+
+  if (!packageData.value?.clearance) return null
+
+  try {
+    return typeof packageData.value.clearance === 'string'
+      ? JSON.parse(packageData.value.clearance)
+      : packageData.value.clearance
+  } catch {
+    return null
+  }
+
+})
 
 // Capitalize each word in a string
 const capitalizeWords = (str) => {
