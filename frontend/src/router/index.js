@@ -19,7 +19,7 @@ const routes = [
     component: ResultsPage
   },
   {
-    path: '/track/admin',
+    path: '/admin',
     name: 'admin',
     component: AdminPage
   }
